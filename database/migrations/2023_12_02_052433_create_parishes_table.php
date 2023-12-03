@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('parishes', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->foreignId('diocese_id');
+            $table->string('office_address')->nullable();
+            $table->string('district')->nullable(); // this will hold the state for the US and other countries that don't have districts
+            $table->json('meta')->nullable(); // for website, socials and other info we might later need to add
             $table->timestamps();
         });
     }

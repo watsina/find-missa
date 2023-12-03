@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('priests', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('email')->unique()->nullable();
+            $table->string('phone')->nullable();
+            $table->morphs('parish');
+            $table->json('meta')->nullable(); // will have photo, socials, ...
             $table->timestamps();
         });
     }

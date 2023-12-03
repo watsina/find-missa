@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('churches', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('type', 100)->default('parish');
+            $table->decimal('latitude', 9, 7)->nullable();
+            $table->decimal('longitude', 9, 7)->nullable();
+            $table->string('street_address')->nullable();
+            $table->string('postal_address')->nullable();
+            $table->string('hours')->nullable();
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
+            $table->nullableMorphs('parish');
+            $table->foreignId('priest_id')->nullable();
+            $table->json('meta')->nullable(); // will hold stuff like photos, website url, social,e.t.c
             $table->timestamps();
         });
     }

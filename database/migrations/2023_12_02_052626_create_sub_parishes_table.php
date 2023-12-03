@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('sub_parishes', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->foreignId('parish_id');
+            $table->string('district')->nullable();
+            $table->string('office_address')->nullable();
+            $table->json('meta')->nullable(); // any other info we might need later
             $table->timestamps();
         });
     }

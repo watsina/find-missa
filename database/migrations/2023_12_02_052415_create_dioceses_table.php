@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('dioceses', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('type')->default('diocese');
+            $table->string('office_address')->nullable();
+            $table->string('postal_address')->nullable();
+            $table->string('country')->default('Uganda');
+            $table->json('meta')->nullable(); // this will have other info like website url, socials, e.t.c
             $table->timestamps();
         });
     }
