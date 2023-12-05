@@ -6,9 +6,13 @@
   import NavLink from '@/Components/NavLink.vue';
   import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
   import ToggleDarkMode from '@/Components/ToggleDarkMode';
-  import { Link } from '@inertiajs/vue3';
+  import { Link, router } from '@inertiajs/vue3';
 
   const showingNavigationDropdown = ref(false);
+
+  const logout = () => {
+    router.post(route('logout'));
+  };
 </script>
 
 <template>
@@ -69,9 +73,9 @@
 
                   <template #content>
                     <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
-                    <DropdownLink as="button" :href="route('logout')" method="post">
-                      Log Out
-                    </DropdownLink>
+                    <form @submit.prevent="logout">
+                      <DropdownLink as="button"> Log Out </DropdownLink>
+                    </form>
                   </template>
                 </Dropdown>
               </div>
