@@ -6,7 +6,8 @@
             <template #content>
                 <form>
                     <div class="mt-4">
-                        <TextInput id="file_upload" accept=".csv,.xls,.xlsx" autofocus
+                        <TextInput
+id="file_upload" accept=".csv,.xls,.xlsx" autofocus
                             class="block w-full mt-1 border-0 outline-none focus:outline-none file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded-full file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                             :error="form.errors.file" label="Upload contact file (.csv,.xls,.xlsx)"
                             placeholder="Choose a file..." required type="file"
@@ -21,7 +22,8 @@
             <template #footer>
                 <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
-                <PrimaryButton class="ml-3" :class="{ 'opacity-25 cursor-progress': form.processing }"
+                <PrimaryButton
+class="ml-3" :class="{ 'opacity-25 cursor-progress': form.processing }"
                     :disabled="form.processing" @click="submit">
                     Upload contacts
                 </PrimaryButton>

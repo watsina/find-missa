@@ -62,19 +62,19 @@ const closeModal = () => {
                 </p>
 
                 <div class="mt-6">
-                    <InputLabel for="password" value="Password" class="sr-only" />
+                    <InputLabel class="sr-only" for="password" value="Password" />
 
                     <TextInput
                         id="password"
                         ref="passwordInput"
                         v-model="form.password"
-                        type="password"
                         class="mt-1 block w-3/4"
                         placeholder="Password"
+                        type="password"
                         @keyup.enter="deleteUser"
                     />
 
-                    <InputError :message="form.errors.password" class="mt-2" />
+                    <InputError class="mt-2" :message="form.errors.password" />
                 </div>
 
                 <div class="mt-6 flex justify-end">

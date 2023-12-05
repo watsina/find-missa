@@ -43,12 +43,12 @@ const submit = () => {
 
                 <TextInput
                     id="email"
-                    type="email"
-                    class="mt-1 block w-full"
                     v-model="form.email"
-                    required
-                    autofocus
                     autocomplete="username"
+                    autofocus
+                    class="mt-1 block w-full"
+                    required
+                    type="email"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
@@ -59,11 +59,11 @@ const submit = () => {
 
                 <TextInput
                     id="password"
-                    type="password"
-                    class="mt-1 block w-full"
                     v-model="form.password"
-                    required
                     autocomplete="current-password"
+                    class="mt-1 block w-full"
+                    required
+                    type="password"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />
@@ -71,7 +71,7 @@ const submit = () => {
 
             <div class="block mt-4">
                 <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
+                    <Checkbox v-model:checked="form.remember" name="remember" />
                     <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
                 </label>
             </div>
@@ -79,8 +79,8 @@ const submit = () => {
             <div class="flex items-center justify-end mt-4">
                 <Link
                     v-if="canResetPassword"
-                    :href="route('password.request')"
                     class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                    :href="route('password.request')"
                 >
                     Forgot your password?
                 </Link>

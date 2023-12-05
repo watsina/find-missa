@@ -30,12 +30,12 @@ const submit = () => {
                 <InputLabel for="password" value="Password" />
                 <TextInput
                     id="password"
-                    type="password"
-                    class="mt-1 block w-full"
                     v-model="form.password"
-                    required
                     autocomplete="current-password"
                     autofocus
+                    class="mt-1 block w-full"
+                    required
+                    type="password"
                 />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>

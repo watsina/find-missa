@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# fix the lint issues
+composer lint:fix
+npm run lint:fix
+
+# add the fixed files
+git add -u
