@@ -1,15 +1,16 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar title="Application bar"></v-app-bar>
+    <top-bar />
 
-    <v-navigation-drawer>
-      <v-list>
-        <v-list-item title="Navigation drawer"></v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <nav-drawer />
 
-    <v-main class="d-flex align-center justify-center" style="min-height: 300px">
-      Main Content
-    </v-main>
+    <main-view />
   </v-layout>
 </template>
+
+<script setup>
+  import NavDrawer from './nav-drawer';
+  import TopBar from './top-bar';
+  import MainView from './main-view';
+  //
+</script>

@@ -11,6 +11,9 @@ export default defineConfig({
       // ziggy: path.resolve('vendor/tightenco/ziggy/dist/vue.m'),
     },
     extensions: ['.gql', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+    optimizeDeps: {
+      include: ['@fawmi/vue-google-maps', 'fast-deep-equal'],
+    },
   },
   plugins: [
     laravel({

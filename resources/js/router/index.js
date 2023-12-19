@@ -1,11 +1,10 @@
-// Composables
 import NProgress from 'nprogress';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   {
     path: '/',
-    // component: () => import('@/layouts/default/Default.vue'),
+    component: () => import('@/app/layouts/app-layout'),
     children: [
       {
         path: '',
@@ -20,7 +19,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 
