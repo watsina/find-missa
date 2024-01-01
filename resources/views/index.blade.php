@@ -18,7 +18,7 @@
               document.documentElement.classList.remove('dark')
             }
         </script>
-        @vite(['resources/js/app.js'])
+        @vite(['ui/app.js'])
     </head>
     <body class="font-sans antialiased">
         <div id="app"/>

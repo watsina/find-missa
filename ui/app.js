@@ -1,7 +1,7 @@
 import './bootstrap';
-import '../css/app.css';
+import './styles/app.css';
 
-import { registerPlugins } from '@/plugins';
+import { registerPlugins } from '@/plugins/index.js';
 import App from './App.vue';
 
 import { createApp } from 'vue';

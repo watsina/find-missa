@@ -7,7 +7,7 @@ import ViteFonts from 'unplugin-fonts/vite';
 export default defineConfig({
   resolve: {
     alias: {
-      '@': '/resources/js',
+      '@': 'ui/',
       // ziggy: path.resolve('vendor/tightenco/ziggy/dist/vue.m'),
     },
     extensions: ['.gql', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
@@ -17,8 +17,8 @@ export default defineConfig({
   },
   plugins: [
     laravel({
-      input: 'resources/js/app.js',
-      ssr: 'resources/js/ssr.js',
+      input: 'ui/app.js',
+      ssr: 'ui/ssr.js',
       refresh: true,
     }),
     vue({
@@ -32,7 +32,7 @@ export default defineConfig({
     vuetify({
       autoImport: true,
       styles: {
-        configFile: 'resources/js/styles/settings.scss',
+        configFile: 'ui/styles/settings.scss',
       },
     }),
     ViteFonts({
