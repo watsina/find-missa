@@ -4,8 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && vite build --ssr",
-    "lint": "eslint --fix-dry-run --ext .js,.vue ui/",
-    "lint:fix": "eslint --fix --ext .js,.vue ui/",
+    "lint": "prettier --check ui/",
+    "lint:fix": "prettier --write ui/",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -30,12 +30,12 @@
     "vue": "^3.3.13"
   },
   "dependencies": {
-    "@fawmi/vue-google-maps": "^0.9.79",
     "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.1.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "vue-router": "^4.2.5",
+    "vue3-google-map": "^0.19.0",
     "vuetify": "^3.4.8"
   }
 }
