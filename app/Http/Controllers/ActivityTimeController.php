@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\ActivityTimeResource;
 use App\Http\Resources\ActivityTimeCollection;
 use App\Http\Requests\ActivityTimeStoreRequest;
@@ -35,5 +36,12 @@ class ActivityTimeController extends Controller
         $activityTime->update($request->validated());
 
         return new ActivityTimeResource($activityTime);
+    }
+
+    public function destroy(Request $request, ActivityTime $activityTime): Response
+    {
+        $activityTime->delete();
+
+        return response()->noContent();
     }
 }

@@ -25,7 +25,6 @@ class SubParish extends Model
     protected $casts = [
         'id' => 'integer',
         'parish_id' => 'integer',
-        'meta' => 'array',
     ];
 
     public function parish(): BelongsTo

@@ -25,7 +25,6 @@ class Parish extends Model
     protected $casts = [
         'id' => 'integer',
         'diocese_id' => 'integer',
-        'meta' => 'array',
     ];
 
     public function diocese(): BelongsTo

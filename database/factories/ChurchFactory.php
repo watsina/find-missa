@@ -28,13 +28,11 @@ class ChurchFactory extends Factory
             'longitude' => $this->faker->longitude(),
             'street_address' => $this->faker->word(),
             'postal_address' => $this->faker->word(),
-            'hours' => $this->faker->word(),
             'contact_email' => $this->faker->word(),
             'contact_phone' => $this->faker->word(),
             'parish_type' => $this->faker->word(),
             'parish_id' => Parish::factory(),
             'priest_id' => Priest::factory(),
-            'meta' => '{}',
         ];
     }
 }

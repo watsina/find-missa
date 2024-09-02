@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $activityTimes = ActivityTime::factory()->count(3)->create();
@@ -96,4 +98,14 @@ test('update behaves as expected', function (): void {
     expect($end_time)->toEqual($activityTime->end_time);
     expect($language)->toEqual($activityTime->language);
     expect($occurence)->toEqual($activityTime->occurence);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $activityTime = ActivityTime::factory()->create();
+
+    $response = delete(route('activity-time.destroy', $activityTime));
+
+    $response->assertNoContent();
+
+    assertModelMissing($activityTime);
 });

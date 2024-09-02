@@ -23,6 +23,5 @@ class Diocese extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'meta' => 'array',
     ];
 }

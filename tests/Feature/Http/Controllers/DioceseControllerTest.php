@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $dioceses = Diocese::factory()->count(3)->create();
@@ -84,4 +86,14 @@ test('update behaves as expected', function (): void {
     expect($name)->toEqual($diocese->name);
     expect($type)->toEqual($diocese->type);
     expect($country)->toEqual($diocese->country);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $diocese = Diocese::factory()->create();
+
+    $response = delete(route('diocese.destroy', $diocese));
+
+    $response->assertNoContent();
+
+    assertModelMissing($diocese);
 });

@@ -24,7 +24,6 @@ class SubParishStoreRequest extends FormRequest
             'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
             'district' => ['nullable', 'string'],
             'office_address' => ['nullable', 'string'],
-            'meta' => ['nullable', 'json'],
         ];
     }
 }

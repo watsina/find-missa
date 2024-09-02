@@ -26,13 +26,11 @@ class ChurchUpdateRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-99.9999999,99.9999999'],
             'street_address' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
-            'hours' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'string'],
             'contact_phone' => ['nullable', 'string'],
             'parish_type' => ['nullable', 'string'],
             'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
             'priest_id' => ['nullable', 'integer', 'exists:priests,id'],
-            'meta' => ['nullable', 'json'],
         ];
     }
 }

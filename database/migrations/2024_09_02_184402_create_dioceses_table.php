@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('priests', function (Blueprint $table) {
+        Schema::create('dioceses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('parish_type');
-            $table->foreignId('parish_id')->nullable()->constrained();
-            $table->json('meta')->nullable();
+            $table->string('type')->default('diocese');
+            $table->string('office_address')->nullable();
+            $table->string('postal_address')->nullable();
+            $table->string('country')->default('Uganda');
             $table->timestamps();
         });
 
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('priests');
+        Schema::dropIfExists('dioceses');
     }
 };

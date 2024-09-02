@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $users = User::factory()->count(3)->create();
@@ -90,4 +92,14 @@ test('update behaves as expected', function (): void {
     expect($email)->toEqual($user->email);
     expect($password)->toEqual($user->password);
     expect($is_super_admin)->toEqual($user->is_super_admin);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $user = User::factory()->create();
+
+    $response = delete(route('user.destroy', $user));
+
+    $response->assertNoContent();
+
+    assertModelMissing($user);
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Church;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\ChurchResource;
 use App\Http\Resources\ChurchCollection;
 use App\Http\Requests\ChurchStoreRequest;
@@ -35,5 +36,12 @@ class ChurchController extends Controller
         $church->update($request->validated());
 
         return new ChurchResource($church);
+    }
+
+    public function destroy(Request $request, Church $church): Response
+    {
+        $church->delete();
+
+        return response()->noContent();
     }
 }

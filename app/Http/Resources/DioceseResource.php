@@ -19,7 +19,6 @@ class DioceseResource extends JsonResource
             'office_address' => $this->office_address,
             'postal_address' => $this->postal_address,
             'country' => $this->country,
-            'meta' => $this->meta,
         ];
     }
 }

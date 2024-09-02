@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $churches = Church::factory()->count(3)->create();
@@ -78,4 +80,14 @@ test('update behaves as expected', function (): void {
 
     expect($name)->toEqual($church->name);
     expect($type)->toEqual($church->type);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $church = Church::factory()->create();
+
+    $response = delete(route('church.destroy', $church));
+
+    $response->assertNoContent();
+
+    assertModelMissing($church);
 });

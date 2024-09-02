@@ -18,7 +18,6 @@ class SubParishResource extends JsonResource
             'parish_id' => $this->parish_id,
             'district' => $this->district,
             'office_address' => $this->office_address,
-            'meta' => $this->meta,
         ];
     }
 }

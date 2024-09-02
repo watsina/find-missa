@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Priest;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\PriestResource;
 use App\Http\Resources\PriestCollection;
 use App\Http\Requests\PriestStoreRequest;
@@ -35,5 +36,12 @@ class PriestController extends Controller
         $priest->update($request->validated());
 
         return new PriestResource($priest);
+    }
+
+    public function destroy(Request $request, Priest $priest): Response
+    {
+        $priest->delete();
+
+        return response()->noContent();
     }
 }

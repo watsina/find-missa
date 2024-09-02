@@ -17,9 +17,7 @@ class PriestResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'parish_type' => $this->parish_type,
             'parish_id' => $this->parish_id,
-            'meta' => $this->meta,
         ];
     }
 }

@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('office_address')->nullable();
             $table->string('postal_address')->nullable();
             $table->string('country')->default('Uganda');
-            $table->json('meta')->nullable();
             $table->timestamps();
         });
 

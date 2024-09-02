@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $subParishes = SubParish::factory()->count(3)->create();
@@ -72,4 +74,14 @@ test('update behaves as expected', function (): void {
     $response->assertJsonStructure([]);
 
     expect($name)->toEqual($subParish->name);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $subParish = SubParish::factory()->create();
+
+    $response = delete(route('sub-parish.destroy', $subParish));
+
+    $response->assertNoContent();
+
+    assertModelMissing($subParish);
 });

@@ -23,9 +23,7 @@ class PriestUpdateRequest extends FormRequest
             'name' => ['required', 'string'],
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string'],
-            'parish_type' => ['required', 'string'],
             'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
-            'meta' => ['nullable', 'json'],
         ];
     }
 }

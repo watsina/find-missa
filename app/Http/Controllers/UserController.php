@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\UserStoreRequest;
@@ -35,5 +36,12 @@ class UserController extends Controller
         $user->update($request->validated());
 
         return new UserResource($user);
+    }
+
+    public function destroy(Request $request, User $user): Response
+    {
+        $user->delete();
+
+        return response()->noContent();
     }
 }

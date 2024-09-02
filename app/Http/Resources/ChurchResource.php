@@ -20,13 +20,11 @@ class ChurchResource extends JsonResource
             'longitude' => $this->longitude,
             'street_address' => $this->street_address,
             'postal_address' => $this->postal_address,
-            'hours' => $this->hours,
             'contact_email' => $this->contact_email,
             'contact_phone' => $this->contact_phone,
             'parish_type' => $this->parish_type,
             'parish_id' => $this->parish_id,
             'priest_id' => $this->priest_id,
-            'meta' => $this->meta,
         ];
     }
 }

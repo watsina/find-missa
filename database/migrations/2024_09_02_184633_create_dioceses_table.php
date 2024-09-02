@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('sub_parishes', function (Blueprint $table) {
+        Schema::create('dioceses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('parish_id')->nullable()->constrained();
-            $table->string('district')->nullable();
+            $table->string('type')->default('diocese');
             $table->string('office_address')->nullable();
-            $table->json('meta')->nullable();
+            $table->string('postal_address')->nullable();
+            $table->string('country')->default('Uganda');
             $table->timestamps();
         });
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sub_parishes');
+        Schema::dropIfExists('dioceses');
     }
 };

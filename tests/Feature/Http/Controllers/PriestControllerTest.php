@@ -8,6 +8,8 @@ use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
     $priests = Priest::factory()->count(3)->create();
@@ -27,16 +29,13 @@ test('store uses form request validation')
 
 test('store saves', function (): void {
     $name = fake()->name();
-    $parish_type = fake()->word();
 
     $response = post(route('priest.store'), [
         'name' => $name,
-        'parish_type' => $parish_type,
     ]);
 
     $priests = Priest::query()
         ->where('name', $name)
-        ->where('parish_type', $parish_type)
         ->get();
     expect($priests)->toHaveCount(1);
     $priest = $priests->first();
@@ -64,11 +63,9 @@ test('update uses form request validation')
 test('update behaves as expected', function (): void {
     $priest = Priest::factory()->create();
     $name = fake()->name();
-    $parish_type = fake()->word();
 
     $response = put(route('priest.update', $priest), [
         'name' => $name,
-        'parish_type' => $parish_type,
     ]);
 
     $priest->refresh();
@@ -77,5 +74,14 @@ test('update behaves as expected', function (): void {
     $response->assertJsonStructure([]);
 
     expect($name)->toEqual($priest->name);
-    expect($parish_type)->toEqual($priest->parish_type);
+});
+
+test('destroy deletes and responds with', function (): void {
+    $priest = Priest::factory()->create();
+
+    $response = delete(route('priest.destroy', $priest));
+
+    $response->assertNoContent();
+
+    assertModelMissing($priest);
 });

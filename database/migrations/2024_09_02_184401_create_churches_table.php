@@ -21,13 +21,11 @@ return new class extends Migration
             $table->decimal('longitude', 9, 7)->nullable();
             $table->string('street_address')->nullable();
             $table->string('postal_address')->nullable();
-            $table->string('hours')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
             $table->string('parish_type')->nullable();
             $table->foreignId('parish_id')->nullable()->constrained();
             $table->foreignId('priest_id')->nullable()->constrained();
-            $table->json('meta')->nullable();
             $table->timestamps();
         });
 

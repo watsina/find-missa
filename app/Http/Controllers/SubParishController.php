@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SubParish;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\SubParishResource;
 use App\Http\Resources\SubParishCollection;
 use App\Http\Requests\SubParishStoreRequest;
@@ -35,5 +36,12 @@ class SubParishController extends Controller
         $subParish->update($request->validated());
 
         return new SubParishResource($subParish);
+    }
+
+    public function destroy(Request $request, SubParish $subParish): Response
+    {
+        $subParish->delete();
+
+        return response()->noContent();
     }
 }

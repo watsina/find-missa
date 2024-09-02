@@ -25,7 +25,6 @@ class DioceseStoreRequest extends FormRequest
             'office_address' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
             'country' => ['required', 'string'],
-            'meta' => ['nullable', 'json'],
         ];
     }
 }

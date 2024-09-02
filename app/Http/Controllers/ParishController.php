@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Parish;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\ParishResource;
 use App\Http\Resources\ParishCollection;
 use App\Http\Requests\ParishStoreRequest;
@@ -35,5 +36,12 @@ class ParishController extends Controller
         $parish->update($request->validated());
 
         return new ParishResource($parish);
+    }
+
+    public function destroy(Request $request, Parish $parish): Response
+    {
+        $parish->delete();
+
+        return response()->noContent();
     }
 }

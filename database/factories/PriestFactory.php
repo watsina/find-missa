@@ -24,9 +24,7 @@ class PriestFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
-            'parish_type' => $this->faker->word(),
             'parish_id' => Parish::factory(),
-            'meta' => '{}',
         ];
     }
 }

@@ -25,7 +25,6 @@ class SubParishFactory extends Factory
             'parish_id' => Parish::factory(),
             'district' => $this->faker->word(),
             'office_address' => $this->faker->word(),
-            'meta' => '{}',
         ];
     }
 }

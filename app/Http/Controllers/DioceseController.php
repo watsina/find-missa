@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Diocese;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\DioceseResource;
 use App\Http\Resources\DioceseCollection;
 use App\Http\Requests\DioceseStoreRequest;
@@ -35,5 +36,12 @@ class DioceseController extends Controller
         $diocese->update($request->validated());
 
         return new DioceseResource($diocese);
+    }
+
+    public function destroy(Request $request, Diocese $diocese): Response
+    {
+        $diocese->delete();
+
+        return response()->noContent();
     }
 }

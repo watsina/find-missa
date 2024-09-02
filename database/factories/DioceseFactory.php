@@ -25,7 +25,6 @@ class DioceseFactory extends Factory
             'office_address' => $this->faker->word(),
             'postal_address' => $this->faker->word(),
             'country' => $this->faker->country(),
-            'meta' => '{}',
         ];
     }
 }
