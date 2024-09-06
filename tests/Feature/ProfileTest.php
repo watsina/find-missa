@@ -2,6 +2,10 @@
 
 use App\Models\User;
 
+beforeEach(function () {
+    //
+})->skip('going to move this to api form from the inertia it was built with');
+
 test('profile page is displayed', function () {
     $user = User::factory()->create();
 

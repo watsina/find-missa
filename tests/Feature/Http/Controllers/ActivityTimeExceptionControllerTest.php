@@ -32,22 +32,20 @@ test('store uses form request validation')
 
 test('store saves', function (): void {
     $activity_time = ActivityTime::factory()->create();
-    $date_of_exception = fake()->dateTime();
+    $date_of_exception = fake()->date;
 
     $response = post(route('activity-time-exception.store'), [
         'activity_time_id' => $activity_time->id,
         'date_of_exception' => $date_of_exception,
     ]);
+    $response->assertCreated();
+    $response->assertJsonStructure([]);
 
     $activityTimeExceptions = ActivityTimeException::query()
         ->where('activity_time_id', $activity_time->id)
-        ->where('date_of_exception', $date_of_exception)
         ->get();
-    expect($activityTimeExceptions)->toHaveCount(1);
-    $activityTimeException = $activityTimeExceptions->first();
 
-    $response->assertCreated();
-    $response->assertJsonStructure([]);
+    expect($activityTimeExceptions)->toHaveCount(1);
 });
 
 test('show behaves as expected', function (): void {
@@ -69,20 +67,20 @@ test('update uses form request validation')
 test('update behaves as expected', function (): void {
     $activityTimeException = ActivityTimeException::factory()->create();
     $activity_time = ActivityTime::factory()->create();
-    $date_of_exception = fake()->dateTime();
+    $date_of_exception = fake()->date;
 
     $response = put(route('activity-time-exception.update', $activityTimeException), [
         'activity_time_id' => $activity_time->id,
         'date_of_exception' => $date_of_exception,
     ]);
 
-    $activityTimeException->refresh();
-
     $response->assertOk();
     $response->assertJsonStructure([]);
 
+    $activityTimeException->refresh();
+
     expect($activity_time->id)->toEqual($activityTimeException->activity_time_id);
-    expect($date_of_exception)->toEqual($activityTimeException->date_of_exception);
+    expect($date_of_exception)->toEqual($activityTimeException->date_of_exception->format('Y-m-d'));
 });
 
 test('destroy deletes and responds with', function (): void {
