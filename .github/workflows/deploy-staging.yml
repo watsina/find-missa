@@ -1,0 +1,122 @@
+name: Web Build & Test (Deploy staging if mainline)
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*.*"
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    services:
+      mysql:
+        image: mysql:8.3
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testing
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: xdebug
+
+      - name: Install Dependencies
+        run: |
+          composer self-update --2
+          composer install --prefer-dist --no-interaction
+          npm ci
+          npm run build
+
+      - name: Setup Environment
+        run: |
+          export APP_ENV=testing
+          cp .env.ci .env
+
+      - name: Test
+        run: |
+          php artisan test --parallel --coverage --stop-on-failure
+
+  dependabot:
+    name: Auto approve and merge Dependabot Pull Requests
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    if: success() && github.event.pull_request.user.login == 'dependabot[bot]'
+    env:
+      PR_URL: ${{ github.event.pull_request.html_url}}
+      GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN}}"
+
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL"
+
+      - name: Auto-merge Dependabot PRs for semver-minor updates
+        id: auto-merge-dependabot-prs-for-semver-minor-updates
+        if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor'}}
+        run: gh pr merge --auto --merge "$PR_URL"
+
+      - name: Auto-merge Dependabot PRs for semver-patch updates
+        id: auto-merge-dependabot-prs-for-semver-patch-updates
+        if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
+        run: gh pr merge --auto --merge "$PR_URL"
+
+  deploy_staging:
+    name: Deploy to testing site
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    needs: build_and_test
+    if: success() && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '--deploy')
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.HOST_IP}}
+          port: 22
+          username: ${{secrets.HOST_USERNAME}}
+          key: ${{secrets.PRIVATE_KEY}}
+          script: |
+            cd ${{secrets.TESTING_DIR}}
+            git reset --hard
+            git pull origin main
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+            php artisan migrate --force
+            php artisan optimize
+            php artisan pulse:restart
+            sudo service php8.3-fpm reload
+            source /usr/local/nvm/nvm.sh
+            node -v
+            npm -v
+            npm ci
+            npm run build
+
