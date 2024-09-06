@@ -30,21 +30,15 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $name = fake()->name();
     $email = fake()->safeEmail();
-    $password = fake()->password();
-    $is_super_admin = fake()->boolean();
 
     $response = post(route('user.store'), [
         'name' => $name,
         'email' => $email,
-        'password' => $password,
-        'is_super_admin' => $is_super_admin,
     ]);
 
     $users = User::query()
         ->where('name', $name)
         ->where('email', $email)
-        ->where('password', $password)
-        ->where('is_super_admin', $is_super_admin)
         ->get();
     expect($users)->toHaveCount(1);
     $user = $users->first();
@@ -73,14 +67,10 @@ test('update behaves as expected', function (): void {
     $user = User::factory()->create();
     $name = fake()->name();
     $email = fake()->safeEmail();
-    $password = fake()->password();
-    $is_super_admin = fake()->boolean();
 
     $response = put(route('user.update', $user), [
         'name' => $name,
         'email' => $email,
-        'password' => $password,
-        'is_super_admin' => $is_super_admin,
     ]);
 
     $user->refresh();
@@ -90,8 +80,6 @@ test('update behaves as expected', function (): void {
 
     expect($name)->toEqual($user->name);
     expect($email)->toEqual($user->email);
-    expect($password)->toEqual($user->password);
-    expect($is_super_admin)->toEqual($user->is_super_admin);
 });
 
 test('destroy deletes and responds with', function (): void {

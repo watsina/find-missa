@@ -22,9 +22,6 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'email' => ['required', 'email'],
-            'email_verified_at' => ['nullable'],
-            'password' => ['required', 'password'],
-            'is_super_admin' => ['required'],
             'role_id' => ['nullable', 'integer'],
             'remember_token' => ['nullable', 'string', 'max:100'],
         ];
