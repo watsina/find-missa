@@ -1,16 +1,38 @@
+<template>
+  <v-dialog v-model="dialog" v-bind="$attrs" :max-width="maxWidth" persistent @close="close">
+    <v-card rounded>
+      <v-toolbar color="#f3f4f6" density="comfortable" flat tile>
+        <v-toolbar-title class="tw-text-lg">
+          <slot name="title" />
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn v-if="closeable" icon="$close" size="small" @click="close"></v-btn>
+      </v-toolbar>
+
+      <v-card-text>
+        <slot name="content" />
+      </v-card-text>
+
+      <v-card-actions
+        class="tw-flex tw-flex-row tw-justify-end tw-px-6 tw-py-4 tw-text-right tw-bg-gray-100"
+      >
+        <slot name="footer" />
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
 <script setup>
-  import Modal from './Modal.vue';
+  import { ref, watch } from 'vue';
 
-  const emit = defineEmits(['close']);
-
-  defineProps({
+  const props = defineProps({
     show: {
       type: Boolean,
       default: false,
     },
     maxWidth: {
       type: String,
-      default: '2xl',
+      default: '500',
     },
     closeable: {
       type: Boolean,
@@ -18,25 +40,17 @@
     },
   });
 
+  const emit = defineEmits(['close']);
+
+  const dialog = ref(false);
+
+  watch(
+    () => props.show,
+    (newValue) => (dialog.value = newValue),
+  );
+
   const close = () => {
+    // dialog.value = false;
     emit('close');
   };
 </script>
-
-<template>
-  <Modal :closeable="closeable" :max-width="maxWidth" :show="show" @close="close">
-    <div class="px-6 py-4">
-      <div class="text-lg font-medium text-gray-900 dark:text-gray-100">
-        <slot name="title" />
-      </div>
-
-      <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-        <slot name="content" />
-      </div>
-    </div>
-
-    <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 dark:bg-gray-800 text-end">
-      <slot name="footer" />
-    </div>
-  </Modal>
-</template>

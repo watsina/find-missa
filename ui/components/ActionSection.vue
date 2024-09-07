@@ -1,9 +1,5 @@
-<script setup>
-  import SectionTitle from './SectionTitle.vue';
-</script>
-
 <template>
-  <div class="md:grid md:grid-cols-3 md:gap-6">
+  <div class="md:tw-grid md:tw-grid-cols-3 md:tw-gap-6">
     <SectionTitle>
       <template #title>
         <slot name="title" />
@@ -13,10 +9,14 @@
       </template>
     </SectionTitle>
 
-    <div class="mt-5 md:mt-0 md:col-span-2">
-      <div class="px-4 py-5 sm:p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+    <div class="tw-mt-5 md:tw-mt-0 md:tw-col-span-2">
+      <div class="tw-px-4 tw-py-5 tw-bg-white tw-shadow sm:tw-p-6 sm:tw-rounded-lg">
         <slot name="content" />
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+  import SectionTitle from './SectionTitle.vue';
+</script>

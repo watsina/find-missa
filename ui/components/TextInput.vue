@@ -1,13 +1,47 @@
+<template>
+  <v-text-field
+    ref="input"
+    v-bind="{ ...$attrs }"
+    v-model="model"
+    :color="color"
+    :density="density"
+    :error-messages="error"
+    hide-details="auto"
+    :hint="hint"
+    :label="label"
+    :placeholder="placeholder"
+    :type="type"
+  ></v-text-field>
+</template>
+
 <script setup>
   import { onMounted, ref } from 'vue';
+  import { v4 as uuid } from 'uuid';
 
   defineProps({
-    modelValue: String,
+    id: {
+      type: String,
+      default() {
+        return `text-input-${uuid()}`;
+      },
+    },
+    type: {
+      type: String,
+      default: 'text',
+    },
+    error: { type: [String, Array], default: '' },
+    hint: { type: String, default: '' },
+    label: { type: String, default: '' },
+    placeholder: { type: String, default: '' },
+    density: { type: String, default: 'default' },
+    color: { type: String, default: 'primary' },
   });
 
-  defineEmits(['update:modelValue']);
-
   const input = ref(null);
+  const model = defineModel({
+    type: [String, Number],
+    required: true,
+  });
 
   onMounted(() => {
     if (input.value.hasAttribute('autofocus')) {
@@ -18,11 +52,8 @@
   defineExpose({ focus: () => input.value.focus() });
 </script>
 
-<template>
-  <input
-    ref="input"
-    class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-    :value="modelValue"
-    @input="$emit('update:modelValue', $event.target.value)"
-  />
-</template>
+<script>
+  export default {
+    inheritAttrs: false,
+  };
+</script>

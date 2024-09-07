@@ -5,6 +5,7 @@
   import PrimaryButton from './PrimaryButton.vue';
   import SecondaryButton from './SecondaryButton.vue';
   import TextInput from './TextInput.vue';
+  import http from '@/Plugins/Http';
 
   const emit = defineEmits(['confirmed']);
 
@@ -34,7 +35,7 @@
   const passwordInput = ref(null);
 
   const startConfirmingPassword = () => {
-    axios.get(route('password.confirmation')).then((response) => {
+    http.get(route('password.confirmation')).then((response) => {
       if (response.data.confirmed) {
         emit('confirmed');
       } else {
@@ -48,7 +49,7 @@
   const confirmPassword = () => {
     form.processing = true;
 
-    axios
+    http
       .post(route('password.confirm'), {
         password: form.password,
       })
@@ -86,18 +87,17 @@
       <template #content>
         {{ content }}
 
-        <div class="mt-4">
+        <div class="tw-mt-4">
           <TextInput
             ref="passwordInput"
             v-model="form.password"
-            autocomplete="current-password"
-            class="mt-1 block w-3/4"
+            class="tw-block tw-w-3/4 tw-mt-1"
             placeholder="Password"
             type="password"
             @keyup.enter="confirmPassword"
           />
 
-          <InputError class="mt-2" :message="form.error" />
+          <InputError class="tw-mt-2" :message="form.error" />
         </div>
       </template>
 
@@ -105,8 +105,8 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="ms-3"
-          :class="{ 'opacity-25': form.processing }"
+          class="tw-ml-3"
+          :class="{ 'tw-opacity-25': form.processing }"
           :disabled="form.processing"
           @click="confirmPassword"
         >

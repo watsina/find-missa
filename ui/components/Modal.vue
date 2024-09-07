@@ -1,3 +1,49 @@
+<template>
+  <teleport to="body">
+    <transition leave-active-class="tw-duration-200">
+      <div
+        v-show="show"
+        class="tw-fixed tw-inset-0 tw-z-50 tw-px-4 tw-py-6 tw-overflow-y-auto sm:tw-px-0"
+        scroll-region
+      >
+        <transition
+          enter-active-class="tw-duration-300 tw-ease-out"
+          enter-from-class="tw-opacity-0"
+          enter-to-class="tw-opacity-100"
+          leave-active-class="tw-duration-200 tw-ease-in"
+          leave-from-class="tw-opacity-100"
+          leave-to-class="tw-opacity-0"
+        >
+          <div
+            v-show="show"
+            class="tw-fixed tw-inset-0 tw-transition-all tw-transform"
+            @click="close"
+          >
+            <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75" />
+          </div>
+        </transition>
+
+        <transition
+          enter-active-class="tw-duration-300 tw-ease-out"
+          enter-from-class="tw-translate-y-4 tw-opacity-0 sm:tw-translate-y-0 sm:tw-scale-95"
+          enter-to-class="tw-translate-y-0 tw-opacity-100 sm:tw-scale-100"
+          leave-active-class="tw-duration-200 tw-ease-in"
+          leave-from-class="tw-translate-y-0 tw-opacity-100 sm:tw-scale-100"
+          leave-to-class="tw-translate-y-4 tw-opacity-0 sm:tw-translate-y-0 sm:tw-scale-95"
+        >
+          <div
+            v-show="show"
+            class="tw-mb-6 tw-overflow-hidden tw-transition-all tw-transform tw-bg-white tw-rounded-lg tw-shadow-xl sm:tw-w-full sm:tw-mx-auto"
+            :class="maxWidthClass"
+          >
+            <slot v-if="show" />
+          </div>
+        </transition>
+      </div>
+    </transition>
+  </teleport>
+</template>
+
 <script setup>
   import { computed, onMounted, onUnmounted, watch } from 'vue';
 
@@ -58,41 +104,3 @@
     }[props.maxWidth];
   });
 </script>
-
-<template>
-  <teleport to="body">
-    <transition leave-active-class="duration-200">
-      <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" scroll-region>
-        <transition
-          enter-active-class="ease-out duration-300"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="ease-in duration-200"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-            <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" />
-          </div>
-        </transition>
-
-        <transition
-          enter-active-class="ease-out duration-300"
-          enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-          leave-active-class="ease-in duration-200"
-          leave-from-class="opacity-100 translate-y-0 sm:scale-100"
-          leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        >
-          <div
-            v-show="show"
-            class="mb-6 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-            :class="maxWidthClass"
-          >
-            <slot v-if="show" />
-          </div>
-        </transition>
-      </div>
-    </transition>
-  </teleport>
-</template>
