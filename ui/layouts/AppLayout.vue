@@ -9,8 +9,8 @@
 </template>
 
 <script setup>
-  //   import NavDrawer from './nav-drawer';
-  import TopBar from './top-bar';
-  import MainView from './main-view';
+  //   import NavDrawer from './NavDrawer';
+  import TopBar from './TopBar';
+  import MainView from './MainView';
   //
 </script>

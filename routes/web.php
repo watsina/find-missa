@@ -16,9 +16,9 @@ use App\Http\Controllers\UploadTestDataController;
 |
 */
 
-Route::get('/', function () {
-    return ['Laravel' => app()->version()];
-});
+// Route::get('/', function () {
+//     return ['Laravel' => app()->version()];
+// });
 
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
