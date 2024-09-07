@@ -1,6 +1,6 @@
 import './styles/app.scss';
 import { date, notify } from '@/utils';
-import { registerPlugins, http, useForm } from '@/plugins';
+import { registerPlugins, useForm } from '@/plugins';
 import App from './App.vue';
 
 import { createApp } from 'vue';
@@ -10,7 +10,6 @@ const app = createApp(App);
 registerPlugins(app);
 
 app.config.globalProperties.$date = date;
-app.config.globalProperties.$http = http;
 app.config.globalProperties.$useForm = useForm;
 app.config.globalProperties.$notify = notify;
 

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { http } from '@/plugins';
 
 const auth = window.Auth || {};
 
@@ -21,8 +22,6 @@ export default defineStore('authStore', {
         return;
       }
       this.$state.isFetching = true;
-
-      const { default: http } = await import('@/plugins/http');
 
       return http
         .get(`/api/v1/auth/global-permissions`)
