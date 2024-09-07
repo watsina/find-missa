@@ -1,0 +1,14 @@
+@import './nprogress';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hljs {
+  color: #eff !important;
+  background: #212121 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}

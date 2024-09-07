@@ -1,20 +1,11 @@
-import VueRouter from 'vue-router';
-
-import Vue from 'vue';
-
+import { createRouter, createWebHistory } from 'vue-router';
 import NProgress from 'nprogress';
-
 import { ensureUserIsAuthorized } from '@/routes/middleware';
-
-import notify from '@/utils/notify';
-
+import { notify } from '@/utils';
 import routes from '@/routes';
 
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-  mode: 'history',
-
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 

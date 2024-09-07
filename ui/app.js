@@ -1,9 +1,6 @@
-import './styles/app.css';
-import date from './utils/date';
-import http from '@/plugins/http';
-import form from './plugins/form';
-
-import { registerPlugins } from '@/plugins/index.js';
+import './styles/app.scss';
+import { date, notify } from '@/utils';
+import { registerPlugins, http, useForm } from '@/plugins';
 import App from './App.vue';
 
 import { createApp } from 'vue';
@@ -14,6 +11,7 @@ registerPlugins(app);
 
 app.config.globalProperties.$date = date;
 app.config.globalProperties.$http = http;
-app.config.globalProperties.$form = form;
+app.config.globalProperties.$useForm = useForm;
+app.config.globalProperties.$notify = notify;
 
 app.mount('#app');
