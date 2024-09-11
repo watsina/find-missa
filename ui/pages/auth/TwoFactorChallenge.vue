@@ -1,6 +1,4 @@
 <template>
-  <Head title="Two-factor Confirmation" />
-
   <AuthenticationCard>
     <template #logo>
       <AuthenticationCardLogo />
@@ -71,7 +69,7 @@
 
 <script setup>
   import { nextTick, ref } from 'vue';
-  import { Head, useForm } from '@inertiajs/vue3';
+  import { useForm } from '@/plugins';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
   import InputError from '@/Components/InputError.vue';

@@ -1,6 +1,5 @@
 <script setup>
   import { computed } from 'vue';
-  import { Link } from '@inertiajs/vue3';
 
   const props = defineProps({
     active: Boolean,
@@ -26,8 +25,8 @@
       <slot />
     </button>
 
-    <Link v-else :aria-current="active ? 'page' : undefined" :class="classes" :href="href">
+    <a v-else :aria-current="active ? 'page' : undefined" :class="classes" :href="href">
       <slot />
-    </Link>
+    </a>
   </div>
 </template>

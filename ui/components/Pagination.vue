@@ -6,20 +6,20 @@
     aria-label="Pagination"
   >
     <div class="tw-flex tw-justify-between tw-flex-1 sm:tw-hidden">
-      <Link
+      <a
         :href="nextPageUrl || '#'"
         preserve-scroll
         class="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-700 tw-bg-white tw-border tw-border-gray-300 tw-rounded-md hover:tw-bg-gray-50"
       >
         Previous
-      </Link>
-      <Link
+      </a>
+      <a
         preserve-scroll
         :href="prevPageUrl || '#'"
         class="tw-relative tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-ml-3 tw-text-sm tw-font-medium tw-text-gray-700 tw-bg-white tw-border tw-border-gray-300 tw-rounded-md hover:tw-bg-gray-50"
       >
         Next
-      </Link>
+      </a>
     </div>
     <div class="tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
       <div>
@@ -66,8 +66,6 @@
 </template>
 
 <script setup>
-  import { Link } from '@inertiajs/vue3';
-
   defineProps({
     links: { type: Array, required: true },
     currentPage: { type: Number, required: true },

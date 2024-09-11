@@ -1,6 +1,4 @@
 <template>
-  <Head title="Email Verification" />
-
   <AuthenticationCard>
     <template #logo>
       <AuthenticationCardLogo />
@@ -23,21 +21,21 @@
         </PrimaryButton>
 
         <div>
-          <Link
+          <a
             :href="route('profile.show')"
             class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
           >
             Edit Profile
-          </Link>
+          </a>
 
-          <Link
+          <a
             :href="route('logout')"
             method="post"
             as="button"
             class="tw-ml-2 tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
           >
             Log Out
-          </Link>
+          </a>
         </div>
       </div>
     </form>
@@ -46,7 +44,7 @@
 
 <script setup>
   import { computed } from 'vue';
-  import { Head, Link, useForm } from '@inertiajs/vue3';
+  import { useForm } from '@/plugins';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
   import PrimaryButton from '@/Components/PrimaryButton.vue';

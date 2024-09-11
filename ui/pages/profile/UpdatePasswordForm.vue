@@ -60,7 +60,7 @@
 
 <script setup>
   import { ref } from 'vue';
-  import { useForm } from '@inertiajs/vue3';
+  import { useForm } from '@/plugins';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import FormSection from '@/Components/FormSection.vue';
   import InputLabel from '@/Components/InputLabel.vue';

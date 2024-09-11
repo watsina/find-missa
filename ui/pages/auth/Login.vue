@@ -1,6 +1,4 @@
 <template>
-  <Head title="Log in" />
-
   <AuthenticationCard>
     <template #logo>
       <AuthenticationCardLogo />
@@ -36,20 +34,17 @@
       </div>
 
       <div class="tw-block tw-mt-4">
-        <label class="tw-flex tw-items-center">
-          <Checkbox v-model:checked="form.remember" name="remember" />
-          <span class="tw-ml-2 tw-text-sm tw-text-gray-600">Remember me</span>
-        </label>
+        <Checkbox v-model="form.remember" label="Remember me" />
       </div>
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <Link
-          v-if="canResetPassword"
-          class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
-          :href="route('password.request')"
-        >
-          Forgot your password?
-        </Link>
+        <!-- <Link -->
+        <!--   v-if="canResetPassword" -->
+        <!--   class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900" -->
+        <!--   :href="route('password.request')" -->
+        <!-- > -->
+        <!--   Forgot your password? -->
+        <!-- </Link> -->
 
         <PrimaryButton
           class="tw-ml-4"
@@ -65,7 +60,7 @@
 </template>
 
 <script setup>
-  import { Head, Link, useForm } from '@inertiajs/vue3';
+  import { useForm } from '@/plugins';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
   import Checkbox from '@/Components/Checkbox.vue';

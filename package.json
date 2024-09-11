@@ -12,6 +12,7 @@
     "@mdi/font": "^7.3.67",
     "@prettier/plugin-php": "^0.22.2",
     "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.15",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue/server-renderer": "^3.2.31",
     "autoprefixer": "^10.4.12",
@@ -39,6 +40,7 @@
     "leaflet": "^1.9.4",
     "nprogress": "^0.2.0",
     "pinia": "^2.2.2",
+    "uuid": "^10.0.0",
     "vue-router": "^4.4.3",
     "vue3-google-map": "^0.19.0",
     "vuetify": "^3.4.8"

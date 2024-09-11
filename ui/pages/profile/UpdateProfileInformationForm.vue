@@ -90,7 +90,7 @@
           <p class="tw-mt-2 tw-text-sm">
             Your email address is unverified.
 
-            <Link
+            <a
               as="button"
               class="tw-text-gray-600 tw-underline hover:tw-text-gray-900"
               :href="route('verification.send')"
@@ -98,7 +98,7 @@
               @click.prevent="sendEmailVerification"
             >
               Click here to re-send the verification email.
-            </Link>
+            </a>
           </p>
 
           <div
@@ -127,8 +127,7 @@
 
 <script setup>
   import { ref } from 'vue';
-  import { router } from '@inertiajs/vue3';
-  import { Link, useForm } from '@inertiajs/vue3';
+  import { http, useForm } from '@/plugins';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import FormSection from '@/Components/FormSection.vue';
   import InputError from '@/Components/InputError.vue';
@@ -188,7 +187,7 @@
   };
 
   const deletePhoto = () => {
-    router.delete(route('current-user-photo.destroy'), {
+    http.delete(route('current-user-photo.destroy'), {
       preserveScroll: true,
       onSuccess: () => {
         photoPreview.value = null;

@@ -1,24 +1,19 @@
 <script setup>
-  import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-  import { Head } from '@inertiajs/vue3';
+  import AppLayout from '@/layouts/AppLayout.vue';
   import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import UploadTestDataModal from '@/Components/UploadTestDataModal.vue';
   import { ref } from 'vue';
 
   const uploading = ref(false);
 </script>
 
 <template>
-  <Head title="Dashboard" />
-
-  <AuthenticatedLayout>
+  <AppLayout>
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
         Dashboard
       </h2>
     </template>
 
-    <upload-test-data-modal v-model:modal-value="uploading" />
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -29,5 +24,5 @@
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </AppLayout>
 </template>

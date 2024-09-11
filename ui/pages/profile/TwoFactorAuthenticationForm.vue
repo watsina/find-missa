@@ -153,8 +153,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue';
-  import { router } from '@inertiajs/vue3';
-  import { useForm, usePage } from '@inertiajs/vue3';
+  import { http, useForm } from '@/plugins';
   import ActionSection from '@/Components/ActionSection.vue';
   import ConfirmsPassword from '@/Components/ConfirmsPassword.vue';
   import DangerButton from '@/Components/DangerButton.vue';
@@ -194,7 +193,7 @@
   const enableTwoFactorAuthentication = () => {
     enabling.value = true;
 
-    router.post(
+    http.post(
       '/user/two-factor-authentication',
       {},
       {
@@ -246,7 +245,7 @@
   const disableTwoFactorAuthentication = () => {
     disabling.value = true;
 
-    router.delete('/user/two-factor-authentication', {
+    http.delete('/user/two-factor-authentication', {
       preserveScroll: true,
       onSuccess: () => {
         disabling.value = false;

@@ -1,6 +1,4 @@
 <template>
-  <Head title="Register" />
-
   <AuthenticationCard>
     <template #logo>
       <AuthenticationCardLogo />
@@ -86,12 +84,12 @@
       </div>
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <Link
+        <a
           :href="route('login')"
           class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
         >
           Already registered?
-        </Link>
+        </a>
 
         <PrimaryButton
           class="tw-ml-4"
@@ -106,7 +104,7 @@
 </template>
 
 <script setup>
-  import { Head, Link, useForm } from '@inertiajs/vue3';
+  import { useForm } from '@/plugins';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
   import Checkbox from '@/Components/Checkbox.vue';
