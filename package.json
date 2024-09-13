@@ -37,6 +37,7 @@
     "@heroicons/vue": "^2.1.1",
     "@vueuse/core": "^11.0.3",
     "dayjs": "^1.11.13",
+    "laravel-precognition-vue": "^0.5.9",
     "leaflet": "^1.9.4",
     "nprogress": "^0.2.0",
     "pinia": "^2.2.2",

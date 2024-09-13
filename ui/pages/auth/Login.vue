@@ -27,7 +27,7 @@
           autocomplete="current-password"
           class="tw-block tw-w-full tw-mt-1"
           :error="form.errors.password"
-          label="password"
+          label="Password"
           required
           type="password"
         />
