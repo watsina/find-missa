@@ -84,7 +84,7 @@
         ...data,
         remember: form.remember ? 'on' : '',
       }))
-      .post(route('login'), {
+      .post('/api/v1/login', {
         onFinish: () => form.reset('password'),
       });
   };
