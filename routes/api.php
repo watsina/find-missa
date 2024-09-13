@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,34 +20,29 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
-// Route::get('/', function () {
-//     return ['Laravel' => app()->version()];
-// });
 
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::middleware('auth')->group(function () {
-//     Route::post('upload-test-data', UploadTestDataController::class)->name('upload.test-data');
+Route::middleware('auth')->group(function () {
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-Route::apiResource('user', App\Http\Controllers\UserController::class);
+    Route::apiResource('user', App\Http\Controllers\UserController::class);
 
-Route::apiResource('church', App\Http\Controllers\ChurchController::class);
+    Route::apiResource('church', App\Http\Controllers\ChurchController::class);
 
-Route::apiResource('diocese', App\Http\Controllers\DioceseController::class);
+    Route::apiResource('diocese', App\Http\Controllers\DioceseController::class);
 
-Route::apiResource('parish', App\Http\Controllers\ParishController::class);
+    Route::apiResource('parish', App\Http\Controllers\ParishController::class);
 
-Route::apiResource('priest', App\Http\Controllers\PriestController::class);
+    Route::apiResource('priest', App\Http\Controllers\PriestController::class);
 
-Route::apiResource('sub-parish', App\Http\Controllers\SubParishController::class);
+    Route::apiResource('sub-parish', App\Http\Controllers\SubParishController::class);
 
-Route::apiResource('activity-time', App\Http\Controllers\ActivityTimeController::class);
+    Route::apiResource('activity-time', App\Http\Controllers\ActivityTimeController::class);
 
-Route::apiResource('activity-time-exception', App\Http\Controllers\ActivityTimeExceptionController::class);
+    Route::apiResource('activity-time-exception', App\Http\Controllers\ActivityTimeExceptionController::class);
+});
