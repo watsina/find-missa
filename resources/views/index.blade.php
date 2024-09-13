@@ -18,7 +18,7 @@
         </script>
         @vite(['ui/app.js'])
     </head>
-    <body class="tw-font-sans tw-antialiased">
+    <body class="tw-h-full tw-font-sans tw-antialiased">
         <div id="app"/>
     </body>
 </html>
