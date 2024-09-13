@@ -61,6 +61,7 @@
 
 <script setup>
   import { useForm } from '@/plugins';
+  import { notify } from '@/utils';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
   import Checkbox from '@/Components/Checkbox.vue';
@@ -85,6 +86,12 @@
         remember: form.remember ? 'on' : '',
       }))
       .post('/api/v1/login', {
+        onSuccess: () => {
+          window.location.reload();
+        },
+        onError: () => {
+          notify.warning('Something went wrong');
+        },
         onFinish: () => form.reset('password'),
       });
   };

@@ -57,6 +57,10 @@ class User extends Authenticatable
 
     public function info()
     {
-        return $this->withoutRelations();
+        return cache()->remember($this->getCacheKey('info'), 5 * 60, function () {
+            return [
+                'user' => $this->withoutRelations(),
+            ];
+        });
     }
 }

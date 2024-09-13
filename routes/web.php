@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('{view?}', function () {
-    return view('index');
+    return view('index')->with(['auth' => with(auth()->user())?->info()]);
 })
     ->where('view', '^(?!(api)).*$');
