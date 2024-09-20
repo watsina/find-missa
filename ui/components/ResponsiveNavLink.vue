@@ -1,12 +1,11 @@
 <script setup>
   import { computed } from 'vue';
-  import { RouterLink } from 'vue-router';
+  import AppLink from './AppLink';
 
   const props = defineProps({
     active: Boolean,
     href: String,
     as: String,
-    ...RouterLink.props,
   });
 
   defineOptions({
@@ -34,17 +33,8 @@
       <slot />
     </button>
 
-    <router-link exact v-else v-bind="$props" custom v-slot="{ isActive, href, navigate }">
-      <a
-        v-bind="$attrs"
-        :aria-current="isActive ? 'page' : undefined"
-        :href="href"
-        @click="navigate"
-        :class="isActive ? activeClass : inactiveClass"
-      >
-        {{ isActive }}
-        <slot />
-      </a>
-    </router-link>
+    <app-link v-else :active-class="activeClass" :inactive-class="inActiveClass" :to="href">
+      <slot />
+    </app-link>
   </div>
 </template>
