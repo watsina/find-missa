@@ -6,10 +6,7 @@
 
     <template #form>
       <!-- Profile Photo -->
-      <div
-        v-if="$page.props.jetstream.managesProfilePhotos"
-        class="tw-col-span-12 sm:tw-col-span-12"
-      >
+      <div class="tw-col-span-12 sm:tw-col-span-12">
         <!-- Profile Photo File Input -->
         <input ref="photoInput" class="tw-hidden" type="file" @change="updatePhotoPreview" />
 
@@ -86,7 +83,7 @@
           type="email"
         />
 
-        <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
+        <div v-if="user.email_verified_at === null">
           <p class="tw-mt-2 tw-text-sm">
             Your email address is unverified.
 

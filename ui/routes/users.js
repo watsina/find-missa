@@ -1,20 +1,14 @@
 export default [
   {
-    path: '/users/@:username',
+    path: '/users',
     props: true,
-    component: () => import('@/Pages/Users/Layout'),
+    component: () => import('@/pages/users/Layout'),
     children: [
-      {
-        path: '',
-        name: 'users.show',
-        props: true,
-        component: () => import('@/Pages/Users/UserProfile'),
-      },
       {
         path: 'activity',
         name: 'users.activity',
         props: true,
-        component: () => import('@/Pages/Users/UserActivity'),
+        component: () => import('@/pages/users/UserActivity'),
       },
     ],
   },

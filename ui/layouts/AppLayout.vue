@@ -1,18 +1,21 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <top-bar v-model:rail="rail" v-model:drawer="drawer" />
+    <top-bar v-model:rail="rail" v-model:drawer="drawer">
+      <slot name="header" />
+    </top-bar>
 
-    <!-- <nav-drawer /> -->
+    <nav-drawer v-model:rail="rail" v-model:drawer="drawer" />
 
-    <main-view />
+    <v-main class="d-flex align-center justify-center" style="min-height: 300px">
+      <slot />
+    </v-main>
   </v-layout>
 </template>
 
 <script setup>
   import { ref } from 'vue';
-  //   import NavDrawer from './NavDrawer';
+  import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
-  import MainView from './MainView';
 
   const drawer = ref(true);
   const rail = ref(true);

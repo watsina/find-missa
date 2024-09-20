@@ -162,11 +162,13 @@
   import PrimaryButton from '@/Components/PrimaryButton.vue';
   import SecondaryButton from '@/Components/SecondaryButton.vue';
   import TextInput from '@/Components/TextInput.vue';
-  import http from '@/Plugins/Http';
+  import useAuthStore from '@/stores/useAuthStore';
 
   const props = defineProps({
     requiresConfirmation: Boolean,
   });
+
+  const store = useAuthStore();
 
   const enabling = ref(false);
   const confirming = ref(false);
@@ -179,9 +181,7 @@
     code: '',
   });
 
-  const twoFactorEnabled = computed(
-    () => !enabling.value && usePage().props.user?.two_factor_enabled,
-  );
+  const twoFactorEnabled = computed(() => !enabling.value && store.user?.two_factor_enabled);
 
   watch(twoFactorEnabled, () => {
     if (!twoFactorEnabled.value) {

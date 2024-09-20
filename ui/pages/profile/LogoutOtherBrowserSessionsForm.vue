@@ -127,7 +127,7 @@
   import TextInput from '@/Components/TextInput.vue';
 
   defineProps({
-    sessions: Array,
+    sessions: { type: Array, default: () => [] },
   });
 
   const confirmingLogout = ref(false);

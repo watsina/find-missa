@@ -14,7 +14,7 @@
 </script>
 
 <template>
-  <a :href="href" :class="classes">
+  <RouteLink :to="href" :class="classes">
     <slot />
-  </a>
+  </RouteLink>
 </template>

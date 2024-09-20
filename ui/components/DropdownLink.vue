@@ -7,28 +7,21 @@
 
 <template>
   <div>
-    <button
+    <v-btn
       v-if="as == 'button'"
+      text
       type="submit"
       class="tw-block tw-w-full tw-px-4 tw-py-2 tw-text-sm tw-leading-5 tw-text-gray-700 tw-text-left hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-bg-gray-100 tw-transition"
     >
       <slot />
-    </button>
+    </v-btn>
 
-    <a
-      v-else-if="as == 'a'"
-      :href="href"
-      class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-leading-5 tw-text-gray-700 hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-bg-gray-100 tw-transition"
-    >
-      <slot />
-    </a>
-
-    <a
+    <RouteLink
       v-else
-      :href="href"
+      :to="href"
       class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-leading-5 tw-text-gray-700 hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-bg-gray-100 tw-transition"
     >
       <slot />
-    </a>
+    </RouteLink>
   </div>
 </template>
