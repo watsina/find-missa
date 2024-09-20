@@ -2,7 +2,7 @@
   import { computed, useSlots } from 'vue';
   import SectionTitle from './SectionTitle.vue';
   defineProps({
-    formGrid: { type: Boolean, default: true },
+    formGrid: Boolean,
   });
   defineEmits(['submitted']);
 

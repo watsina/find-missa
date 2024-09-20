@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\UserCollection;
 use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileController extends Controller
@@ -13,7 +13,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): UserCollection
+    public function update(ProfileUpdateRequest $request): UserResource
     {
         $request->user()->fill($request->validated());
 
@@ -23,7 +23,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return new UserCollection($request->user());
+        return new UserResource($request->user());
     }
 
     /**

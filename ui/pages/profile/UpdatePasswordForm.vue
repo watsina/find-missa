@@ -7,41 +7,42 @@
     </template>
 
     <template #form>
-      <div class="tw-col-span-6 sm:tw-col-span-4">
-        <TextInput
-          ref="currentPasswordInput"
-          v-model="form.current_password"
-          autocomplete="current-password"
-          class="tw-block tw-w-full tw-mt-1"
-          :error="form.errors.current_password"
-          label="Current Password"
-          type="password"
-        />
-      </div>
-
-      <div class="tw-col-span-6 sm:tw-col-span-4">
-        <InputLabel for="password" />
-        <TextInput
-          ref="passwordInput"
-          v-model="form.password"
-          autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
-          :error="form.errors.password"
-          label="New Password"
-          type="password"
-        />
-      </div>
-
-      <div class="tw-col-span-6 sm:tw-col-span-4">
-        <TextInput
-          v-model="form.password_confirmation"
-          autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
-          :error="form.errors.password_confirmation"
-          label="Confirm Password"
-          type="password"
-        />
-      </div>
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="12" sm="6">
+            <TextInput
+              ref="currentPasswordInput"
+              v-model="form.current_password"
+              autocomplete="current-password"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.current_password"
+              label="Current Password"
+              type="password"
+            />
+          </v-col>
+          <v-col cols="12" md="12" sm="6">
+            <TextInput
+              ref="passwordInput"
+              v-model="form.password"
+              autocomplete="new-password"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.password"
+              label="New Password"
+              type="password"
+            />
+          </v-col>
+          <v-col cols="12" md="12" sm="6">
+            <TextInput
+              v-model="form.password_confirmation"
+              autocomplete="new-password"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.password_confirmation"
+              label="Confirm Password"
+              type="password"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
 
     <template #actions>
@@ -77,9 +78,8 @@
   });
 
   const updatePassword = () => {
-    form.put(route('user-password.update'), {
+    form.put('/api/v1/password', {
       errorBag: 'updatePassword',
-      preserveScroll: true,
       onSuccess: () => form.reset(),
       onError: () => {
         if (form.errors.password) {
