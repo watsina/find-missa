@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class ProfileController extends Controller
 {
@@ -15,11 +16,21 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): UserResource
     {
-        $request->user()->fill($request->validated());
+        $data = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (isset($data['photo'])) {
+            $request->user()->updateprofilephoto($data['photo']);
         }
+
+        $request->user()->fill([
+            'name' => $data['name'],
+            // 'email' => $data['email'],
+        ]);
+
+        // if ($request->user()->isDirty('email') && $request->user() instanceof MustVerifyEmail) {
+        //     $request->user()->email_verified_at = null;
+        //     $request->user()->sendEmailVerificationNotification();
+        // }
 
         $request->user()->save();
 

@@ -9,16 +9,11 @@
         <v-row>
           <!-- Profile Photo -->
           <v-col cols="12" md="12" sm="6">
-            <!-- Profile Photo File Input -->
-            <input ref="photoInput" class="tw-hidden" type="file" @change="updatePhotoPreview" />
-
-            <InputLabel for="photo" value="Photo" />
-
             <!-- Current Profile Photo -->
             <div v-show="!photoPreview" class="tw-mt-2">
               <img
                 :alt="user.name"
-                class="tw-object-cover tw-w-20 tw-h-20 tw-rounded-full"
+                class="tw-object-cover tw-w-40 tw-h-40 tw-rounded-full"
                 :src="user.profile_photo_url"
               />
             </div>
@@ -26,14 +21,24 @@
             <!-- New Profile Photo Preview -->
             <div v-show="photoPreview" class="tw-mt-2">
               <span
-                class="tw-block tw-w-20 tw-h-20 tw-bg-center tw-bg-no-repeat tw-bg-cover tw-rounded-full"
+                class="tw-block tw-w-40 tw-h-40 tw-bg-center tw-bg-no-repeat tw-bg-cover tw-rounded-full"
                 :style="'background-image: url(\'' + photoPreview + '\');'"
               />
             </div>
 
-            <SecondaryButton class="tw-mt-2 tw-mr-2" type="button" @click.prevent="selectNewPhoto">
-              Select A New Photo
-            </SecondaryButton>
+            <!-- Profile Photo File Input -->
+            <FileInput
+              accept="image/png,image/jpeg,image/jpg, image/webp"
+              autofocus
+              v-model="form.photo"
+              class="tw-mt-2 tw-w-3/4"
+              :prepend-icon="mdiCamera"
+              :error="form.errors.photo"
+              density="compact"
+              variant="underlined"
+              label="Upload Profile Photo (jpg, jpeg, png, webp)"
+              placeholder="Choose a file..."
+            />
 
             <SecondaryButton
               v-if="user.profile_photo_path"
@@ -43,8 +48,6 @@
             >
               Remove Photo
             </SecondaryButton>
-
-            <InputError class="tw-mt-2" :message="form.errors.photo" />
           </v-col>
           <!--Name -->
           <v-col cols="12" md="12" sm="6">
@@ -61,6 +64,7 @@
           <v-col cols="12" md="12" sm="6">
             <TextInput
               v-model="form.email"
+              disabled
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.email"
               label="Email"
@@ -109,11 +113,13 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { http, useForm } from '@/plugins';
+  import { mdiCamera } from '@mdi/js';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import FormSection from '@/Components/FormSection.vue';
   import InputError from '@/Components/InputError.vue';
+  import FileInput from '@/Components/FileInput.vue';
   import InputLabel from '@/Components/InputLabel.vue';
   import PrimaryButton from '@/Components/PrimaryButton.vue';
   import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -124,21 +130,24 @@
   });
 
   const form = useForm({
+    _method: 'PUT',
     name: props.user.name,
     email: props.user.email,
     photo: null,
   });
+
+  watch(
+    () => form.photo,
+    () => updatePhotoPreview(),
+  );
 
   const verificationLinkSent = ref(null);
   const photoPreview = ref(null);
   const photoInput = ref(null);
 
   const updateProfileInformation = () => {
-    if (photoInput.value) {
-      form.photo = photoInput.value.files[0];
-    }
-
-    form.put('/api/v1/profile', {
+    form.post('/api/v1/profile', {
+      headers: { 'Content-Type': 'multipart/form-data' },
       onSuccess: () => clearPhotoFileInput(),
     });
   };
@@ -152,7 +161,7 @@
   };
 
   const updatePhotoPreview = () => {
-    const photo = photoInput.value.files[0];
+    const photo = form.photo;
 
     if (!photo) return;
 

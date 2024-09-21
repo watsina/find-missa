@@ -19,6 +19,7 @@ class ProfileUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             // disabling updating of emails for now
             // 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
         ];
     }
 }

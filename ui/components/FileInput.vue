@@ -11,8 +11,6 @@
     :hint="hint"
     :label="label"
     :placeholder="placeholder"
-    prepend-icon=""
-    prepend-inner-icon="$file"
     show-size
   ></v-file-input>
 </template>
@@ -38,8 +36,8 @@
 
   const input = ref(null);
   const model = defineModel({
-    type: [String, Number],
-    required: true,
+    type: Object,
+    default: null,
   });
 
   onMounted(() => {
