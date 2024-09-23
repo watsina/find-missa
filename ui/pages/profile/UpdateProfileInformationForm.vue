@@ -45,7 +45,7 @@
               v-if="user.profile_photo_path"
               class="tw-mt-2"
               type="button"
-              @click.prevent="deletePhoto"
+              @click="deletePhoto"
             >
               Remove Photo
             </SecondaryButton>
@@ -114,7 +114,7 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import { http, useForm } from '@/plugins';
   import { notify } from '@/utils';
   import { mdiCamera } from '@mdi/js';
@@ -126,15 +126,16 @@
   import PrimaryButton from '@/Components/PrimaryButton.vue';
   import SecondaryButton from '@/Components/SecondaryButton.vue';
   import TextInput from '@/Components/TextInput.vue';
+  import useAuthStore from '@/stores/useAuthStore';
 
-  const props = defineProps({
-    user: Object,
-  });
+  const store = useAuthStore();
+
+  const user = computed(() => store?.user);
 
   const form = useForm({
     _method: 'PUT',
-    name: props.user.name,
-    email: props.user.email,
+    name: user.value?.name,
+    email: user.value?.email,
     photo: null,
   });
 
@@ -145,13 +146,13 @@
 
   const verificationLinkSent = ref(null);
   const photoPreview = ref(null);
-  const photoInput = ref(null);
 
   const updateProfileInformation = () => {
-    form.post('/api/v1/profile', {
+    form.post('/api/v1/auth/profile', {
       headers: { 'Content-Type': 'multipart/form-data' },
-      onSuccess: () => {
+      onSuccess: ({ data }) => {
         clearPhotoFileInput();
+        store.updateUser(data);
         notify.success('Profile Information Updated successfully.');
       },
     });
@@ -159,10 +160,6 @@
 
   const sendEmailVerification = () => {
     verificationLinkSent.value = true;
-  };
-
-  const selectNewPhoto = () => {
-    photoInput.value.click();
   };
 
   const updatePhotoPreview = () => {
@@ -180,18 +177,20 @@
   };
 
   const deletePhoto = () => {
-    http.delete(route('current-user-photo.destroy'), {
-      preserveScroll: true,
-      onSuccess: () => {
+    http
+      .delete('/api/v1/auth/profile-photo')
+      .then(({ data }) => {
         photoPreview.value = null;
         clearPhotoFileInput();
-      },
-    });
+        store.updateUser(data?.data);
+        notify.success('Profile photo removed successfully');
+      })
+      .catch(() => notify.error('Something went wrong while trying to delete profile photo.'));
   };
 
   const clearPhotoFileInput = () => {
-    if (photoInput.value?.value) {
-      photoInput.value.value = null;
+    if (form.photo) {
+      form.photo = null;
     }
   };
 </script>

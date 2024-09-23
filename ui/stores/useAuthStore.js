@@ -17,19 +17,26 @@ export default defineStore('authStore', {
     hasUser: (state) => !!state.user?.id,
   },
   actions: {
-    async fetchGlobalPermissions() {
-      if (this.$state.isFetching) {
+    updateUser(newData) {
+      if (!newData) {
         return;
       }
-      this.$state.isFetching = true;
+      console.log('setting user value...');
+      this.user = newData;
+    },
+    async fetchGlobalPermissions() {
+      if (this.isFetching) {
+        return;
+      }
+      this.isFetching = true;
 
       return http
         .get(`/api/v1/auth/global-permissions`)
         .then(({ data }) => {
-          this.$state.globalPermissions = data;
+          this.globalPermissions = data;
         })
         .finally(() => {
-          this.$state.isFetching = false;
+          this.isFetching = false;
         });
     },
   },

@@ -17,8 +17,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
-            'is_super_admin' => $this->is_super_admin,
-            'role_id' => $this->role_id,
+            'profile_photo_url' => $this->profile_photo_url,
+            'profile_photo_path' => $this->profile_photo_path,
         ];
     }
 }

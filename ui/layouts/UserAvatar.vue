@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-if="user" offset="8, 0">
+  <v-menu offset="8, 0" v-if="store.hasUser">
     <template #activator="{ props }">
       <v-btn icon v-bind="props">
         <v-avatar size="40">
@@ -20,12 +20,14 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue';
   import { http } from '@/plugins';
   import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+  import useAuthStore from '@/stores/useAuthStore';
 
-  defineProps({
-    user: { type: Object, required: true },
-  });
+  const store = useAuthStore();
+
+  const user = computed(() => store?.user);
 
   const logout = () => {
     http.post('/api/v1/logout').then(() => window.location.reload());

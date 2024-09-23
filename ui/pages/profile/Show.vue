@@ -8,7 +8,7 @@
         <div class="sm:tw-rounded-lg">
           <!-- start -->
           <div class="tw-pb-10 tw-max-w-7xl sm:tw-px-6 lg:tw-px-8">
-            <UpdateProfileInformationForm :user="store?.user" />
+            <UpdateProfileInformationForm />
 
             <SectionBorder />
 

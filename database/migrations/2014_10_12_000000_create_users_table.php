@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_super_admin')->default(false);
             $table->string('profile_photo_path', 2048)->nullable();
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

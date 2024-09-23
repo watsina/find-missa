@@ -13,7 +13,7 @@
       <v-app-bar-title>App Name</v-app-bar-title>
     </template>
     <v-spacer></v-spacer>
-    <user-avatar v-if="store.hasUser" :user="store?.user"></user-avatar>
+    <user-avatar></user-avatar>
     <div class="tw-ml-4"></div>
   </v-app-bar>
 </template>
@@ -22,9 +22,6 @@
   import NavLink from '@/components/NavLink';
   import ApplicationMark from '@/components/ApplicationMark';
   import UserAvatar from './UserAvatar';
-  import useAuthStore from '@/stores/useAuthStore';
-
-  const store = useAuthStore();
 
   const rail = defineModel('rail', { type: Boolean });
   const drawer = defineModel('drawer', { type: Boolean });
