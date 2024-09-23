@@ -9,6 +9,7 @@
         <v-row>
           <!-- Profile Photo -->
           <v-col cols="12" md="12" sm="6">
+            <InputLabel for="photo" value="Photo" />
             <!-- Current Profile Photo -->
             <div v-show="!photoPreview" class="tw-mt-2">
               <img
