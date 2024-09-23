@@ -28,27 +28,29 @@
             </div>
 
             <!-- Profile Photo File Input -->
-            <FileInput
-              accept="image/png,image/jpeg,image/jpg, image/webp"
-              autofocus
-              v-model="form.photo"
-              class="tw-mt-2 tw-w-3/4"
-              :prepend-icon="mdiCamera"
-              :error="form.errors.photo"
-              density="compact"
-              variant="underlined"
-              label="Upload Profile Photo (jpg, jpeg, png, webp)"
-              placeholder="Choose a file..."
-            />
+            <div class="tw-flex tw-justify-between">
+              <FileInput
+                accept="image/png,image/jpeg,image/jpg, image/webp"
+                autofocus
+                v-model="form.photo"
+                class="tw-mt-2 tw-w-1/2 tw-mr-2"
+                :prepend-icon="mdiCamera"
+                :error="form.errors.photo"
+                density="compact"
+                variant="underlined"
+                label="Upload Profile Photo (jpg, jpeg, png, webp)"
+                placeholder="Choose a file..."
+              />
 
-            <SecondaryButton
-              v-if="user.profile_photo_path"
-              class="tw-mt-2"
-              type="button"
-              @click="deletePhoto"
-            >
-              Remove Photo
-            </SecondaryButton>
+              <SecondaryButton
+                v-if="user.profile_photo_path"
+                class="tw-mt-2"
+                type="button"
+                @click="deletePhoto"
+              >
+                Remove Photo
+              </SecondaryButton>
+            </div>
           </v-col>
           <!--Name -->
           <v-col cols="12" md="12" sm="6">
