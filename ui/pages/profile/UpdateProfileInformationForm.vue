@@ -116,6 +116,7 @@
 <script setup>
   import { ref, watch } from 'vue';
   import { http, useForm } from '@/plugins';
+  import { notify } from '@/utils';
   import { mdiCamera } from '@mdi/js';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import FormSection from '@/Components/FormSection.vue';
@@ -149,7 +150,10 @@
   const updateProfileInformation = () => {
     form.post('/api/v1/profile', {
       headers: { 'Content-Type': 'multipart/form-data' },
-      onSuccess: () => clearPhotoFileInput(),
+      onSuccess: () => {
+        clearPhotoFileInput();
+        notify.success('Profile Information Updated successfully.');
+      },
     });
   };
 

@@ -1,5 +1,6 @@
 <template>
   <v-layout class="rounded rounded-md">
+    <global-notifications></global-notifications>
     <top-bar v-model:rail="rail" v-model:drawer="drawer">
       <slot name="header" />
     </top-bar>
@@ -16,6 +17,7 @@
   import { ref } from 'vue';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
+  import GlobalNotifications from '@/components/GlobalNotifications';
 
   const drawer = ref(true);
   const rail = ref(true);

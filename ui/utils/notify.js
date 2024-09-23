@@ -1,7 +1,7 @@
 import { reactive } from 'vue';
 
 export default reactive({
-  type: 'info',
+  color: 'info',
   text: '',
   props: {},
   confirmation: {},
@@ -11,8 +11,8 @@ export default reactive({
     this.text = null;
     clearTimeout(this.timeoutId);
   },
-  show(type, text, props = {}) {
-    this.type = type;
+  show(color, text, props = {}) {
+    this.color = color;
     this.text = text;
     this.props = props || {};
 
@@ -30,14 +30,12 @@ export default reactive({
   errorFromResponse(error, defaultError = 'Something went wrong') {
     this.show('error', error?.response?.data?.message || error?.message || defaultError);
   },
-
   error(...args) {
     this.show('error', ...args);
   },
   warning(...args) {
-    this.show('error', ...args);
+    this.show('warning', ...args);
   },
-
   info(...args) {
     this.show('info', ...args);
   },
@@ -49,7 +47,6 @@ export default reactive({
 
     return this.confirmation?.reject(false);
   },
-
   confirm(message, options = {}) {
     this.confirmation = { message, options };
 

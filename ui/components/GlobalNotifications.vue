@@ -2,17 +2,20 @@
 
 <template>
   <div>
-    <v-alert
+    <v-snackbar
       v-if="$notify.text"
-      :type="$notify.type"
+      :model-value="!!$notify.text"
       v-bind="$notify.props"
-      dismissible
-      tile
-      class="tw-fixed tw-z-[1000] tw-top-0 tw-left-0 tw-right-0"
+      :color="$notify.color"
       @input="!$event && $notify.close()"
     >
       {{ $notify.text }}
-    </v-alert>
+      <template v-slot:actions>
+        <v-btn variant="plain" density="compact" size="small" @click="$notify.close()">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
 
     <v-dialog
       :value="!!$notify.confirmation.message"

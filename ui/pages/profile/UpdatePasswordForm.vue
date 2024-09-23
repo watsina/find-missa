@@ -62,6 +62,7 @@
 <script setup>
   import { ref } from 'vue';
   import { useForm } from '@/plugins';
+  import { notify } from '@/utils';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import FormSection from '@/Components/FormSection.vue';
   import InputLabel from '@/Components/InputLabel.vue';
@@ -80,7 +81,10 @@
   const updatePassword = () => {
     form.put('/api/v1/password', {
       errorBag: 'updatePassword',
-      onSuccess: () => form.reset(),
+      onSuccess: () => {
+        form.reset();
+        notify.success('Password saved successfully.');
+      },
       onError: () => {
         if (form.errors.password) {
           form.reset('password', 'password_confirmation');
@@ -91,6 +95,8 @@
           form.reset('current_password');
           currentPasswordInput.value.focus();
         }
+
+        notify.error('Something went wrong updating your password');
       },
     });
   };
