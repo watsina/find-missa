@@ -2,41 +2,50 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Laravel\Fortify\Actions\ConfirmPassword;
+use Laravel\Fortify\Http\Responses\PasswordConfirmedResponse;
+use Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse;
 
 class ConfirmablePasswordController extends Controller
 {
     /**
-     * Show the confirm password view.
+     * The guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
-    public function show(): Response
+    protected $guard;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(StatefulGuard $guard)
     {
-        return Inertia::render('Auth/ConfirmPassword');
+        $this->guard = $guard;
     }
 
     /**
      * Confirm the user's password.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        if (! Auth::guard('web')->validate([
-            'email' => $request->user()->email,
-            'password' => $request->password,
-        ])) {
-            throw ValidationException::withMessages([
-                'password' => __('auth.password'),
-            ]);
+        $confirmed = app(ConfirmPassword::class)(
+            $this->guard,
+            $request->user(),
+            $request->input('password')
+        );
+
+        if ($confirmed) {
+            $request->session()->put('auth.password_confirmed_at', Date::now()->unix());
         }
 
-        $request->session()->put('auth.password_confirmed_at', time());
-
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return $confirmed
+            ? app(PasswordConfirmedResponse::class)
+            : app(FailedPasswordConfirmationResponse::class);
     }
 }
