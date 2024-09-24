@@ -24,8 +24,6 @@ class Church extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
         'parish_id' => 'integer',
         'priest_id' => 'integer',
     ];
