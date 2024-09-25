@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Laravel\Fortify\Features;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\ProfileUpdateRequest;
@@ -22,13 +23,13 @@ class ProfileController extends Controller
 
         $request->user()->fill([
             'name' => $data['name'],
-            // 'email' => $data['email'],
+            'email' => $data['email'],
         ]);
 
-        // if ($request->user()->isDirty('email') && $request->user() instanceof MustVerifyEmail) {
-        //     $request->user()->email_verified_at = null;
-        //     $request->user()->sendEmailVerificationNotification();
-        // }
+        if ($request->user()->isDirty('email') && $request->user() instanceof MustVerifyEmail && Features::enabled(Features::emailVerification())) {
+            $request->user()->email_verified_at = null;
+            $request->user()->sendEmailVerificationNotification();
+        }
 
         $request->user()->save();
 

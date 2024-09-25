@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -15,9 +16,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
+        // Registered::class => Features::enabled(Features::emailVerification()) ? [
+        //     SendEmailVerificationNotification::class,
+        // ] : [],
     ];
 
     /**

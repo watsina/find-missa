@@ -1,89 +1,71 @@
 <?php
 
 use App\Models\User;
+use Laravel\Fortify\Features;
 
-beforeEach(function () {
-    //
-})->skip('going to move this to api form from the inertia it was built with');
+use function PHPUnit\Framework\assertNotNull;
+use function PHPUnit\Framework\assertNotSame;
 
-test('profile page is displayed', function () {
+test('profile information cannot be updated if feature is disabled', function () {
     $user = User::factory()->create();
 
-    $response = $this
+    $this
         ->actingAs($user)
-        ->get('/profile');
+        ->patch('api/v1/user/profile-information', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ])
+        ->assertNotFound();
 
-    $response->assertOk();
-});
+    $user->refresh();
+
+    assertNotSame('Test User', $user->name);
+    assertNotSame('test@example.com', $user->email);
+    assertNotNull($user->email_verified_at);
+})->skip(function () {
+    return Features::enabled(Features::updateProfileInformation());
+}, 'Update profile information support is enabled.');
 
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
-    $response = $this
+    $this
         ->actingAs($user)
-        ->patch('/profile', [
+        ->put(route('user-profile-information.update'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+        ])
+        ->assertOk();
 
     $user->refresh();
 
     $this->assertSame('Test User', $user->name);
     $this->assertSame('test@example.com', $user->email);
-    $this->assertNull($user->email_verified_at);
-});
+
+    if (Features::enabled(Features::emailVerification())) {
+        $this->assertNull($user->email_verified_at);
+    }
+})->skip(function () {
+    return ! Features::enabled(Features::updateProfileInformation());
+}, 'Update profile information support is not enabled.');
 
 test('email verification status is unchanged when the email address is unchanged', function () {
     $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
-        ->patch('/profile', [
+        ->put(route('user-profile-information.update'), [
             'name' => 'Test User',
             'email' => $user->email,
         ]);
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+        ->assertOk();
 
-    $this->assertNotNull($user->refresh()->email_verified_at);
-});
-
-test('user can delete their account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->delete('/profile', [
-            'password' => 'password',
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
-
-    $this->assertGuest();
-    $this->assertNull($user->fresh());
-});
-
-test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
-
-    $response
-        ->assertSessionHasErrors('password')
-        ->assertRedirect('/profile');
-
-    $this->assertNotNull($user->fresh());
-});
+    if (Features::enabled(Features::emailVerification())) {
+        $this->assertNotNull($user->refresh()->email_verified_at);
+    }
+})->skip(function () {
+    return ! Features::enabled(Features::updateProfileInformation());
+}, 'Update profile information support is not enabled.');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Events\Verified;
 use App\Providers\AppServiceProvider;
@@ -24,7 +25,9 @@ test('email can be verified', function () {
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     $response->assertRedirect(config('app.frontend_url').AppServiceProvider::HOME.'?verified=1');
-});
+})->skip(function () {
+    return ! Features::enabled(Features::emailVerification());
+}, 'Email verification not enabled.');
 
 test('email is not verified with invalid hash', function () {
     $user = User::factory()->create([
@@ -40,4 +43,6 @@ test('email is not verified with invalid hash', function () {
     $this->actingAs($user)->get($verificationUrl);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
-});
+})->skip(function () {
+    return ! Features::enabled(Features::emailVerification());
+}, 'Email verification not enabled.');

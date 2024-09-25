@@ -5,19 +5,18 @@ use App\Models\User;
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
-    $response = $this->post('/login', [
+    $this->post(route('login'), [
         'email' => $user->email,
         'password' => 'password',
-    ]);
+    ])->assertOk();
 
     $this->assertAuthenticated();
-    $response->assertNoContent();
 });
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $this->post('/login', [
+    $this->post(route('login'), [
         'email' => $user->email,
         'password' => 'wrong-password',
     ]);
@@ -28,7 +27,7 @@ test('users can not authenticate with invalid password', function () {
 test('users can logout', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    $response = $this->actingAs($user)->post(route('logout'));
 
     $this->assertGuest();
     $response->assertNoContent();

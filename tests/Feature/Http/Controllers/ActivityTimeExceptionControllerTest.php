@@ -14,6 +14,8 @@ use App\Models\ActivityTimeException;
 
 use function Pest\Laravel\assertModelMissing;
 
+beforeEach(fn () => $this->signIn());
+
 test('index behaves as expected', function (): void {
     $activityTimeExceptions = ActivityTimeException::factory()->count(3)->create();
 

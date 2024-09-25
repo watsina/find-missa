@@ -1,44 +1,61 @@
 <?php
 
 use App\Models\User;
+use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Hash;
 
-beforeEach(function () {
-    //
-})->skip('going to move this to api form from the inertia it was built with');
+test('user cannot update password if feature is disabled', function () {
+    $this->actingAs($user = User::factory()->create());
+
+    $this->put('/api/v1/user/password', [
+        'current_password' => 'password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])->assertNotFound();
+
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+})->skip(function () {
+    return Features::enabled(Features::updatePasswords());
+}, 'Update passwords support is enabled.');
 
 test('password can be updated', function () {
-    $user = User::factory()->create();
+    $this->actingAs($user = User::factory()->create());
 
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->put('/password', [
-            'current_password' => 'password',
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ]);
+    $this->put(route('user-password.update'), [
+        'current_password' => 'password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+    expect(Hash::check('new-password', $user->fresh()->password))->toBeTrue();
+})->skip(function () {
+    return ! Features::enabled(Features::updatePasswords());
+}, 'Password update support is not enabled.');
 
-    $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
-});
+test('current password must be correct', function () {
+    $this->actingAs($user = User::factory()->create());
 
-test('correct password must be provided to update password', function () {
-    $user = User::factory()->create();
+    $this->put(route('user-password.update'), [
+        'current_password' => 'wrong-password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])->assertJsonValidationErrors(['current_password']);
 
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->put('/password', [
-            'current_password' => 'wrong-password',
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ]);
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+})->skip(function () {
+    return ! Features::enabled(Features::updatePasswords());
+}, 'Password update support is not enabled.');
 
-    $response
-        ->assertSessionHasErrors('current_password')
-        ->assertRedirect('/profile');
-});
+test('new passwords must match', function () {
+    $this->actingAs($user = User::factory()->create());
+
+    $this->put(route('user-password.update'), [
+        'current_password' => 'password',
+        'password' => 'new-password',
+        'password_confirmation' => 'wrong-password',
+    ])->assertJsonValidationErrors(['password']);
+
+    expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+})->skip(function () {
+    return ! Features::enabled(Features::updatePasswords());
+}, 'Password update support is not enabled.');

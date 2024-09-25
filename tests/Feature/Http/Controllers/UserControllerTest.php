@@ -9,7 +9,9 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
-use function Pest\Laravel\assertModelMissing;
+use function Pest\Laravel\assertSoftDeleted;
+
+beforeEach(fn () => $this->signIn());
 
 test('index behaves as expected', function (): void {
     $users = User::factory()->count(3)->create();
@@ -89,5 +91,5 @@ test('destroy deletes and responds with', function (): void {
 
     $response->assertNoContent();
 
-    assertModelMissing($user);
+    assertSoftDeleted($user);
 });

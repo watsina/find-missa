@@ -24,9 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ->api(prepend: [
                 \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
                 \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+                'json',
             ])
             ->alias([
                 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+                'json' => \App\Http\Middleware\JsonMiddleware::class,
             ]);
     })
     ->withSchedule(function (Schedule $schedule) {
