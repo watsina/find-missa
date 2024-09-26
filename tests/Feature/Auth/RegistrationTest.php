@@ -3,7 +3,7 @@
 use Laravel\Fortify\Features;
 
 test('new uses cannot register if support is disabled', function () {
-    $this->post(route('register'), [
+    $this->post('api/v1/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',

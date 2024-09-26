@@ -1,8 +1,21 @@
 <?php
 
 use App\Models\User;
+use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\ResetPassword;
+
+test('reset password link cannot be requested if feature is disabled.', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    $this->post('/api/v1/forgot-password', ['email' => $user->email]);
+
+    Notification::assertNotSentTo($user, ResetPassword::class);
+})->skip(function () {
+    return Features::enabled(Features::resetPasswords());
+}, 'Password resets support is enabled.');
 
 test('reset password link can be requested', function () {
     Notification::fake();
@@ -12,7 +25,9 @@ test('reset password link can be requested', function () {
     $this->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class);
-});
+})->skip(function () {
+    return ! Features::enabled(Features::resetPasswords());
+}, 'Password resets support is not enabled.');
 
 test('password can be reset with valid token', function () {
     Notification::fake();
@@ -33,4 +48,6 @@ test('password can be reset with valid token', function () {
 
         return true;
     });
-});
+})->skip(function () {
+    return ! Features::enabled(Features::resetPasswords());
+}, 'Password resets support is not enabled.');
