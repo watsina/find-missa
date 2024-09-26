@@ -19,7 +19,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.

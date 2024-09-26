@@ -8,7 +8,8 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use AdditionalAssertions, CreatesApplication;
+    use AdditionalAssertions;
+    use CreatesApplication;
 
     public function signIn(?User $user = null)
     {
