@@ -9,8 +9,8 @@ export default defineStore('authStore', {
       isInitialized: false,
       isFetching: false,
       error: null,
-      user: auth.user || {},
-      globalPermissions: null,
+      user: auth?.user || {},
+      features: auth?.features || {},
     };
   },
   getters: {
@@ -21,23 +21,21 @@ export default defineStore('authStore', {
       if (!newData) {
         return;
       }
-      console.log('setting user value...');
+
       this.user = newData;
     },
-    async fetchGlobalPermissions() {
+    async refreshUser() {
       if (this.isFetching) {
         return;
       }
       this.isFetching = true;
-
       return http
-        .get(`/api/v1/auth/global-permissions`)
+        .get('/api/v1/auth/user')
         .then(({ data }) => {
-          this.globalPermissions = data;
+          console.log(data);
+          this.user = data;
         })
-        .finally(() => {
-          this.isFetching = false;
-        });
+        .finally(() => (this.isFetching = false));
     },
   },
 });

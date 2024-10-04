@@ -164,9 +164,8 @@
   import TextInput from '@/Components/TextInput.vue';
   import useAuthStore from '@/stores/useAuthStore';
 
-  const props = defineProps({
-    requiresConfirmation: Boolean,
-  });
+  // TODO: This will come from the features part
+  const requiresConfirmation = true;
 
   const store = useAuthStore();
 
@@ -193,43 +192,39 @@
   const enableTwoFactorAuthentication = () => {
     enabling.value = true;
 
-    http.post(
-      '/user/two-factor-authentication',
-      {},
-      {
-        preserveScroll: true,
-        onSuccess: () => Promise.all([showQrCode(), showSetupKey(), showRecoveryCodes()]),
-        onFinish: () => {
-          enabling.value = false;
-          confirming.value = props.requiresConfirmation;
-        },
-      },
-    );
+    http
+      .post('/api/v1/user/two-factor-authentication')
+      .then(async () => {
+        store.updateUser({ ...store.user, two_factor_enabled: true });
+        Promise.all([showQrCode(), showSetupKey(), showRecoveryCodes()]);
+      })
+      .finally(() => {
+        enabling.value = false;
+        confirming.value = props.requiresConfirmation;
+      });
   };
 
   const showQrCode = () => {
-    return http.get('/user/two-factor-qr-code').then((response) => {
+    return http.get('/api/v1/user/two-factor-qr-code').then((response) => {
       qrCode.value = response.data.svg;
     });
   };
 
   const showSetupKey = () => {
-    return http.get('/user/two-factor-secret-key').then((response) => {
+    return http.get('/api/v1/user/two-factor-secret-key').then((response) => {
       setupKey.value = response.data.secretKey;
     });
   };
 
   const showRecoveryCodes = () => {
-    return http.get('/user/two-factor-recovery-codes').then((response) => {
+    return http.get('/api/v1/user/two-factor-recovery-codes').then((response) => {
       recoveryCodes.value = response.data;
     });
   };
 
   const confirmTwoFactorAuthentication = () => {
-    confirmationForm.post('/user/confirmed-two-factor-authentication', {
+    confirmationForm.post('/api/v1/user/confirmed-two-factor-authentication', {
       errorBag: 'confirmTwoFactorAuthentication',
-      preserveScroll: true,
-      preserveState: true,
       onSuccess: () => {
         confirming.value = false;
         qrCode.value = null;
@@ -239,18 +234,15 @@
   };
 
   const regenerateRecoveryCodes = () => {
-    http.post('/user/two-factor-recovery-codes').then(() => showRecoveryCodes());
+    http.post('/api/v1/user/two-factor-recovery-codes').then(() => showRecoveryCodes());
   };
 
   const disableTwoFactorAuthentication = () => {
     disabling.value = true;
 
-    http.delete('/user/two-factor-authentication', {
-      preserveScroll: true,
-      onSuccess: () => {
-        disabling.value = false;
-        confirming.value = false;
-      },
+    http.delete('/api/v1/user/two-factor-authentication').finally(() => {
+      disabling.value = false;
+      confirming.value = false;
     });
   };
 </script>

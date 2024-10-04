@@ -16,10 +16,7 @@
 
             <SectionBorder />
 
-            <TwoFactorAuthenticationForm
-              :requires-confirmation="confirmsTwoFactorAuthentication"
-              class="tw-mt-10 sm:tw-mt-0"
-            />
+            <TwoFactorAuthenticationForm class="tw-mt-10 sm:tw-mt-0" />
 
             <SectionBorder />
 
@@ -51,7 +48,6 @@
   const store = useAuthStore();
 
   defineProps({
-    confirmsTwoFactorAuthentication: Boolean,
     sessions: Array,
   });
 </script>

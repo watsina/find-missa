@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();
-});
+})->name('auth.user');
 
 Route::middleware('auth')->group(function () {
 

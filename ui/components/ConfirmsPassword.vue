@@ -35,7 +35,7 @@
   const passwordInput = ref(null);
 
   const startConfirmingPassword = () => {
-    http.get(route('password.confirmation')).then((response) => {
+    http.get('/api/v1/user/confirmed-password-status').then((response) => {
       if (response.data.confirmed) {
         emit('confirmed');
       } else {
@@ -50,7 +50,7 @@
     form.processing = true;
 
     http
-      .post(route('password.confirm'), {
+      .post('/api/v1/user/confirm-password/', {
         password: form.password,
       })
       .then(() => {

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -46,16 +47,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'is_super_admin',
         'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
     /**
@@ -63,7 +56,20 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-    protected $appends = ['profile_photo_url'];
+    protected $appends = ['profile_photo_url', 'two_factor_enabled'];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
     public static function booted()
     {
@@ -72,6 +78,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 $user->password = Hash::make(Str::random(10));
             }
         });
+    }
+
+    public function twoFactorEnabled(): Attribute
+    {
+        return Attribute::get(fn () => $this->hasEnabledTwoFactorAuthentication());
     }
 
     /**
@@ -91,6 +102,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return cache()->remember($this->getCacheKey('info'), 5 * 60, function () {
             return [
                 'user' => $this->withoutRelations(),
+                'features' => [
+                    // will merge more as the come
+                    'fortify' => [
+                        'features' => config('fortify.features', []),
+                        'options' => config('fortify-options', []),
+                    ],
+                ],
             ];
         });
     }
