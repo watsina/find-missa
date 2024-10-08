@@ -33,13 +33,13 @@
   };
 
   const submit = () => {
-    form.post(route('two-factor.login'));
+    form.post('/api/v1/two-factor-challenge', {
+      onSuccess: () => window.location.reload(),
+    });
   };
 </script>
 
 <template>
-  <Head title="Two-factor Confirmation" />
-
   <AuthenticationCard>
     <template #logo>
       <AuthenticationCardLogo />
@@ -58,9 +58,8 @@
 
     <form @submit.prevent="submit">
       <div v-if="!recovery">
-        <InputLabel for="code" value="Code" />
         <TextInput
-          id="code"
+          label="Code"
           ref="codeInput"
           v-model="form.code"
           type="text"
@@ -68,21 +67,22 @@
           class="mt-1 block w-full"
           autofocus
           autocomplete="one-time-code"
+          :error="form.errors.code"
         />
-        <InputError class="mt-2" :message="form.errors.code" />
       </div>
 
       <div v-else>
-        <InputLabel for="recovery_code" value="Recovery Code" />
+        <InputLabel for="recovery_code" />
         <TextInput
-          id="recovery_code"
+          label="Recovery Code"
           ref="recoveryCodeInput"
           v-model="form.recovery_code"
           type="text"
           class="mt-1 block w-full"
+          clearable
           autocomplete="one-time-code"
+          :error="form.errors.recovery_code"
         />
-        <InputError class="mt-2" :message="form.errors.recovery_code" />
       </div>
 
       <div class="flex items-center justify-end mt-4">
@@ -98,8 +98,10 @@
 
         <PrimaryButton
           class="ms-4"
-          :class="{ 'opacity-25': form.processing }"
+          type="submit"
+          :loading="form.processing"
           :disabled="form.processing"
+          @click="submit"
         >
           Log in
         </PrimaryButton>

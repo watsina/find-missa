@@ -60,6 +60,7 @@
 </template>
 
 <script setup>
+  import { useRouter } from 'vue-router';
   import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import AuthenticationCard from '@/Components/AuthenticationCard.vue';
@@ -72,6 +73,8 @@
     canResetPassword: Boolean,
     status: String,
   });
+
+  const router = useRouter();
 
   const form = useForm({
     email: '',
@@ -86,8 +89,12 @@
         remember: form.remember ? 'on' : '',
       }))
       .post('/api/v1/login', {
-        onSuccess: () => {
-          window.location.reload();
+        onSuccess: (data) => {
+          if (data?.two_factor) {
+            router.push({ name: 'auth.two-factor-challenge' });
+          } else {
+            window.location.reload();
+          }
         },
         onError: () => {
           notify.warning('Something went wrong');

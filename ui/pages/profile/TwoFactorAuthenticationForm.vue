@@ -164,10 +164,13 @@
   import TextInput from '@/Components/TextInput.vue';
   import useAuthStore from '@/stores/useAuthStore';
 
-  // TODO: This will come from the features part
-  const requiresConfirmation = true;
-
   const store = useAuthStore();
+
+  const requiresConfirmation = computed(
+    () =>
+      store.featureIsEnabled('fortify', 'two-factor-authentication') &&
+      store.featureOptionIsEnabled('fortify', 'two-factor-authentication', 'confirm'),
+  );
 
   const enabling = ref(false);
   const confirming = ref(false);
@@ -200,7 +203,7 @@
       })
       .finally(() => {
         enabling.value = false;
-        confirming.value = props.requiresConfirmation;
+        confirming.value = requiresConfirmation.value;
       });
   };
 

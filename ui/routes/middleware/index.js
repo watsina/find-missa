@@ -8,12 +8,13 @@ export async function ensureUserIsAuthorized(to, from, next) {
   const store = useAuthStore();
 
   const isNavigatingToLogin = to.name === 'auth.login';
+  const isNavigatingToTwoFactor = to.name === 'auth.two-factor-challenge';
 
-  if (isNavigatingToLogin && store.hasUser) {
+  if ((isNavigatingToTwoFactor || isNavigatingToLogin) && store.hasUser) {
     return next({ name: 'dashboard.index' });
   }
 
-  if (!isNavigatingToLogin && !store.hasUser) {
+  if (!isNavigatingToLogin && !isNavigatingToTwoFactor && !store.hasUser) {
     return next({ name: 'auth.login' });
   }
 

@@ -17,6 +17,12 @@ export default defineStore('authStore', {
     hasUser: (state) => !!state.user?.id,
   },
   actions: {
+    featureIsEnabled($namespace, $feature) {
+      return this.features[$namespace]['features']?.includes($feature);
+    },
+    featureOptionIsEnabled($namespace, $feature, $option) {
+      return !!this.features[$namespace]['options'][$feature][$option];
+    },
     updateUser(newData) {
       if (!newData) {
         return;
@@ -32,7 +38,6 @@ export default defineStore('authStore', {
       return http
         .get('/api/v1/auth/user')
         .then(({ data }) => {
-          console.log(data);
           this.user = data;
         })
         .finally(() => (this.isFetching = false));
