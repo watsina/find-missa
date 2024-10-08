@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->api(prepend: [
                 \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+                'auth.session',
                 \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
                 'json',
             ])

@@ -150,7 +150,7 @@
   const photoPreview = ref(null);
 
   const updateProfileInformation = () => {
-    form.post('/api/v1/auth/profile', {
+    form.post('/api/v1/user/profile-information', {
       headers: { 'Content-Type': 'multipart/form-data' },
       onSuccess: ({ data }) => {
         clearPhotoFileInput();

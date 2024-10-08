@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import vuetify from 'vite-plugin-vuetify';
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 
 export default defineConfig({
     resolve: {
@@ -16,14 +16,9 @@ export default defineConfig({
             refresh: true,
         }),
         vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
+            template: { transformAssetUrls },
         }),
-        vuetify({
+        Vuetify({
             autoImport: true,
             styles: {
                 configFile: 'ui/styles/settings.scss',

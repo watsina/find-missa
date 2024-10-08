@@ -116,8 +116,8 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
-  import { useForm } from '@/plugins';
+  import { ref, onMounted } from 'vue';
+  import { http, useForm } from '@/plugins';
   import ActionMessage from '@/Components/ActionMessage.vue';
   import ActionSection from '@/Components/ActionSection.vue';
   import DialogModal from '@/Components/DialogModal.vue';
@@ -126,16 +126,21 @@
   import SecondaryButton from '@/Components/SecondaryButton.vue';
   import TextInput from '@/Components/TextInput.vue';
 
-  defineProps({
-    sessions: { type: Array, default: () => [] },
-  });
-
   const confirmingLogout = ref(false);
   const passwordInput = ref(null);
+  const sessions = ref([]);
 
   const form = useForm({
     password: '',
   });
+
+  onMounted(() => getSessions());
+
+  const getSessions = () => {
+    http.get('/api/v1/user/browser-sessions').then(({ data }) => {
+      sessions.value = data || [];
+    });
+  };
 
   const confirmLogout = () => {
     confirmingLogout.value = true;
@@ -144,7 +149,7 @@
   };
 
   const logoutOtherBrowserSessions = () => {
-    form.delete(route('other-browser-sessions.destroy'), {
+    form.delete('/api/v1/user/other-browser-sessions', {
       preserveScroll: true,
       onSuccess: () => closeModal(),
       onError: () => passwordInput.value.focus(),

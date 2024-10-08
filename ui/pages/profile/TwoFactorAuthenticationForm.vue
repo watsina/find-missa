@@ -243,9 +243,12 @@
   const disableTwoFactorAuthentication = () => {
     disabling.value = true;
 
-    http.delete('/api/v1/user/two-factor-authentication').finally(() => {
-      disabling.value = false;
-      confirming.value = false;
-    });
+    http
+      .delete('/api/v1/user/two-factor-authentication')
+      .then(() => window.location.reload())
+      .finally(() => {
+        disabling.value = false;
+        confirming.value = false;
+      });
   };
 </script>

@@ -1,3 +1,46 @@
+<script setup>
+  import { ref } from 'vue';
+  import { useForm } from '@/plugins';
+  import { notify } from '@/utils';
+  import ActionMessage from '@/Components/ActionMessage.vue';
+  import FormSection from '@/Components/FormSection.vue';
+  import InputLabel from '@/Components/InputLabel.vue';
+  import PrimaryButton from '@/Components/PrimaryButton.vue';
+  import TextInput from '@/Components/TextInput.vue';
+
+  const passwordInput = ref(null);
+  const currentPasswordInput = ref(null);
+
+  const form = useForm({
+    current_password: '',
+    password: '',
+    password_confirmation: '',
+  });
+
+  const updatePassword = () => {
+    form.put('/api/v1/user/password', {
+      errorBag: 'updatePassword',
+      onSuccess: () => {
+        form.reset();
+        notify.success('Password saved successfully.');
+      },
+      onError: () => {
+        if (form.errors.password) {
+          form.reset('password', 'password_confirmation');
+          passwordInput.value.focus();
+        }
+
+        if (form.errors.current_password) {
+          form.reset('current_password');
+          currentPasswordInput.value.focus();
+        }
+
+        notify.error('Something went wrong updating your password');
+      },
+    });
+  };
+</script>
+
 <template>
   <FormSection @submitted="updatePassword">
     <template #title> Update Password </template>
@@ -58,46 +101,3 @@
     </template>
   </FormSection>
 </template>
-
-<script setup>
-  import { ref } from 'vue';
-  import { useForm } from '@/plugins';
-  import { notify } from '@/utils';
-  import ActionMessage from '@/Components/ActionMessage.vue';
-  import FormSection from '@/Components/FormSection.vue';
-  import InputLabel from '@/Components/InputLabel.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
-
-  const passwordInput = ref(null);
-  const currentPasswordInput = ref(null);
-
-  const form = useForm({
-    current_password: '',
-    password: '',
-    password_confirmation: '',
-  });
-
-  const updatePassword = () => {
-    form.put('/api/v1/password', {
-      errorBag: 'updatePassword',
-      onSuccess: () => {
-        form.reset();
-        notify.success('Password saved successfully.');
-      },
-      onError: () => {
-        if (form.errors.password) {
-          form.reset('password', 'password_confirmation');
-          passwordInput.value.focus();
-        }
-
-        if (form.errors.current_password) {
-          form.reset('current_password');
-          currentPasswordInput.value.focus();
-        }
-
-        notify.error('Something went wrong updating your password');
-      },
-    });
-  };
-</script>

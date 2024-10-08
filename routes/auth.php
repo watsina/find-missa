@@ -9,7 +9,9 @@ use App\Http\Controllers\Auth\ProfilePhotoController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use Laravel\Fortify\Http\Controllers\RecoveryCodeController;
+use App\Http\Controllers\Auth\OtherBrowserSessionsController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\Auth\GetUserBrowserSessionsController;
 use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
@@ -36,6 +38,13 @@ Route::group(['middleware' => config('fortify.middleware', ['web'])], function (
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->middleware([config('fortify.auth_middleware', 'auth').':'.config('fortify.guard')])
         ->name('logout');
+
+    // user sessions
+    Route::get('/user/browser-sessions', GetUserBrowserSessionsController::class)
+        ->name('browser-sessions');
+
+    Route::delete('/user/other-browser-sessions', [OtherBrowserSessionsController::class, 'destroy'])
+        ->name('other-browser-sessions.destroy');
 
     // Password Reset...
     if (Features::enabled(Features::resetPasswords())) {
