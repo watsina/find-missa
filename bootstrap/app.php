@@ -21,12 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware
-            ->api(prepend: [
-                \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-                'auth.session',
-                \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
-                'json',
-            ])
+            ->statefulApi()
+            ->throttleApi()
+            ->api(['auth.session', 'json'])
             ->alias([
                 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
                 'json' => \App\Http\Middleware\JsonMiddleware::class,
@@ -36,5 +33,5 @@ return Application::configure(basePath: dirname(__DIR__))
         // $schedule->command('inspire')->hourly();
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation']);
     })->create();

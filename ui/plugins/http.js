@@ -3,6 +3,7 @@ import axios from 'axios';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 axios.defaults.withCredentials = false;
+// axios.defaults.withXSRFToken = false;
 
 const instance = axios.create({
   headers: {

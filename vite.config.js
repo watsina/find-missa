@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import Vuetify from 'vite-plugin-vuetify';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
     resolve: {
         alias: {
-            '@': '/ui/',
+            '@': fileURLToPath(new URL('./ui', import.meta.url)),
         },
         extensions: ['.gql', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
     },
@@ -16,7 +17,12 @@ export default defineConfig({
             refresh: true,
         }),
         vue({
-            template: { transformAssetUrls },
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
         }),
         Vuetify({
             autoImport: true,
