@@ -1,6 +1,12 @@
-// import users from './users';
 import auth from './auth';
 import dashboard from './dashboard';
+// import users from './users';
+// import parishes from './parishes';
+// import churces from './churces';
+// import activities from './activities';
+// import sub-parishes from './sub-parishes';
+// import dioceses from './dioceses';
+// import priests from './priests';
 // import errors from './errors';
 
 export default [
@@ -19,6 +25,12 @@ export default [
   ...dashboard,
   ...auth,
   // ...users,
+  // ...dioceses,
+  // ...activities,
+  // ...parishes,
+  // ...churces,
+  // ...priests,
+  // ...sub-parishes,
   // ...errors,
   // {
   //   path: '*',
