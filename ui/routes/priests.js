@@ -1,15 +1,8 @@
 export default [
   {
-    path: '/priests',
+    path: '',
+    name: 'priests.index',
     props: true,
-    component: () => import('@/layouts/AppLayout'),
-    children: [
-      {
-        path: '',
-        name: 'priests.index',
-        props: true,
-        component: () => import('@/pages/priests'),
-      },
-    ],
+    component: () => import('@/pages/priests'),
   },
 ];

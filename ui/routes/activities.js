@@ -1,15 +1,8 @@
 export default [
   {
-    path: '/activities',
+    path: '',
+    name: 'activities.index',
     props: true,
-    component: () => import('@/layouts/AppLayout'),
-    children: [
-      {
-        path: '',
-        name: 'activities.index',
-        props: true,
-        component: () => import('@/pages/activities'),
-      },
-    ],
+    component: () => import('@/pages/activities'),
   },
 ];

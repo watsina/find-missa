@@ -1,15 +1,8 @@
 export default [
   {
-    path: '/dioceses',
+    path: '',
+    name: 'parishes.index',
     props: true,
-    component: () => import('@/layouts/AppLayout'),
-    children: [
-      {
-        path: '',
-        name: 'dioceses.index',
-        props: true,
-        component: () => import('@/pages/dioceses'),
-      },
-    ],
+    component: () => import('@/pages/parishes'),
   },
 ];

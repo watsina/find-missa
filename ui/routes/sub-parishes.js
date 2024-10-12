@@ -1,15 +1,8 @@
 export default [
   {
-    path: '/sub-parishes',
+    path: '',
+    name: 'sub-parishes.index',
     props: true,
-    component: () => import('@/layouts/AppLayout'),
-    children: [
-      {
-        path: '',
-        name: 'sub-parishes.index',
-        props: true,
-        component: () => import('@/pages/sub-parishes'),
-      },
-    ],
+    component: () => import('@/pages/sub-parishes'),
   },
 ];

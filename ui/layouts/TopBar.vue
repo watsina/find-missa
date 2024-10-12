@@ -12,6 +12,13 @@
       </div>
       <v-app-bar-title>App Name</v-app-bar-title>
     </template>
+    <template #extension v-if="$slots.header">
+      <header class="">
+        <div class="tw-px-4 tw-mx-auto md:tw-px-6 lg:tw-px-8">
+          <slot name="header" />
+        </div>
+      </header>
+    </template>
     <v-spacer></v-spacer>
     <user-avatar></user-avatar>
     <div class="tw-ml-4"></div>

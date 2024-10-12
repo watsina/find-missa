@@ -2,7 +2,9 @@
   <v-layout class="rounded rounded-md">
     <global-notifications></global-notifications>
     <top-bar v-model:rail="rail" v-model:drawer="drawer">
-      <slot name="header" />
+      <template #header v-if="$slots.head">
+        <slot name="head" />
+      </template>
     </top-bar>
 
     <nav-drawer v-model:rail="rail" v-model:drawer="drawer" />
