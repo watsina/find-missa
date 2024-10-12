@@ -12,10 +12,9 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
-    { title: 'Type', value: 'type' },
-    { title: 'Country', value: 'country' },
+    { title: 'Diocese', value: 'diocese' },
     { title: 'Office Address', value: 'office_address' },
-    { title: 'Postal Address', value: 'postal_address' },
+    { title: 'District', value: 'district' },
     { title: '', value: 'actions' },
   ];
 

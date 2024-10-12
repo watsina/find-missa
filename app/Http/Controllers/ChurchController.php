@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Church;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\ChurchResource;
 use App\Http\Resources\ChurchCollection;
 use App\Http\Requests\ChurchStoreRequest;
@@ -21,7 +22,16 @@ class ChurchController extends Controller
 
     public function store(ChurchStoreRequest $request): ChurchResource
     {
-        $church = Church::create($request->validated());
+        $data = $request->validated();
+
+        if (isset($data['longitude']) && isset($data['latitude'])) {
+            $data['coordinates'] = DB::raw("ST_SRID(Point({$data['longitude']}, {$data['latitude']}), 4326)");
+        }
+
+        unset($data['longitude']);
+        unset($data['latitude']);
+
+        $church = Church::create($data);
 
         return new ChurchResource($church);
     }
@@ -33,7 +43,16 @@ class ChurchController extends Controller
 
     public function update(ChurchUpdateRequest $request, Church $church): ChurchResource
     {
-        $church->update($request->validated());
+        $data = $request->validated();
+
+        if (isset($data['longitude']) && isset($data['latitude'])) {
+            $data['coordinates'] = DB::raw("ST_SRID(Point({$data['longitude']}, {$data['latitude']}), 4326)");
+        }
+
+        unset($data['longitude']);
+        unset($data['latitude']);
+
+        $church->update($data);
 
         return new ChurchResource($church);
     }

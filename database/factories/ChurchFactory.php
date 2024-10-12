@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Priest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ChurchFactory extends Factory
@@ -23,13 +24,12 @@ class ChurchFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'type' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'latitude' => $this->faker->latitude(),
-            'longitude' => $this->faker->longitude(),
-            'street_address' => $this->faker->word(),
-            'postal_address' => $this->faker->word(),
-            'contact_email' => $this->faker->word(),
-            'contact_phone' => $this->faker->word(),
+            'type' => $this->faker->randomElement(['parish', 'sub_parish']),
+            'coordinates' => DB::raw("ST_SRID(Point({$this->faker->longitude}, {$this->faker->latitude}), 4326)"),
+            'street_address' => $this->faker->streetAddress(),
+            'postal_address' => $this->faker->postcode(),
+            'contact_email' => $this->faker->safeEmail(),
+            'contact_phone' => $this->faker->phoneNumber(),
             'parish_type' => $this->faker->word(),
             'parish_id' => Parish::factory(),
             'priest_id' => Priest::factory(),

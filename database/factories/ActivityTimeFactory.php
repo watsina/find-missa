@@ -22,13 +22,13 @@ class ActivityTimeFactory extends Factory
     {
         return [
             'type' => $this->faker->word(),
-            'start_time' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'end_time' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'language' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'start_time' => $this->faker->time,
+            'end_time' => $this->faker->time,
+            'language' => $this->faker->languageCode,
             'church_id' => Church::factory(),
-            'occurence' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'occurence' => $this->faker->randomElement(['weekly', 'one-time', 'monthly']),
             'date' => $this->faker->dateTime(),
-            'day_of_week' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'day_of_week' => $this->faker->dayOfWeek(),
         ];
     }
 }

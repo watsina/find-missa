@@ -11,11 +11,14 @@
   const isFetching = ref(false);
 
   const headers = [
-    { title: 'Name', value: 'name' },
-    { title: 'Type', value: 'type' },
-    { title: 'Country', value: 'country' },
-    { title: 'Office Address', value: 'office_address' },
-    { title: 'Postal Address', value: 'postal_address' },
+    { title: 'Activity Type', value: 'type' },
+    { title: 'Church', value: 'church' },
+    { title: 'Start Time', value: 'start_time' },
+    { title: 'End Time', value: 'end_time' },
+    { title: 'Language', value: 'language' },
+    { title: 'Occurrence', value: 'occurrence' },
+    { title: 'Date', value: 'date' },
+    { title: 'Day of Week', value: 'day_of_week' },
     { title: '', value: 'actions' },
   ];
 
@@ -25,7 +28,7 @@
 
   const fetchActivities = () => {
     isFetching.value = true;
-    http.get('/api/v1/activities').then(({ data }) => {
+    http.get('/api/v1/activity-time').then(({ data }) => {
       console.info({ data });
       activities.value = data?.data;
     });

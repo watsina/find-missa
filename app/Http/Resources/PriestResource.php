@@ -17,6 +17,7 @@ class PriestResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'parish' => $this->parish?->name,
             'parish_id' => $this->parish_id,
         ];
     }

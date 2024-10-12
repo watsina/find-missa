@@ -12,8 +12,7 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
-    { title: 'Type', value: 'type' },
-    { title: 'Country', value: 'country' },
+    { title: 'Parish', value: 'parish' },
     { title: 'Office Address', value: 'office_address' },
     { title: 'Postal Address', value: 'postal_address' },
     { title: '', value: 'actions' },
@@ -25,7 +24,7 @@
 
   const fetchDioceses = () => {
     isFetching.value = true;
-    http.get('/api/v1/sub-parishes').then(({ data }) => {
+    http.get('/api/v1/sub-parish').then(({ data }) => {
       console.info({ data });
       subParishes.value = data?.data;
     });
