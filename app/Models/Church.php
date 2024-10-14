@@ -26,7 +26,6 @@ class Church extends Model
         'id' => 'integer',
         'parish_id' => 'integer',
         'priest_id' => 'integer',
-        // 'coordinates' => '',
     ];
 
     public function parish(): BelongsTo

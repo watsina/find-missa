@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type', 100)->default('parish');
-            $table->geography('coordinates', 'point')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->string('street_address')->nullable();
             $table->string('postal_address')->nullable();
             $table->string('contact_email')->nullable();
