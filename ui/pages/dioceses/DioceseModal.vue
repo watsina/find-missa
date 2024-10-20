@@ -12,7 +12,7 @@
     diocese: { type: Object, default: null },
   });
 
-  const emit = defineEmits(['update:modalValue']);
+  const emit = defineEmits(['update:modalValue', 'created', 'updated']);
 
   const form = useForm({
     name: props.diocese?.name || '',
@@ -26,13 +26,11 @@
     () => props.diocese,
     (newValue) => {
       if (newValue?.id) {
-        form.first_name = newValue?.first_name;
-        form.last_name = newValue?.last_name;
-        form.email = newValue?.email;
-        form.phone_number = newValue?.phone_number;
-        form.unique_identifier = newValue?.unique_identifier;
-        form.category_id = newValue?.category?.id;
-        form.birth_date = newValue?.birth_date;
+        form.name = props.diocese?.name || '';
+        form.type = props.diocese?.type || '';
+        form.office_address = props.diocese?.office_address || '';
+        form.postal_address = props.diocese?.postal_address || '';
+        form.country = props.diocese?.country || 'Uganda';
       }
     },
   );
@@ -59,7 +57,10 @@
       preserveScroll: true,
       onSuccess: ({ data }) => {
         console.info({ data });
-        notify.success('Diocese added successfully.');
+        const message = isEditing.value
+          ? 'Diocese was updated successfully'
+          : 'Diocese was added successfully.';
+        notify.success(message);
         closeModal(data);
       },
       onError: () => notify.error('There was an error saving the information.'),
@@ -68,7 +69,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data) emit('created', data);
+    if (data && !isEditing.value) emit('created', data);
+    if (data && isEditing.value) emit('updated', data);
     emit('update:modalValue', false);
   };
 </script>

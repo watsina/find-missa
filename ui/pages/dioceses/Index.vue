@@ -38,6 +38,15 @@
       .finally(() => (isFetching.value = false));
   };
 
+  function updateDioceses(updated) {
+    dioceses.value = dioceses.value?.map((diocese) => {
+      if (diocese?.id === updated?.id) {
+        return updated;
+      }
+      return diocese;
+    });
+  }
+
   const showModal = (diocese = null) => {
     editDiocese.value = diocese;
 
@@ -54,6 +63,7 @@
       v-model:modal-value="showingModal"
       :diocese="editDiocese"
       @created="dioceses.push($event)"
+      @updated="updateDioceses"
     />
     <v-container>
       <v-row class="tw-py-12">
@@ -89,6 +99,7 @@
             <template #item.actions="{ item }">
               <v-icon
                 :icon="mdiPencil"
+                @click="showModal(item)"
                 color="primary"
                 title="Edit Diocese"
                 class="tw-cursor-pointer"
