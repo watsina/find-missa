@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('postal_address')->nullable();
             $table->string('country')->default('Uganda');
             $table->timestamps();
+
+            $table->unique(['name', 'country']);
         });
 
         Schema::enableForeignKeyConstraints();

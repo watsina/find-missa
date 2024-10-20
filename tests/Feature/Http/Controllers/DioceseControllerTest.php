@@ -31,7 +31,7 @@ test('store uses form request validation')
 
 test('store saves', function (): void {
     $name = fake()->name();
-    $type = fake()->word();
+    $type = fake()->randomElement(['diocese', 'archdiocese']);
     $country = fake()->country();
 
     $response = post(route('diocese.store'), [
@@ -71,7 +71,7 @@ test('update uses form request validation')
 test('update behaves as expected', function (): void {
     $diocese = Diocese::factory()->create();
     $name = fake()->name();
-    $type = fake()->word();
+    $type = fake()->randomElement(['diocese', 'archdiocese']);
     $country = fake()->country();
 
     $response = put(route('diocese.update', $diocese), [

@@ -1,14 +1,19 @@
 <script setup>
   import { ref, onMounted } from 'vue';
+  import { mdiPencil } from '@mdi/js';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import DioceseModal from './DioceseModal.vue';
 
   const { smAndDown } = useDisplay();
   const dioceses = ref([]);
   const search = ref('');
   const isFetching = ref(false);
+  const showingModal = ref(false);
+  const editDiocese = ref(null);
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -25,10 +30,18 @@
 
   const fetchDioceses = () => {
     isFetching.value = true;
-    http.get('/api/v1/diocese').then(({ data }) => {
-      console.info({ data });
-      dioceses.value = data?.data;
-    });
+    http
+      .get('/api/v1/diocese')
+      .then(({ data }) => {
+        dioceses.value = data?.data;
+      })
+      .finally(() => (isFetching.value = false));
+  };
+
+  const showModal = (diocese = null) => {
+    editDiocese.value = diocese;
+
+    showingModal.value = true;
   };
 </script>
 
@@ -37,16 +50,24 @@
     <template #head>
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Dioceses</h2>
     </template>
+    <diocese-modal
+      v-model:modal-value="showingModal"
+      :diocese="editDiocese"
+      @created="dioceses.push($event)"
+    />
     <v-container>
       <v-row class="tw-py-12">
-        <v-col cols="12" md="8">
+        <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-sm tw-text-gray-700">A list of all the dioceses.</p>
+          <PrimaryButton @click="showModal"> Add a diocese </PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table
             :headers="headers"
             :items="dioceses || []"
             :mobile="smAndDown"
+            :loading="isFetching"
+            no-data-text="No dioceses have been added yet..."
             mobile-breakpoint="md"
           >
             <template #top>
@@ -62,7 +83,17 @@
                 type="text"
               />
             </template>
-            <template #item.actions="{ item }"> </template>
+            <template #item.name="{ item }" class="tw-capitalize">
+              {{ item.name }}
+            </template>
+            <template #item.actions="{ item }">
+              <v-icon
+                :icon="mdiPencil"
+                color="primary"
+                title="Edit Diocese"
+                class="tw-cursor-pointer"
+              ></v-icon>
+            </template>
           </v-data-table>
         </v-col>
       </v-row>

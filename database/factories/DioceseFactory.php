@@ -21,7 +21,7 @@ class DioceseFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'type' => $this->faker->randomElement(['diocese', 'arch diocese']),
+            'type' => $this->faker->randomElement(['diocese', 'archdiocese']),
             'office_address' => $this->faker->word(),
             'postal_address' => $this->faker->word(),
             'country' => $this->faker->country(),

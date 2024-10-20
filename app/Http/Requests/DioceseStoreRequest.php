@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DioceseStoreRequest extends FormRequest
@@ -20,8 +21,8 @@ class DioceseStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'type' => ['required', 'string'],
+            'name' => ['required', 'string', 'unique:dioceses'],
+            'type' => ['required', 'string', Rule::in(['diocese', 'archdiocese'])],
             'office_address' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
             'country' => ['required', 'string'],
