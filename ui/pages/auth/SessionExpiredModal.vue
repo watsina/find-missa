@@ -5,7 +5,7 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn :to="{ name: 'auth.login' }" outlined color="primary">
+        <v-btn href="/auth/login" outlined color="primary">
           <v-icon :icon="mdiLoginVariant" />
           Go to login
         </v-btn>

@@ -19,6 +19,7 @@
 
 <script setup>
   import { ref, onMounted } from 'vue';
+  import { http } from '@/plugins';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
   import GlobalNotifications from '@/components/GlobalNotifications';
@@ -29,8 +30,6 @@
   const showSessionExpiredModal = ref(false);
 
   onMounted(async () => {
-    const http = (await import('@/plugins/http')).default;
-
     http.interceptors.response.use(null, async (error) => {
       if (error.response?.status === 401 || error.response?.status === 419) {
         showSessionExpiredModal.value = true;
