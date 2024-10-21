@@ -2,6 +2,7 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
+  import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
@@ -37,6 +38,13 @@
     parishToEdit.value = data;
     showingModal.value = true;
   }
+
+  function updateParish(updates) {
+    parishes.value = parishes.value?.map((parish) => {
+      if (parish?.id === updates?.id) return updates;
+      return parish;
+    });
+  }
 </script>
 
 <template>
@@ -48,17 +56,18 @@
       v-model:show-modal="showingModal"
       :parish="parishToEdit"
       @created="parishes.push($event)"
+      @updated="updateParish"
     ></parish-modal>
     <v-container>
       <v-row class="tw-py-12">
-        <v-col cols="12" class="tw-flex tw-justify-between">
+        <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-sm tw-text-gray-700">A list of all the parishes.</p>
           <PrimaryButton @click="showModal"> Add Parish</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table
-            :headers="headers"
             class="tw-capitalize"
+            :headers="headers"
             :items="parishes || []"
             :mobile="smAndDown"
             mobile-breakpoint="md"
@@ -76,7 +85,9 @@
                 type="text"
               />
             </template>
-            <template #item.actions="{ item }"> </template>
+            <template #item.actions="{ item }">
+              <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
