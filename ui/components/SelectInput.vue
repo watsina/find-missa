@@ -25,7 +25,7 @@
 
   const model = defineModel({
     required: true,
-    type: Object,
+    type: [Object, String, Number],
   });
 </script>
 

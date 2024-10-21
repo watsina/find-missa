@@ -1,6 +1,6 @@
 export default [
   {
-    path: '',
+    path: '/priests',
     name: 'priests.index',
     props: true,
     component: () => import('@/pages/priests'),

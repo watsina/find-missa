@@ -8,11 +8,12 @@
   import TextInput from '@/components/TextInput.vue';
 
   const props = defineProps({
-    modalValue: Boolean,
     diocese: { type: Object, default: null },
   });
 
-  const emit = defineEmits(['update:modalValue', 'created', 'updated']);
+  const showModal = defineModel('showModal', { type: Boolean });
+
+  const emit = defineEmits(['created', 'updated']);
 
   const form = useForm({
     name: props.diocese?.name || '',
@@ -36,7 +37,7 @@
   );
 
   watch(
-    () => props.modalValue,
+    () => props.showModal,
     (newValue) => {
       if (!newValue) {
         form.reset();
@@ -48,7 +49,7 @@
   const isEditing = computed(() => !!props.diocese?.id);
 
   const submit = () => {
-    const url = isEditing.value ? `api/v1/diocese/${props.diocese?.id}` : `api/v1/diocese`;
+    const url = isEditing.value ? `/api/v1/diocese/${props.diocese?.id}` : `/api/v1/diocese`;
 
     const method = isEditing.value ? 'put' : 'post';
 
@@ -56,7 +57,6 @@
       preserveState: true,
       preserveScroll: true,
       onSuccess: ({ data }) => {
-        console.info({ data });
         const message = isEditing.value
           ? 'Diocese was updated successfully'
           : 'Diocese was added successfully.';
@@ -71,13 +71,14 @@
     form.reset();
     if (data && !isEditing.value) emit('created', data);
     if (data && isEditing.value) emit('updated', data);
-    emit('update:modalValue', false);
+
+    showModal.value = false;
   };
 </script>
 
 <template>
   <div>
-    <dialog-modal max-width="600" :show="modalValue" @close="closeModal">
+    <dialog-modal max-width="600" :show="showModal" @close="closeModal">
       <template #title> {{ isEditing ? 'Update Diocese' : 'New Diocese' }} </template>
 
       <template #content>

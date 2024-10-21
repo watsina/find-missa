@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue';
-  import { mdiPencil } from '@mdi/js';
+  import { mdiPencilOutline } from '@mdi/js';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
   import TextInput from '@/components/TextInput.vue';
@@ -60,7 +60,7 @@
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Dioceses</h2>
     </template>
     <diocese-modal
-      v-model:modal-value="showingModal"
+      v-model:show-modal="showingModal"
       :diocese="editDiocese"
       @created="dioceses.push($event)"
       @updated="updateDioceses"
@@ -98,7 +98,7 @@
             </template>
             <template #item.actions="{ item }">
               <v-icon
-                :icon="mdiPencil"
+                :icon="mdiPencilOutline"
                 @click="showModal(item)"
                 color="primary"
                 title="Edit Diocese"

@@ -2,13 +2,17 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
+  import ParishModal from './ParishModal.vue';
 
   const { smAndDown } = useDisplay();
   const parishes = ref([]);
   const search = ref('');
   const isFetching = ref(false);
+  const showingModal = ref(false);
+  const parishToEdit = ref(null);
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -19,16 +23,20 @@
   ];
 
   onMounted(() => {
-    fetchDioceses();
+    fetchParishes();
   });
 
-  const fetchDioceses = () => {
+  const fetchParishes = () => {
     isFetching.value = true;
     http.get('/api/v1/parish').then(({ data }) => {
-      console.info({ data });
       parishes.value = data?.data;
     });
   };
+
+  function showModal(data = null) {
+    parishToEdit.value = data;
+    showingModal.value = true;
+  }
 </script>
 
 <template>
@@ -36,14 +44,21 @@
     <template #head>
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Parishes</h2>
     </template>
+    <parish-modal
+      v-model:show-modal="showingModal"
+      :parish="parishToEdit"
+      @created="parishes.push($event)"
+    ></parish-modal>
     <v-container>
       <v-row class="tw-py-12">
-        <v-col cols="12" md="8">
+        <v-col cols="12" class="tw-flex tw-justify-between">
           <p class="tw-mt-2 tw-text-sm tw-text-gray-700">A list of all the parishes.</p>
+          <PrimaryButton @click="showModal"> Add Parish</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table
             :headers="headers"
+            class="tw-capitalize"
             :items="parishes || []"
             :mobile="smAndDown"
             mobile-breakpoint="md"
