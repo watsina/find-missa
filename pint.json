@@ -1,9 +1,9 @@
 {
-    "preset": "laravel",
-    "rules": {
-        "ordered_imports": {
-            "sort_algorithm": "length"
-        },
-        "single_trait_insert_per_statement": true
-    }
+  "preset": "laravel",
+  "rules": {
+    "ordered_imports": {
+      "sort_algorithm": "length"
+    },
+    "single_trait_insert_per_statement": true
+  }
 }

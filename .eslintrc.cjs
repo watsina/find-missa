@@ -23,5 +23,11 @@ module.exports = {
         alphabetical: true,
       },
     ],
+    'vue/valid-v-slot': [
+      'warn',
+      {
+        allowModifiers: true,
+      },
+    ],
   },
 };
