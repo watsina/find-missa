@@ -16,13 +16,13 @@ class ChurchResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
-            'coordinates' => "($this->longitude, $this->latitude)",
+            'coordinates' => "[$this->longitude, $this->latitude]",
             'street_address' => $this->street_address,
             'postal_address' => $this->postal_address,
             'contact_email' => $this->contact_email,
             'contact_phone' => $this->contact_phone,
-            'parish_type' => $this->parish_type,
-            'parish_id' => $this->parish_id,
+            'parishable_type' => $this->parishable_type,
+            'parish' => $this->parishable,
             'priest_id' => $this->priest_id,
         ];
     }

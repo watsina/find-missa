@@ -30,8 +30,8 @@ class ChurchFactory extends Factory
             'postal_address' => $this->faker->postcode(),
             'contact_email' => $this->faker->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
-            'parish_type' => $this->faker->word(),
-            'parish_id' => Parish::factory(),
+            // 'parishable_type' => 'parish',
+            // 'parishable_id' => Parish::factory(),
             'priest_id' => Priest::factory(),
         ];
     }

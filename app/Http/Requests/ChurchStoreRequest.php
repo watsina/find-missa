@@ -28,8 +28,8 @@ class ChurchStoreRequest extends FormRequest
             'postal_address' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'string'],
             'contact_phone' => ['nullable', 'string'],
-            'parish_type' => ['nullable', 'string'],
-            'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
+            'parishable_type' => ['nullable', 'string'],
+            'parishable_id' => ['nullable', 'integer', 'exists:parishes,id'],
             'priest_id' => ['nullable', 'integer', 'exists:priests,id'],
         ];
     }

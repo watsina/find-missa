@@ -28,9 +28,9 @@ class Church extends Model
         'priest_id' => 'integer',
     ];
 
-    public function parish(): BelongsTo
+    public function parishable(): BelongsTo
     {
-        return $this->belongsTo(Parish::class);
+        return $this->morphTo();
     }
 
     public function priest(): BelongsTo

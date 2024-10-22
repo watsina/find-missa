@@ -23,8 +23,7 @@ return new class extends Migration
             $table->string('postal_address')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
-            $table->string('parish_type')->nullable();
-            $table->foreignId('parish_id')->nullable()->constrained();
+            $table->nullableMorphs('parishable');
             $table->foreignId('priest_id')->nullable()->constrained();
             $table->timestamps();
         });
