@@ -40,9 +40,9 @@
   }
 
   function updateSubParish(updates) {
-    subParishes.value = subParishes.value?.map((parish) => {
-      if (parish?.id === updates?.id) return updates;
-      return parish;
+    subParishes.value = subParishes.value?.map((subParish) => {
+      if (subParish?.id === updates?.id) return updates;
+      return subParish;
     });
   }
 </script>
