@@ -24,10 +24,12 @@ class Church extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'parish_id' => 'integer',
         'priest_id' => 'integer',
     ];
 
+    /**
+     * Get the parent parishable model (parish or sub-parish).
+     */
     public function parishable(): BelongsTo
     {
         return $this->morphTo();

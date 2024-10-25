@@ -21,8 +21,7 @@ class ChurchResource extends JsonResource
             'postal_address' => $this->postal_address,
             'contact_email' => $this->contact_email,
             'contact_phone' => $this->contact_phone,
-            'parishable_type' => $this->parishable_type,
-            'parish' => $this->parishable,
+            // 'parish' => $this->parishable,
             'priest_id' => $this->priest_id,
         ];
     }

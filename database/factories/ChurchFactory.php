@@ -23,15 +23,17 @@ class ChurchFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'type' => $this->faker->randomElement(['parish', 'sub_parish']),
+            'type' => 'parish',
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
             'street_address' => $this->faker->streetAddress(),
             'postal_address' => $this->faker->postcode(),
             'contact_email' => $this->faker->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
-            // 'parishable_type' => 'parish',
-            // 'parishable_id' => Parish::factory(),
+            'parishable_id' => Parish::factory()->createOne()->id,
+            'parishable_type' => function (array $attributes) {
+                return Parish::find($attributes['parishable_id'])->type;
+            },
             'priest_id' => Priest::factory(),
         ];
     }

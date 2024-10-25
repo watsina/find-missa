@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Church;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Resources\ChurchResource;
@@ -21,7 +22,8 @@ class ChurchController extends Controller
 
     public function store(ChurchStoreRequest $request): ChurchResource
     {
-        $church = Church::create($request->validated());
+        $data = $request->validated();
+        $church = Church::create(Arr::except($data, 'parishable_id'));
 
         return new ChurchResource($church);
     }

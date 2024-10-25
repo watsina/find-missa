@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ChurchType;
+use Illuminate\Validation\Rule;
+use App\Rules\ValidateParishableId;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ChurchUpdateRequest extends FormRequest
@@ -21,15 +24,14 @@ class ChurchUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'type' => ['required', 'string', 'max:100'],
+            'type' => ['required', Rule::enum(ChurchType::class)],
             'latitude' => ['nullable', 'numeric', 'between:-99.9999999,99.9999999'],
             'longitude' => ['nullable', 'numeric', 'between:-99.9999999,99.9999999'],
             'street_address' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'string'],
             'contact_phone' => ['nullable', 'string'],
-            'parishable_type' => ['nullable', 'string'],
-            'parishable_id' => ['nullable', 'integer', 'exists:parishes,id'],
+            'parishable_id' => ['nullable', 'integer', new ValidateParishableId],
             'priest_id' => ['nullable', 'integer', 'exists:priests,id'],
         ];
     }
