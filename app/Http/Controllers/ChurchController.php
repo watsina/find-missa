@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Church;
-use Illuminate\Support\Arr;
+use App\Models\Parish;
+use App\Models\SubParish;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Resources\ChurchResource;
@@ -22,8 +23,16 @@ class ChurchController extends Controller
 
     public function store(ChurchStoreRequest $request): ChurchResource
     {
+        $church = Church::create($request->safe()->except('parishable_id'));
         $data = $request->validated();
-        $church = Church::create(Arr::except($data, 'parishable_id'));
+
+        if ($data['type'] === 'sub-parish') {
+            $parish = SubParish::find($data['parishable_id']);
+        } else {
+            $parish = Parish::find($data['parishable_id']);
+        }
+
+        $church->parishable()->associate($parish)->save();
 
         return new ChurchResource($church);
     }
@@ -35,7 +44,17 @@ class ChurchController extends Controller
 
     public function update(ChurchUpdateRequest $request, Church $church): ChurchResource
     {
-        $church->update($request->validated());
+        $church->update($request->safe()->except('parishable_id'));
+        $data = $request->validated();
+
+        if (isset($data['parishable_id'])) {
+            if ($data['type'] === 'sub-parish') {
+                $parish = SubParish::find($data['parishable_id']);
+            } else {
+                $parish = Parish::find($data['parishable_id']);
+            }
+            $church->parishable()->associate($parish)->save();
+        }
 
         return new ChurchResource($church);
     }

@@ -19,8 +19,8 @@
     { title: 'Name', value: 'name' },
     { title: 'Coordinates', value: 'coordinates' },
     { title: 'Contact Email', value: 'contact_email' },
+    { title: 'Street Address', value: 'street_address' },
     { title: 'Postal Address', value: 'postal_address' },
-    { title: 'Physical Address', value: 'physical_address' },
     { title: 'Parish', value: 'parish' },
     { title: '', value: 'actions' },
   ];
@@ -32,7 +32,6 @@
   const fetchChurches = () => {
     isFetching.value = true;
     http.get('/api/v1/church').then(({ data }) => {
-      console.info({ data });
       churches.value = data?.data;
     });
   };

@@ -45,6 +45,16 @@ test('store saves', function (): void {
     $church = $churches->first();
 });
 
+test('store saves the parishable relation.', function (): void {
+    $church = Church::factory()->raw();
+
+    post(route('church.store'), $church)->assertCreated();
+
+    $church = Church::first();
+
+    expect($church->parishable)->not->toBeNull();
+});
+
 test('parish is properly validated when creating a church.', function (): void {
     $name = fake()->name();
     $type = fake()->randomElement(['parish', 'basilica', 'minor-basilica']);
@@ -136,6 +146,22 @@ test('update behaves as expected', function (): void {
 
     expect($name)->toEqual($church->name);
     expect($type)->toEqual($church->type);
+});
+
+test('update also updates the parishable relation.', function (): void {
+    $church = Church::factory()->create();
+    $newParish = SubParish::factory()->createOne();
+
+    put(route('church.update', $church), [
+        ...$church->getAttributes(),
+        'type' => 'sub-parish',
+        'parishable_id' => $newParish->id,
+    ])->assertOk();
+
+    $church = Church::first();
+
+    expect($church->parishable_id)->toBe($newParish->id);
+    expect($church->parishable_type)->toBe(SubParish::class);
 });
 
 test('destroy deletes and responds with', function (): void {

@@ -31,9 +31,7 @@ class ChurchFactory extends Factory
             'contact_email' => $this->faker->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
             'parishable_id' => Parish::factory()->createOne()->id,
-            'parishable_type' => function (array $attributes) {
-                return Parish::find($attributes['parishable_id'])->type;
-            },
+            'parishable_type' => Parish::class,
             'priest_id' => Priest::factory(),
         ];
     }

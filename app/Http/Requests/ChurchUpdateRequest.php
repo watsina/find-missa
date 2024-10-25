@@ -25,8 +25,8 @@ class ChurchUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'type' => ['required', Rule::enum(ChurchType::class)],
-            'latitude' => ['nullable', 'numeric', 'between:-99.9999999,99.9999999'],
-            'longitude' => ['nullable', 'numeric', 'between:-99.9999999,99.9999999'],
+            'latitude' => ['nullable', 'numeric', 'between:-90.9999999,90.9999999'],
+            'longitude' => ['nullable', 'numeric', 'between:-180.9999999,180.9999999'],
             'street_address' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'string'],

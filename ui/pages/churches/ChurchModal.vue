@@ -16,35 +16,64 @@
   const emit = defineEmits(['created', 'updated']);
 
   const parishes = ref([]);
+  const subParishes = ref([]);
+
+  const churchTypes = [
+    { title: 'Parish', value: 'parish' },
+    { title: 'SubParish', value: 'sub-parish' },
+    { title: 'Basilica', value: 'basilica' },
+    { title: 'Minor Basilica', value: 'minor-basilica' },
+  ];
 
   onMounted(() => {
     // fetch parishes
     http.get('/api/v1/parish').then(({ data }) => {
       parishes.value = data?.data;
     });
+    // fetch subparishes
+    http.get('/api/v1/sub-parish').then(({ data }) => {
+      subParishes.value = data?.data;
+    });
   });
+
+  const parishable = ref([]);
 
   const form = useForm({
     name: props.church?.name || '',
     type: props.church?.type || '',
+    parishable_id: props.church?.parishable_id || '',
     latitude: props.church?.latitude || '',
     longitude: props.church?.longitude || '',
     contact_email: props.church?.contact_email || '',
-    street_address: props.church?.street_address || '',
-    parish_id: props.church?.parish_id || '',
-    postal_address: props.church?.postal_address || '',
     contact_phone: props.church?.contact_phone || '',
-    parish_priest_id: props.church?.parish_priest_id || '',
+    street_address: props.church?.street_address || '',
+    postal_address: props.church?.postal_address || '',
   });
+
+  watch(
+    () => form.type,
+    (value) => {
+      if (value === 'sub-parish') {
+        parishable.value = subParishes.value;
+      } else {
+        parishable.value = parishes.value;
+      }
+    },
+  );
 
   watch(
     () => props.church,
     (newValue) => {
       if (newValue?.id) {
         form.name = props.church?.name || '';
-        form.parish_id = props.church?.parish_id || '';
-        form.office_address = props.church?.office_address || '';
-        form.district = props.church?.district || '';
+        form.type = props.church?.type || '';
+        form.latitude = props.church?.latitude || '';
+        form.longitude = props.church?.longitude || '';
+        form.contact_email = props.church?.contact_email || '';
+        form.contact_phone = props.church?.contact_phone || '';
+        form.street_address = props.church?.street_address || '';
+        form.parishable_id = props.church?.parishable_id || '';
+        form.postal_address = props.church?.postal_address || '';
       }
     },
   );
@@ -62,7 +91,7 @@
   const isEditing = computed(() => !!props.church?.id);
 
   const submit = () => {
-    const url = isEditing.value ? `/api/v1/sub-parish/${props.church?.id}` : `/api/v1/sub-parish`;
+    const url = isEditing.value ? `/api/v1/church/${props.church?.id}` : `/api/v1/church`;
 
     const method = isEditing.value ? 'put' : 'post';
 
@@ -111,12 +140,25 @@
 
           <div class="tw-mt-4">
             <SelectInput
-              v-model="form.parish_id"
+              v-model="form.type"
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
-              :error="form.errors.diocese_id"
+              :error="form.errors.type"
+              :items="churchTypes"
+              label="Type*"
+              required
+              type="text"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <SelectInput
+              v-model="form.parishable_id"
+              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              :error="form.errors.parishable_id"
+              hint="Name of parish/subParish that the church belongs to."
               item-title="name"
               item-value="id"
-              :items="parishes"
+              :items="parishable"
               label="Parish*"
               required
               type="text"
@@ -125,11 +167,67 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.office_address"
+              v-model="form.latitude"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.office_address"
-              label="Office Address"
-              placeholder="Office Address"
+              :error="form.errors.latitude"
+              label="Latitude"
+              placeholder="43.88"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.longitude"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.longitude"
+              label="Longitude"
+              placeholder="93.78"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.contact_email"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.contact_email"
+              label="Contact Email"
+              placeholder="church@email.com"
+              required
+              type="email"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.contact_phone"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.contact_phone"
+              label="Contact Phone"
+              placeholder="+256 700 000000"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.street_address"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.street_address"
+              label="Plot 2, Kyadondo Road"
+              placeholder="Street Address"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.postal_address"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.postal_address"
+              label="Postal Address"
+              placeholder="PO BOX 123 Kampala"
               required
             />
           </div>
