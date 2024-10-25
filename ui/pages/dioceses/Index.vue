@@ -68,17 +68,17 @@
     <v-container>
       <v-row class="tw-py-12">
         <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-sm tw-text-gray-700">A list of all the dioceses.</p>
+          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the dioceses.</p>
           <PrimaryButton @click="showModal"> Add a diocese </PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table
             :headers="headers"
             :items="dioceses || []"
-            :mobile="smAndDown"
             :loading="isFetching"
-            no-data-text="No dioceses have been added yet..."
+            :mobile="smAndDown"
             mobile-breakpoint="md"
+            no-data-text="No dioceses have been added yet..."
           >
             <template #top>
               <TextInput
@@ -98,11 +98,11 @@
             </template>
             <template #item.actions="{ item }">
               <v-icon
-                :icon="mdiPencilOutline"
-                @click="showModal(item)"
-                color="primary"
-                title="Edit Diocese"
                 class="tw-cursor-pointer"
+                color="primary"
+                :icon="mdiPencilOutline"
+                title="Edit Diocese"
+                @click="showModal(item)"
               ></v-icon>
             </template>
           </v-data-table>

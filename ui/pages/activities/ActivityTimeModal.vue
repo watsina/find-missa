@@ -11,7 +11,7 @@
   import DateInput from '@/components/DateInput.vue';
 
   const props = defineProps({
-    priest: { type: Object, default: null },
+    activity: { type: Object, default: null },
   });
 
   const showModal = defineModel('showModal', { type: Boolean });
@@ -39,28 +39,28 @@
   });
 
   const form = useForm({
-    type: props.priest?.type || '',
-    start_time: props.priest?.start_time || '',
-    end_time: props.priest?.end_time || '',
-    language: props.priest?.language || '',
-    occurrence: props.priest?.occurrence || '',
-    date: props.priest?.date || null,
-    day_of_week: props.priest?.day_of_week || '',
-    church_id: props.priest?.church_id || '',
+    type: props.activity?.type || '',
+    start_time: props.activity?.start_time || '',
+    end_time: props.activity?.end_time || '',
+    language: props.activity?.language || '',
+    occurrence: props.activity?.occurrence || '',
+    date: props.activity?.date || null,
+    day_of_week: props.activity?.day_of_week || '',
+    church_id: props.activity?.church_id || '',
   });
 
   watch(
-    () => props.priest,
+    () => props.activity,
     (newValue) => {
       if (newValue?.id) {
-        form.type = props.priest?.type || '';
-        form.start_time = props.priest?.start_time || '';
-        form.end_time = props.priest?.end_time || '';
-        form.language = props.priest?.language || '';
-        form.occurrence = props.priest?.occurrence || '';
-        form.date = props.priest?.date || null;
-        form.day_of_week = props.priest?.day_of_week || '';
-        form.church_id = props.priest?.church_id || '';
+        form.type = newValue?.type || '';
+        form.start_time = newValue?.start_time || '';
+        form.end_time = newValue?.end_time || '';
+        form.language = newValue?.language || '';
+        form.occurrence = newValue?.occurrence || '';
+        form.date = newValue?.date || null;
+        form.day_of_week = newValue?.day_of_week || '';
+        form.church_id = newValue?.church_id || '';
       }
     },
   );
@@ -75,21 +75,21 @@
     },
   );
 
-  const isEditing = computed(() => !!props.priest?.id);
+  const isEditing = computed(() => !!props.activity?.id);
 
   const submit = () => {
     const url = isEditing.value
-      ? `/api/v1/activity-time/${props.priest?.id}`
+      ? `/api/v1/activity-time/${props.activity?.id}`
       : `/api/v1/activity-time`;
 
     const method = isEditing.value ? 'put' : 'post';
 
     // some clean up to ensure that the data matches what we expect
     if (form.occurrence === 'weekly') {
-      form.date = '';
+      form.date = null;
     } else if (form.occurrence === 'daily') {
       form.day_of_week = '';
-      form.date = '';
+      form.date = null;
     } else if (form.occurrence === 'one-time') {
       form.day_of_week = '';
     }

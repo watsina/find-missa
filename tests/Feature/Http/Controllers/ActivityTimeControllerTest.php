@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\ActivityTime;
 
-use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
@@ -30,32 +29,20 @@ test('store uses form request validation')
     );
 
 test('store saves', function (): void {
-    $type = fake()->word();
-    $start_time = fake()->word();
-    $end_time = fake()->word();
-    $language = fake()->word();
-    $occurrence = fake()->word();
+    $data = ActivityTime::factory()->raw();
 
-    $response = post(route('activity-time.store'), [
-        'type' => $type,
-        'start_time' => $start_time,
-        'end_time' => $end_time,
-        'language' => $language,
-        'occurrence' => $occurrence,
-    ]);
+    post(route('activity-time.store'), $data)
+        ->assertCreated()
+        ->assertJsonStructure([]);
 
     $activityTimes = ActivityTime::query()
-        ->where('type', $type)
-        ->where('start_time', $start_time)
-        ->where('end_time', $end_time)
-        ->where('language', $language)
-        ->where('occurrence', $occurrence)
+        ->where('type', $data['type'])
+        ->where('start_time', $data['start_time'])
+        ->where('end_time', $data['end_time'])
+        ->where('language', $data['language'])
+        ->where('occurrence', $data['occurrence'])
         ->get();
     expect($activityTimes)->toHaveCount(1);
-    $activityTime = $activityTimes->first();
-
-    $response->assertCreated();
-    $response->assertJsonStructure([]);
 });
 
 test('show behaves as expected', function (): void {
@@ -76,30 +63,26 @@ test('update uses form request validation')
 
 test('update behaves as expected', function (): void {
     $activityTime = ActivityTime::factory()->create();
-    $type = fake()->word();
-    $start_time = fake()->word();
-    $end_time = fake()->word();
-    $language = fake()->word();
-    $occurrence = fake()->word();
+    $data = ActivityTime::factory()->raw();
 
-    $response = put(route('activity-time.update', $activityTime), [
-        'type' => $type,
-        'start_time' => $start_time,
-        'end_time' => $end_time,
-        'language' => $language,
-        'occurrence' => $occurrence,
-    ]);
+    put(route('activity-time.update', $activityTime), [
+        'type' => $data['type'],
+        'start_time' => $data['start_time'],
+        'end_time' => $data['end_time'],
+        'language' => $data['language'],
+        'occurrence' => $data['occurrence'],
+        'date' => $data['date'],
+    ])
+        ->assertOk()
+        ->assertJsonStructure([]);
 
     $activityTime->refresh();
 
-    $response->assertOk();
-    $response->assertJsonStructure([]);
-
-    expect($type)->toEqual($activityTime->type);
-    expect($start_time)->toEqual($activityTime->start_time);
-    expect($end_time)->toEqual($activityTime->end_time);
-    expect($language)->toEqual($activityTime->language);
-    expect($occurrence)->toEqual($activityTime->occurrence);
+    expect($data['type'])->toEqual($activityTime->type);
+    expect($data['start_time'])->toEqual($activityTime->start_time);
+    expect($data['end_time'])->toEqual($activityTime->end_time);
+    expect($data['language'])->toEqual($activityTime->language);
+    expect($data['occurrence'])->toEqual($activityTime->occurrence);
 });
 
 test('destroy deletes and responds with', function (): void {

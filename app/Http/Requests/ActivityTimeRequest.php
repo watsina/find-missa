@@ -29,7 +29,7 @@ class ActivityTimeRequest extends FormRequest
             'language' => ['required', 'string', 'max:100'],
             'church_id' => ['nullable', 'integer', 'exists:churches,id'],
             'occurrence' => ['required', Rule::enum(ActivityOccurrence::class)],
-            'date' => ['required_if:occurrence,once', 'date'],
+            'date' => ['required_if:occurrence,one-time', 'nullable', 'date'],
             'day_of_week' => ['required_if:occurrence,weekly'],
         ];
     }

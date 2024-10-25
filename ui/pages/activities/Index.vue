@@ -2,6 +2,7 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
+  import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
@@ -16,7 +17,7 @@
 
   const headers = [
     { title: 'Activity Type', value: 'type' },
-    { title: 'Church', value: 'church' },
+    { title: 'Church', value: 'church.name' },
     { title: 'Start Time', value: 'start_time' },
     { title: 'End Time', value: 'end_time' },
     { title: 'Language', value: 'language' },
@@ -69,6 +70,7 @@
         </v-col>
         <v-col cols="12">
           <v-data-table
+            class="tw-capitalize"
             :headers="headers"
             :items="activities || []"
             :mobile="smAndDown"
@@ -87,7 +89,9 @@
                 type="text"
               />
             </template>
-            <template #item.actions="{ item }"> </template>
+            <template #item.actions="{ item }">
+              <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
