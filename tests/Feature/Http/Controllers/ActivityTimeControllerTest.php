@@ -72,6 +72,7 @@ test('update behaves as expected', function (): void {
         'language' => $data['language'],
         'occurrence' => $data['occurrence'],
         'date' => $data['date'],
+        'day_of_week' => $data['day_of_week'],
     ])
         ->assertOk()
         ->assertJsonStructure([]);

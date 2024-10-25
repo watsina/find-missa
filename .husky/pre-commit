@@ -6,10 +6,10 @@ composer lint:fix
 npm run lint:fix
 
 # first run tests
-# php artisan test --parallel
+php artisan test --parallel
 
 # ensure it builds
-# npm run build
+npm run build
 
 # add the fixed files
 git add -u
