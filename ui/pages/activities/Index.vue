@@ -2,13 +2,17 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
+  import ActivityTimeModal from './ActivityTimeModal.vue';
 
   const { smAndDown } = useDisplay();
   const activities = ref([]);
   const search = ref('');
   const isFetching = ref(false);
+  const showingModal = ref(false);
+  const activityToEdit = ref(null);
 
   const headers = [
     { title: 'Activity Type', value: 'type' },
@@ -29,10 +33,21 @@
   const fetchActivities = () => {
     isFetching.value = true;
     http.get('/api/v1/activity-time').then(({ data }) => {
-      console.info({ data });
       activities.value = data?.data;
     });
   };
+
+  function showModal(data = null) {
+    activityToEdit.value = data;
+    showingModal.value = true;
+  }
+
+  function updateActivity(updates) {
+    activities.value = activities.value?.map((activity) => {
+      if (activity?.id === updates?.id) return updates;
+      return activity;
+    });
+  }
 </script>
 
 <template>
@@ -40,10 +55,17 @@
     <template #head>
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Activities</h2>
     </template>
+    <activity-time-modal
+      v-model:show-modal="showingModal"
+      :activity="activityToEdit"
+      @created="activities.push($event)"
+      @updated="updateActivity"
+    />
     <v-container>
       <v-row class="tw-py-12">
-        <v-col cols="12" md="8">
-          <p class="tw-mt-2 tw-text-sm tw-text-gray-700">A list of all the activities.</p>
+        <v-col class="tw-flex tw-justify-between" cols="12">
+          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the activities.</p>
+          <PrimaryButton @click="showModal"> Add Activity</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table

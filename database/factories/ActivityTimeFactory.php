@@ -26,7 +26,7 @@ class ActivityTimeFactory extends Factory
             'end_time' => $this->faker->time,
             'language' => $this->faker->languageCode,
             'church_id' => Church::factory(),
-            'occurence' => $this->faker->randomElement(['weekly', 'one-time', 'monthly']),
+            'occurrence' => $this->faker->randomElement(['weekly', 'one-time', 'monthly']),
             'date' => $this->faker->dateTime(),
             'day_of_week' => $this->faker->dayOfWeek(),
         ];

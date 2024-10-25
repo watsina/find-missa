@@ -26,9 +26,9 @@
 
   const form = useForm({
     name: props.priest?.name || '',
-    parish_id: props.priest?.parish_id || '',
     email: props.priest?.email || '',
     phone: props.priest?.phone || '',
+    parish_id: props.priest?.parish_id || '',
   });
 
   watch(
@@ -36,9 +36,9 @@
     (newValue) => {
       if (newValue?.id) {
         form.name = props.priest?.name || '';
-        form.parish_id = props.priest?.parish_id || '';
         form.email = props.priest?.email || '';
         form.phone = props.priest?.phone || '';
+        form.parish_id = props.priest?.parish_id || '';
       }
     },
   );

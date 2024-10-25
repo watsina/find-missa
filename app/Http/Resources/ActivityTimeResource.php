@@ -19,7 +19,7 @@ class ActivityTimeResource extends JsonResource
             'end_time' => $this->end_time,
             'language' => $this->language,
             'church_id' => $this->church_id,
-            'occurence' => $this->occurence,
+            'occurrence' => $this->occurrence,
             'date' => $this->date,
             'day_of_week' => $this->day_of_week,
         ];

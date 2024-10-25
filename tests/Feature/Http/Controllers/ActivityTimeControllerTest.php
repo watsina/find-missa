@@ -26,7 +26,7 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ActivityTimeController::class,
         'store',
-        \App\Http\Requests\ActivityTimeStoreRequest::class
+        \App\Http\Requests\ActivityTimeRequest::class
     );
 
 test('store saves', function (): void {
@@ -34,14 +34,14 @@ test('store saves', function (): void {
     $start_time = fake()->word();
     $end_time = fake()->word();
     $language = fake()->word();
-    $occurence = fake()->word();
+    $occurrence = fake()->word();
 
     $response = post(route('activity-time.store'), [
         'type' => $type,
         'start_time' => $start_time,
         'end_time' => $end_time,
         'language' => $language,
-        'occurence' => $occurence,
+        'occurrence' => $occurrence,
     ]);
 
     $activityTimes = ActivityTime::query()
@@ -49,7 +49,7 @@ test('store saves', function (): void {
         ->where('start_time', $start_time)
         ->where('end_time', $end_time)
         ->where('language', $language)
-        ->where('occurence', $occurence)
+        ->where('occurrence', $occurrence)
         ->get();
     expect($activityTimes)->toHaveCount(1);
     $activityTime = $activityTimes->first();
@@ -71,7 +71,7 @@ test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ActivityTimeController::class,
         'update',
-        \App\Http\Requests\ActivityTimeUpdateRequest::class
+        \App\Http\Requests\ActivityTimeRequest::class
     );
 
 test('update behaves as expected', function (): void {
@@ -80,14 +80,14 @@ test('update behaves as expected', function (): void {
     $start_time = fake()->word();
     $end_time = fake()->word();
     $language = fake()->word();
-    $occurence = fake()->word();
+    $occurrence = fake()->word();
 
     $response = put(route('activity-time.update', $activityTime), [
         'type' => $type,
         'start_time' => $start_time,
         'end_time' => $end_time,
         'language' => $language,
-        'occurence' => $occurence,
+        'occurrence' => $occurrence,
     ]);
 
     $activityTime->refresh();
@@ -99,7 +99,7 @@ test('update behaves as expected', function (): void {
     expect($start_time)->toEqual($activityTime->start_time);
     expect($end_time)->toEqual($activityTime->end_time);
     expect($language)->toEqual($activityTime->language);
-    expect($occurence)->toEqual($activityTime->occurence);
+    expect($occurrence)->toEqual($activityTime->occurrence);
 });
 
 test('destroy deletes and responds with', function (): void {

@@ -31,11 +31,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $dioceses = Diocese::factory(10)->create();
-        $parishes = Parish::factory(20)->recycle($dioceses)->create();
-        SubParish::factory(30)->recycle($parishes)->create();
-        // $churches = Church::factory(100)->recycle($parishes)->create();
+        $dioceses = Diocese::factory(8)->create();
+        $parishes = Parish::factory(10)->recycle($dioceses)->create();
+        SubParish::factory(15)->recycle($parishes)->create();
+        $churches = Church::factory(10)->recycle($parishes)->create();
         // ActivityTime::factory()->recycle($churches)->create();
-        // Priest::factory(80)->recycle($parishes)->create();
+        Priest::factory(10)->recycle($parishes)->create();
     }
 }

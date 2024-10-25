@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\ActivityTimeRequest;
 use App\Http\Resources\ActivityTimeResource;
 use App\Http\Resources\ActivityTimeCollection;
-use App\Http\Requests\ActivityTimeStoreRequest;
-use App\Http\Requests\ActivityTimeUpdateRequest;
 
 class ActivityTimeController extends Controller
 {
@@ -19,7 +18,7 @@ class ActivityTimeController extends Controller
         return new ActivityTimeCollection($activityTimes);
     }
 
-    public function store(ActivityTimeStoreRequest $request): ActivityTimeResource
+    public function store(ActivityTimeRequest $request): ActivityTimeResource
     {
         $activityTime = ActivityTime::create($request->validated());
 
@@ -31,7 +30,7 @@ class ActivityTimeController extends Controller
         return new ActivityTimeResource($activityTime);
     }
 
-    public function update(ActivityTimeUpdateRequest $request, ActivityTime $activityTime): ActivityTimeResource
+    public function update(ActivityTimeRequest $request, ActivityTime $activityTime): ActivityTimeResource
     {
         $activityTime->update($request->validated());
 
