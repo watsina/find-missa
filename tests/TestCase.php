@@ -12,12 +12,18 @@ abstract class TestCase extends BaseTestCase
     use AdditionalAssertions;
     use LazilyRefreshDatabase;
 
-    public function signIn(?User $user = null)
+    public function actingAsRandomUser(array $attributes = [])
     {
-        $user = $user ?? User::factory()->create();
+        $user = User::factory()->create($attributes);
 
+        /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
         $this->actingAs($user);
 
         return $this;
+    }
+
+    public function actingAsSuperAdmin()
+    {
+        return $this->actingAsRandomUser(['is_super_admin' => true]);
     }
 }

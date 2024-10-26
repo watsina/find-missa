@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Church;
 use App\Models\Parish;
-use App\Models\Priest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ChurchFactory extends Factory
@@ -30,9 +29,8 @@ class ChurchFactory extends Factory
             'postal_address' => $this->faker->postcode(),
             'contact_email' => $this->faker->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
-            'parishable_id' => Parish::factory()->createOne()->id,
+            'parishable_id' => Parish::factory(),
             'parishable_type' => Parish::class,
-            'priest_id' => Priest::factory(),
         ];
     }
 }

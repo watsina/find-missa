@@ -1,9 +1,8 @@
 <script setup>
-  import { computed } from 'vue';
   import AppLink from './AppLink';
 
   const props = defineProps({
-    href: String,
+    href: { type: [String, Object], required: true },
     active: Boolean,
   });
 

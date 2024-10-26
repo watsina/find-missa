@@ -9,8 +9,8 @@
         v-for="(item, i) in navigation"
         :key="i"
         color="primary"
-        :value="item"
         :to="{ name: item.routeName }"
+        :value="item"
       >
         <template #prepend>
           <v-icon :icon="item.icon" :title="item.name"></v-icon>
@@ -62,7 +62,7 @@
     },
     {
       name: 'sub parishes',
-      routeName: 'sub-parishes.index',
+      routeName: 'subParishes.index',
       icon: mdiHomeGroup,
       current: true,
       show: true,
