@@ -3,8 +3,8 @@
  * @see https://github.com/inertiajs/inertia/blob/master/packages/vue3/src/useForm.ts
  */
 import http from '@/plugins/http';
-import cloneDeep from 'lodash/clonedeep';
-import isEqual from 'lodash/isequal';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { reactive, watch } from 'vue';
 
 export default function useForm(...args) {
