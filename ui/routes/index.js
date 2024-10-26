@@ -10,18 +10,6 @@ import priests from './priests';
 // import errors from './errors';
 
 export default [
-  {
-    path: '/',
-    component: () => import('@/layouts/AppLayout'),
-    children: [
-      {
-        path: '',
-        name: 'landing.index',
-        props: true,
-        component: () => import('@/pages/landing'),
-      },
-    ],
-  },
   ...dashboard,
   ...auth,
   // ...users,
