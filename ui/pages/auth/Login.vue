@@ -4,9 +4,9 @@
       <AuthenticationCardLogo />
     </template>
 
-    <div v-if="status" class="tw-mb-4 tw-text-sm tw-font-medium tw-text-green-600">
-      {{ status }}
-    </div>
+    <!-- <div v-if="status" class="tw-mb-4 tw-text-sm tw-font-medium tw-text-green-600"> -->
+    <!--   {{ status }} -->
+    <!-- </div> -->
 
     <form @submit.prevent="submit">
       <div class="tw-mt-4">
@@ -38,13 +38,9 @@
       </div>
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <!-- <Link -->
-        <!--   v-if="canResetPassword" -->
-        <!--   class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900" -->
-        <!--   :href="route('password.request')" -->
-        <!-- > -->
-        <!--   Forgot your password? -->
-        <!-- </Link> -->
+        <NavLink class="tw-underline" :href="{ name: 'auth.forgot-password' }">
+          Forgot your password?
+        </NavLink>
 
         <PrimaryButton
           class="tw-ml-4"
@@ -63,16 +59,12 @@
   import { useRouter } from 'vue-router';
   import { useForm } from '@/plugins';
   import { notify } from '@/utils';
+  import NavLink from '@/components/NavLink';
   import AuthenticationCard from '@/components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
   import Checkbox from '@/components/Checkbox.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
-
-  defineProps({
-    canResetPassword: Boolean,
-    status: String,
-  });
 
   const router = useRouter();
 

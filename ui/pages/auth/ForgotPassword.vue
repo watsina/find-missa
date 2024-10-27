@@ -5,37 +5,26 @@
     </template>
 
     <div class="tw-mb-4 tw-text-sm tw-text-gray-600">
-      {{
-        newAccount && newEmail
-          ? `Your account has been successfully created. Please request a password reset to create a
-            password
-            and start using the account`
-          : `Forgot your password ? No problem. Just let us know your email address and we will
-            email you a
-            password reset link that will allow you to choose a new one.`
-      }}
-    </div>
-
-    <div v-if="status" class="tw-mb-4 tw-text-sm tw-font-medium tw-text-green-600">
-      {{ status }}
+      Forgot your password ? No problem. Just let us know your email address and we will email you a
+      password reset link that will allow you to choose a new one.
     </div>
 
     <form @submit.prevent="submit">
       <div>
         <TextInput
-          label="Email"
           id="email"
           v-model="form.email"
-          type="email"
-          class="tw-block tw-w-full tw-mt-1"
-          required
           autofocus
+          class="tw-block tw-w-full tw-mt-1"
           :error="form.errors.email"
+          label="Email"
+          required
+          type="email"
         />
       </div>
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <PrimaryButton type="submit" :loading="form.processing" :disabled="form.processing">
+        <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
           Email Password Reset Link
         </PrimaryButton>
       </div>
@@ -44,27 +33,26 @@
 </template>
 
 <script setup>
-  import { useForm } from '@/plugins';
+  import { useForm, http } from '@/plugins';
+  import { notify } from '@/utils';
   import AuthenticationCard from '@/components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
-  import InputError from '@/components/InputError.vue';
-  import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
 
-  const props = defineProps({
-    status: String,
-  });
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const newAccount = Boolean(urlParams.get('newAccount'));
-  const newEmail = urlParams.get('newEmail');
-
   const form = useForm({
-    email: newEmail || '',
+    email: '',
   });
 
-  const submit = () => {
-    form.post(route('password.email'));
+  const submit = async () => {
+    await http.get('/sanctum/csrf-cookie');
+    form.post('/api/v1/forgot-password', {
+      onSuccess: () => {
+        notify.success('Password reset link has been successfully sent to your email.');
+      },
+      onFailure: () => {
+        notify.error('There was an error requesting password reset.');
+      },
+    });
   };
 </script>

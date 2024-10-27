@@ -9,12 +9,21 @@ export async function ensureUserIsAuthorized(to, from, next) {
 
   const isNavigatingToLogin = to.name === 'auth.login';
   const isNavigatingToTwoFactor = to.name === 'auth.two-factor-challenge';
+  const isNavigatingToForgotPassword = to.name === 'auth.forgot-password';
 
-  if ((isNavigatingToTwoFactor || isNavigatingToLogin) && store.hasUser) {
+  if (
+    (isNavigatingToTwoFactor || isNavigatingToLogin || isNavigatingToForgotPassword) &&
+    store.hasUser
+  ) {
     return next({ name: 'dashboard.index' });
   }
 
-  if (!isNavigatingToLogin && !isNavigatingToTwoFactor && !store.hasUser) {
+  if (
+    !isNavigatingToLogin &&
+    !isNavigatingToTwoFactor &&
+    !isNavigatingToForgotPassword &&
+    !store.hasUser
+  ) {
     return next({ name: 'auth.login' });
   }
 
