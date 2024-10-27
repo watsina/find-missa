@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build_and_test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -119,4 +119,3 @@ jobs:
             npm -v
             npm ci
             npm run build
-
