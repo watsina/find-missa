@@ -10,6 +10,11 @@ export default [
     component: () => import('@/pages/auth/ForgotPassword'),
   },
   {
+    path: '/auth/reset-password/:token*',
+    name: 'auth.reset-password',
+    component: () => import('@/pages/auth/ResetPassword'),
+  },
+  {
     path: '/auth/two-factor-challenge',
     name: 'auth.two-factor-challenge',
     component: () => import('@/pages/auth/TwoFactorChallenge'),

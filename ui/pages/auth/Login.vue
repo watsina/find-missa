@@ -57,7 +57,7 @@
 
 <script setup>
   import { useRouter } from 'vue-router';
-  import { useForm } from '@/plugins';
+  import { useForm, http } from '@/plugins';
   import { notify } from '@/utils';
   import NavLink from '@/components/NavLink';
   import AuthenticationCard from '@/components/AuthenticationCard.vue';
@@ -74,7 +74,8 @@
     remember: false,
   });
 
-  const submit = () => {
+  const submit = async () => {
+    await http.get('/sanctum/csrf-cookie');
     form
       .transform((data) => ({
         ...data,

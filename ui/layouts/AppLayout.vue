@@ -1,15 +1,13 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <global-notifications />
-
     <session-expired-modal v-model="showSessionExpiredModal" />
-    <top-bar v-model:rail="rail" v-model:drawer="drawer">
-      <template #header v-if="$slots.head">
+    <top-bar v-model:drawer="drawer" v-model:rail="rail">
+      <template v-if="$slots.head" #header>
         <slot name="head" />
       </template>
     </top-bar>
 
-    <nav-drawer v-model:rail="rail" v-model:drawer="drawer" />
+    <nav-drawer v-model:drawer="drawer" v-model:rail="rail" />
 
     <v-main class="d-flex align-center justify-center" style="min-height: 300px">
       <slot />
@@ -22,7 +20,6 @@
   import { http } from '@/plugins';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
-  import GlobalNotifications from '@/components/GlobalNotifications';
   import SessionExpiredModal from '@/pages/auth/SessionExpiredModal';
 
   const drawer = ref(true);

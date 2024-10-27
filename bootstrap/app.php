@@ -1,5 +1,6 @@
 <?php
 
+use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ->statefulApi()
             ->throttleApi()
             ->api(['auth.session', 'json'])
+            ->redirectUsersTo(AppServiceProvider::HOME)
             ->alias([
                 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
                 'json' => \App\Http\Middleware\JsonMiddleware::class,

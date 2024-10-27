@@ -7,44 +7,45 @@
     <form @submit.prevent="submit">
       <div>
         <TextInput
-          label="Email"
           v-model="form.email"
-          :error="form.errors.email"
-          type="email"
-          class="tw-block tw-w-full tw-mt-1"
-          required
           autofocus
+          class="tw-block tw-w-full tw-mt-1"
+          :error="form.errors.email"
+          label="Email"
+          required
+          type="email"
         />
       </div>
 
       <div class="tw-mt-4">
         <TextInput
-          label="Password"
           v-model="form.password"
-          type="password"
-          class="tw-block tw-w-full tw-mt-1"
-          required
           autocomplete="new-password"
+          class="tw-block tw-w-full tw-mt-1"
           :error="form.errors.password"
+          label="Password"
+          required
+          type="password"
         />
       </div>
 
       <div class="tw-mt-4">
-        <InputLabel for="password_confirmation" />
         <TextInput
-          label="Confirm Password"
-          id="password_confirmation"
           v-model="form.password_confirmation"
-          type="password"
-          class="tw-block tw-w-full tw-mt-1"
-          required
           autocomplete="new-password"
+          class="tw-block tw-w-full tw-mt-1"
           :error="form.errors.password_confirmation"
+          label="Confirm Password"
+          required
+          type="password"
         />
       </div>
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <PrimaryButton type="submit" :loading="form.processing" :disabled="form.processing">
+        <NavLink class="tw-underline tw-mr-2" :href="{ name: 'auth.login' }">
+          Back to Login
+        </NavLink>
+        <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
           Reset Password
         </PrimaryButton>
       </div>
@@ -54,27 +55,33 @@
 
 <script setup>
   import { useForm } from '@/plugins';
+  import { notify } from '@/utils';
+  import { useRouter } from 'vue-router';
   import AuthenticationCard from '@/components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
-  import InputError from '@/components/InputError.vue';
-  import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import NavLink from '@/components/NavLink';
 
-  const props = defineProps({
-    email: String,
-    token: String,
-  });
+  const router = useRouter();
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+  const token = window.location.pathname.split('/')[3];
 
   const form = useForm({
-    token: props.token,
-    email: props.email,
+    token: token,
+    email: email,
     password: '',
     password_confirmation: '',
   });
 
   const submit = () => {
-    form.post(route('password.update'), {
+    form.post('/api/v1/reset-password', {
+      onSuccess: () => {
+        notify.success('Your password has been reset.');
+        router.push({ name: 'auth.login' });
+      },
+      onError: () => notify.error('Something went wrong'),
       onFinish: () => form.reset('password', 'password_confirmation'),
     });
   };

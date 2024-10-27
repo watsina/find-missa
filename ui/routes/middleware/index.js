@@ -10,20 +10,20 @@ export async function ensureUserIsAuthorized(to, from, next) {
   const isNavigatingToLogin = to.name === 'auth.login';
   const isNavigatingToTwoFactor = to.name === 'auth.two-factor-challenge';
   const isNavigatingToForgotPassword = to.name === 'auth.forgot-password';
+  const isNavigatingToResetPassword = to.name === 'auth.reset-password';
 
-  if (
-    (isNavigatingToTwoFactor || isNavigatingToLogin || isNavigatingToForgotPassword) &&
-    store.hasUser
-  ) {
+  const isNonAuthRoute =
+    isNavigatingToTwoFactor ||
+    isNavigatingToLogin ||
+    isNavigatingToForgotPassword ||
+    isNavigatingToResetPassword;
+
+  console.info({ isNavigatingToForgotPassword, isNonAuthRoute });
+  if (isNonAuthRoute && store.hasUser) {
     return next({ name: 'dashboard.index' });
   }
 
-  if (
-    !isNavigatingToLogin &&
-    !isNavigatingToTwoFactor &&
-    !isNavigatingToForgotPassword &&
-    !store.hasUser
-  ) {
+  if (!isNonAuthRoute && !store.hasUser) {
     return next({ name: 'auth.login' });
   }
 
