@@ -10,22 +10,22 @@ import { createVuetify } from 'vuetify';
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
-    components: {
-        VTimePicker,
+  components: {
+    VTimePicker,
+  },
+  icons: {
+    defaultSet: 'mdi',
+    aliases: {
+      ...aliases,
     },
-    icons: {
-        defaultSet: 'mdi',
-        aliases: {
-            ...aliases,
-        },
-        sets: {
-            mdi,
-        },
+    sets: {
+      mdi,
     },
-    theme: {
-        themes: {
-            dark: { colors },
-            light: { colors },
-        },
+  },
+  theme: {
+    themes: {
+      dark: { colors },
+      light: { colors },
     },
+  },
 });
