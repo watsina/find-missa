@@ -45,9 +45,9 @@
 <script setup>
   import { computed } from 'vue';
   import { useForm } from '@/plugins';
-  import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-  import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
+  import AuthenticationCard from '@/components/AuthenticationCard.vue';
+  import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
 
   const props = defineProps({
     status: String,

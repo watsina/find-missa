@@ -20,13 +20,13 @@
           <div>
             <svg
               v-if="session.agent.is_desktop"
+              class="tw-w-8 tw-h-8 tw-text-gray-500"
               fill="none"
+              stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="tw-w-8 tw-h-8 tw-text-gray-500"
             >
               <path
                 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
@@ -35,17 +35,17 @@
 
             <svg
               v-else
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
               fill="none"
+              stroke="currentColor"
               stroke-linecap="round"
-              stroke-linejoin="round"
               class="tw-w-8 tw-h-8 tw-text-gray-500"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M0 0h24v24H0z" stroke="none" />
-              <rect x="7" y="4" width="10" height="16" rx="1" />
+              <rect height="16" rx="1" width="10" x="7" y="4" />
               <path d="M11 5h2M12 17v.01" />
             </svg>
           </div>
@@ -73,7 +73,7 @@
       <div class="tw-flex tw-items-center tw-mt-5">
         <PrimaryButton @click="confirmLogout"> Log Out Other Browser Sessions </PrimaryButton>
 
-        <ActionMessage :on="form.recentlySuccessful" class="tw-ml-3"> Done. </ActionMessage>
+        <ActionMessage class="tw-ml-3" :on="form.recentlySuccessful"> Done. </ActionMessage>
       </div>
 
       <!-- Log Out Other Devices Confirmation Modal -->
@@ -88,13 +88,13 @@
             <TextInput
               ref="passwordInput"
               v-model="form.password"
-              type="password"
               class="tw-block tw-w-3/4 tw-mt-1"
               placeholder="Password"
+              type="password"
               @keyup.enter="logoutOtherBrowserSessions"
             />
 
-            <InputError :message="form.errors.password" class="tw-mt-2" />
+            <InputError class="tw-mt-2" :message="form.errors.password" />
           </div>
         </template>
 
@@ -118,13 +118,13 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http, useForm } from '@/plugins';
-  import ActionMessage from '@/Components/ActionMessage.vue';
-  import ActionSection from '@/Components/ActionSection.vue';
-  import DialogModal from '@/Components/DialogModal.vue';
-  import InputError from '@/Components/InputError.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import SecondaryButton from '@/Components/SecondaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import ActionMessage from '@/components/ActionMessage.vue';
+  import ActionSection from '@/components/ActionSection.vue';
+  import DialogModal from '@/components/DialogModal.vue';
+  import InputError from '@/components/InputError.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import SecondaryButton from '@/components/SecondaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
 
   const confirmingLogout = ref(false);
   const passwordInput = ref(null);

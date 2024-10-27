@@ -2,11 +2,11 @@
   import { ref } from 'vue';
   import { useForm } from '@/plugins';
   import { notify } from '@/utils';
-  import ActionMessage from '@/Components/ActionMessage.vue';
-  import FormSection from '@/Components/FormSection.vue';
-  import InputLabel from '@/Components/InputLabel.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import ActionMessage from '@/components/ActionMessage.vue';
+  import FormSection from '@/components/FormSection.vue';
+  import InputLabel from '@/components/InputLabel.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
 
   const passwordInput = ref(null);
   const currentPasswordInput = ref(null);

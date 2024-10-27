@@ -10,11 +10,11 @@
         <TextInput
           id="name"
           v-model="form.name"
-          type="text"
+          autocomplete="name"
+          autofocus
           class="tw-block tw-w-full tw-mt-1"
           required
-          autofocus
-          autocomplete="name"
+          type="text"
         />
         <InputError class="tw-mt-2" :message="form.errors.name" />
       </div>
@@ -24,9 +24,9 @@
         <TextInput
           id="email"
           v-model="form.email"
-          type="email"
           class="tw-block tw-w-full tw-mt-1"
           required
+          type="email"
         />
         <InputError class="tw-mt-2" :message="form.errors.email" />
       </div>
@@ -36,10 +36,10 @@
         <TextInput
           id="password"
           v-model="form.password"
-          type="password"
+          autocomplete="new-password"
           class="tw-block tw-w-full tw-mt-1"
           required
-          autocomplete="new-password"
+          type="password"
         />
         <InputError class="tw-mt-2" :message="form.errors.password" />
       </div>
@@ -49,10 +49,10 @@
         <TextInput
           id="password_confirmation"
           v-model="form.password_confirmation"
-          type="password"
+          autocomplete="new-password"
           class="tw-block tw-w-full tw-mt-1"
           required
-          autocomplete="new-password"
+          type="password"
         />
         <InputError class="tw-mt-2" :message="form.errors.password_confirmation" />
       </div>
@@ -65,16 +65,16 @@
             <div class="tw-ml-2">
               I agree to the
               <a
-                target="_blank"
-                :href="route('terms.show')"
                 class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+                :href="route('terms.show')"
+                target="_blank"
                 >Terms of Service</a
               >
               and
               <a
-                target="_blank"
-                :href="route('policy.show')"
                 class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+                :href="route('policy.show')"
+                target="_blank"
                 >Privacy Policy</a
               >
             </div>
@@ -85,8 +85,8 @@
 
       <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
         <a
-          :href="route('login')"
           class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+          :href="route('login')"
         >
           Already registered?
         </a>
@@ -105,13 +105,13 @@
 
 <script setup>
   import { useForm } from '@/plugins';
-  import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-  import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-  import Checkbox from '@/Components/Checkbox.vue';
-  import InputError from '@/Components/InputError.vue';
-  import InputLabel from '@/Components/InputLabel.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import AuthenticationCard from '@/components/AuthenticationCard.vue';
+  import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
+  import Checkbox from '@/components/Checkbox.vue';
+  import InputError from '@/components/InputError.vue';
+  import InputLabel from '@/components/InputLabel.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
 
   const form = useForm({
     name: '',

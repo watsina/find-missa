@@ -22,7 +22,7 @@
 <script setup>
   import { computed } from 'vue';
   import { http } from '@/plugins';
-  import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+  import ResponsiveNavLink from '@/components/ResponsiveNavLink.vue';
   import useAuthStore from '@/stores/useAuthStore';
 
   const store = useAuthStore();

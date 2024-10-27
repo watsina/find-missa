@@ -28,13 +28,13 @@
             <TextInput
               ref="passwordInput"
               v-model="form.password"
-              type="password"
               class="tw-block tw-w-3/4 tw-mt-1"
               placeholder="Password"
+              type="password"
               @keyup.enter="deleteUser"
             />
 
-            <InputError :message="form.errors.password" class="tw-mt-2" />
+            <InputError class="tw-mt-2" :message="form.errors.password" />
           </div>
         </template>
 
@@ -58,12 +58,12 @@
 <script setup>
   import { ref } from 'vue';
   import { useForm } from '@/plugins';
-  import ActionSection from '@/Components/ActionSection.vue';
-  import DangerButton from '@/Components/DangerButton.vue';
-  import DialogModal from '@/Components/DialogModal.vue';
-  import InputError from '@/Components/InputError.vue';
-  import SecondaryButton from '@/Components/SecondaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import ActionSection from '@/components/ActionSection.vue';
+  import DangerButton from '@/components/DangerButton.vue';
+  import DialogModal from '@/components/DialogModal.vue';
+  import InputError from '@/components/InputError.vue';
+  import SecondaryButton from '@/components/SecondaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
 
   const confirmingUserDeletion = ref(false);
   const passwordInput = ref(null);

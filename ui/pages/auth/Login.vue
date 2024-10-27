@@ -63,11 +63,11 @@
   import { useRouter } from 'vue-router';
   import { useForm } from '@/plugins';
   import { notify } from '@/utils';
-  import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-  import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-  import Checkbox from '@/Components/Checkbox.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import AuthenticationCard from '@/components/AuthenticationCard.vue';
+  import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
+  import Checkbox from '@/components/Checkbox.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
 
   defineProps({
     canResetPassword: Boolean,

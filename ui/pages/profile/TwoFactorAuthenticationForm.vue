@@ -154,14 +154,14 @@
 <script setup>
   import { ref, computed, watch } from 'vue';
   import { http, useForm } from '@/plugins';
-  import ActionSection from '@/Components/ActionSection.vue';
-  import ConfirmsPassword from '@/Components/ConfirmsPassword.vue';
-  import DangerButton from '@/Components/DangerButton.vue';
-  import InputError from '@/Components/InputError.vue';
-  import InputLabel from '@/Components/InputLabel.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import SecondaryButton from '@/Components/SecondaryButton.vue';
-  import TextInput from '@/Components/TextInput.vue';
+  import ActionSection from '@/components/ActionSection.vue';
+  import ConfirmsPassword from '@/components/ConfirmsPassword.vue';
+  import DangerButton from '@/components/DangerButton.vue';
+  import InputError from '@/components/InputError.vue';
+  import InputLabel from '@/components/InputLabel.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import SecondaryButton from '@/components/SecondaryButton.vue';
+  import TextInput from '@/components/TextInput.vue';
   import useAuthStore from '@/stores/useAuthStore';
 
   const store = useAuthStore();

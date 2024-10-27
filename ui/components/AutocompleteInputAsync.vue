@@ -22,7 +22,7 @@
 <script setup>
   import { ref, watch, onMounted } from 'vue';
   import debounce from 'lodash/debounce';
-  import http from '@/Plugins/Http';
+  import http from '@/plugins/http';
 
   const props = defineProps({
     itemsData: { type: Array, default: () => [] },

@@ -5,7 +5,7 @@
   import PrimaryButton from './PrimaryButton.vue';
   import SecondaryButton from './SecondaryButton.vue';
   import TextInput from './TextInput.vue';
-  import http from '@/Plugins/Http';
+  import http from '@/plugins/http';
 
   const emit = defineEmits(['confirmed']);
 
