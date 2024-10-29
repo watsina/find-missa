@@ -18,7 +18,6 @@ export async function ensureUserIsAuthorized(to, from, next) {
     isNavigatingToForgotPassword ||
     isNavigatingToResetPassword;
 
-  console.info({ isNavigatingToForgotPassword, isNonAuthRoute });
   if (isNonAuthRoute && store.hasUser) {
     return next({ name: 'dashboard.index' });
   }

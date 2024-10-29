@@ -1,6 +1,6 @@
 import auth from './auth';
 import dashboard from './dashboard';
-// import users from './users';
+import users from './users';
 import parishes from './parishes';
 import churches from './churches';
 import activities from './activities';
@@ -10,15 +10,21 @@ import priests from './priests';
 // import errors from './errors';
 
 export default [
-  ...dashboard,
-  ...auth,
-  // ...users,
-  ...dioceses,
-  ...activities,
-  ...parishes,
-  ...churches,
-  ...priests,
-  ...subParishes,
+  // backoffice routes
+  {
+    path: '/backoffice',
+    children: [
+      ...dashboard,
+      ...auth,
+      ...users,
+      ...dioceses,
+      ...activities,
+      ...parishes,
+      ...churches,
+      ...priests,
+      ...subParishes,
+    ],
+  },
   // ...errors,
   // {
   //   path: '*',

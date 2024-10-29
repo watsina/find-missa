@@ -1,6 +1,6 @@
 export default [
   {
-    path: '/activities',
+    path: 'activities',
     name: 'activities.index',
     props: true,
     component: () => import('@/pages/activities/Index'),

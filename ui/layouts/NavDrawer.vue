@@ -33,6 +33,7 @@
     mdiMap,
     mdiRunFast,
     mdiAccountDetailsOutline,
+    mdiAccountGroup,
   } from '@mdi/js';
 
   const drawer = defineModel('drawer', { type: Boolean });
@@ -85,6 +86,13 @@
       name: 'priests',
       routeName: 'priests.index',
       icon: mdiAccountDetailsOutline,
+      current: true,
+      show: true,
+    },
+    {
+      name: 'users',
+      routeName: 'users.index',
+      icon: mdiAccountGroup,
       current: true,
       show: true,
     },

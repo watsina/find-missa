@@ -1,18 +1,18 @@
 <template>
-  <v-app-bar app flat elevation="1" elevate-on-scroll>
+  <v-app-bar app elevate-on-scroll elevation="1" flat>
     <template #prepend>
       <v-app-bar-nav-icon
         variant="text"
         @click.stop="!$vuetify.display.mobile ? (rail = !rail) : (drawer = !drawer)"
       ></v-app-bar-nav-icon>
       <div class="tw-flex tw-items-center shrink-0 tw-mr-4">
-        <NavLink href="/">
+        <NavLink :href="{ name: 'dashboard.index' }">
           <ApplicationMark class="tw-block tw-w-auto tw-h-9" />
         </NavLink>
       </div>
       <v-app-bar-title>App Name</v-app-bar-title>
     </template>
-    <template #extension v-if="$slots.header">
+    <template v-if="$slots.header" #extension>
       <header class="">
         <div class="tw-px-4 tw-mx-auto md:tw-px-6 lg:tw-px-8">
           <slot name="header" />

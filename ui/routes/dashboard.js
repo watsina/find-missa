@@ -1,6 +1,6 @@
 export default [
   {
-    path: '/dashboard',
+    path: 'dashboard',
     name: 'dashboard.index',
     props: true,
     component: () => import('@/pages/dashboard/Index'),

@@ -45,7 +45,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $hidden = [
         'password',
-        'is_super_admin',
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
@@ -68,6 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_super_admin' => 'boolean',
         ];
     }
 
@@ -95,6 +95,11 @@ class User extends Authenticatable implements MustVerifyEmail
         if (Features::enabled(Features::emailVerification())) {
             $this->notify(new VerifyEmail);
         }
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return (bool) $this->is_super_admin;
     }
 
     public function info()

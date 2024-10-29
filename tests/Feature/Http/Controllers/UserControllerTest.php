@@ -16,7 +16,7 @@ beforeEach(fn () => $this->actingAsRandomUser());
 test('index behaves as expected', function (): void {
     $users = User::factory()->count(3)->create();
 
-    $response = get(route('user.index'));
+    $response = get(route('users.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -33,7 +33,7 @@ test('store saves', function (): void {
     $name = fake()->name();
     $email = fake()->safeEmail();
 
-    $response = post(route('user.store'), [
+    $response = post(route('users.store'), [
         'name' => $name,
         'email' => $email,
     ]);
@@ -52,7 +52,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $user = User::factory()->create();
 
-    $response = get(route('user.show', $user));
+    $response = get(route('users.show', $user));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -70,7 +70,7 @@ test('update behaves as expected', function (): void {
     $name = fake()->name();
     $email = fake()->safeEmail();
 
-    $response = put(route('user.update', $user), [
+    $response = put(route('users.update', $user), [
         'name' => $name,
         'email' => $email,
     ]);
@@ -87,7 +87,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $user = User::factory()->create();
 
-    $response = delete(route('user.destroy', $user));
+    $response = delete(route('users.destroy', $user));
 
     $response->assertNoContent();
 
