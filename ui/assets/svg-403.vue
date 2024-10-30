@@ -1,4 +1,5 @@
 <template>
+  <!-- "SVG made by storyset <a href="https://storyset.com/">Illustrations by Storyset</a>" -->
   <svg height="682.89" viewBox="0 0 750 500" width="865.76" xmlns="http://www.w3.org/2000/svg">
     <g id="freepik--background-complete--inject-2">
       <path

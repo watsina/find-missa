@@ -1,4 +1,5 @@
 <template>
+  <!-- "SVG made by storyset <a href="https://storyset.com/">Illustrations by Storyset</a>" -->
   <svg
     height="682.89"
     viewBox="0 0 750 500"

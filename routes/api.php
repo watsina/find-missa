@@ -14,6 +14,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard.index');
     Route::apiResource('users', App\Http\Controllers\UserController::class)->middleware('admin');
+    Route::apiResource('user-invitations', App\Http\Controllers\UserInvitationController::class)->only('store', 'destroy')->middleware('admin');
     Route::apiResource('church', App\Http\Controllers\ChurchController::class);
     Route::apiResource('diocese', App\Http\Controllers\DioceseController::class);
     Route::apiResource('parish', App\Http\Controllers\ParishController::class);

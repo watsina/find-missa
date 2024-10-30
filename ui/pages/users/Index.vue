@@ -5,14 +5,14 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
-  import UserModal from './UserModal.vue';
+  import UserInvitationModal from './UserInvitationModal.vue';
 
   const { smAndDown } = useDisplay();
   const users = ref([]);
+  const invitedUsers = ref([]);
   const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
-  const userToEdit = ref(null);
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -24,6 +24,7 @@
 
   onMounted(() => {
     fetchUsers();
+    fetchInvitedUsers();
   });
 
   const fetchUsers = () => {
@@ -33,16 +34,15 @@
     });
   };
 
-  function showModal(data = null) {
-    userToEdit.value = data;
-    showingModal.value = true;
-  }
-
-  function updateChurch(updates) {
-    users.value = users.value?.map((user) => {
-      if (user?.id === updates?.id) return updates;
-      return user;
+  const fetchInvitedUsers = () => {
+    isFetching.value = true;
+    http.get('/api/v1/user-invitations').then(({ data }) => {
+      invitedUsers.value = data?.data;
     });
+  };
+
+  function showModal() {
+    showingModal.value = true;
   }
 </script>
 
@@ -51,17 +51,12 @@
     <template #head>
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Users</h2>
     </template>
-    <user-modal
-      v-model:show-modal="showingModal"
-      :user="userToEdit"
-      @created="users.push($event)"
-      @updated="updateChurch"
-    />
+    <user-invitation-modal v-model:show-modal="showingModal" @created="invitedUsers.push($event)" />
     <v-container>
       <v-row class="tw-py-12">
         <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the users.</p>
-          <PrimaryButton @click="showModal"> Add Church</PrimaryButton>
+          <PrimaryButton @click="showModal"> Invite User</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <v-data-table
