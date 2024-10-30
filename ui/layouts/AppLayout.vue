@@ -17,6 +17,7 @@
 
 <script setup>
   import { ref, onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
   import { http } from '@/plugins';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
@@ -24,6 +25,7 @@
 
   const drawer = ref(true);
   const rail = ref(true);
+  const router = useRouter();
   const showSessionExpiredModal = ref(false);
 
   onMounted(async () => {
@@ -32,9 +34,9 @@
         showSessionExpiredModal.value = true;
       }
 
-      // if (error?.response?.status === 403 && this.$route.name !== 'errors.403') {
-      //   await this.$router.push({ name: 'errors.403' });
-      // }
+      if (error?.response?.status === 403 && router.currentRoute.value.name !== 'errors.403') {
+        await router.push({ name: 'errors.403' });
+      }
 
       return Promise.reject(error);
     });

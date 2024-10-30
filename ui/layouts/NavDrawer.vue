@@ -35,6 +35,9 @@
     mdiAccountDetailsOutline,
     mdiAccountGroup,
   } from '@mdi/js';
+  import useAuthStore from '@/stores/useAuthStore';
+
+  const store = useAuthStore();
 
   const drawer = defineModel('drawer', { type: Boolean });
   const rail = defineModel('rail', { type: Boolean });
@@ -94,7 +97,7 @@
       routeName: 'users.index',
       icon: mdiAccountGroup,
       current: true,
-      show: true,
+      show: !!store?.user?.is_admin,
     },
   ];
 

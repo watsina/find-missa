@@ -2,10 +2,10 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
-  import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
+  import UserModal from './UserModal.vue';
 
   const { smAndDown } = useDisplay();
   const users = ref([]);
@@ -18,7 +18,7 @@
     { title: 'Name', value: 'name' },
     { title: 'Email', value: 'email' },
     { title: 'Has Two Factor', value: 'two_factor_enabled' },
-    { title: 'Super Admin', value: 'is_super_admin' },
+    { title: 'Super Admin', value: 'is_admin' },
     { title: '', value: 'actions' },
   ];
 
@@ -84,17 +84,17 @@
               />
             </template>
             <template #item.two_factor_enabled="{ item }">
-              <v-chip :color="item.two_factor_enabled ? 'primary' : ''" size="small">
+              <v-chip :color="item.two_factor_enabled ? 'primary' : ''" size="small" variant="flat">
                 {{ item.two_factor_enabled ? 'true' : 'false' }}
               </v-chip>
             </template>
-            <template #item.is_super_admin="{ item }">
-              <v-chip :color="item.is_super_admin ? 'primary' : ''" size="small">
-                {{ item.is_super_admin ? 'true' : 'false' }}
+            <template #item.is_admin="{ item }">
+              <v-chip :color="item.is_admin ? 'primary' : ''" size="small" variant="flat">
+                {{ item.is_admin ? 'true' : 'false' }}
               </v-chip>
             </template>
             <template #item.actions="{ item }">
-              <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
+              <!-- <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon> -->
             </template>
           </v-data-table>
         </v-col>

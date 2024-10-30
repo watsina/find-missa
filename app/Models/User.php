@@ -45,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $hidden = [
         'password',
+        'is_super_admin',
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
@@ -55,7 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-    protected $appends = ['profile_photo_url', 'two_factor_enabled'];
+    protected $appends = ['profile_photo_url', 'two_factor_enabled', 'is_admin'];
 
     /**
      * Get the attributes that should be cast.
@@ -83,6 +84,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function twoFactorEnabled(): Attribute
     {
         return Attribute::get(fn () => $this->hasEnabledTwoFactorAuthentication());
+    }
+
+    public function isAdmin(): Attribute
+    {
+        return Attribute::get(fn () => (bool) $this->is_super_admin);
     }
 
     /**

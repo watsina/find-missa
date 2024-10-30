@@ -7,7 +7,7 @@ import activities from './activities';
 import subParishes from './sub-parishes';
 import dioceses from './dioceses';
 import priests from './priests';
-// import errors from './errors';
+import errors from './errors';
 
 export default [
   // backoffice routes
@@ -25,9 +25,9 @@ export default [
       ...subParishes,
     ],
   },
-  // ...errors,
-  // {
-  //   path: '*',
-  //   component: () => import('@/Errors/Error404'),
-  // },
+  ...errors,
+  {
+    path: '/:catchAll(.*)',
+    component: () => import('@/errors/Error404'),
+  },
 ];

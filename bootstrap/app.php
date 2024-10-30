@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ->alias([
                 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
                 'json' => \App\Http\Middleware\JsonMiddleware::class,
+                'admin' => \App\Http\Middleware\IsAdminMiddleware::class,
             ]);
     })
     ->withSchedule(function (Schedule $schedule) {

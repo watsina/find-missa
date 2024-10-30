@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
 Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard.index');
-    Route::apiResource('users', App\Http\Controllers\UserController::class);
+    Route::apiResource('users', App\Http\Controllers\UserController::class)->middleware('admin');
     Route::apiResource('church', App\Http\Controllers\ChurchController::class);
     Route::apiResource('diocese', App\Http\Controllers\DioceseController::class);
     Route::apiResource('parish', App\Http\Controllers\ParishController::class);

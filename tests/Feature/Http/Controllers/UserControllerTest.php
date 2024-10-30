@@ -11,7 +11,7 @@ use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\assertSoftDeleted;
 
-beforeEach(fn () => $this->actingAsRandomUser());
+beforeEach(fn () => $this->actingAsSuperAdmin());
 
 test('index behaves as expected', function (): void {
     $users = User::factory()->count(3)->create();
