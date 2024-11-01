@@ -27,7 +27,7 @@
     name: props.parish?.name || '',
     diocese_id: props.parish?.diocese_id || '',
     office_address: props.parish?.office_address || '',
-    district: props.parish?.district || '',
+    city: props.parish?.city || '',
   });
 
   watch(
@@ -37,7 +37,7 @@
         form.name = props.parish?.name || '';
         form.diocese_id = props.parish?.diocese_id || '';
         form.office_address = props.parish?.office_address || '';
-        form.district = props.parish?.district || '';
+        form.city = props.parish?.city || '';
       }
     },
   );
@@ -105,11 +105,11 @@
           <div class="tw-mt-4">
             <SelectInput
               v-model="form.diocese_id"
-              :items="dioceses"
-              item-value="id"
-              item-title="name"
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.diocese_id"
+              item-title="name"
+              item-value="id"
+              :items="dioceses"
               label="Diocese*"
               required
               type="text"
@@ -129,10 +129,10 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.district"
+              v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.district"
-              label="District"
+              :error="form.errors.city"
+              label="City"
               placeholder="Kampala"
               required
             />

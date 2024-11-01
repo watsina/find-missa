@@ -19,7 +19,7 @@
     { title: 'Name', value: 'name' },
     { title: 'Diocese', value: 'diocese' },
     { title: 'Office Address', value: 'office_address' },
-    { title: 'District', value: 'district' },
+    { title: 'City', value: 'city' },
     { title: '', value: 'actions' },
   ];
 

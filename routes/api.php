@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportDataController;
 
 require __DIR__.'/auth.php';
 
@@ -11,6 +12,7 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
 })->name('auth.user');
 
 Route::middleware('auth')->group(function () {
+    Route::post('import-data', ImportDataController::class)->name('import-data')->middleware('admin');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard.index');
     Route::apiResource('users', App\Http\Controllers\UserController::class)->middleware('admin');

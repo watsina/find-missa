@@ -17,6 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type')->default('diocese');
+            $table->string('rite', 150)->default('roman-latin');
+            $table->string('contact_email', 150)->nullable();
+            $table->string('website_url')->nullable();
             $table->string('office_address')->nullable();
             $table->string('postal_address')->nullable();
             $table->string('country')->default('Uganda');

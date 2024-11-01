@@ -21,6 +21,8 @@ return new class extends Migration
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('street_address')->nullable();
             $table->string('postal_address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('website_url')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
             $table->nullableMorphs('parishable');

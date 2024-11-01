@@ -24,7 +24,7 @@ class ParishFactory extends Factory
             'name' => $this->faker->name(),
             'diocese_id' => Diocese::factory(),
             'office_address' => $this->faker->word(),
-            'district' => $this->faker->word(),
+            'city' => $this->faker->word(),
         ];
     }
 }

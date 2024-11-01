@@ -40,8 +40,11 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+
   const form = useForm({
-    email: '',
+    email: email || '',
   });
 
   const submit = async () => {

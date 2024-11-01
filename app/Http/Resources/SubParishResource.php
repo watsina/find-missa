@@ -17,7 +17,7 @@ class SubParishResource extends JsonResource
             'name' => $this->name,
             'parish' => $this->parish?->name,
             'parish_id' => $this->parish_id,
-            'district' => $this->district,
+            'city' => $this->city,
             'office_address' => $this->office_address,
         ];
     }

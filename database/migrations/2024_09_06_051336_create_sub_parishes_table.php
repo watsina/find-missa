@@ -16,9 +16,11 @@ return new class extends Migration
         Schema::create('sub_parishes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('parish_id')->nullable()->constrained();
-            $table->string('district')->nullable();
+            $table->string('contact_email', 150)->nullable();
             $table->string('office_address')->nullable();
+            $table->string('website_url')->nullable();
+            $table->foreignId('parish_id')->nullable()->constrained();
+            $table->string('city')->nullable();
             $table->timestamps();
         });
 

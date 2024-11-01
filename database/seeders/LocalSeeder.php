@@ -27,11 +27,16 @@ class LocalSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        // $this->seedData();
+    }
+
+    protected function seedData()
+    {
         $dioceses = Diocese::factory(8)->create();
         $parishes = Parish::factory(10)->recycle($dioceses)->create();
         SubParish::factory(15)->recycle($parishes)->create();
         $churches = Church::factory(10)->recycle($parishes)->create();
-        // ActivityTime::factory()->recycle($churches)->create();
+        ActivityTime::factory()->recycle($churches)->create();
         Priest::factory(10)->recycle($parishes)->create();
     }
 }

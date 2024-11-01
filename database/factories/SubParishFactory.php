@@ -23,7 +23,7 @@ class SubParishFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'parish_id' => Parish::factory(),
-            'district' => $this->faker->word(),
+            'city' => $this->faker->word(),
             'office_address' => $this->faker->word(),
         ];
     }

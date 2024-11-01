@@ -23,7 +23,7 @@ class ParishStoreRequest extends FormRequest
             'name' => ['required', 'string'],
             'diocese_id' => ['nullable', 'integer', 'exists:dioceses,id'],
             'office_address' => ['nullable', 'string'],
-            'district' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
         ];
     }
 }

@@ -28,7 +28,7 @@
     name: props.subParish?.name || '',
     parish_id: props.subParish?.parish_id || '',
     office_address: props.subParish?.office_address || '',
-    district: props.subParish?.district || '',
+    city: props.subParish?.city || '',
   });
 
   watch(
@@ -38,7 +38,7 @@
         form.name = props.subParish?.name || '';
         form.parish_id = props.subParish?.parish_id || '';
         form.office_address = props.subParish?.office_address || '';
-        form.district = props.subParish?.district || '';
+        form.city = props.subParish?.city || '';
       }
     },
   );
@@ -132,10 +132,10 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.district"
+              v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.district"
-              label="District"
+              :error="form.errors.city"
+              label="City"
               placeholder="Kampala"
               required
             />

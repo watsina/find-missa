@@ -1,10 +1,18 @@
 <script setup>
   import AppLayout from '@/layouts/AppLayout.vue';
   import NavLink from '@/components/NavLink.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
+  import ImportDataModal from './ImportDataModal.vue';
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
+  import useAuthStore from '@/stores/useAuthStore';
+
+  const store = useAuthStore();
+
+  const user = computed(() => store?.user);
 
   const isFetching = ref(false);
+  const showUploadModal = ref(false);
 
   const stats = ref([]);
 
@@ -38,10 +46,18 @@
       </h2>
     </template>
 
+    <import-data-modal
+      v-if="user.is_admin"
+      v-model:show-modal="showUploadModal"
+    ></import-data-modal>
+
     <v-container>
       <v-row class="py-12">
-        <v-col cols="12">
+        <v-col class="tw-flex tw-justify-between" cols="12">
           <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to your dashboard</div>
+          <PrimaryButton v-if="user.is_admin" @click="showUploadModal = true">
+            Upload data
+          </PrimaryButton>
         </v-col>
         <v-col v-for="card in cards" :key="card.name" cols="12" md="4">
           <v-card rounded="lg">

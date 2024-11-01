@@ -234,10 +234,10 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.district"
+              v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.district"
-              label="District"
+              :error="form.errors.city"
+              label="City"
               placeholder="Kampala"
               required
             />

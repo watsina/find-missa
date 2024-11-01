@@ -11,5 +11,7 @@ enum ChurchType: string
     case Parish = 'parish';
     case SubParish = 'sub-parish';
     case Basilica = 'basilica';
+    case Cathedral = 'cathedral';
+    case Chapel = 'chapel';
     case Minor_Basilica = 'minor-basilica';
 }

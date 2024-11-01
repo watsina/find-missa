@@ -22,7 +22,7 @@ class SubParishStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
-            'district' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
             'office_address' => ['nullable', 'string'],
         ];
     }
