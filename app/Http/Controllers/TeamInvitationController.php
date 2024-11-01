@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserInvitation;
-use App\Http\Resources\UserInvitationResource;
-use App\Http\Resources\UserInvitationCollection;
+use App\Models\TeamInvitation;
+use App\Http\Resources\TeamInvitationResource;
+use App\Http\Resources\TeamInvitationCollection;
 
-class UserInvitationController extends Controller
+class TeamInvitationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $invitations = UserInvitation::all();
+        $invitations = TeamInvitation::all();
 
-        return new UserInvitationCollection($invitations);
+        return new TeamInvitationCollection($invitations);
     }
 
     /**
@@ -29,15 +29,15 @@ class UserInvitationController extends Controller
             'email' => 'required|email|unique:users|unique:user_invitations',
         ]);
 
-        $invitation = UserInvitation::create($data);
+        $invitation = TeamInvitation::create($data);
 
-        return new UserInvitationResource($invitation);
+        return new TeamInvitationResource($invitation);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(UserInvitation $userInvitation)
+    public function show(TeamInvitation $userInvitation)
     {
         //
     }
@@ -45,7 +45,7 @@ class UserInvitationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UserInvitation $userInvitation)
+    public function update(Request $request, TeamInvitation $userInvitation)
     {
         //
     }
@@ -53,7 +53,7 @@ class UserInvitationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserInvitation $userInvitation)
+    public function destroy(TeamInvitation $userInvitation)
     {
         $userInvitation->delete();
 

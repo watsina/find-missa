@@ -2,9 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AcceptUserInvitationController;
+use App\Http\Controllers\AcceptTeamInvitationController;
 
-Route::get('user-invitation/{invitation}/accept', AcceptUserInvitationController::class)
+Route::get('user-invitation/{invitation}/accept', AcceptTeamInvitationController::class)
     ->middleware(['signed'])
     ->name('user.accept-invitation');
 

@@ -5,7 +5,7 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
-  import UserInvitationModal from './UserInvitationModal.vue';
+  // import UserInvitationModal from './UserInvitationModal.vue';
 
   const { smAndDown } = useDisplay();
   const users = ref([]);

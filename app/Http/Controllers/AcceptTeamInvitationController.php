@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserInvitation;
+use App\Models\TeamInvitation;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class AcceptUserInvitationController extends Controller
+class AcceptTeamInvitationController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, UserInvitation $invitation)
+    public function __invoke(Request $request, TeamInvitation $invitation)
     {
         if ($request->user()) {
             Auth::logout();

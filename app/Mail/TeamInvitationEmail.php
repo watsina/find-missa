@@ -4,12 +4,12 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use App\Models\UserInvitation;
+use App\Models\TeamInvitation;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 
-class UserInvitationEmail extends Mailable
+class TeamInvitationEmail extends Mailable
 {
     use Queueable;
     use SerializesModels;
@@ -17,7 +17,7 @@ class UserInvitationEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public UserInvitation $invitation) {}
+    public function __construct(public TeamInvitation $invitation) {}
 
     /**
      * Get the message envelope.

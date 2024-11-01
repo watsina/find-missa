@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
-use App\Mail\UserInvitationEmail;
+use App\Mail\TeamInvitationEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class UserInvitation extends Model
+class TeamInvitation extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserInvitationFactory> */
+    /** @use HasFactory<\Database\Factories\TeamInvitationFactory> */
     use HasFactory;
 
     public static function booted()
     {
-        static::created(fn ($invitation) => Mail::to($invitation->email)->send(new UserInvitationEmail($invitation)));
+        static::created(fn ($invitation) => Mail::to($invitation->email)->send(new TeamInvitationEmail($invitation)));
     }
 
     public function acceptUrl()
