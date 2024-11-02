@@ -1,5 +1,5 @@
 <x-mail::message>
-{{ __('You have been invited to join and collaborate in Mass Finder.) }}
+{{ __('You have been invited to join and collaborate in Mass Finder.') }}
 
 {{ __('You may accept this invitation by clicking the button below:') }}
 

@@ -20,7 +20,7 @@ class TeamResource extends JsonResource
             'name' => $this->name,
             'country' => $this->country,
             'users' => $this->users,
-            'teamInvitations' => $this->teamInvitations,
+            'teamInvitations' => $this->invitations,
             'availableRoles' => [], // array_values(Jetstream::$roles),
             'availablePermissions' => [], //Jetstream::$permissions,
             'defaultPermissions' => [], // Jetstream::$defaultPermissions,

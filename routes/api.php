@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
 //admin routes
 Route::middleware('auth', 'admin')->group(function () {
     Route::post('import-data', ImportDataController::class)->name('import-data');
-    Route::apiResource('user-invitations', App\Http\Controllers\TeamInvitationController::class)->only('store', 'destroy');
+    Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', App\Http\Controllers\UserController::class);
     Route::apiResource('teams', App\Http\Controllers\TeamController::class);
 });

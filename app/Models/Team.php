@@ -20,36 +20,26 @@ class Team extends Model
     protected function casts(): array
     {
         return [
-            'personal_team' => 'boolean',
+            //
         ];
     }
 
     /**
-     * Get the owner of the team.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function owner()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Get all of the team's users including its owner.
+     * Get all of the team's members including its owner.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function allUsers()
+    public function allMembers()
     {
-        return $this->users->merge([$this->owner]);
+        return $this->members;
     }
 
     /**
-     * Get all of the users that belong to the team.
+     * Get all of the members that belong to the team.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function members()
     {
         return $this->belongsToMany(User::class, TeamMember::class)
             ->withTimestamps()
@@ -57,65 +47,65 @@ class Team extends Model
     }
 
     /**
-     * Determine if the given user belongs to the team.
+     * Determine if the given member belongs to the team.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $member
      * @return bool
      */
-    public function hasUser($user)
+    public function hasMember($member)
     {
-        return $this->users->contains($user) || $user->ownsTeam($this);
+        return $this->members->contains($member);
     }
 
     /**
-     * Determine if the given email address belongs to a user on the team.
+     * Determine if the given email address belongs to a member on the team.
      *
      * @return bool
      */
-    public function hasUserWithEmail(string $email)
+    public function hasMemberWithEmail(string $email)
     {
-        return $this->allUsers()->contains(function ($user) use ($email) {
-            return $user->email === $email;
+        return $this->allMembers()->contains(function ($member) use ($email) {
+            return $member->email === $email;
         });
     }
 
     /**
-     * Determine if the given user has the given permission on the team.
+     * Determine if the given member has the given permission on the team.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $member
      * @param  string  $permission
      * @return bool
      */
-    public function userHasPermission($user, $permission)
+    public function memberHasPermission($member, $permission)
     {
-        return $user->hasTeamPermission($this, $permission);
+        return $member->hasTeamPermission($this, $permission);
     }
 
     /**
-     * Get all of the pending user invitations for the team.
+     * Get all of the pending member invitations for the team.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function teamInvitations()
+    public function invitations()
     {
         return $this->hasMany(TeamInvitation::class);
     }
 
     /**
-     * Remove the given user from the team.
+     * Remove the given member from the team.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $member
      * @return void
      */
-    public function removeUser($user)
+    public function removeMember($member)
     {
-        if ($user->current_team_id === $this->id) {
-            $user->forceFill([
+        if ($member->current_team_id === $this->id) {
+            $member->forceFill([
                 'current_team_id' => null,
             ])->save();
         }
 
-        $this->users()->detach($user);
+        $this->members()->detach($member);
     }
 
     /**
@@ -128,10 +118,10 @@ class Team extends Model
         $this->owner()->where('current_team_id', $this->id)
             ->update(['current_team_id' => null]);
 
-        $this->users()->where('current_team_id', $this->id)
+        $this->members()->where('current_team_id', $this->id)
             ->update(['current_team_id' => null]);
 
-        $this->users()->detach();
+        $this->members()->detach();
 
         $this->delete();
     }

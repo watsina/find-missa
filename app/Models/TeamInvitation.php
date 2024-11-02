@@ -5,12 +5,15 @@ namespace App\Models;
 use App\Mail\TeamInvitationEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TeamInvitation extends Model
 {
     /** @use HasFactory<\Database\Factories\TeamInvitationFactory> */
     use HasFactory;
+
+    protected $guarded = [];
 
     public static function booted()
     {
@@ -19,17 +22,30 @@ class TeamInvitation extends Model
 
     public function acceptUrl()
     {
-        return url()->signedRoute('user.accept-invitation', [
+        return url()->signedRoute('team-invitations.accept', [
             'invitation' => $this,
         ]);
     }
 
     public function convertToMembership()
     {
-        User::create($this->only(['name', 'email']));
+        $user = User::firstOrCreate(
+            ['email' => $this->email],
+            ['name' => $this->name],
+        );
+
+        $this->team()->members()->attach($user);
 
         $this->delete();
 
         return true;
+    }
+
+    /**
+     * Get the team that the invitation belongs to.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 }

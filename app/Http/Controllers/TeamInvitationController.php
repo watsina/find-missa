@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Models\TeamInvitation;
 use App\Http\Resources\TeamInvitationResource;
@@ -22,14 +23,14 @@ class TeamInvitationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Team $team)
     {
         $data = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users|unique:user_invitations',
+            'email' => 'required|email|unique:users|unique:team_invitations',
         ]);
 
-        $invitation = TeamInvitation::create($data);
+        $invitation = $team->invitations()->create($data);
 
         return new TeamInvitationResource($invitation);
     }
@@ -53,9 +54,9 @@ class TeamInvitationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TeamInvitation $userInvitation)
+    public function destroy(Team $team, TeamInvitation $invitation)
     {
-        $userInvitation->delete();
+        $invitation->delete();
 
         return response()->noContent();
     }

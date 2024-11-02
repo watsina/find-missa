@@ -35,7 +35,7 @@ class TeamInvitationEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.users.invitation',
+            markdown: 'emails.teams.invitation',
             with: ['acceptUrl' => $this->invitation->acceptUrl()],
         );
     }
