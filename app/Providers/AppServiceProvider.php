@@ -39,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
+        Gate::before(fn (User $user, string $ability) => $user->is_admin ? true : null);
+
         Gate::define('viewPulse', fn (User $user) => $user->is_admin);
 
         RateLimiter::for('api', function (Request $request) {

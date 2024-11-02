@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use Illuminate\Http\Request;
+use App\Actions\Teams\CreateTeam;
+use App\Http\Resources\TeamResource;
+use Illuminate\Support\Facades\Gate;
+use App\Actions\Teams\UpdateTeamName;
+use App\Http\Resources\TeamCollection;
 
 class TeamController extends Controller
 {
@@ -12,15 +17,21 @@ class TeamController extends Controller
      */
     public function index()
     {
-        //
+        Gate::authorize('viewAll', Team::class);
+
+        $teams = Team::all();
+
+        return new TeamCollection($teams);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateTeam $createTeam, Request $request)
     {
-        //
+        $team = $createTeam->handle($request);
+
+        return new TeamResource($team);
     }
 
     /**
@@ -28,15 +39,19 @@ class TeamController extends Controller
      */
     public function show(Team $team)
     {
-        //
+        Gate::authorize('view', $team);
+
+        return new TeamResource($team);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Team $team)
+    public function update(UpdateTeamName $updateTeamName, Request $request, Team $team)
     {
-        //
+        $updateTeamName->handle($request, $team);
+
+        return response()->noContent();
     }
 
     /**
