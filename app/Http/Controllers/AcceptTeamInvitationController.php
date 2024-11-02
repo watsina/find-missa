@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\TeamInvitation;
 use Illuminate\Support\Facades\Auth;
+use App\Providers\AppServiceProvider;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AcceptTeamInvitationController extends Controller
@@ -23,8 +25,10 @@ class AcceptTeamInvitationController extends Controller
             return redirect($invitation->acceptUrl());
         }
 
+        $hasUser = User::whereEmail($invitation->email)->exists();
+
         if ($invitation->convertToMembership()) {
-            return redirect(route('password.request', [
+            return $hasUser ? redirect(AppServiceProvider::HOME) : redirect(route('password.update', [
                 'email' => $invitation->email,
             ]));
         }

@@ -34,7 +34,7 @@ class TeamInvitation extends Model
             ['name' => $this->name],
         );
 
-        $this->team()->members()->attach($user);
+        $this->team->members()->attach($user);
 
         $this->delete();
 
