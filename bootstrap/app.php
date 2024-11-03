@@ -24,12 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->statefulApi()
             ->throttleApi()
+            ->web(append: [\App\Http\Middleware\ScopeBouncer::class])
             ->api(['auth.session', 'json'])
             ->redirectUsersTo(AppServiceProvider::HOME)
             ->alias([
                 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
                 'json' => \App\Http\Middleware\JsonMiddleware::class,
                 'admin' => \App\Http\Middleware\IsAdminMiddleware::class,
+                'userWithTeam' => \App\Http\Middleware\UserWithTeam::class,
             ]);
     })
     ->withSchedule(function (Schedule $schedule) {

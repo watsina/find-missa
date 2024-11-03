@@ -32,7 +32,7 @@ class ScopeBouncer
     {
         $teamId = $request->user()->current_team_id;
 
-        $this->bouncer->scope()->to($teamId);
+        $this->bouncer->scope()->to($teamId)->onlyRelations();
 
         return $next($request);
     }

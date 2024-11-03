@@ -34,7 +34,7 @@ trait HasTeams
      * @param  mixed  $team
      * @return bool
      */
-    public function switchTeam($team)
+    public function switchTeam($team, $isLoggedInUser = true)
     {
         if (! $this->belongsToTeam($team)) {
             return false;
@@ -45,6 +45,10 @@ trait HasTeams
         ])->save();
 
         $this->setRelation('currentTeam', $team);
+
+        if ($isLoggedInUser) {
+            session()->put('current_team_id', $team->id);
+        }
 
         return true;
     }
@@ -85,6 +89,20 @@ trait HasTeams
 
         return $this->teams->contains(function ($t) use ($team) {
             return $t->id === $team->id;
+        });
+    }
+
+    /**
+     * Determine if the user belongs to the same team as the logged in user
+     */
+    public function hasAuthUserTeam()
+    {
+        if (! session()->has('current_team_id')) {
+            return false;
+        }
+
+        return $this->teams->contains(function ($team) {
+            return $team->id === session()->get('current_team_id');
         });
     }
 }
