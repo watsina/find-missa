@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\Parish;
 use App\Models\SubParish;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class SubParishFactory extends Factory
             'parish_id' => Parish::factory(),
             'city' => $this->faker->word(),
             'office_address' => $this->faker->word(),
+            'team_id' => Team::factory(),
         ];
     }
 }

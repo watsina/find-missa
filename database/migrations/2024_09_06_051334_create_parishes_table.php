@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('diocese_id')->nullable()->constrained();
             $table->string('office_address')->nullable();
             $table->string('city')->nullable();
+            $table->foreignId('team_id');
             $table->timestamps();
         });
 

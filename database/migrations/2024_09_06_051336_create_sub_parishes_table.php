@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('website_url')->nullable();
             $table->foreignId('parish_id')->nullable()->constrained();
             $table->string('city')->nullable();
+            $table->foreignId('team_id');
             $table->timestamps();
         });
 

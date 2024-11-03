@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\Parish;
 use App\Models\Diocese;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class ParishFactory extends Factory
             'diocese_id' => Diocese::factory(),
             'office_address' => $this->faker->word(),
             'city' => $this->faker->word(),
+            'team_id' => Team::factory(),
         ];
     }
 }
