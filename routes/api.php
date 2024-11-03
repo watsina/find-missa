@@ -17,6 +17,8 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', App\Http\Controllers\UserController::class);
     Route::apiResource('teams', App\Http\Controllers\TeamController::class);
+    // acl
+    Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
 });
 
 Route::middleware('auth')->group(function () {
