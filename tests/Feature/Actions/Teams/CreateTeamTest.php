@@ -2,39 +2,44 @@
 
 namespace Tests\Feature\Actions\Teams;
 
-use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Actions\Teams\CreateTeam;
 use Illuminate\Support\Facades\Auth;
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+
 use Illuminate\Auth\Access\AuthorizationException;
 
 test('teams can be created', function () {
     $this->actingAsSuperAdmin();
 
-    $request = new Request;
-    $request->setUserResolver(fn () => Auth::user());
-    $request->merge([
+    $data = [
         'name' => 'Test Team',
         'country' => 'Uganda',
-    ]);
+    ];
+    $request = new Request;
+    $request->setUserResolver(fn () => Auth::user());
+    $request->merge($data);
 
     $action = new CreateTeam;
 
     $action->handle($request);
 
-    expect(Team::count())->toEqual(1);
-    expect(Team::first()->name)->toEqual('Test Team');
+    assertDatabaseHas('teams', $data);
 });
 
 test('non admin can not create a team.', function () {
     $this->actingAsRandomUser();
 
+    $data = [
+        'name' => 'New Team',
+        'country' => 'Uganda',
+    ];
+
     $request = new Request;
     $request->setUserResolver(fn () => Auth::user());
-    $request->merge([
-        'name' => 'Test Team',
-        'country' => 'Uganda',
-    ]);
+    $request->merge($data);
 
     $this->expectException(AuthorizationException::class);
 
@@ -42,5 +47,5 @@ test('non admin can not create a team.', function () {
 
     $action->handle($request);
 
-    expect(Team::count())->toEqual(0);
+    assertDatabaseMissing('teams', $data);
 });

@@ -9,17 +9,14 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertModelMissing;
 
-beforeEach(fn () => $this->actingAsRandomUser());
-
 test('index behaves as expected', function (): void {
-    $dioceses = Diocese::factory()->count(3)->create();
+    $this->actingAsUserWithTeam();
+    Diocese::factory()->count(3)->create();
 
-    $response = get(route('diocese.index'));
-
-    $response->assertOk();
-    $response->assertJsonStructure([]);
+    get(route('diocese.index'))->assertOk()->assertJsonStructure([]);
 });
 
 test('store uses form request validation')
@@ -30,29 +27,22 @@ test('store uses form request validation')
     );
 
 test('store saves', function (): void {
-    $name = fake()->name();
-    $type = fake()->randomElement(['diocese', 'archdiocese']);
-    $country = fake()->country();
+    $this->actingAsUserWithTeam();
 
-    $response = post(route('diocese.store'), [
-        'name' => $name,
-        'type' => $type,
-        'country' => $country,
-    ]);
+    $data = [
+        'name' => fake()->name(),
+        'type' => fake()->randomElement(['diocese', 'archdiocese']),
+    ];
+    post(route('diocese.store'), $data)
+        ->assertCreated()
+        ->assertJsonStructure([]);
 
-    $dioceses = Diocese::query()
-        ->where('name', $name)
-        ->where('type', $type)
-        ->where('country', $country)
-        ->get();
-    expect($dioceses)->toHaveCount(1);
-    $diocese = $dioceses->first();
-
-    $response->assertCreated();
-    $response->assertJsonStructure([]);
+    assertDatabaseHas('dioceses', $data);
 });
 
 test('show behaves as expected', function (): void {
+    $this->actingAsUserWithTeam();
+
     $diocese = Diocese::factory()->create();
 
     $response = get(route('diocese.show', $diocese));
@@ -69,28 +59,27 @@ test('update uses form request validation')
     );
 
 test('update behaves as expected', function (): void {
-    $diocese = Diocese::factory()->create();
-    $name = fake()->name();
-    $type = fake()->randomElement(['diocese', 'archdiocese']);
-    $country = fake()->country();
+    $this->actingAsUserWithTeam();
 
-    $response = put(route('diocese.update', $diocese), [
-        'name' => $name,
-        'type' => $type,
-        'country' => $country,
-    ]);
+    $diocese = Diocese::factory()->create();
+    $data = [
+        'name' => fake()->name(),
+        'type' => fake()->randomElement(['diocese', 'archdiocese']),
+    ];
+
+    put(route('diocese.update', $diocese), $data)
+        ->assertOk()
+        ->assertJsonStructure([]);
 
     $diocese->refresh();
 
-    $response->assertOk();
-    $response->assertJsonStructure([]);
-
-    expect($name)->toEqual($diocese->name);
-    expect($type)->toEqual($diocese->type);
-    expect($country)->toEqual($diocese->country);
+    expect($data['name'])->toEqual($diocese->name);
+    expect($data['type'])->toEqual($diocese->type);
 });
 
 test('destroy deletes and responds with', function (): void {
+    $this->actingAsUserWithTeam();
+
     $diocese = Diocese::factory()->create();
 
     $response = delete(route('diocese.destroy', $diocese));

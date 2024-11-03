@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\Diocese;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,7 +25,7 @@ class DioceseFactory extends Factory
             'type' => $this->faker->randomElement(['diocese', 'archdiocese']),
             'office_address' => $this->faker->word(),
             'postal_address' => $this->faker->word(),
-            'country' => $this->faker->country(),
+            'team_id' => Team::factory(),
         ];
     }
 }

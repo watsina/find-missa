@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use JMac\Testing\Traits\AdditionalAssertions;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -16,8 +17,16 @@ abstract class TestCase extends BaseTestCase
     {
         $user = User::factory()->create($attributes);
 
-        /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
-        $this->actingAs($user);
+        Auth::login($user);
+
+        return $this;
+    }
+
+    public function actingAsUserWithTeam(array $attributes = [])
+    {
+        $user = User::factory()->withTeam()->create($attributes);
+
+        Auth::login($user);
 
         return $this;
     }

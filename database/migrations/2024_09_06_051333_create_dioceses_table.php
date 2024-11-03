@@ -22,10 +22,10 @@ return new class extends Migration
             $table->string('website_url')->nullable();
             $table->string('office_address')->nullable();
             $table->string('postal_address')->nullable();
-            $table->string('country')->default('Uganda');
+            $table->foreignId('team_id');
             $table->timestamps();
 
-            $table->unique(['name', 'country']);
+            $table->unique(['name', 'team_id']);
         });
 
         Schema::enableForeignKeyConstraints();
