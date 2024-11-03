@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\Church;
 use App\Enums\ActivityType;
 use App\Models\ActivityTime;
@@ -31,6 +32,7 @@ class ActivityTimeFactory extends Factory
             'occurrence' => $this->faker->randomElement(ActivityOccurrence::values()),
             'date' => $this->faker->date,
             'day_of_week' => $this->faker->dayOfWeek(),
+            'team_id' => Team::factory(),
         ];
     }
 }

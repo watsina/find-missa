@@ -26,7 +26,8 @@ return new class extends Migration
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
             $table->nullableMorphs('parishable');
-            $table->foreignId('priest_id')->nullable()->constrained();
+            $table->foreignId('priest_id')->nullable();
+            $table->foreignId('team_id');
             $table->timestamps();
         });
 

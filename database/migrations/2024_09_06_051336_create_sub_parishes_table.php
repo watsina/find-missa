@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('contact_email', 150)->nullable();
             $table->string('office_address')->nullable();
             $table->string('website_url')->nullable();
-            $table->foreignId('parish_id')->nullable()->constrained();
+            $table->foreignId('parish_id')->nullable();
             $table->string('city')->nullable();
             $table->foreignId('team_id');
             $table->timestamps();

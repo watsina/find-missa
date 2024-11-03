@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->foreignId('parish_id')->nullable()->constrained();
+            $table->foreignId('parish_id')->nullable();
+            $table->foreignId('team_id');
             $table->timestamps();
         });
 

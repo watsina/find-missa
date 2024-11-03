@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\Church;
 use App\Models\Parish;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -31,6 +32,7 @@ class ChurchFactory extends Factory
             'contact_phone' => $this->faker->phoneNumber(),
             'parishable_id' => Parish::factory(),
             'parishable_type' => Parish::class,
+            'team_id' => Team::factory(),
         ];
     }
 }

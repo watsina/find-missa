@@ -19,10 +19,11 @@ return new class extends Migration
             $table->string('start_time', 100);
             $table->string('end_time', 100);
             $table->string('language', 100);
-            $table->foreignId('church_id')->nullable()->constrained();
+            $table->foreignId('church_id')->nullable();
             $table->string('occurrence', 100);
             $table->dateTime('date')->nullable();
             $table->string('day_of_week', 100)->nullable();
+            $table->foreignId('team_id');
             $table->timestamps();
         });
 

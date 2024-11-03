@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('activity_time_exceptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('activity_time_id')->constrained();
+            $table->foreignId('activity_time_id');
             $table->dateTime('date_of_exception');
             $table->timestamps();
         });

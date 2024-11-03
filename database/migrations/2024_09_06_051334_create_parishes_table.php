@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('contact_email', 150)->nullable();
             $table->string('website_url')->nullable();
-            $table->foreignId('diocese_id')->nullable()->constrained();
+            $table->foreignId('diocese_id')->nullable();
             $table->string('office_address')->nullable();
             $table->string('city')->nullable();
             $table->foreignId('team_id');

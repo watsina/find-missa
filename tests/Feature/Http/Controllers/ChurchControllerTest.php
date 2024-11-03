@@ -14,7 +14,7 @@ use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\assertModelMissing;
 
-beforeEach(fn () => $this->actingAsRandomUser());
+beforeEach(fn () => $this->actingAsUserWithTeam());
 
 test('index behaves as expected', function (): void {
     Church::factory()->count(3)->create();
