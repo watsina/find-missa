@@ -161,7 +161,7 @@ test('update also updates the parishable relation.', function (): void {
     $church = Church::first();
 
     expect($church->parishable_id)->toBe($newParish->id);
-    expect($church->parishable_type)->toBe(SubParish::class);
+    expect($church->parishable_type)->toBe('subParish');
 });
 
 test('destroy deletes and responds with', function (): void {
