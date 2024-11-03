@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(AclSeeder::class);
 
         if (App::environment('local')) {
             $this->call(LocalSeeder::class);
