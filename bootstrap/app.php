@@ -24,7 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->statefulApi()
             ->throttleApi()
-            ->web(append: [\App\Http\Middleware\ScopeBouncer::class])
             ->api(['auth.session', 'json'])
             ->redirectUsersTo(AppServiceProvider::HOME)
             ->alias([

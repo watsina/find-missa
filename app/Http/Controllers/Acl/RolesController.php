@@ -34,11 +34,11 @@ class RolesController extends Controller
     public function update(Request $request, Role $role)
     {
         $data = $request->validate([
-            'ability_ids' => 'required|array',
-            'ability_ids.*' => 'required|exists:abilities,id',
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'required|exists:permissions,id',
         ]);
 
-        $role->abilities()->sync($data['ability_ids']);
+        $role->syncPermissions($data['permission_ids']);
 
         return new RoleResource($role);
     }

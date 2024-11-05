@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Silber\Bouncer\Database\Ability as BouncerAbility;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-class Ability extends BouncerAbility
+class Permission extends SpatiePermission
 {
     /** @use HasFactory<\Database\Factories\AbilityFactory> */
     use HasFactory;
