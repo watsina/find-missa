@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->statefulApi()
             ->throttleApi()
+            ->prepend(\App\Http\Middleware\TeamsPermission::class)
             ->api(['auth.session', 'json'])
             ->redirectUsersTo(AppServiceProvider::HOME)
             ->alias([
