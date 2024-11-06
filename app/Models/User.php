@@ -110,9 +110,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function info()
     {
-        return cache()->remember($this->getCacheKey('info'), 5 * 60, function () {
+        $teamId = session()->get('current_team_id');
+
+        return cache()->remember($this->getCacheKey("info:{$teamId}"), 5 * 60, function () {
             return [
                 'user' => $this->withoutRelations(),
+                'current_team' => $this->currentTeam,
+                'permissions' => $this->getAllPermissions(),
                 'features' => [
                     // will merge more as the come
                     'fortify' => [

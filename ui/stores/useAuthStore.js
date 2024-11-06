@@ -10,6 +10,8 @@ export default defineStore('authStore', {
       isFetching: false,
       error: null,
       user: auth?.user || {},
+      current_team: auth?.current_team || {},
+      permissions: auth?.permissions || [],
       features: auth?.features || {},
     };
   },
@@ -22,6 +24,17 @@ export default defineStore('authStore', {
     },
     featureOptionIsEnabled($namespace, $feature, $option) {
       return !!this.features[$namespace]['options'][$feature][$option];
+    },
+    canPerformActionOperation(permission) {
+      if (this.user?.is_admin) {
+        return true;
+      }
+
+      if (!permission || !this.permissions.length) {
+        return false;
+      }
+
+      return this.permissions.includes(permission);
     },
     updateUser(newData) {
       if (!newData) {
