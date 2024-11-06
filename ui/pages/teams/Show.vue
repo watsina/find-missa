@@ -1,10 +1,10 @@
 <script setup>
   import { ref } from 'vue';
   import AppLayout from '@/layouts/AppLayout.vue';
-  import DeleteTeamForm from '@/teams/partials/DeleteTeamForm.vue';
+  import DeleteTeamForm from './partials/DeleteTeamForm.vue';
   import SectionBorder from '@/components/SectionBorder.vue';
-  import TeamMemberManager from '@/teams/partials/TeamMemberManager.vue';
-  import UpdateTeamNameForm from '@/teams/partials/UpdateTeamNameForm.vue';
+  import TeamMemberManager from './partials/TeamMemberManager.vue';
+  import UpdateTeamNameForm from './partials/UpdateTeamNameForm.vue';
 
   const team = ref('');
   const availableRoles = ref([]);

@@ -1,10 +1,10 @@
 <script setup>
   import { ref } from 'vue';
-  import { useForm } from '@inertiajs/vue3';
   import ActionSection from '@/components/ActionSection.vue';
   import ConfirmationModal from '@/components/ConfirmationModal.vue';
   import DangerButton from '@/components/DangerButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
+  import { useForm } from '@/plugins';
 
   const props = defineProps({
     team: { type: Object, required: true },

@@ -1,11 +1,11 @@
 <script setup>
-  import { useForm } from '@inertiajs/vue3';
   import ActionMessage from '@/components/ActionMessage.vue';
   import FormSection from '@/components/FormSection.vue';
   import InputError from '@/components/InputError.vue';
   import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import { useForm } from '@/plugins';
   import { notify } from '@/utils';
 
   const props = defineProps({

@@ -20,6 +20,8 @@
       </header>
     </template>
     <v-spacer></v-spacer>
+    <teams-menu />
+    <div class="tw-mr-4"></div>
     <user-avatar></user-avatar>
     <div class="tw-ml-4"></div>
   </v-app-bar>
@@ -29,6 +31,7 @@
   import NavLink from '@/components/NavLink';
   import ApplicationMark from '@/components/ApplicationMark';
   import UserAvatar from './UserAvatar';
+  import TeamsMenu from './TeamsMenu.vue';
 
   const rail = defineModel('rail', { type: Boolean });
   const drawer = defineModel('drawer', { type: Boolean });

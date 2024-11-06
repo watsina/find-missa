@@ -12,6 +12,7 @@ export default defineStore('authStore', {
       user: auth?.user || {},
       current_team: auth?.current_team || {},
       permissions: auth?.permissions || [],
+      all_teams: auth?.all_teams || [],
       features: auth?.features || {},
     };
   },
@@ -25,7 +26,7 @@ export default defineStore('authStore', {
     featureOptionIsEnabled($namespace, $feature, $option) {
       return !!this.features[$namespace]['options'][$feature][$option];
     },
-    canPerformActionOperation(permission) {
+    hasPermission(permission) {
       if (this.user?.is_admin) {
         return true;
       }
