@@ -19,7 +19,7 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::apiResource('teams', App\Http\Controllers\TeamController::class);
     // acl
     Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
-    Route::apiResource('user.roles', App\Http\Controllers\Acl\UserRolesController::class)->only('index', 'show', 'store')->middleware('userWithTeam');
+    Route::apiResource('user.roles', App\Http\Controllers\Acl\UserRolesController::class)->only('index', 'store')->middleware('userWithTeam');
 });
 
 Route::middleware('auth')->group(function () {

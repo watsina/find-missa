@@ -23,9 +23,18 @@ class UserRolesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, User $user)
     {
-        //
+        $this->userBelongsToTeam($user);
+
+        $data = $request->validate([
+            'role_ids' => 'required|array',
+            'role_ids.*' => 'required|exists:roles,id',
+        ]);
+
+        $user->syncRoles($data['role_ids']);
+
+        return new RoleCollection($user->roles);
     }
 
     /**

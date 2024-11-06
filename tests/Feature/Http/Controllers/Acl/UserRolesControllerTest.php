@@ -14,7 +14,7 @@ test('admin must have a team selected to access endpoints.', function () {
         ->assertNotFound();
 });
 
-test('User should be in the same team.', function () {
+test('can get roles of user in the team', function () {
     $this->actingAsSuperAdminWithTeam();
 
     $team = Team::find(session('current_team_id'));
@@ -25,14 +25,48 @@ test('User should be in the same team.', function () {
         ->assertJsonCount(3, 'data');
 });
 
-test('admin can assign roles to a user.', function () {
-    //
-})->todo();
+test('can not get roles user has in a different team.', function () {
+    $this->actingAsSuperAdminWithTeam();
 
-test('admin can get the users roles.', function () {
-    //
-})->todo();
+    $team = Team::find(session('current_team_id'));
+    $user = User::factory()->hasAttached($team)->create();
+    $otherTeam = Team::factory()->create();
+    $otherTeam->members()->attach($user);
+    $user->roles()->attach(Role::factory(3)->create(), ['team_id' => $otherTeam->id]);
+
+    $this->get('/api/v1/user/'.$user->id.'/roles')
+        ->assertOk()
+        ->assertJsonCount(0, 'data');
+});
+
+test('admin can assign roles to a user.', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $team = Team::find(session('current_team_id'));
+    $user = User::factory()->hasAttached($team)->create();
+    $roleIds = Role::factory(3)->create()->pluck('id');
+
+    $this->post('/api/v1/user/'.$user->id.'/roles', [
+        'role_ids' => $roleIds->toArray(),
+    ])
+        ->assertOk()
+        ->assertJsonCount(3, 'data');
+
+    expect($user->fresh()->roles()->count())->toEqual(3);
+});
 
 test('admin can remove users roles.', function () {
-    //
-})->todo();
+    $this->actingAsSuperAdminWithTeam();
+
+    $team = Team::find(session('current_team_id'));
+    $user = User::factory()->hasAttached($team)->hasAttached(Role::factory(5), ['team_id' => $team->id])->create();
+    $roleIds = Role::factory(2)->create()->pluck('id');
+
+    $this->post('/api/v1/user/'.$user->id.'/roles', [
+        'role_ids' => $roleIds->toArray(),
+    ])
+        ->assertOk()
+        ->assertJsonCount(2, 'data');
+
+    expect($user->fresh()->roles()->count())->toEqual(2);
+});
