@@ -22,20 +22,25 @@
     <v-list density="compact">
       <!-- Team Settings -->
       <template v-if="authStore.hasPermission('team.manage')">
-        <v-list-subheader>Manage Team</v-list-subheader>
-        <v-list-item :to="{ name: 'teams.show', params: { teamId: authUser.current_team_id } }">
+        <v-list-subheader class="!tw-text-gray-500 hover:!tw-text-gray-700">
+          Manage Team
+        </v-list-subheader>
+        <v-list-item
+          class="!tw-text-gray-700"
+          :to="{ name: 'teams.show', params: { teamId: authUser.current_team_id } }"
+        >
           Team Settings
         </v-list-item>
-        <v-list-item v-if="canCreateTeams" :to="{ name: 'teams.create' }">
+        <v-list-item v-if="canCreateTeams" class="!tw-text-gray-700" :to="{ name: 'teams.create' }">
           Create New Team
         </v-list-item>
       </template>
       <!-- Team Switcher -->
       <template v-if="authStore.all_teams.length > 1">
-        <div class="border-t border-gray-200" />
-        <v-list-subheader>Switch Teams</v-list-subheader>
+        <div class="tw-border-t tw-border-gray-200" />
+        <v-list-subheader class="tw-text-gray-400">Switch Teams</v-list-subheader>
         <v-list-item v-for="team in authStore.all_teams" :key="team.id">
-          <v-list-item-title>
+          <v-list-item-title class="tw-text-gray-700">
             <v-icon
               v-if="team.id == authUser.current_team_id"
               class="tw-mr-2"

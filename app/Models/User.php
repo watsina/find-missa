@@ -111,8 +111,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function info()
     {
         $teamId = session()->get('current_team_id');
+        $team = $this->currentTeam;
 
-        return cache()->remember($this->getCacheKey("info:{$teamId}"), 5 * 60, function () {
+        return cache()->remember($this->getCacheKey("info:{$teamId}:{$team?->updated_at}"), 5 * 60, function () {
             return [
                 'user' => $this->withoutRelations(),
                 'current_team' => $this->currentTeam,

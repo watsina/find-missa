@@ -10,7 +10,7 @@
           <ApplicationMark class="tw-block tw-w-auto tw-h-9" />
         </NavLink>
       </div>
-      <v-app-bar-title>App Name</v-app-bar-title>
+      <v-app-bar-title>Find Missa</v-app-bar-title>
     </template>
     <template v-if="$slots.header" #extension>
       <header class="">

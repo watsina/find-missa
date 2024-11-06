@@ -1,8 +1,6 @@
 <script setup>
   import ActionMessage from '@/components/ActionMessage.vue';
   import FormSection from '@/components/FormSection.vue';
-  import InputError from '@/components/InputError.vue';
-  import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import { useForm } from '@/plugins';
@@ -10,7 +8,7 @@
 
   const props = defineProps({
     team: { type: Object, required: true },
-    permissions: { type: Object, required: true },
+    canUpdateTeam: { type: Boolean, required: true },
   });
 
   const form = useForm({
@@ -19,8 +17,11 @@
 
   const updateTeamName = () => {
     form.put(`/api/v1/teams/${props.team?.id}`, {
-      onSuccess: () => notify.success('Team updated successfully.'),
-      onError: () => notify.success('Something went wrong'),
+      onSuccess: () => {
+        notify.success('Team updated successfully.');
+        window.location.reload();
+      },
+      onError: () => notify.error('Something went wrong'),
     });
   };
 </script>
@@ -29,49 +30,28 @@
   <FormSection @submitted="updateTeamName">
     <template #title> Team Name </template>
 
-    <template #description> The team's name and owner information. </template>
+    <template #description> The team's name. </template>
 
     <template #form>
-      <!-- Team Owner Information -->
-      <div class="col-span-6">
-        <InputLabel value="Team Owner" />
-
-        <div class="flex items-center mt-2">
-          <img
-            :alt="team.owner.name"
-            class="w-12 h-12 rounded-full object-cover"
-            :src="team.owner.profile_photo_url"
+      <v-row>
+        <v-col cols="12">
+          <TextInput
+            v-model="form.name"
+            class="tw-mt-1 tw-block tw-w-full"
+            :disabled="!canUpdateTeam"
+            :error="form.errors.name"
+            label="Team Name"
+            type="text"
+            variant="outlined"
           />
-
-          <div class="ms-4 leading-tight">
-            <div class="text-gray-900">{{ team.owner.name }}</div>
-            <div class="text-gray-700 text-sm">
-              {{ team.owner.email }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Team Name -->
-      <div class="col-span-6 sm:col-span-4">
-        <InputLabel for="name" value="Team Name" />
-
-        <TextInput
-          id="name"
-          v-model="form.name"
-          class="mt-1 block w-full"
-          :disabled="!permissions.canUpdateTeam"
-          type="text"
-        />
-
-        <InputError class="mt-2" :message="form.errors.name" />
-      </div>
+        </v-col>
+      </v-row>
     </template>
 
-    <template v-if="permissions.canUpdateTeam" #actions>
-      <ActionMessage class="me-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
+    <template v-if="canUpdateTeam" #actions>
+      <ActionMessage class="tw-me-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
 
-      <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+      <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
         Save
       </PrimaryButton>
     </template>
