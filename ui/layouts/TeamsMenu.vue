@@ -16,7 +16,7 @@
   <!-- Teams Dropdown -->
   <v-menu offset-y>
     <template #activator="{ props }">
-      <v-btn dark x-small v-bind="props">
+      <v-btn dark v-bind="props">
         {{ authStore.current_team.name }}
         <v-icon v-if="canViewTeam || hasManyTeams" :icon="mdiUnfoldMoreHorizontal"></v-icon>
       </v-btn>

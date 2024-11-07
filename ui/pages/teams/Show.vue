@@ -2,7 +2,9 @@
   import { computed, onMounted, ref, watch } from 'vue';
   import AppLayout from '@/layouts/AppLayout.vue';
   import UpdateTeamNameForm from './partials/UpdateTeamNameForm.vue';
-  import TeamMemberManager from './partials/TeamMemberManager.vue';
+  import TeamMembers from './partials/TeamMembers.vue';
+  import AddTeamMember from './partials/AddTeamMember.vue';
+  import TeamInvitations from './partials/TeamInvitations.vue';
   import { http } from '@/plugins';
   import { notify } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
@@ -74,11 +76,11 @@
         <v-col v-else cols="12">
           <UpdateTeamNameForm :can-update-team="canUpdateTeam" :team="team" />
 
-          <TeamMemberManager
-            v-model:team="team"
-            :available-roles="availableRoles"
-            class="tw-mt-10"
-          />
+          <AddTeamMember v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
+
+          <TeamInvitations v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
+
+          <TeamMembers v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
         </v-col>
       </v-row>
     </v-container>

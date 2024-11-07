@@ -20,7 +20,7 @@ class TeamResource extends JsonResource
             'name' => $this->name,
             'country' => $this->country,
             'users' => $this->users,
-            'team_invitations' => $this->invitations,
+            'invitations' => $this->invitations,
         ];
     }
 }
