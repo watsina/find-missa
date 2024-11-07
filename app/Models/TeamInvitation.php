@@ -36,6 +36,8 @@ class TeamInvitation extends Model
 
         $this->team->members()->attach($user);
 
+        $user->roles()->attach($this->role, ['team_id' => $this->team->id]);
+
         $this->delete();
 
         return true;
@@ -47,5 +49,13 @@ class TeamInvitation extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    /**
+     * Get the role that the invitation invited user was given
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
     }
 }

@@ -18,23 +18,25 @@
   import { mdiCheckCircleOutline } from '@mdi/js';
 
   const props = defineProps({
-    team: { type: Object, required: true },
     availableRoles: { type: Array, required: true },
   });
 
+  const team = defineModel('team', { type: Object, required: true });
+
   const authStore = useAuthStore();
-  const authUser = computed(() => authStore?.user);
+  // const authUser = computed(() => authStore?.user);
   const canAddTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
   const canRemoveTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
   const canUpdateTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
 
   const addTeamMemberForm = useForm({
+    name: '',
     email: '',
-    role: null,
+    role_id: null,
   });
 
   const updateRoleForm = useForm({
-    role: null,
+    role_id: null,
   });
 
   const leaveTeamForm = useForm({});
@@ -46,9 +48,11 @@
   const teamMemberBeingRemoved = ref(null);
 
   const addTeamMember = () => {
-    addTeamMemberForm.post(`/api/v1/team/${props.team?.id}/members`, {
-      onSuccess: () => {
+    addTeamMemberForm.post(`/api/v1/team/${props.team?.id}/invitations`, {
+      onSuccess: ({ data }) => {
         addTeamMemberForm.reset();
+        console.info({ data });
+        team.value.team_invitations?.push(data?.data || data);
         notify.success('Team member was added successfully.');
       },
       onError: () => notify.error('Something went wrong.'),
@@ -119,14 +123,24 @@
         <template #form>
           <v-row>
             <v-col cols="12">
-              <div class="tw-max-w-xl tw-text-sm tw-text-gray-600">
-                Please provide the email address of the person you would like to add to this team.
-              </div>
+              <TextInput
+                v-model="addTeamMemberForm.name"
+                class="tw-mt-1 tw-block tw-w-full"
+                :error="addTeamMemberForm.errors.name"
+                hint="Please provide the name of the person you would like to add to this team."
+                label="Name"
+                persistent-hint
+                type="text"
+              />
+            </v-col>
+            <v-col cols="12">
               <TextInput
                 v-model="addTeamMemberForm.email"
                 class="tw-mt-1 tw-block tw-w-full"
                 :error="addTeamMemberForm.errors.email"
+                hint="Please provide the email address of the person you would like to add to this team."
                 label="Email"
+                persistent-hint
                 type="email"
               />
             </v-col>
@@ -137,18 +151,18 @@
               cols="12"
             >
               <InputLabel for="roles" value="Role" />
-              <InputError class="tw-mt-2" :message="addTeamMemberForm.errors.role" />
+              <InputError class="tw-mt-2" :message="addTeamMemberForm.errors.role_id" />
 
               <v-list lines="two" selectable>
                 <v-list-item
                   v-for="(role, i) in availableRoles"
                   :key="role.id"
-                  @click="addTeamMemberForm.role = role.id"
+                  @click="addTeamMemberForm.role_id = role.id"
                 >
                   <!-- Role title -->
                   <v-list-item-title
                     class="tw-text-sm !tw-capitalize"
-                    :class="{ 'tw-font-semibold': addTeamMemberForm.role === role.id }"
+                    :class="{ 'tw-font-semibold': addTeamMemberForm.role_id === role.id }"
                   >
                     {{ role.name?.replace(/-/g, ' ') }}
                   </v-list-item-title>
@@ -158,7 +172,7 @@
                   </v-list-item-subtitle>
                   <template #append>
                     <v-icon
-                      v-if="addTeamMemberForm.role == role.id"
+                      v-if="addTeamMemberForm.role_id == role.id"
                       color="success"
                       :icon="mdiCheckCircleOutline"
                     ></v-icon>
@@ -175,10 +189,11 @@
           </ActionMessage>
 
           <PrimaryButton
-            :class="{ 'tw-opacity-25': addTeamMemberForm.processing }"
             :disabled="addTeamMemberForm.processing"
+            :loading="addTeamMemberForm.processing"
+            type="submit"
           >
-            Add
+            Invite
           </PrimaryButton>
         </template>
       </FormSection>
@@ -205,7 +220,7 @@
               class="tw-flex tw-items-center tw-justify-between"
             >
               <div class="tw-text-gray-600">
-                {{ invitation.email }}
+                {{ invitation.name(invitation.email) }}
               </div>
 
               <div class="tw-flex tw-items-center">

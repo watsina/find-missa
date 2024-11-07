@@ -74,7 +74,11 @@
         <v-col v-else cols="12">
           <UpdateTeamNameForm :can-update-team="canUpdateTeam" :team="team" />
 
-          <TeamMemberManager :available-roles="availableRoles" class="tw-mt-10" :team="team" />
+          <TeamMemberManager
+            v-model:team="team"
+            :available-roles="availableRoles"
+            class="tw-mt-10"
+          />
         </v-col>
       </v-row>
     </v-container>

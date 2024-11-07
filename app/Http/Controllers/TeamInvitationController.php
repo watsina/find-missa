@@ -28,6 +28,7 @@ class TeamInvitationController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users|unique:team_invitations',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         $invitation = $team->invitations()->create($data);

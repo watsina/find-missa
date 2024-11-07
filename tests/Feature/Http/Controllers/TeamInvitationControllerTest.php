@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Mail\TeamInvitationEmail;
@@ -14,6 +15,7 @@ test('admin can invite a user and email is sent.', function () {
     $data = [
         'name' => 'hello user',
         'email' => 'invite@hello.com',
+        'role_id' => Role::factory()->create()->id,
     ];
 
     $this->post('/api/v1/team/'.$team->id.'/invitations', $data)
