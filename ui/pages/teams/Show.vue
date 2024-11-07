@@ -2,6 +2,7 @@
   import { computed, onMounted, ref, watch } from 'vue';
   import AppLayout from '@/layouts/AppLayout.vue';
   import UpdateTeamNameForm from './partials/UpdateTeamNameForm.vue';
+  import TeamMemberManager from './partials/TeamMemberManager.vue';
   import { http } from '@/plugins';
   import { notify } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
@@ -13,7 +14,6 @@
   const authStore = useAuthStore();
 
   const canUpdateTeam = computed(() => authStore.hasPermission('teams.write'));
-  const canDeleteTeam = computed(() => authStore.hasPermission('teams.write'));
 
   const team = ref('');
   const fetchingTeam = ref(false);
@@ -56,32 +56,27 @@
 
 <template>
   <AppLayout title="Team Settings">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">Team Settings</h2>
+    <template #head>
+      <h2 class="tw-font-semibold tw-text-xl tw-text-gray-800 tw-leading-tight">Team Settings</h2>
     </template>
 
     <v-container>
-      <v-skeleton-loader
-        v-if="fetchingRoles || fetchingTeam"
-        type="card-avatar"
-      ></v-skeleton-loader>
+      <v-row class="tw-max-w-7xl tw-mx-auto tw-py-10 sm:tw-px-6 lg:tw-px-8">
+        <v-col v-if="fetchingRoles || fetchingTeam" cols="12">
+          <v-skeleton-loader type="card-avatar"></v-skeleton-loader>
+        </v-col>
 
-      <v-card v-else-if="!teamId || !team">
-        <v-card-text> No team found </v-card-text>
-      </v-card>
-
-      <div v-else>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+        <v-col v-else-if="!teamId || !team" cols="12">
+          <v-card>
+            <v-card-text> No team found </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col v-else cols="12">
           <UpdateTeamNameForm :can-update-team="canUpdateTeam" :team="team" />
 
-          <!-- <TeamMemberManager -->
-          <!--   :available-roles="availableRoles" -->
-          <!--   class="mt-10 sm:mt-0" -->
-          <!--   :team="team" -->
-          <!--   :user-permissions="permissions" -->
-          <!-- /> -->
-        </div>
-      </div>
+          <TeamMemberManager :available-roles="availableRoles" class="tw-mt-10" :team="team" />
+        </v-col>
+      </v-row>
     </v-container>
   </AppLayout>
 </template>

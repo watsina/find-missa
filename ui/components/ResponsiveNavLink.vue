@@ -3,7 +3,7 @@
   import AppLink from './AppLink';
 
   const props = defineProps({
-    href: { type: [String, Object], required: true },
+    href: { type: [String, Object], default: null },
     active: Boolean,
     as: { type: String, default: null },
     activeClass: {

@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" v-bind="$attrs" :max-width="maxWidth" persistent @close="close">
     <v-card rounded>
-      <v-card-content class="tw-px-4 tw-pt-5 tw-pb-4 tw-bg-white sm:tw-p-6 sm:tw-pb-4">
+      <v-card-text class="tw-px-4 tw-pt-5 tw-pb-4 tw-bg-white sm:tw-p-6 sm:tw-pb-4">
         <div class="sm:tw-flex sm:tw-items-start">
           <div
             class="tw-flex tw-items-center tw-justify-center tw-w-12 tw-h-12 tw-mx-auto tw-bg-red-100 tw-rounded-full shrink-0 sm:tw-mx-0 sm:tw-h-10 sm:tw-w-10"
@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-      </v-card-content>
+      </v-card-text>
 
       <v-card-actions
         class="tw-flex tw-flex-row tw-justify-end tw-px-6 tw-py-2 tw-text-right tw-bg-gray-100"

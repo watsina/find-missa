@@ -7,6 +7,8 @@
 
   const authUser = computed(() => authStore.user);
   const canCreateTeams = computed(() => authStore.hasPermission('teams.write'));
+  const hasManyTeams = computed(() => authStore.all_teams.length > 1);
+  const canViewTeam = computed(() => authStore.hasPermission('team.manage'));
   //
 </script>
 
@@ -16,12 +18,12 @@
     <template #activator="{ props }">
       <v-btn dark x-small v-bind="props">
         {{ authStore.current_team.name }}
-        <v-icon :icon="mdiUnfoldMoreHorizontal"></v-icon>
+        <v-icon v-if="canViewTeam || hasManyTeams" :icon="mdiUnfoldMoreHorizontal"></v-icon>
       </v-btn>
     </template>
-    <v-list density="compact">
+    <v-list v-if="canViewTeam || hasManyTeams" density="compact">
       <!-- Team Settings -->
-      <template v-if="authStore.hasPermission('team.manage')">
+      <template v-if="canViewTeam">
         <v-list-subheader class="!tw-text-gray-500 hover:!tw-text-gray-700">
           Manage Team
         </v-list-subheader>
@@ -36,7 +38,7 @@
         </v-list-item>
       </template>
       <!-- Team Switcher -->
-      <template v-if="authStore.all_teams.length > 1">
+      <template v-if="hasManyTeams">
         <div class="tw-border-t tw-border-gray-200" />
         <v-list-subheader class="tw-text-gray-400">Switch Teams</v-list-subheader>
         <v-list-item v-for="team in authStore.all_teams" :key="team.id">
