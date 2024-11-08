@@ -49,7 +49,7 @@ class TeamMemberController extends Controller
      */
     public function destroy(Team $team, TeamMember $member)
     {
-        $member->purge();
+        $member->delete();
 
         return response()->noContent();
     }

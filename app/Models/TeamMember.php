@@ -13,6 +13,16 @@ class TeamMember extends Pivot
 
     protected $table = 'team_members';
 
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            // remove the assigned roles on that team
+            setPermissionsTeamId($model->team->id);
+
+            $model->user->syncRoles([]);
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -21,14 +31,5 @@ class TeamMember extends Pivot
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
-    }
-
-    public function purge()
-    {
-        setPermissionsTeamId($this->team->id);
-
-        $this->user->syncRoles([]);
-
-        $this->delete();
     }
 }
