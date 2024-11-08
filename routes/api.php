@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportDataController;
+use App\Http\Controllers\TeamMemberController;
 
 require __DIR__.'/auth.php';
 
@@ -26,6 +27,7 @@ Route::middleware('auth', 'admin')->group(function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard.index');
+    Route::apiResource('team.members', TeamMemberController::class)->only('index', 'show', 'update', 'destroy');
     Route::apiResource('church', App\Http\Controllers\ChurchController::class);
     Route::apiResource('diocese', App\Http\Controllers\DioceseController::class);
     Route::apiResource('parish', App\Http\Controllers\ParishController::class);

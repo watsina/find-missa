@@ -5,6 +5,7 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import SelectInput from '@/components/SelectInput.vue';
+  import SectionBorder from '@/components/SectionBorder.vue';
   import { useForm } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';
   import { notify } from '@/utils';
@@ -22,7 +23,7 @@
   const form = useForm({
     name: '',
     email: '',
-    role_id: null,
+    role_id: '',
   });
 
   const itemProps = (item) => {
@@ -37,7 +38,6 @@
     form.post(`/api/v1/team/${props.team?.id}/invitations`, {
       onSuccess: ({ data }) => {
         form.reset();
-        console.info({ data });
         team.value.invitations?.push(data?.data || data);
         notify.success('Team member was added successfully.');
       },
@@ -88,12 +88,14 @@
           <v-col v-if="availableRoles?.length > 0" class="tw-col-span-6 lg:tw-col-span-4" cols="12">
             <SelectInput
               v-model="form.role_id"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.role_id"
+              hint="Please provide the role you would like to assign to the team member."
               :item-props="itemProps"
               item-subtitle="description"
               :items="availableRoles"
               label="Role*"
+              persistent-hint
               required
             />
           </v-col>

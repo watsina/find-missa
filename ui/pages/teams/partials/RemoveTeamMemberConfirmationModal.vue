@@ -1,28 +1,36 @@
 <script setup>
-  import { ref } from 'vue';
   import ConfirmationModal from '@/components/ConfirmationModal.vue';
   import DangerButton from '@/components/DangerButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import { useForm } from '@/plugins';
+  import { notify } from '@/utils';
 
-  defineProps({
-    availableRoles: { type: Array, required: true },
+  const teamMemberBeingRemoved = defineModel('teamMemberBeingRemoved', {
+    type: Object,
+    default: null,
   });
+  const team = defineModel('team', { type: Object, required: true });
 
   const removeTeamMemberForm = useForm({});
 
-  const teamMemberBeingRemoved = ref(null);
+  defineEmits(['removed']);
 
   const removeTeamMember = () => {
-    // removeTeamMemberForm.delete(
-    //   route('team-members.destroy', [props.team, teamMemberBeingRemoved.value]),
-    //   {
-    //     errorBag: 'removeTeamMember',
-    //     preserveScroll: true,
-    //     preserveState: true,
-    //     onSuccess: () => (teamMemberBeingRemoved.value = null),
-    //   },
-    // );
+    removeTeamMemberForm.delete(
+      `/api/v1/team/${team.value?.id}/members/${teamMemberBeingRemoved.value?.membership?.user_id}`,
+      {
+        onSuccess: () => {
+          team.value.members = team.value.members?.filter(
+            (member) => member?.email !== teamMemberBeingRemoved.value?.email,
+          );
+
+          teamMemberBeingRemoved.value = null;
+
+          notify.success('Team member was removed successfully.');
+        },
+        onError: () => notify.error('Something went wrong while removing team member'),
+      },
+    );
   };
 </script>
 
@@ -37,8 +45,8 @@
 
       <DangerButton
         class="ms-3"
-        :class="{ 'tw-opacity-25': removeTeamMemberForm.processing }"
         :disabled="removeTeamMemberForm.processing"
+        :processing="removeTeamMemberForm.processing"
         @click="removeTeamMember"
       >
         Remove

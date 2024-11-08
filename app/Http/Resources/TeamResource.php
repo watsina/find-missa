@@ -20,7 +20,8 @@ class TeamResource extends JsonResource
             'name' => $this->name,
             'country' => $this->country,
             'users' => $this->users,
-            'invitations' => $this->invitations,
+            'invitations' => $this->invitations->loadMissing('role:id,name,description'),
+            'members' => $this->members->each(fn ($member) => $member['roles'] = $member->roles()->get()),
         ];
     }
 }

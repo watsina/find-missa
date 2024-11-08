@@ -28,7 +28,7 @@ class AcceptTeamInvitationController extends Controller
         $hasUser = User::whereEmail($invitation->email)->exists();
 
         if ($invitation->convertToMembership()) {
-            return $hasUser ? redirect(AppServiceProvider::HOME) : redirect(route('password.update', [
+            return $hasUser ? redirect(AppServiceProvider::HOME) : redirect(route('forgot-password', [
                 'email' => $invitation->email,
             ]));
         }

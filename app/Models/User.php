@@ -51,6 +51,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_secret',
     ];
 
+    // protected $with = ['roles'];
+
     /**
      * The accessors to append to the model's array form.
      *

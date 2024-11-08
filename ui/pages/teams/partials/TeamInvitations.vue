@@ -52,7 +52,7 @@
         <v-list lines="two">
           <v-list-item v-for="invitation in team.invitations" :key="invitation.id">
             <v-list-item-title class="tw-text-sm !tw-capitalize">
-              {{ invitation.name }}
+              {{ invitation.name }} [{{ invitation?.role?.name?.replace(/-/g, ' ') }}]
             </v-list-item-title>
             <v-list-item-subtitle class="tw-text-xs !tw-lowercase">
               {{ invitation.email }}

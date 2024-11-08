@@ -2,6 +2,7 @@
   import { computed, ref } from 'vue';
   import ActionSection from '@/components/ActionSection.vue';
   import SectionBorder from '@/components/SectionBorder.vue';
+  import RemoveTeamMemberConfirmation from './RemoveTeamMemberConfirmationModal.vue';
   import useAuthStore from '@/stores/useAuthStore';
   import { useForm } from '@/plugins';
 
@@ -12,7 +13,7 @@
   const team = defineModel('team', { type: Object, required: true });
 
   const authStore = useAuthStore();
-  // const authUser = computed(() => authStore?.user);
+  const authUser = computed(() => authStore?.user);
   const canRemoveTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
   const canUpdateTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
 
@@ -40,13 +41,17 @@
   };
 
   const displayableRole = (role) => {
-    return props.availableRoles.find((r) => r.key === role).name;
+    // return props.availableRoles.find((r) => r.id === role).name;
   };
 </script>
 
 <template>
   <div v-if="team.members?.length > 0">
     <SectionBorder />
+    <RemoveTeamMemberConfirmation
+      v-model:team="team"
+      v-model:team-member-being-removed="teamMemberBeingRemoved"
+    />
 
     <!-- Manage Team Members -->
     <ActionSection class="tw-mt-10 sm:tw-mt-0">
@@ -89,7 +94,7 @@
 
               <!-- Leave Team -->
               <button
-                v-if="$authUser?.id === member.id"
+                v-if="authUser?.id === member.id && !authUser?.is_admin"
                 class="tw-cursor-pointer ms-6 tw-text-sm tw-text-red-500"
                 @click="confirmLeavingTeam"
               >
@@ -97,13 +102,17 @@
               </button>
 
               <!-- Remove Team Member -->
-              <button
-                v-else-if="canRemoveTeamMembers"
-                class="tw-cursor-pointer ms-6 tw-text-sm tw-text-red-500"
+              <v-btn
+                v-else-if="canRemoveTeamMembers && !member?.is_admin"
+                color="error"
+                :disabled="teamMemberBeingRemoved"
+                :loading="teamMemberBeingRemoved?.email === member?.email"
+                size="x-small"
+                variant="text"
                 @click="confirmTeamMemberRemoval(member)"
               >
                 Remove
-              </button>
+              </v-btn>
             </div>
           </div>
         </div>

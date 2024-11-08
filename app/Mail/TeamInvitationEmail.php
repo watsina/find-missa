@@ -25,7 +25,7 @@ class TeamInvitationEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invitation to collaborate in Mass Finder.',
+            subject: 'Invitation to collaborate with '.ucwords($this->invitation->team->name).' in Find Missa',
         );
     }
 
@@ -36,7 +36,10 @@ class TeamInvitationEmail extends Mailable
     {
         return new Content(
             markdown: 'emails.teams.invitation',
-            with: ['acceptUrl' => $this->invitation->acceptUrl()],
+            with: [
+                'acceptUrl' => $this->invitation->acceptUrl(),
+                'teamName' => ucwords($this->invitation->team->name),
+            ],
         );
     }
 }
