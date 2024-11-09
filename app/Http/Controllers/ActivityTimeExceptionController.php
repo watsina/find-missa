@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\ActivityTimeException;
+use App\Http\Requests\ActivityTimeExceptionRequest;
 use App\Http\Resources\ActivityTimeExceptionResource;
 use App\Http\Resources\ActivityTimeExceptionCollection;
-use App\Http\Requests\ActivityTimeExceptionStoreRequest;
-use App\Http\Requests\ActivityTimeExceptionUpdateRequest;
 
 class ActivityTimeExceptionController extends Controller
 {
@@ -19,7 +18,7 @@ class ActivityTimeExceptionController extends Controller
         return new ActivityTimeExceptionCollection($activityTimeExceptions);
     }
 
-    public function store(ActivityTimeExceptionStoreRequest $request): ActivityTimeExceptionResource
+    public function store(ActivityTimeExceptionRequest $request): ActivityTimeExceptionResource
     {
         $activityTimeException = ActivityTimeException::create($request->validated());
 
@@ -31,7 +30,7 @@ class ActivityTimeExceptionController extends Controller
         return new ActivityTimeExceptionResource($activityTimeException);
     }
 
-    public function update(ActivityTimeExceptionUpdateRequest $request, ActivityTimeException $activityTimeException): ActivityTimeExceptionResource
+    public function update(ActivityTimeExceptionRequest $request, ActivityTimeException $activityTimeException): ActivityTimeExceptionResource
     {
         $activityTimeException->update($request->validated());
 
