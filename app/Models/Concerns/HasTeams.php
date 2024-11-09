@@ -40,9 +40,7 @@ trait HasTeams
             return false;
         }
 
-        $this->forceFill([
-            'current_team_id' => $team->id,
-        ])->save();
+        $this->update(['current_team_id' => $team->id]);
 
         $this->setRelation('currentTeam', $team);
 
@@ -60,7 +58,22 @@ trait HasTeams
      */
     public function allTeams()
     {
-        return $this->teams->sortBy('name');
+        return $this->ownedTeams->merge($this->teams)->sortBy('name');
+    }
+
+    /**
+     * Determine if the user owns the given team.
+     *
+     * @param  mixed  $team
+     * @return bool
+     */
+    public function ownsTeam($team)
+    {
+        if (is_null($team)) {
+            return false;
+        }
+
+        return $this->id == $team->user_id;
     }
 
     /**
@@ -76,6 +89,16 @@ trait HasTeams
     }
 
     /**
+     * Get all of the teams the user owns.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class);
+    }
+
+    /**
      * Determine if the user belongs to the given team.
      *
      * @param  mixed  $team
@@ -87,7 +110,7 @@ trait HasTeams
             return false;
         }
 
-        return $this->teams->contains(function ($t) use ($team) {
+        return $this->ownsTeam($team) || $this->teams->contains(function ($t) use ($team) {
             return $t->id === $team->id;
         });
     }

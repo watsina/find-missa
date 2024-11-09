@@ -12,7 +12,7 @@ export default defineStore('authStore', {
       user: auth?.user || {},
       current_team: auth?.current_team || {},
       permissions: auth?.permissions || [],
-      all_teams: auth?.all_teams || [],
+      all_teams: Object.values(auth?.all_teams) || [],
       features: auth?.features || {},
     };
   },

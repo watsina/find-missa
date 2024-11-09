@@ -14,7 +14,7 @@ class SetCurrentTeamOnLogin
         /** @var \App\Models\User $user */
         $user = $event->user;
         // check if tht user has a current team, if not set the team for them
-        if (! $user?->current_team_id && $team = $user->teams()->first()) {
+        if (! $user->current_team_id && $team = $user->allTeams()->first()) {
             return $user->switchTeam($team);
         }
 

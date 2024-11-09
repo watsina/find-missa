@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Team;
 use App\Models\User;
 use App\Models\Church;
 use App\Models\Parish;
@@ -29,12 +28,12 @@ class LocalSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $team = Team::factory()->create([
+        $team = $admin->ownedTeams()->create([
             'name' => 'Team Uganda',
             'country' => 'Uganda',
         ]);
 
-        $team->members()->attach([$admin->id, $user->id]);
+        $team->members()->attach([$user->id]);
     }
 
     protected function seedData()
