@@ -34,17 +34,19 @@ trait HasTeams
      * @param  mixed  $team
      * @return bool
      */
-    public function switchTeam($team)
+    public function switchTeam($team, $isLoggedInUser = true)
     {
         if (! $this->belongsToTeam($team)) {
             return false;
         }
 
-        $this->forceFill([
-            'current_team_id' => $team->id,
-        ])->save();
+        $this->update(['current_team_id' => $team->id]);
 
         $this->setRelation('currentTeam', $team);
+
+        if ($isLoggedInUser) {
+            session()->put('current_team_id', $team->id);
+        }
 
         return true;
     }
@@ -56,7 +58,22 @@ trait HasTeams
      */
     public function allTeams()
     {
-        return $this->teams->sortBy('name');
+        return $this->ownedTeams->merge($this->teams)->sortBy('name');
+    }
+
+    /**
+     * Determine if the user owns the given team.
+     *
+     * @param  mixed  $team
+     * @return bool
+     */
+    public function ownsTeam($team)
+    {
+        if (is_null($team)) {
+            return false;
+        }
+
+        return $this->id == $team->user_id;
     }
 
     /**
@@ -72,6 +89,16 @@ trait HasTeams
     }
 
     /**
+     * Get all of the teams the user owns.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class);
+    }
+
+    /**
      * Determine if the user belongs to the given team.
      *
      * @param  mixed  $team
@@ -83,8 +110,22 @@ trait HasTeams
             return false;
         }
 
-        return $this->teams->contains(function ($t) use ($team) {
+        return $this->ownsTeam($team) || $this->teams->contains(function ($t) use ($team) {
             return $t->id === $team->id;
+        });
+    }
+
+    /**
+     * Determine if the user belongs to the same team as the logged in user
+     */
+    public function hasAuthUserTeam()
+    {
+        if (! session()->has('current_team_id')) {
+            return false;
+        }
+
+        return $this->teams->contains(function ($team) {
+            return $team->id === session()->get('current_team_id');
         });
     }
 }

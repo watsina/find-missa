@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset="8, 0" v-if="store.hasUser">
+  <v-menu v-if="store.hasUser" offset="8, 0">
     <template #activator="{ props }">
       <v-btn icon v-bind="props">
         <v-avatar size="40">

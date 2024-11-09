@@ -9,6 +9,7 @@ use Laravel\Fortify\Features;
 use App\Models\Concerns\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Traits\HasRoles;
 use App\Models\Concerns\HasProfilePhoto;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
+    use HasRoles;
     use HasTeams;
     use Notifiable;
     use SoftDeletes;
@@ -48,6 +50,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
+
+    // protected $with = ['roles'];
 
     /**
      * The accessors to append to the model's array form.
@@ -108,9 +112,15 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function info()
     {
-        return cache()->remember($this->getCacheKey('info'), 5 * 60, function () {
+        $teamId = session()->get('current_team_id');
+        $team = $this->currentTeam;
+
+        return cache()->remember($this->getCacheKey("info:{$teamId}:{$team?->updated_at}"), 5 * 60, function () {
             return [
                 'user' => $this->withoutRelations(),
+                'current_team' => $this->currentTeam,
+                'all_teams' => $this->allTeams(),
+                'permissions' => $this->getAllPermissions(),
                 'features' => [
                     // will merge more as the come
                     'fortify' => [

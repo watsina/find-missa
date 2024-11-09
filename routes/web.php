@@ -12,6 +12,10 @@ Route::get('auth/reset-password/{token}', fn () => view('index'))
     ->middleware(['guest:'.config('fortify.guard')])
     ->name('password.reset');
 
+Route::get('auth/forgot-password', fn () => view('index'))
+    ->middleware(['guest:'.config('fortify.guard')])
+    ->name('forgot-password');
+
 Route::get('{view?}', function (Request $request) {
     return view('index')->with(['auth' => with($request->user())?->info()]);
 })

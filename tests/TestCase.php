@@ -35,4 +35,9 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->actingAsRandomUser(['is_super_admin' => true]);
     }
+
+    public function actingAsSuperAdminWithTeam()
+    {
+        return $this->actingAsUserWithTeam(['is_super_admin' => true]);
+    }
 }

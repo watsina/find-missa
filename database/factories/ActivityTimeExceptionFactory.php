@@ -22,7 +22,8 @@ class ActivityTimeExceptionFactory extends Factory
     {
         return [
             'activity_time_id' => ActivityTime::factory(),
-            'date_of_exception' => $this->faker->dateTime(),
+            'start_date' => $this->faker->date(),
+            'end_date' => $this->faker->date(),
         ];
     }
 }

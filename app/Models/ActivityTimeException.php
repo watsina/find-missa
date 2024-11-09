@@ -25,7 +25,8 @@ class ActivityTimeException extends Model
     protected $casts = [
         'id' => 'integer',
         'activity_time_id' => 'integer',
-        'date_of_exception' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function activityTime(): BelongsTo

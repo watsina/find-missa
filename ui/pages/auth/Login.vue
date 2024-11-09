@@ -90,7 +90,7 @@
           }
         },
         onError: () => {
-          notify.warning('Something went wrong');
+          notify.error('Something went wrong');
         },
         onFinish: () => form.reset('password'),
       });

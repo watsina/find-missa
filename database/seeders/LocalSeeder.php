@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Priest;
@@ -17,17 +18,22 @@ class LocalSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::factory()->create([
+        $admin = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'is_super_admin' => true,
         ]);
-        \App\Models\User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
-        // $this->seedData();
+        $team = $admin->ownedTeams()->create([
+            'name' => 'Team Uganda',
+            'country' => 'Uganda',
+        ]);
+
+        $team->members()->attach([$user->id]);
     }
 
     protected function seedData()

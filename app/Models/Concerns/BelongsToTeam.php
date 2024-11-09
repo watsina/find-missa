@@ -15,7 +15,7 @@ trait BelongsToTeam
     protected static function bootBelongsToTeam()
     {
         static::creating(function ($model) {
-            if ($teamId = auth()->user()?->current_team_id) {
+            if ($teamId = session()->get('current_team_id')) {
                 $model->team_id = $teamId;
             }
         });

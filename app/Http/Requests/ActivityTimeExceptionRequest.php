@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ActivityTimeExceptionStoreRequest extends FormRequest
+class ActivityTimeExceptionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,7 +21,8 @@ class ActivityTimeExceptionStoreRequest extends FormRequest
     {
         return [
             'activity_time_id' => ['required', 'integer', 'exists:activity_times,id'],
-            'date_of_exception' => ['required', 'date'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date'],
         ];
     }
 }

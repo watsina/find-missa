@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\ActivityTime;
 
-use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
@@ -29,17 +28,14 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ActivityTimeExceptionController::class,
         'store',
-        \App\Http\Requests\ActivityTimeExceptionStoreRequest::class
+        \App\Http\Requests\ActivityTimeExceptionRequest::class
     );
 
 test('store saves', function (): void {
     $activity_time = ActivityTime::factory()->create();
-    $date_of_exception = fake()->date;
+    $data = ActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
 
-    $response = post(route('activity-time-exception.store'), [
-        'activity_time_id' => $activity_time->id,
-        'date_of_exception' => $date_of_exception,
-    ]);
+    $response = post(route('activity-time-exception.store'), $data);
     $response->assertCreated();
     $response->assertJsonStructure([]);
 
@@ -63,18 +59,15 @@ test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ActivityTimeExceptionController::class,
         'update',
-        \App\Http\Requests\ActivityTimeExceptionUpdateRequest::class
+        \App\Http\Requests\ActivityTimeExceptionRequest::class
     );
 
 test('update behaves as expected', function (): void {
     $activityTimeException = ActivityTimeException::factory()->create();
     $activity_time = ActivityTime::factory()->create();
-    $date_of_exception = fake()->date;
+    $data = ActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
 
-    $response = put(route('activity-time-exception.update', $activityTimeException), [
-        'activity_time_id' => $activity_time->id,
-        'date_of_exception' => $date_of_exception,
-    ]);
+    $response = put(route('activity-time-exception.update', $activityTimeException), $data);
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -82,7 +75,8 @@ test('update behaves as expected', function (): void {
     $activityTimeException->refresh();
 
     expect($activity_time->id)->toEqual($activityTimeException->activity_time_id);
-    expect($date_of_exception)->toEqual($activityTimeException->date_of_exception->format('Y-m-d'));
+    expect($data['start_date'])->toEqual($activityTimeException->start_date->format('Y-m-d'));
+    expect($data['end_date'])->toEqual($activityTimeException->end_date->format('Y-m-d'));
 });
 
 test('destroy deletes and responds with', function (): void {

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('country');
+            $table->string('country')->index();
+            $table->foreignId('user_id')->index();
             $table->timestamps();
 
             $table->unique('name', 'country');

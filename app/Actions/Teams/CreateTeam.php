@@ -22,7 +22,9 @@ class CreateTeam
             'country' => ['required', 'string', 'max:255', 'unique:teams'],
         ]);
 
-        $request->user()->switchTeam($team = Team::create($data));
+        $user = $request->user();
+
+        $user->switchTeam($team = $user->ownedTeams()->create($data));
 
         return $team;
     }

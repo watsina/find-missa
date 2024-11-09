@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,6 +22,7 @@ class TeamInvitationFactory extends Factory
             'name' => $this->faker->word,
             'email' => $this->faker->email,
             'team_id' => Team::factory(),
+            'role_id' => Role::factory(),
         ];
     }
 }
