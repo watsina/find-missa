@@ -1,14 +1,13 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { useDisplay } from 'vuetify';
   import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ParishModal from './ParishModal.vue';
 
-  const { smAndDown } = useDisplay();
   const parishes = ref([]);
   const search = ref('');
   const isFetching = ref(false);
@@ -55,6 +54,7 @@
     <parish-modal
       v-model:show-modal="showingModal"
       :parish="parishToEdit"
+      :search="search"
       @created="parishes.push($event)"
       @updated="updateParish"
     ></parish-modal>
@@ -65,13 +65,7 @@
           <PrimaryButton @click="showModal"> Add Parish</PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <v-data-table
-            class="tw-capitalize"
-            :headers="headers"
-            :items="parishes || []"
-            :mobile="smAndDown"
-            mobile-breakpoint="md"
-          >
+          <DataTable :headers="headers" :items="parishes || []">
             <template #top>
               <TextInput
                 id="search"
@@ -88,7 +82,7 @@
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>
-          </v-data-table>
+          </DataTable>
         </v-col>
       </v-row>
     </v-container>

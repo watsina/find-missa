@@ -1,14 +1,13 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { useDisplay } from 'vuetify';
   import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import SubParishModal from './SubParishModal.vue';
 
-  const { smAndDown } = useDisplay();
   const subParishes = ref([]);
   const search = ref('');
   const isFetching = ref(false);
@@ -65,12 +64,7 @@
           <PrimaryButton @click="showModal"> Add Sub Parish</PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <v-data-table
-            :headers="headers"
-            :items="subParishes || []"
-            :mobile="smAndDown"
-            mobile-breakpoint="md"
-          >
+          <data-table :headers="headers" :items="subParishes || []" :search="search">
             <template #top>
               <TextInput
                 id="search"
@@ -87,7 +81,7 @@
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>
-          </v-data-table>
+          </data-table>
         </v-col>
       </v-row>
     </v-container>

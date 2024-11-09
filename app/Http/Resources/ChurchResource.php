@@ -18,6 +18,7 @@ class ChurchResource extends JsonResource
             'type' => $this->type,
             'coordinates' => "[$this->longitude, $this->latitude]",
             'street_address' => $this->street_address,
+            'city' => $this->city,
             'postal_address' => $this->postal_address,
             'contact_email' => $this->contact_email,
             'contact_phone' => $this->contact_phone,

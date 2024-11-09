@@ -1,14 +1,13 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { useDisplay } from 'vuetify';
   import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ChurchModal from './ChurchModal.vue';
 
-  const { smAndDown } = useDisplay();
   const churches = ref([]);
   const search = ref('');
   const isFetching = ref(false);
@@ -17,11 +16,10 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
+    { title: 'City/Town', value: 'city' },
+    { title: 'Parish', value: 'parish' },
     { title: 'Coordinates', value: 'coordinates' },
     { title: 'Contact Email', value: 'contact_email' },
-    { title: 'Street Address', value: 'street_address' },
-    { title: 'Postal Address', value: 'postal_address' },
-    { title: 'Parish', value: 'parish' },
     { title: '', value: 'actions' },
   ];
 
@@ -67,12 +65,7 @@
           <PrimaryButton @click="showModal"> Add Church</PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <v-data-table
-            :headers="headers"
-            :items="churches || []"
-            :mobile="smAndDown"
-            mobile-breakpoint="md"
-          >
+          <data-table :headers="headers" :items="churches || []" :search="search">
             <template #top>
               <TextInput
                 id="search"
@@ -89,7 +82,7 @@
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>
-          </v-data-table>
+          </data-table>
         </v-col>
       </v-row>
     </v-container>

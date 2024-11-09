@@ -4,6 +4,7 @@
   import { http } from '@/plugins';
   import { useDisplay } from 'vuetify';
   import TextInput from '@/components/TextInput.vue';
+  import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DioceseModal from './DioceseModal.vue';
@@ -72,13 +73,12 @@
           <PrimaryButton @click="showModal"> Add a diocese </PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <v-data-table
+          <data-table
             :headers="headers"
             :items="dioceses || []"
             :loading="isFetching"
-            :mobile="smAndDown"
-            mobile-breakpoint="md"
             no-data-text="No dioceses have been added yet..."
+            :search="search"
           >
             <template #top>
               <TextInput
@@ -105,7 +105,7 @@
                 @click="showModal(item)"
               ></v-icon>
             </template>
-          </v-data-table>
+          </data-table>
         </v-col>
       </v-row>
     </v-container>

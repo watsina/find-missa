@@ -13,7 +13,7 @@
       <v-app-bar-title>Find Missa</v-app-bar-title>
     </template>
     <template v-if="$slots.header" #extension>
-      <header class="">
+      <header class="tw-font-semibold tw-text-xl tw-text-gray-800 tw-leading-tight">
         <div class="tw-px-4 tw-mx-auto md:tw-px-6 lg:tw-px-8">
           <slot name="header" />
         </div>
@@ -32,6 +32,12 @@
   import ApplicationMark from '@/components/ApplicationMark';
   import UserAvatar from './UserAvatar';
   import TeamsMenu from './TeamsMenu.vue';
+  import useAuthStore from '@/stores/useAuthStore';
+  import { computed } from 'vue';
+
+  const authStore = useAuthStore();
+
+  const authUser = computed(() => authStore?.user);
 
   const rail = defineModel('rail', { type: Boolean });
   const drawer = defineModel('drawer', { type: Boolean });

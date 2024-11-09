@@ -4,10 +4,6 @@
       <AuthenticationCardLogo />
     </template>
 
-    <!-- <div v-if="status" class="tw-mb-4 tw-text-sm tw-font-medium tw-text-green-600"> -->
-    <!--   {{ status }} -->
-    <!-- </div> -->
-
     <form @submit.prevent="submit">
       <div class="tw-mt-4">
         <TextInput

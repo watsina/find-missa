@@ -25,10 +25,7 @@
         return `text-input-${uuid()}`;
       },
     },
-    type: {
-      type: String,
-      default: 'text',
-    },
+    type: { type: String, default: 'text' },
     error: { type: [String, Array], default: '' },
     hint: { type: String, default: '' },
     label: { type: String, default: '' },

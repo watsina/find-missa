@@ -96,7 +96,7 @@ jobs:
       run:
         shell: bash
     needs: build_and_test
-    if: success() && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '--deploy')
+    if: success() && github.ref == 'refs/heads/main'
     steps:
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.3

@@ -19,6 +19,14 @@
 
   const churches = ref([]);
 
+  const churchProps = (item) => {
+    return {
+      title: item.name,
+      subtitle: item.city,
+      value: item.id,
+    };
+  };
+
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
     { title: 'Confession', value: 'confession' },
@@ -127,8 +135,7 @@
               v-model="form.church_id"
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.church_id"
-              item-title="name"
-              item-value="id"
+              :item-props="churchProps"
               :items="churches"
               label="Church*"
               required
