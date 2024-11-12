@@ -13,6 +13,13 @@ abstract class TestCase extends BaseTestCase
     use AdditionalAssertions;
     use LazilyRefreshDatabase;
 
+    public function actingAsUser(User $user)
+    {
+        Auth::login($user);
+
+        return $this;
+    }
+
     public function actingAsRandomUser(array $attributes = [])
     {
         $user = User::factory()->create($attributes);

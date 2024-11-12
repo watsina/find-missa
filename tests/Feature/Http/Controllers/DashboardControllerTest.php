@@ -12,6 +12,8 @@ use App\Models\ActivityTime;
 use function Pest\Laravel\get;
 
 test('it returns the expected stats.', function () {
+    $this->actingAsUserWithTeam();
+
     $dioceses = Diocese::factory(8)->create();
     $parishes = Parish::factory(10)->recycle($dioceses)->create();
     SubParish::factory(12)->recycle($parishes)->create();
@@ -19,7 +21,6 @@ test('it returns the expected stats.', function () {
     ActivityTime::factory(16)->recycle($churches)->create();
     Priest::factory(18)->recycle($parishes)->create();
 
-    $this->actingAsRandomUser();
     get(route('dashboard.index'))
         ->assertOk()
         ->assertJsonPath('stats.dioceses', 8)

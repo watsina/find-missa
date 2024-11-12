@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserWithTeam
 {
@@ -16,8 +15,8 @@ class UserWithTeam
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->current_team_id) {
-            throw new NotFoundHttpException;
+        if (! $request->user()?->current_team_id && ! session()->has('current_team_id')) {
+            abort(404, 'Resource not found.');
         }
 
         return $next($request);
