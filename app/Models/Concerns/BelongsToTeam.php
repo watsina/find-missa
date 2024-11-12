@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Models\Team;
+use App\Models\Scopes\TeamScope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait BelongsToTeam
@@ -14,6 +15,8 @@ trait BelongsToTeam
      */
     protected static function bootBelongsToTeam()
     {
+        static::addGlobalScope(new TeamScope);
+
         static::creating(function ($model) {
             if ($teamId = session()->get('current_team_id')) {
                 $model->team_id = $teamId;
