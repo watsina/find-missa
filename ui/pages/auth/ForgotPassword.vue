@@ -5,8 +5,13 @@
     </template>
 
     <div class="tw-mb-4 tw-text-sm tw-text-gray-600">
-      Forgot your password ? No problem. Just let us know your email address and we will email you a
-      password reset link that will allow you to choose a new one.
+      {{
+        email
+          ? `An account has been created for you. Please request a password reset to create a
+            password and start contributing to your team.`
+          : `Forgot your password ? No problem. Just let us know your email address and we will
+            email you a password reset link that will allow you to choose a new one.`
+      }}
     </div>
 
     <form @submit.prevent="submit">
