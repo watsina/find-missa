@@ -13,7 +13,7 @@ use App\Models\ActivityTimeException;
 
 use function Pest\Laravel\assertModelMissing;
 
-beforeEach(fn () => $this->actingAsRandomUser());
+beforeEach(fn () => $this->actingAsUserWithTeam());
 
 test('index behaves as expected', function (): void {
     $activityTimeExceptions = ActivityTimeException::factory()->count(3)->create();
