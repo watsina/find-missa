@@ -38,6 +38,13 @@
           Manage Team
         </v-list-subheader>
         <v-list-item
+          v-if="authUser?.is_admin"
+          class="!tw-text-gray-700"
+          :to="{ name: 'acl.index' }"
+        >
+          Roles and Permissions
+        </v-list-item>
+        <v-list-item
           v-if="authUser?.current_team_id"
           class="!tw-text-gray-700"
           :to="{ name: 'teams.show', params: { teamId: authUser.current_team_id } }"

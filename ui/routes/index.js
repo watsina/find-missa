@@ -2,6 +2,7 @@ import auth from './auth';
 import dashboard from './dashboard';
 import users from './users';
 import teams from './teams';
+import acl from './acl';
 import parishes from './parishes';
 import churches from './churches';
 import activities from './activities';
@@ -19,6 +20,7 @@ export default [
       ...auth,
       ...users,
       ...teams,
+      ...acl,
       ...dioceses,
       ...activities,
       ...parishes,
