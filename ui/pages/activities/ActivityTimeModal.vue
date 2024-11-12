@@ -1,6 +1,6 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue';
-  import { http, useForm } from '@/plugins';
+  import { computed, watch } from 'vue';
+  import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -12,20 +12,11 @@
 
   const props = defineProps({
     activity: { type: Object, default: null },
+    church: { type: Object, required: true },
   });
 
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
-
-  const churches = ref([]);
-
-  const churchProps = (item) => {
-    return {
-      title: item.name,
-      subtitle: item.city,
-      value: item.id,
-    };
-  };
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
@@ -39,13 +30,6 @@
     { title: 'One Time', value: 'one-time' },
   ];
 
-  onMounted(() => {
-    // fetch churches
-    http.get('/api/v1/church').then(({ data }) => {
-      churches.value = data?.data;
-    });
-  });
-
   const form = useForm({
     type: props.activity?.type || '',
     start_time: props.activity?.start_time || '',
@@ -54,7 +38,7 @@
     occurrence: props.activity?.occurrence || '',
     date: props.activity?.date || null,
     day_of_week: props.activity?.day_of_week || '',
-    church_id: props.activity?.church_id || '',
+    church_id: props.church?.id || '',
   });
 
   watch(
@@ -71,6 +55,7 @@
         form.church_id = newValue?.church_id || '';
       }
     },
+    { deep: true },
   );
 
   watch(
@@ -81,11 +66,16 @@
         form.clearErrors();
       }
     },
+    { deep: true },
   );
 
   const isEditing = computed(() => !!props.activity?.id);
 
   const submit = () => {
+    if (!props.church?.id) {
+      return notify.error('Church details not provided');
+    }
+
     const url = isEditing.value
       ? `/api/v1/activity-time/${props.activity?.id}`
       : `/api/v1/activity-time`;
@@ -102,6 +92,8 @@
       form.day_of_week = '';
     }
 
+    form.church_id = props.church.id;
+
     return form[method](url, {
       onSuccess: ({ data }) => {
         const message = isEditing.value
@@ -116,8 +108,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data && !isEditing.value) emit('created', data);
-    if (data && isEditing.value) emit('updated', data);
+    if (data?.id && !isEditing.value) emit('created', data);
+    if (data?.id && isEditing.value) emit('updated', data);
 
     showModal.value = false;
   };
@@ -131,14 +123,13 @@
       <template #content>
         <form>
           <div class="tw-mt-4">
-            <SelectInput
-              v-model="form.church_id"
+            <v-text-field
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.church_id"
-              :item-props="churchProps"
-              :items="churches"
               label="Church*"
-              required
+              :model-value="`${church.name} - ${church.city}`"
+              readonly
+              variant="solo"
             />
           </div>
 
@@ -149,6 +140,39 @@
               :error="form.errors.type"
               :items="activityTypes"
               label="Activity Type*"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <SelectInput
+              v-model="form.occurrence"
+              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              :error="form.errors.occurrence"
+              :items="occurrences"
+              label="occurrence*"
+              required
+            />
+          </div>
+
+          <div v-if="form.occurrence === 'one-time'" class="tw-mt-4">
+            <DateInput
+              v-model="form.date"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.date"
+              label="Date"
+              landscape
+              required
+            />
+          </div>
+
+          <div v-if="form.occurrence === 'weekly'" class="tw-mt-4">
+            <TextInput
+              v-model="form.day_of_week"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.day_of_week"
+              label="Day of Week"
+              placeholder="Sunday"
               required
             />
           </div>
@@ -172,17 +196,6 @@
           </div>
 
           <div class="tw-mt-4">
-            <SelectInput
-              v-model="form.occurrence"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
-              :error="form.errors.occurrence"
-              :items="occurrences"
-              label="occurrence*"
-              required
-            />
-          </div>
-
-          <div class="tw-mt-4">
             <TextInput
               v-model="form.language"
               autofocus
@@ -192,28 +205,6 @@
               placeholder="Ruhororo"
               required
               type="text"
-            />
-          </div>
-
-          <div v-if="form.occurrence === 'one-time'" class="tw-mt-4">
-            <DateInput
-              v-model="form.date"
-              class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.date"
-              label="Date"
-              landscape
-              required
-            />
-          </div>
-
-          <div v-if="form.occurrence === 'weekly'" class="tw-mt-4">
-            <TextInput
-              v-model="form.day_of_week"
-              class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.day_of_week"
-              label="Day of Week"
-              placeholder="Sunday"
-              required
             />
           </div>
         </form>

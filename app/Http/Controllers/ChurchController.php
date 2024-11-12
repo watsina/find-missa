@@ -16,7 +16,7 @@ class ChurchController extends Controller
 {
     public function index(Request $request): ChurchCollection
     {
-        $churches = Church::all();
+        $churches = Church::with('activities')->paginate(20);
 
         return new ChurchCollection($churches);
     }
@@ -39,6 +39,8 @@ class ChurchController extends Controller
 
     public function show(Request $request, Church $church): ChurchResource
     {
+        $church->loadMissing('activities');
+
         return new ChurchResource($church);
     }
 

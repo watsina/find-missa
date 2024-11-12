@@ -59,7 +59,12 @@
             Upload data
           </PrimaryButton>
         </v-col>
-        <v-col v-for="card in cards" :key="card.name" cols="12" md="4">
+        <template v-if="isFetching">
+          <v-col v-for="i in 6" :key="i" cols="12" md="4">
+            <v-skeleton-loader type="card"></v-skeleton-loader>
+          </v-col>
+        </template>
+        <v-col v-for="card in cards" v-else :key="card.name" cols="12" md="4">
           <v-card rounded="lg">
             <div class="tw-flex tw-items-center tw-p-5">
               <div class="tw-flex-shrink-0">

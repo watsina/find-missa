@@ -20,11 +20,11 @@ export default defineStore('authStore', {
     hasUser: (state) => !!state.user?.id,
   },
   actions: {
-    featureIsEnabled($namespace, $feature) {
-      return this.features[$namespace]['features']?.includes($feature);
+    featureIsEnabled(namespace, feature) {
+      return this.features[namespace]['features']?.includes(feature);
     },
-    featureOptionIsEnabled($namespace, $feature, $option) {
-      return !!this.features[$namespace]['options'][$feature][$option];
+    featureOptionIsEnabled(namespace, feature, option) {
+      return !!this.features[namespace]['options'][feature][option];
     },
     hasPermission(permission) {
       if (this.user?.is_admin) {

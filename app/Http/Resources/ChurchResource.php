@@ -16,7 +16,7 @@ class ChurchResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
-            'coordinates' => "[$this->longitude, $this->latitude]",
+            'coordinates' => $this->when($this->longitude || $this->latitude, "[$this->longitude, $this->latitude]"),
             'street_address' => $this->street_address,
             'city' => $this->city,
             'postal_address' => $this->postal_address,
@@ -28,6 +28,7 @@ class ChurchResource extends JsonResource
             'parishable_type' => $this->parishable_type,
             // 'parish' => $this->parishable,
             'priest_id' => $this->priest_id,
+            'activities' => ActivityTimeResource::collection($this->activities),
         ];
     }
 }

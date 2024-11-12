@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\DayOfWeek;
 use App\Enums\ActivityType;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityOccurrence;
@@ -30,7 +31,7 @@ class ActivityTimeRequest extends FormRequest
             'church_id' => ['nullable', 'integer', 'exists:churches,id'],
             'occurrence' => ['required', Rule::enum(ActivityOccurrence::class)],
             'date' => ['required_if:occurrence,one-time', 'exclude_unless:occurrence,one-time', 'nullable', 'date'],
-            'day_of_week' => ['required_if:occurrence,weekly', 'exclude_unless:occurrence,weekly'],
+            'day_of_week' => ['required_if:occurrence,weekly', 'exclude_unless:occurrence,weekly',  new DayOfWeek],
         ];
     }
 

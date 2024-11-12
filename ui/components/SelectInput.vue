@@ -16,7 +16,7 @@
 <script setup>
   defineProps({
     items: { type: Array, required: true },
-    error: { type: String, default: '' },
+    error: { type: [String, Array], default: '' },
     hint: { type: String, default: '' },
     label: { type: String, default: '' },
     density: { type: String, default: 'default' },

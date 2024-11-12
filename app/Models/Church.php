@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -33,5 +34,10 @@ class Church extends BaseModel
     public function priest(): BelongsTo
     {
         return $this->belongsTo(Priest::class);
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ActivityTime::class);
     }
 }

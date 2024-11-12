@@ -6,6 +6,7 @@ use App\Models\Church;
 use App\Models\Parish;
 use App\Enums\ChurchType;
 use App\Models\SubParish;
+use App\Models\ActivityTime;
 
 use function Pest\Faker\fake;
 use function Pest\Laravel\get;
@@ -113,13 +114,12 @@ test('sub-parish is properly validated when creating a church.', function (): vo
     expect($churches)->toHaveCount(1);
 });
 
-test('show behaves as expected', function (): void {
-    $church = Church::factory()->create();
+test('it shows the church with its activities', function (): void {
+    $church = Church::factory()->has(ActivityTime::factory(3), 'activities')->create();
 
-    $response = get(route('church.show', $church));
-
-    $response->assertOk();
-    $response->assertJsonStructure([]);
+    get(route('church.show', $church))
+        ->assertOk()
+        ->assertJsonCount(3, 'data.activities');
 });
 
 test('update uses form request validation')

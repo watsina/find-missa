@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { mdiPencilOutline } from '@mdi/js';
+  import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -80,7 +80,20 @@
               />
             </template>
             <template #item.actions="{ item }">
-              <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
+              <v-icon
+                class="tw-mr-2"
+                color="primary"
+                :icon="mdiPencilOutline"
+                title="Edit Church Details"
+                @click="showModal(item)"
+              ></v-icon>
+              <v-btn
+                color="primary"
+                :icon="mdiEyeOutline"
+                title="View Church Details"
+                :to="{ name: 'churches.show', params: { churchId: item.id } }"
+                variant="text"
+              ></v-btn>
             </template>
           </data-table>
         </v-col>
