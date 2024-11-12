@@ -26,7 +26,7 @@ test('it returns a permissions details.', function () {
 
     get(route('permissions.show', $permission))
         ->assertOk()
-        ->assertJsonFragment(['name' => 'permission']);
+        ->assertJsonFragment(['id' => $permission->id]);
 });
 
 test('it creates a permission.', function () {

@@ -8,24 +8,37 @@
   import { notify } from '@/utils';
 
   const roles = ref([]);
-  const isFetching = ref(false);
+  const permissions = ref([]);
+  const isFetchingRoles = ref(false);
+  const isFetchingPermissions = ref(false);
   const authStore = useAuthStore();
   const authUser = computed(() => authStore?.user);
   const canUpdateRoles = computed(() => authUser.value?.is_admin);
 
   onMounted(() => {
     fetchRoles();
+    fetchPermissions();
   });
 
   const fetchRoles = () => {
-    isFetching.value = true;
+    isFetchingRoles.value = true;
     http
       .get('/api/v1/roles')
       .then(({ data }) => {
         roles.value = data?.data || [];
       })
       .catch(() => notify.error('Something went wrong while fetching roles.'))
-      .finally(() => (isFetching.value = false));
+      .finally(() => (isFetchingRoles.value = false));
+  };
+  const fetchPermissions = () => {
+    isFetchingPermissions.value = true;
+    http
+      .get('/api/v1/permissions')
+      .then(({ data }) => {
+        permissions.value = data?.data || [];
+      })
+      .catch(() => notify.error('Something went wrong while fetching permissions.'))
+      .finally(() => (isFetchingPermissions.value = false));
   };
 </script>
 
@@ -36,14 +49,18 @@
     </template>
 
     <v-container>
-      <v-skeleton-loader v-if="isFetching" type="list-item-three-line@3"></v-skeleton-loader>
+      <v-skeleton-loader
+        v-if="isFetchingRoles || isFetchingPermissions"
+        type="list-item-three-line@3"
+      ></v-skeleton-loader>
       <v-card v-else-if="!canUpdateRoles"> Sorry you don't have permission to update roles</v-card>
       <v-row v-else class="tw-max-w-7xl tw-mx-auto tw-py-10 sm:tw-px-6 lg:tw-px-8">
-        <v-expansion-panels variant="accordion">
+        <v-expansion-panels variant="default">
           <role-expansion-panel
             v-for="role in roles"
             :key="role.id"
             :data-role="role"
+            :permissions="permissions"
           ></role-expansion-panel>
         </v-expansion-panels>
       </v-row>
