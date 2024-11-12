@@ -22,6 +22,7 @@ Route::middleware('auth', 'admin')->group(function () {
     // acl
     Route::get('roles-permissions', App\Http\Controllers\Acl\GetRolesAndPermissionsController::class);
     Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
+    Route::apiResource('permissions', App\Http\Controllers\Acl\PermissionsController::class)->only('index', 'show', 'store', 'update');
     Route::apiResource('user.roles', App\Http\Controllers\Acl\UserRolesController::class)->only('index', 'store')->middleware('userWithTeam');
 });
 
