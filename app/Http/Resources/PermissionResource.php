@@ -17,7 +17,8 @@ class PermissionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => ucwords(Str::replace('.', ' ', $this->name)),
+            'name' => $this->name,
+            'display_name' => ucwords(Str::replace('.', ' ', $this->name)),
             'description' => $this->description,
         ];
     }

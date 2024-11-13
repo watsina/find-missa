@@ -25,6 +25,8 @@ class RolesController extends Controller
      */
     public function show(Role $role)
     {
+        $role->loadMissing('permissions');
+
         return new RoleResource($role);
     }
 
@@ -39,6 +41,8 @@ class RolesController extends Controller
         ]);
 
         $role->syncPermissions($data['permission_ids']);
+
+        $role->loadMissing('permissions');
 
         return new RoleResource($role);
     }

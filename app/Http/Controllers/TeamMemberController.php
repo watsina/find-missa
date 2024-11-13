@@ -15,7 +15,7 @@ class TeamMemberController extends Controller
      */
     public function index()
     {
-        $members = TeamMember::all();
+        $members = TeamMember::with('user')->paginate(20);
 
         return new TeamMemberCollection($members);
     }
@@ -25,6 +25,7 @@ class TeamMemberController extends Controller
      */
     public function show(Team $team, TeamMember $member)
     {
+        $member->loadMissing('user.roles');
 
         return new TeamMemberResource($member);
     }
@@ -40,6 +41,8 @@ class TeamMemberController extends Controller
         ]);
 
         $member->user->syncRoles($data['role_ids']);
+
+        $member->loadMissing('user.roles');
 
         return new TeamMemberResource($member);
     }

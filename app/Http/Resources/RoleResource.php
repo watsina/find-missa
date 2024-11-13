@@ -19,7 +19,7 @@ class RoleResource extends JsonResource
             'id' => $this->id,
             'name' => ucwords(Str::replace('-', ' ', $this->name)),
             'description' => $this->description,
-            'permissions' => $this->permissions,
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
         ];
     }
 }

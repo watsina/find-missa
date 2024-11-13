@@ -16,10 +16,8 @@ class TeamMemberResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->user->name,
-            'email' => $this->user->email,
-            'team_id' => $this->team_id,
-            'roles' => $this->user->roles,
+            'user' => new UserResource($this->whenLoaded('user')),
+            'team' => new TeamResource($this->whenLoaded('team')),
         ];
     }
 }

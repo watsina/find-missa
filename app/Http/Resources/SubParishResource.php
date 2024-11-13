@@ -15,7 +15,7 @@ class SubParishResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'parish' => $this->parish?->name,
+            'parish' => new ParishResource($this->whenLoaded('parish')),
             'parish_id' => $this->parish_id,
             'city' => $this->city,
             'office_address' => $this->office_address,

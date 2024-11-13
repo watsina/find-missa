@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'profile_photo_url' => $this->profile_photo_url,
             'profile_photo_path' => $this->profile_photo_path,
+            'roles' => RoleResource::collection($this->whenLoaded('roles')),
         ];
     }
 }

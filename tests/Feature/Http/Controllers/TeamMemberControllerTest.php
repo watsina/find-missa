@@ -38,7 +38,7 @@ test('can show the member details with only the roles they have on that team.', 
 
     get('/api/v1/team/'.$team->id.'/members/'.$member->id)
         ->assertOk()
-        ->assertJsonCount(5, 'data.roles');
+        ->assertJsonCount(5, 'data.user.roles');
 });
 
 test('can update a members roles.', function () {
@@ -55,7 +55,7 @@ test('can update a members roles.', function () {
         'role_ids' => $roleIds,
     ])
         ->assertOk()
-        ->assertJsonCount(2, 'data.roles');
+        ->assertJsonCount(2, 'data.user.roles');
 });
 
 test('can remove a team member with only their assigned roles for that team.', function () {

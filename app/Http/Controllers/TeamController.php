@@ -41,6 +41,8 @@ class TeamController extends Controller
     {
         Gate::authorize('view', $team);
 
+        $team->loadMissing('members.roles', 'invitations');
+
         return new TeamResource($team);
     }
 

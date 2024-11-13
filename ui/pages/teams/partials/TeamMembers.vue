@@ -27,9 +27,9 @@
   const teamMemberBeingRemoved = ref(null);
 
   const manageRole = (teamMember) => {
-    managingRoleFor.value = teamMember;
-    updateRoleForm.role = teamMember.membership.role;
-    currentlyManagingRole.value = true;
+    // managingRoleFor.value = teamMember;
+    // updateRoleForm.role = teamMember.membership.role;
+    // currentlyManagingRole.value = true;
   };
 
   const confirmLeavingTeam = () => {
@@ -85,11 +85,11 @@
                 class="ms-2 tw-text-sm tw-text-gray-400 tw-underline"
                 @click="manageRole(member)"
               >
-                {{ displayableRole(member.membership.role) }}
+                <!-- {{ displayableRole(member.membership.role) }} -->
               </button>
 
               <div v-else-if="availableRoles.length" class="ms-2 tw-text-sm tw-text-gray-400">
-                {{ displayableRole(member.membership.role) }}
+                <!-- {{ displayableRole(member.membership.role) }} -->
               </div>
 
               <!-- Leave Team -->

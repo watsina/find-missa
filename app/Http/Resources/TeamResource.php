@@ -19,9 +19,8 @@ class TeamResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'country' => $this->country,
-            'users' => $this->users,
-            'invitations' => $this->invitations->loadMissing('role:id,name,description'),
-            'members' => $this->members->each(fn ($member) => $member['roles'] = $member->roles()->get()),
+            'invitations' => TeamInvitationResource::collection($this->whenLoaded('invitations')),
+            'members' => UserResource::collection($this->whenLoaded('members')),
         ];
     }
 }

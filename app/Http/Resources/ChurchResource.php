@@ -28,7 +28,7 @@ class ChurchResource extends JsonResource
             'parishable_type' => $this->parishable_type,
             // 'parish' => $this->parishable,
             'priest_id' => $this->priest_id,
-            'activities' => ActivityTimeResource::collection($this->activities),
+            'activities' => ActivityTimeResource::collection($this->whenLoaded('activities')),
         ];
     }
 }
