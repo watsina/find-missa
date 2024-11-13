@@ -22,10 +22,10 @@
 
   const createTeam = () => {
     form.post('/api/v1/teams', {
-      onSuccess: () => {
+      onSuccess: async () => {
         notify.success('Team created successfully');
-        router.push({ name: 'dashboard.index' });
-        // window.location.reload();
+        await router.push({ name: 'dashboard.index' });
+        window.location.reload();
       },
     });
   };

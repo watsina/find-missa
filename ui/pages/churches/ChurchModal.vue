@@ -47,6 +47,7 @@
     contact_email: props.church?.contact_email || '',
     contact_phone: props.church?.contact_phone || '',
     street_address: props.church?.street_address || '',
+    city: props.church?.city || '',
     postal_address: props.church?.postal_address || '',
   });
 
@@ -73,9 +74,11 @@
         form.contact_phone = props.church?.contact_phone || '';
         form.street_address = props.church?.street_address || '';
         form.parishable_id = props.church?.parishable_id || '';
+        form.city = props.church?.city || '';
         form.postal_address = props.church?.postal_address || '';
       }
     },
+    { deep: true },
   );
 
   watch(
@@ -111,8 +114,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data && !isEditing.value) emit('created', data);
-    if (data && isEditing.value) emit('updated', data);
+    if (data?.id && !isEditing.value) emit('created', data);
+    if (data?.id && isEditing.value) emit('updated', data);
 
     showModal.value = false;
   };
@@ -120,7 +123,7 @@
 
 <template>
   <div>
-    <dialog-modal max-width="600" :show="showModal" @close="closeModal">
+    <dialog-modal height="600" max-width="500" scrollable :show="showModal" @close="closeModal">
       <template #title> {{ isEditing ? 'Update Church' : 'New Church' }} </template>
 
       <template #content>
@@ -162,6 +165,17 @@
               label="Parish*"
               required
               type="text"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.city"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.city"
+              label="City/Town"
+              placeholder="Kampala"
+              required
             />
           </div>
 
@@ -215,8 +229,8 @@
               v-model="form.street_address"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.street_address"
-              label="Plot 2, Kyadondo Road"
-              placeholder="Street Address"
+              label="Street Address"
+              placeholder="Plot 2, Kyadondo Road"
               required
             />
           </div>
@@ -228,17 +242,6 @@
               :error="form.errors.postal_address"
               label="Postal Address"
               placeholder="PO BOX 123 Kampala"
-              required
-            />
-          </div>
-
-          <div class="tw-mt-4">
-            <TextInput
-              v-model="form.city"
-              class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.city"
-              label="City"
-              placeholder="Kampala"
               required
             />
           </div>

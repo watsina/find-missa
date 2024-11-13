@@ -28,6 +28,7 @@ class ChurchStoreRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'between:-90.9999999,90.9999999'],
             'longitude' => ['nullable', 'numeric', 'between:-180.9999999,180.9999999'],
             'street_address' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
             'postal_address' => ['nullable', 'string'],
             'contact_email' => ['nullable', 'string'],
             'contact_phone' => ['nullable', 'string'],

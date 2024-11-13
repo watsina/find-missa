@@ -6,7 +6,7 @@
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
-  import ActivityTimeModal from '@/pages/activities/ActivityTimeModal.vue';
+  import ChurchDetails from './ChurchDetails.vue';
   import { notify } from '@/utils';
 
   const props = defineProps({
@@ -71,35 +71,12 @@
         <v-card-title> No church found</v-card-title>
       </v-card>
       <v-row v-else class="tw-py-12">
-        <activity-time-modal
-          v-model:show-modal="showingModal"
-          :activity="activityToEdit"
-          :church="church"
-          @created="church.activities.push($event)"
-          @updated="updateActivity"
-        />
         <!-- show church details -->
         <v-col cols="12">
-          <v-list lines="two">
-            <v-list-subheader class="!tw-capitalize !tw-text-lg !tw-font-black">
-              {{ `${church?.name} - ${church?.city}` }}
-            </v-list-subheader>
-            <v-list-item>
-              <v-list-item-title>Name</v-list-item-title>
-              <v-list-item-subtitle>{{ church?.name }}</v-list-item-subtitle>
-              <v-list-item-title>City/Town</v-list-item-title>
-              <v-list-item-subtitle>{{ church?.city }}</v-list-item-subtitle>
-              <v-list-item-title>Parish</v-list-item-title>
-              <v-list-item-subtitle>{{ church?.parish }}</v-list-item-subtitle>
-              <v-list-item-title>Coordinates</v-list-item-title>
-              <v-list-item-subtitle>{{ church?.coordinates }}</v-list-item-subtitle>
-              <v-list-item-title>Contact Email</v-list-item-title>
-              <v-list-item-subtitle>{{ church?.contact_email }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
+          <ChurchDetails v-model:church="church" />
         </v-col>
         <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the activities.</p>
+          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>
           <PrimaryButton @click="showModal"> Add Activity</PrimaryButton>
         </v-col>
         <v-col cols="12">

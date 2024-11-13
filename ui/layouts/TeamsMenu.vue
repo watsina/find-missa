@@ -4,8 +4,11 @@
   import { mdiCheckCircleOutline, mdiUnfoldMoreHorizontal } from '@mdi/js';
   import { http } from '@/plugins';
   import { notify } from '@/utils';
+  import { useRouter } from 'vue-router';
 
   const authStore = useAuthStore();
+
+  const router = useRouter();
 
   const authUser = computed(() => authStore.user);
   const canCreateTeams = computed(() => authStore.hasPermission('teams.write'));
@@ -15,7 +18,8 @@
   const switchToTeam = (team) => {
     http
       .put('/api/v1/switch-team', { team_id: team.id })
-      .then(() => {
+      .then(async () => {
+        await router.push({ name: 'dashboard.index' });
         window.location.reload();
       })
       .catch(() => notify.error('Something went wrong while switching teams.'));
