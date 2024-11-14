@@ -7,6 +7,8 @@
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ActivityDetails from './ActivityDetails.vue';
+  import ActivityTimeExceptionModal from './ActivityTimeExceptionModal.vue';
+
   import { notify } from '@/utils';
 
   const props = defineProps({
@@ -17,7 +19,7 @@
   const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
-  const activityToEdit = ref(null);
+  const exceptionToEdit = ref(null);
 
   const headers = [
     { title: 'Reason', value: 'reason' },
@@ -43,7 +45,7 @@
   };
 
   function showModal(data = null) {
-    activityToEdit.value = data;
+    exceptionToEdit.value = data;
     showingModal.value = true;
   }
 
@@ -66,6 +68,13 @@
         <v-card-title> No activity found</v-card-title>
       </v-card>
       <v-row v-else class="tw-py-12">
+        <activity-time-exception-modal
+          v-model:show-modal="showingModal"
+          :activity-id="activityId"
+          :exception="exceptionToEdit"
+          @created="activity.exceptions?.push($event)"
+          @updated="updateActivityException"
+        />
         <v-col cols="12">
           <ActivityDetails v-model:activity="activity" />
         </v-col>
@@ -79,7 +88,7 @@
           <data-table
             class="tw-capitalize"
             :headers="headers"
-            :items="activity?.activities || []"
+            :items="activity?.exceptions || []"
             :search="search"
           >
             <template #top>

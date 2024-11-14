@@ -20,6 +20,7 @@ class ActivityTimeResource extends JsonResource
             'language' => $this->language,
             'church_id' => $this->church_id,
             'church' => new ChurchResource($this->whenLoaded('church')),
+            'exceptions' => ActivityTimeExceptionResource::collection($this->whenLoaded('exceptions')),
             'occurrence' => $this->occurrence,
             'date' => $this->date,
             'day_of_week' => $this->day_of_week,

@@ -37,5 +37,5 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('priest', App\Http\Controllers\PriestController::class);
     Route::apiResource('sub-parish', App\Http\Controllers\SubParishController::class);
     Route::apiResource('activity-time', App\Http\Controllers\ActivityTimeController::class);
-    Route::apiResource('activity-time-exception', App\Http\Controllers\ActivityTimeExceptionController::class);
+    Route::apiResource('activity-time-exceptions', App\Http\Controllers\ActivityTimeExceptionController::class);
 });

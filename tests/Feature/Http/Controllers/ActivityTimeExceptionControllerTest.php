@@ -18,7 +18,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     $activityTimeExceptions = ActivityTimeException::factory()->count(3)->create();
 
-    $response = get(route('activity-time-exception.index'));
+    $response = get(route('activity-time-exceptions.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -35,7 +35,7 @@ test('store saves', function (): void {
     $activity_time = ActivityTime::factory()->create();
     $data = ActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
 
-    $response = post(route('activity-time-exception.store'), $data);
+    $response = post(route('activity-time-exceptions.store'), $data);
     $response->assertCreated();
     $response->assertJsonStructure([]);
 
@@ -49,7 +49,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $activityTimeException = ActivityTimeException::factory()->create();
 
-    $response = get(route('activity-time-exception.show', $activityTimeException));
+    $response = get(route('activity-time-exceptions.show', $activityTimeException));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -67,7 +67,7 @@ test('update behaves as expected', function (): void {
     $activity_time = ActivityTime::factory()->create();
     $data = ActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
 
-    $response = put(route('activity-time-exception.update', $activityTimeException), $data);
+    $response = put(route('activity-time-exceptions.update', $activityTimeException), $data);
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -82,7 +82,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $activityTimeException = ActivityTimeException::factory()->create();
 
-    $response = delete(route('activity-time-exception.destroy', $activityTimeException));
+    $response = delete(route('activity-time-exceptions.destroy', $activityTimeException));
 
     $response->assertNoContent();
 

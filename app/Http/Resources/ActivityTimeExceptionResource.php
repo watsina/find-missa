@@ -14,8 +14,10 @@ class ActivityTimeExceptionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'activity_time_id' => $this->activity_time_id,
-            'date_of_exception' => $this->date_of_exception,
+            'reason' => $this->reason,
+            'activity_time' => ActivityTimeResource::collection($this->whenLoaded('activityTime')),
+            'start_date' => $this->start_date->format('Y-m-d'),
+            'end_date' => $this->end_date->format('Y-m-d'),
         ];
     }
 }

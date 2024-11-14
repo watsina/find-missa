@@ -27,7 +27,7 @@ class ActivityTimeController extends Controller
 
     public function show(Request $request, ActivityTime $activityTime): ActivityTimeResource
     {
-        $activityTime->loadMissing('church');
+        $activityTime->loadMissing('church', 'exceptions');
 
         return new ActivityTimeResource($activityTime);
     }

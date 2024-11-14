@@ -36,15 +36,12 @@
     },
   );
 
-  watch(
-    () => props.showModal,
-    (newValue) => {
-      if (!newValue) {
-        form.reset();
-        form.clearErrors();
-      }
-    },
-  );
+  watch(showModal, (newValue) => {
+    if (!newValue) {
+      form.reset();
+      form.clearErrors();
+    }
+  });
 
   const isEditing = computed(() => !!props.diocese?.id);
 
@@ -101,9 +98,9 @@
               v-model="form.type"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.type"
+              hint="diocese/archdiocese"
               label="Type*"
               placeholder="diocese"
-              hint="diocese/archdiocese"
               required
               type="text"
             />
@@ -135,11 +132,11 @@
             <TextInput
               v-model="form.country"
               class="tw-block tw-w-full tw-mt-1"
+              disabled
               :error="form.errors.country"
               label="Country"
               placeholder="Country"
               required
-              disabled
             />
           </div>
         </form>

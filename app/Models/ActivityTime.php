@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -23,5 +24,10 @@ class ActivityTime extends BaseModel
     public function church(): BelongsTo
     {
         return $this->belongsTo(Church::class);
+    }
+
+    public function exceptions(): HasMany
+    {
+        return $this->hasMany(ActivityTimeException::class);
     }
 }

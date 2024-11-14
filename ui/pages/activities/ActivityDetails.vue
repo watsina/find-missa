@@ -6,6 +6,16 @@
   const showingModal = ref(false);
   const activity = defineModel('activity', { type: Object, required: true });
   const activityToEdit = ref(null);
+
+  function showModal() {
+    activityToEdit.value = activity.value;
+    showingModal.value = true;
+  }
+
+  function updateActivity(updates) {
+    activity.value = { ...activity, ...updates };
+    activityToEdit.value = null;
+  }
 </script>
 
 <template>
@@ -14,19 +24,14 @@
       v-model:show-modal="showingModal"
       :activity="activityToEdit"
       :church="activity?.church"
-      @updated="(activity = { ...activity, ...$event }), (activityToEdit = null)"
+      @updated="updateActivity"
     />
     <v-col cols="12">
       <v-sheet>
         <v-container>
           <div class="tw-px-4 sm:tw-px-0 tw-flex tw-justify-between">
             <h3 class="text-base/7 tw-font-semibold tw-text-gray-900">Activity Information</h3>
-            <PrimaryButton
-              variant="outlined"
-              @click="(activityToEdit = activity), (showingModal = true)"
-            >
-              Update Activity
-            </PrimaryButton>
+            <PrimaryButton variant="outlined" @click="showModal"> Update Activity </PrimaryButton>
           </div>
           <div class="tw-mt-6">
             <dl class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2">

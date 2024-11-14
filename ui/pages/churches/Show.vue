@@ -7,6 +7,7 @@
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ChurchDetails from './ChurchDetails.vue';
+  import ActivityTimeModal from '@/pages/activities/ActivityTimeModal.vue';
   import { notify } from '@/utils';
 
   const props = defineProps({
@@ -17,7 +18,7 @@
   const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
-  const churchToEdit = ref(null);
+  const activityToEdit = ref(null);
 
   const headers = [
     { title: 'Activity Type', value: 'type' },
@@ -48,7 +49,7 @@
   };
 
   function showModal(data = null) {
-    churchToEdit.value = data;
+    activityToEdit.value = data;
     showingModal.value = true;
   }
 
@@ -75,6 +76,13 @@
         <v-col cols="12">
           <ChurchDetails v-model:church="church" />
         </v-col>
+        <activity-time-modal
+          v-model:show-modal="showingModal"
+          :activity="activityToEdit"
+          :church="church"
+          @created="church.activities.push($event)"
+          @updated="updateActivity"
+        />
         <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>
           <PrimaryButton @click="showModal"> Add Activity</PrimaryButton>

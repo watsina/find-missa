@@ -58,16 +58,12 @@
     { deep: true },
   );
 
-  watch(
-    () => props.showModal,
-    (newValue) => {
-      if (!newValue) {
-        form.reset();
-        form.clearErrors();
-      }
-    },
-    { deep: true },
-  );
+  watch(showModal, (newValue) => {
+    if (!newValue) {
+      // form.reset();
+      form.clearErrors();
+    }
+  });
 
   const isEditing = computed(() => !!props.activity?.id);
 

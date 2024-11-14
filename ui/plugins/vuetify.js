@@ -4,6 +4,7 @@ import '@mdi/font/css/materialdesignicons.css';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import colors from '@/utils/colors';
 import { VTimePicker } from 'vuetify/labs/VTimePicker';
+import { VDateInput } from 'vuetify/labs/VDateInput';
 
 // Composables
 import { createVuetify } from 'vuetify';
@@ -12,6 +13,7 @@ import { createVuetify } from 'vuetify';
 export default createVuetify({
   components: {
     VTimePicker,
+    VDateInput,
   },
   icons: {
     defaultSet: 'mdi',

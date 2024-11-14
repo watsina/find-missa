@@ -42,15 +42,12 @@
     },
   );
 
-  watch(
-    () => props.showModal,
-    (newValue) => {
-      if (!newValue) {
-        form.reset();
-        form.clearErrors();
-      }
-    },
-  );
+  watch(showModal, (newValue) => {
+    if (!newValue) {
+      form.reset();
+      form.clearErrors();
+    }
+  });
 
   const isEditing = computed(() => !!props.parish?.id);
 
