@@ -23,8 +23,9 @@ class ActivityTimeExceptionFactory extends Factory
         return [
             'activity_time_id' => ActivityTime::factory(),
             'team_id' => ActivityTime::factory(),
-            'start_date' => $this->faker->date(),
-            'end_date' => $this->faker->date(),
+            'start_date' => now()->format('Y-m-d'),
+            'end_date' => now()->addDay()->format('Y-m-d'),
+            'reason' => $this->faker->words(3, true),
         ];
     }
 }

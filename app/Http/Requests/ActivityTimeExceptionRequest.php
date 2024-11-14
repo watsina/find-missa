@@ -20,9 +20,10 @@ class ActivityTimeExceptionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'reason' => ['required', 'string', 'max:255'],
             'activity_time_id' => ['required', 'integer', 'exists:activity_times,id'],
             'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ];
     }
 }

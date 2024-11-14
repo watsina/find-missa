@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
+  import { mdiEyeOutline } from '@mdi/js';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
@@ -64,8 +65,13 @@
               />
             </template>
             <template #item.actions="{ item }">
-              <!-- will make the activity viewable here later -->
-              <!-- <v-icon color="primary" :icon="mdiEyeOutline" ></v-icon> -->
+              <v-btn
+                color="primary"
+                :icon="mdiEyeOutline"
+                title="View Activity Details"
+                :to="{ name: 'activities.show', params: { activityId: item.id } }"
+                variant="text"
+              ></v-btn>
             </template>
           </data-table>
         </v-col>

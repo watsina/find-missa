@@ -127,7 +127,7 @@
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.church_id"
               label="Church*"
-              :model-value="`${church.name} - ${church.city}`"
+              :model-value="`${church?.name} - ${church?.city}`"
               readonly
               variant="solo"
             />
