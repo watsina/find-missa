@@ -2,14 +2,12 @@
   import { ref, onMounted } from 'vue';
   import { mdiPencilOutline } from '@mdi/js';
   import { http } from '@/plugins';
-  import { useDisplay } from 'vuetify';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DioceseModal from './DioceseModal.vue';
 
-  const { smAndDown } = useDisplay();
   const dioceses = ref([]);
   const search = ref('');
   const isFetching = ref(false);
@@ -19,7 +17,8 @@
   const headers = [
     { title: 'Name', value: 'name' },
     { title: 'Type', value: 'type' },
-    { title: 'Country', value: 'country' },
+    { title: 'Contact Email', value: 'contact_email' },
+    { title: 'Website', value: 'website_url' },
     { title: 'Office Address', value: 'office_address' },
     { title: 'Postal Address', value: 'postal_address' },
     { title: '', value: 'actions' },

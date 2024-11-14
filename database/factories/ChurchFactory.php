@@ -29,6 +29,8 @@ class ChurchFactory extends Factory
             'street_address' => $this->faker->streetAddress(),
             'postal_address' => $this->faker->postcode(),
             'contact_email' => $this->faker->safeEmail(),
+            'website_url' => $this->faker->url(),
+            'city' => $this->faker->city,
             'contact_phone' => $this->faker->phoneNumber(),
             'parishable_id' => Parish::factory(),
             'parishable_type' => Parish::class,

@@ -16,10 +16,12 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
-    { title: 'City/Town', value: 'city' },
+    { title: 'Type', value: 'type' },
     { title: 'Parish', value: 'parish' },
+    { title: 'City/Town', value: 'city' },
     { title: 'Coordinates', value: 'coordinates' },
     { title: 'Contact Email', value: 'contact_email' },
+    { title: 'Website', value: 'website_url' },
     { title: '', value: 'actions' },
   ];
 
@@ -78,6 +80,9 @@
                 required
                 type="text"
               />
+            </template>
+            <template #item.parish="{ item }">
+              {{ item?.parish?.id ? `${item?.parish?.name} - ${item?.parish?.city}` : '' }}
             </template>
             <template #item.actions="{ item }">
               <v-icon

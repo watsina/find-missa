@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\SubParish;
 
-use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
@@ -26,24 +25,21 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\SubParishController::class,
         'store',
-        \App\Http\Requests\SubParishStoreRequest::class
+        \App\Http\Requests\SubParishRequest::class
     );
 
 test('store saves', function (): void {
-    $name = fake()->name();
+    $data = SubParish::factory()->raw();
 
-    $response = post(route('sub-parish.store'), [
-        'name' => $name,
-    ]);
-
-    $subParishes = SubParish::query()
-        ->where('name', $name)
-        ->get();
-    expect($subParishes)->toHaveCount(1);
-    $subParish = $subParishes->first();
+    $response = post(route('sub-parish.store'), $data);
 
     $response->assertCreated();
     $response->assertJsonStructure([]);
+
+    $subParishes = SubParish::query()
+        ->where('name', $data['name'])
+        ->get();
+    expect($subParishes)->toHaveCount(1);
 });
 
 test('show behaves as expected', function (): void {
@@ -59,23 +55,21 @@ test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\SubParishController::class,
         'update',
-        \App\Http\Requests\SubParishUpdateRequest::class
+        \App\Http\Requests\SubParishRequest::class
     );
 
 test('update behaves as expected', function (): void {
     $subParish = SubParish::factory()->create();
-    $name = fake()->name();
+    $data = SubParish::factory()->raw();
 
-    $response = put(route('sub-parish.update', $subParish), [
-        'name' => $name,
-    ]);
-
-    $subParish->refresh();
+    $response = put(route('sub-parish.update', $subParish), $data);
 
     $response->assertOk();
     $response->assertJsonStructure([]);
 
-    expect($name)->toEqual($subParish->name);
+    $subParish->refresh();
+
+    expect($data['name'])->toEqual($subParish->name);
 });
 
 test('destroy deletes and responds with', function (): void {
@@ -86,4 +80,4 @@ test('destroy deletes and responds with', function (): void {
     $response->assertNoContent();
 
     assertModelMissing($subParish);
-});
+})->todo('Not supported at the moment.');

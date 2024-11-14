@@ -104,8 +104,8 @@
             <SelectInput
               v-model="form.parish_id"
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
-              :error="form.errors.diocese_id"
-              item-title="name"
+              :error="form.errors.parish_id"
+              :item-title="(item) => (item?.id ? `${item?.name} - ${item?.city || ''}` : '')"
               item-value="id"
               :items="parishes"
               label="Parish*"

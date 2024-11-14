@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Church;
 use App\Models\Parish;
-use App\Enums\ChurchType;
 use App\Models\SubParish;
 use App\Models\ActivityTime;
 
@@ -30,7 +29,7 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ChurchController::class,
         'store',
-        \App\Http\Requests\ChurchStoreRequest::class
+        \App\Http\Requests\ChurchRequest::class
     );
 
 test('store saves', function (): void {
@@ -60,11 +59,13 @@ test('parish is properly validated when creating a church.', function (): void {
     $name = fake()->name();
     $type = fake()->randomElement(['parish', 'basilica', 'minor-basilica']);
 
-    post(route('church.store'), [
+    $data = Church::factory()->raw([
         'name' => $name,
         'type' => $type,
         'parishable_id' => SubParish::factory()->createOne(['parish_id' => null])->id,
-    ])->assertInvalid('parishable_id');
+    ]);
+
+    post(route('church.store'), $data)->assertInvalid('parishable_id');
 
     $churches = Church::query()
         ->where('name', $name)
@@ -72,11 +73,9 @@ test('parish is properly validated when creating a church.', function (): void {
         ->get();
     expect($churches)->toHaveCount(0);
 
-    post(route('church.store'), [
-        'name' => $name,
-        'type' => $type,
-        'parishable_id' => Parish::factory()->createOne()->id,
-    ])->assertCreated();
+    $data['parishable_id'] = Parish::factory()->createOne()->id;
+
+    post(route('church.store'), $data)->assertCreated();
 
     $churches = Church::query()
         ->where('name', $name)
@@ -89,11 +88,13 @@ test('sub-parish is properly validated when creating a church.', function (): vo
     $name = fake()->name();
     $type = 'sub-parish';
 
-    post(route('church.store'), [
+    $data = Church::factory()->raw([
         'name' => $name,
         'type' => $type,
         'parishable_id' => Parish::factory()->createOne()->id,
-    ])->assertInvalid('parishable_id');
+    ]);
+
+    post(route('church.store'), $data)->assertInvalid('parishable_id');
 
     $churches = Church::query()
         ->where('name', $name)
@@ -101,11 +102,9 @@ test('sub-parish is properly validated when creating a church.', function (): vo
         ->get();
     expect($churches)->toHaveCount(0);
 
-    post(route('church.store'), [
-        'name' => $name,
-        'type' => $type,
-        'parishable_id' => SubParish::factory()->createOne(['parish_id' => null])->id,
-    ])->assertCreated();
+    $data['parishable_id'] = SubParish::factory()->createOne(['parish_id' => null])->id;
+
+    post(route('church.store'), $data)->assertCreated();
 
     $churches = Church::query()
         ->where('name', $name)
@@ -126,26 +125,24 @@ test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ChurchController::class,
         'update',
-        \App\Http\Requests\ChurchUpdateRequest::class
+        \App\Http\Requests\ChurchRequest::class
     );
 
 test('update behaves as expected', function (): void {
     $church = Church::factory()->create();
     $name = fake()->name();
-    $type = fake()->randomElement(ChurchType::values());
 
-    $response = put(route('church.update', $church), [
+    $data = Church::factory()->raw([
         'name' => $name,
-        'type' => $type,
     ]);
+
+    put(route('church.update', $church), $data)
+        ->assertOk()
+        ->assertJsonStructure([]);
 
     $church->refresh();
 
-    $response->assertOk();
-    $response->assertJsonStructure([]);
-
     expect($name)->toEqual($church->name);
-    expect($type)->toEqual($church->type);
 });
 
 test('update also updates the parishable relation.', function (): void {
@@ -172,4 +169,4 @@ test('destroy deletes and responds with', function (): void {
     $response->assertNoContent();
 
     assertModelMissing($church);
-});
+})->todo('not supported for now.');

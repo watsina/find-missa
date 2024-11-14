@@ -16,6 +16,8 @@ class DioceseResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
+            'contact_email' => $this->contact_email,
+            'website_url' => $this->website_url,
             'office_address' => $this->office_address,
             'postal_address' => $this->postal_address,
         ];

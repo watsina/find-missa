@@ -38,7 +38,7 @@ class ValidateParishableId implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! $type = Arr::get($this->data, 'type')) {
-            $fail('Type not defined');
+            $fail('Church type is not provided.');
         }
 
         if ($type === 'sub-parish' && SubParish::whereId($value)->exists()) {

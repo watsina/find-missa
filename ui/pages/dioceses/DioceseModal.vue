@@ -20,7 +20,8 @@
     type: props.diocese?.type || '',
     office_address: props.diocese?.office_address || '',
     postal_address: props.diocese?.postal_address || '',
-    country: 'Uganda',
+    website_url: props.diocese?.website_url || '',
+    contact_email: props.diocese?.contact_email || '',
   });
 
   watch(
@@ -29,9 +30,10 @@
       if (newValue?.id) {
         form.name = props.diocese?.name || '';
         form.type = props.diocese?.type || '';
+        form.website_url = props.diocese?.website_url || '';
+        form.contact_email = props.diocese?.contact_email || '';
         form.office_address = props.diocese?.office_address || '';
         form.postal_address = props.diocese?.postal_address || '';
-        form.country = props.diocese?.country || 'Uganda';
       }
     },
   );
@@ -50,9 +52,9 @@
 
     const method = isEditing.value ? 'put' : 'post';
 
+    form.type = form.type?.toLowerCase();
+
     return form[method](url, {
-      preserveState: true,
-      preserveScroll: true,
       onSuccess: ({ data }) => {
         const message = isEditing.value
           ? 'Diocese was updated successfully'
@@ -75,7 +77,7 @@
 
 <template>
   <div>
-    <dialog-modal max-width="600" :show="showModal" @close="closeModal">
+    <dialog-modal :show="showModal" @close="closeModal">
       <template #title> {{ isEditing ? 'Update Diocese' : 'New Diocese' }} </template>
 
       <template #content>
@@ -108,6 +110,30 @@
 
           <div class="tw-mt-4">
             <TextInput
+              v-model="form.contact_email"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.contact_email"
+              label="Contact Email"
+              placeholder="diocese@email.com"
+              required
+              type="email"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.website_url"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.website_url"
+              label="Website Url"
+              placeholder="www.diocese.com"
+              required
+              type="url"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
               v-model="form.office_address"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.office_address"
@@ -124,18 +150,6 @@
               :error="form.errors.postal_address"
               label="Postal Address"
               placeholder="Postal Address"
-              required
-            />
-          </div>
-
-          <div class="tw-mt-4">
-            <TextInput
-              v-model="form.country"
-              class="tw-block tw-w-full tw-mt-1"
-              disabled
-              :error="form.errors.country"
-              label="Country"
-              placeholder="Country"
               required
             />
           </div>

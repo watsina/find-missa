@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Parish;
 
-use function Pest\Faker\fake;
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
@@ -26,64 +25,54 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ParishController::class,
         'store',
-        \App\Http\Requests\ParishStoreRequest::class
+        \App\Http\Requests\ParishRequest::class
     );
 
 test('store saves', function (): void {
-    $name = fake()->name();
+    $data = Parish::factory()->raw();
 
-    $response = post(route('parish.store'), [
-        'name' => $name,
-    ]);
-
-    $parishes = Parish::query()
-        ->where('name', $name)
-        ->get();
-    expect($parishes)->toHaveCount(1);
-    $parish = $parishes->first();
-
+    $response = post(route('parish.store'), $data);
     $response->assertCreated();
     $response->assertJsonStructure([]);
+
+    $parishes = Parish::query()
+        ->where('name', $data['name'])
+        ->get();
+    expect($parishes)->toHaveCount(1);
 });
 
 test('show behaves as expected', function (): void {
     $parish = Parish::factory()->create();
 
-    $response = get(route('parish.show', $parish));
-
-    $response->assertOk();
-    $response->assertJsonStructure([]);
+    get(route('parish.show', $parish))
+        ->assertOk()
+        ->assertJsonStructure([]);
 });
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\ParishController::class,
         'update',
-        \App\Http\Requests\ParishUpdateRequest::class
+        \App\Http\Requests\ParishRequest::class
     );
 
 test('update behaves as expected', function (): void {
     $parish = Parish::factory()->create();
-    $name = fake()->name();
+    $data = Parish::factory()->raw();
 
-    $response = put(route('parish.update', $parish), [
-        'name' => $name,
-    ]);
+    put(route('parish.update', $parish), $data)
+        ->assertOk()
+        ->assertJsonStructure([]);
 
     $parish->refresh();
 
-    $response->assertOk();
-    $response->assertJsonStructure([]);
-
-    expect($name)->toEqual($parish->name);
+    expect($data['name'])->toEqual($parish->name);
 });
 
 test('destroy deletes and responds with', function (): void {
     $parish = Parish::factory()->create();
 
-    $response = delete(route('parish.destroy', $parish));
-
-    $response->assertNoContent();
+    delete(route('parish.destroy', $parish))->assertNoContent();
 
     assertModelMissing($parish);
-});
+})->todo('not yet supported');

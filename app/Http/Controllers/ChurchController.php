@@ -7,21 +7,20 @@ use App\Models\Parish;
 use App\Models\SubParish;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\ChurchRequest;
 use App\Http\Resources\ChurchResource;
 use App\Http\Resources\ChurchCollection;
-use App\Http\Requests\ChurchStoreRequest;
-use App\Http\Requests\ChurchUpdateRequest;
 
 class ChurchController extends Controller
 {
     public function index(Request $request): ChurchCollection
     {
-        $churches = Church::with('activities')->paginate(20);
+        $churches = Church::with('activities', 'parishable:id,name,city')->paginate(20);
 
         return new ChurchCollection($churches);
     }
 
-    public function store(ChurchStoreRequest $request): ChurchResource
+    public function store(ChurchRequest $request): ChurchResource
     {
         $church = Church::create($request->safe()->except('parishable_id'));
         $data = $request->validated();
@@ -34,17 +33,19 @@ class ChurchController extends Controller
 
         $church->parishable()->associate($parish)->save();
 
+        $church->loadMissing('activities', 'parishable:id,name,city');
+
         return new ChurchResource($church);
     }
 
     public function show(Request $request, Church $church): ChurchResource
     {
-        $church->loadMissing('activities');
+        $church->loadMissing('activities', 'parishable:id,name,city');
 
         return new ChurchResource($church);
     }
 
-    public function update(ChurchUpdateRequest $request, Church $church): ChurchResource
+    public function update(ChurchRequest $request, Church $church): ChurchResource
     {
         $church->update($request->safe()->except('parishable_id'));
         $data = $request->validated();
@@ -58,11 +59,14 @@ class ChurchController extends Controller
             $church->parishable()->associate($parish)->save();
         }
 
+        $church->loadMissing('activities', 'parishable:id,name,city');
+
         return new ChurchResource($church);
     }
 
     public function destroy(Request $request, Church $church): Response
     {
+        // first make sure the user has deleted all the activites
         $church->delete();
 
         return response()->noContent();

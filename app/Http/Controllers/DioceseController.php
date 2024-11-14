@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Diocese;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\DioceseRequest;
 use App\Http\Resources\DioceseResource;
 use App\Http\Resources\DioceseCollection;
-use App\Http\Requests\DioceseStoreRequest;
-use App\Http\Requests\DioceseUpdateRequest;
 
 class DioceseController extends Controller
 {
@@ -19,7 +18,7 @@ class DioceseController extends Controller
         return new DioceseCollection($dioceses);
     }
 
-    public function store(DioceseStoreRequest $request): DioceseResource
+    public function store(DioceseRequest $request): DioceseResource
     {
         $diocese = Diocese::create($request->validated());
 
@@ -31,7 +30,7 @@ class DioceseController extends Controller
         return new DioceseResource($diocese);
     }
 
-    public function update(DioceseUpdateRequest $request, Diocese $diocese): DioceseResource
+    public function update(DioceseRequest $request, Diocese $diocese): DioceseResource
     {
         $diocese->update($request->validated());
 

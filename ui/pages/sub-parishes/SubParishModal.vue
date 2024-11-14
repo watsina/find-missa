@@ -29,6 +29,8 @@
     parish_id: props.subParish?.parish_id || '',
     office_address: props.subParish?.office_address || '',
     city: props.subParish?.city || '',
+    website_url: props.subParish?.website_url || '',
+    contact_email: props.subParish?.contact_email || '',
   });
 
   watch(
@@ -39,6 +41,8 @@
         form.parish_id = props.subParish?.parish_id || '';
         form.office_address = props.subParish?.office_address || '';
         form.city = props.subParish?.city || '';
+        form.website_url = props.subParish?.website_url || '';
+        form.contact_email = props.subParish?.contact_email || '';
       }
     },
   );
@@ -106,7 +110,7 @@
             <SelectInput
               v-model="form.parish_id"
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
-              :error="form.errors.diocese_id"
+              :error="form.errors.parish_id"
               item-title="name"
               item-value="id"
               :items="parishes"
@@ -118,22 +122,46 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.office_address"
+              v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.office_address"
-              label="Office Address"
-              placeholder="Office Address"
+              :error="form.errors.city"
+              label="City"
+              placeholder="Kampala"
               required
             />
           </div>
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.city"
+              v-model="form.contact_email"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.city"
-              label="City"
-              placeholder="Kampala"
+              :error="form.errors.contact_email"
+              label="Contact Email"
+              placeholder="subParish@email.com"
+              required
+              type="email"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.website_url"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.website_url"
+              label="Website Url"
+              placeholder="www.subParish.com"
+              required
+              type="url"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.office_address"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.office_address"
+              label="Office Address"
+              placeholder="Office Address"
               required
             />
           </div>

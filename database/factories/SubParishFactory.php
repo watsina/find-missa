@@ -24,7 +24,9 @@ class SubParishFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'parish_id' => Parish::factory(),
-            'city' => $this->faker->word(),
+            'city' => $this->faker->city,
+            'contact_email' => $this->faker->safeEmail(),
+            'website_url' => $this->faker->url(),
             'office_address' => $this->faker->word(),
             'team_id' => Team::factory(),
         ];

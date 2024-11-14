@@ -28,6 +28,8 @@
     diocese_id: props.parish?.diocese_id || '',
     office_address: props.parish?.office_address || '',
     city: props.parish?.city || '',
+    website_url: props.parish?.website_url || '',
+    contact_email: props.parish?.contact_email || '',
   });
 
   watch(
@@ -36,6 +38,8 @@
       if (newValue?.id) {
         form.name = props.parish?.name || '';
         form.diocese_id = props.parish?.diocese_id || '';
+        form.office_address = props.parish?.office_address || '';
+        form.contact_email = props.parish?.contact_email || '';
         form.office_address = props.parish?.office_address || '';
         form.city = props.parish?.city || '';
       }
@@ -72,8 +76,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data && !isEditing.value) emit('created', data);
-    if (data && isEditing.value) emit('updated', data);
+    if (data?.id && !isEditing.value) emit('created', data);
+    if (data?.id && isEditing.value) emit('updated', data);
 
     showModal.value = false;
   };
@@ -81,7 +85,7 @@
 
 <template>
   <div>
-    <dialog-modal max-width="600" :show="showModal" @close="closeModal">
+    <dialog-modal :show="showModal" @close="closeModal">
       <template #title> {{ isEditing ? 'Update Parish' : 'New Parish' }} </template>
 
       <template #content>
@@ -115,6 +119,17 @@
 
           <div class="tw-mt-4">
             <TextInput
+              v-model="form.city"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.city"
+              label="City"
+              placeholder="Kampala"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
               v-model="form.office_address"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.office_address"
@@ -126,12 +141,25 @@
 
           <div class="tw-mt-4">
             <TextInput
-              v-model="form.city"
+              v-model="form.contact_email"
               class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.city"
-              label="City"
-              placeholder="Kampala"
+              :error="form.errors.contact_email"
+              label="Contact Email"
+              placeholder="parish@email.com"
               required
+              type="email"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.website_url"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.website_url"
+              label="Website Url"
+              placeholder="www.parish.com"
+              required
+              type="url"
             />
           </div>
         </form>

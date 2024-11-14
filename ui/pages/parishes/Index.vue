@@ -16,9 +16,11 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
-    { title: 'Diocese', value: 'diocese' },
-    { title: 'Office Address', value: 'office_address' },
+    { title: 'Diocese', value: 'diocese.name' },
     { title: 'City', value: 'city' },
+    { title: 'Contact Email', value: 'contact_email' },
+    { title: 'Website', value: 'website_url' },
+    { title: 'Office Address', value: 'office_address' },
     { title: '', value: 'actions' },
   ];
 

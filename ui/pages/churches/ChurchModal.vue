@@ -36,8 +36,6 @@
     });
   });
 
-  const parishable = ref([]);
-
   const form = useForm({
     name: props.church?.name || '',
     type: props.church?.type || '',
@@ -45,22 +43,19 @@
     latitude: props.church?.latitude || '',
     longitude: props.church?.longitude || '',
     contact_email: props.church?.contact_email || '',
+    website_url: props.church?.website_url || '',
     contact_phone: props.church?.contact_phone || '',
     street_address: props.church?.street_address || '',
     city: props.church?.city || '',
     postal_address: props.church?.postal_address || '',
   });
 
-  watch(
-    () => form.type,
-    (value) => {
-      if (value === 'sub-parish') {
-        parishable.value = subParishes.value;
-      } else {
-        parishable.value = parishes.value;
-      }
-    },
-  );
+  const parishable = computed(() => {
+    if (form.type === 'sub-parish') {
+      return subParishes.value;
+    }
+    return parishes.value;
+  });
 
   watch(
     () => props.church,
@@ -71,6 +66,7 @@
         form.latitude = props.church?.latitude || '';
         form.longitude = props.church?.longitude || '';
         form.contact_email = props.church?.contact_email || '';
+        form.website_url = props.church?.website_url || '';
         form.contact_phone = props.church?.contact_phone || '';
         form.street_address = props.church?.street_address || '';
         form.parishable_id = props.church?.parishable_id || '';
@@ -95,9 +91,9 @@
 
     const method = isEditing.value ? 'put' : 'post';
 
+    form.type = form.type?.toLowerCase();
+
     return form[method](url, {
-      preserveState: true,
-      preserveScroll: true,
       onSuccess: ({ data }) => {
         const message = isEditing.value
           ? 'Church was updated successfully'
@@ -156,10 +152,10 @@
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.parishable_id"
               hint="Name of parish/subParish that the church belongs to."
-              item-title="name"
+              :item-title="(item) => (item?.id ? `${item?.name} - ${item?.city || ''}` : '')"
               item-value="id"
               :items="parishable"
-              label="Parish*"
+              :label="form.type === 'sub-parish' ? 'SubParish*' : 'Parish*'"
               required
               type="text"
             />
@@ -207,6 +203,18 @@
               placeholder="church@email.com"
               required
               type="email"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.website_url"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.website_url"
+              label="Website Url"
+              placeholder="www.church.com"
+              required
+              type="url"
             />
           </div>
 

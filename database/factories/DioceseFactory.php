@@ -24,6 +24,8 @@ class DioceseFactory extends Factory
             'name' => $this->faker->name(),
             'type' => $this->faker->randomElement(['diocese', 'archdiocese']),
             'office_address' => $this->faker->word(),
+            'contact_email' => $this->faker->safeEmail(),
+            'website_url' => $this->faker->url(),
             'postal_address' => $this->faker->word(),
             'team_id' => Team::factory(),
         ];
