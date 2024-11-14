@@ -48,7 +48,7 @@
   const isEditing = computed(() => !!props.diocese?.id);
 
   const submit = () => {
-    const url = isEditing.value ? `/api/v1/diocese/${props.diocese?.id}` : `/api/v1/diocese`;
+    const url = isEditing.value ? `/api/v1/dioceses/${props.diocese?.id}` : `/api/v1/dioceses`;
 
     const method = isEditing.value ? 'put' : 'post';
 

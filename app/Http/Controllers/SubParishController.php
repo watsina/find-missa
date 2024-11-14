@@ -13,7 +13,7 @@ class SubParishController extends Controller
 {
     public function index(Request $request): SubParishCollection
     {
-        $subParishes = SubParish::with('parish')->paginate(20);
+        $subParishes = SubParish::with('parish')->withCount('churches')->paginate(20);
 
         return new SubParishCollection($subParishes);
     }

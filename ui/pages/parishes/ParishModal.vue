@@ -1,31 +1,23 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue';
-  import { http, useForm } from '@/plugins';
+  import { computed, watch } from 'vue';
+  import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
-  import SelectInput from '@/components/SelectInput.vue';
   import TextInput from '@/components/TextInput.vue';
 
   const props = defineProps({
     parish: { type: Object, default: null },
+    diocese: { type: Object, required: true },
   });
 
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
 
-  const dioceses = ref([]);
-
-  onMounted(() => {
-    http.get('/api/v1/diocese').then(({ data }) => {
-      dioceses.value = data?.data;
-    });
-  });
-
   const form = useForm({
     name: props.parish?.name || '',
-    diocese_id: props.parish?.diocese_id || '',
+    diocese_id: props.diocese?.id,
     office_address: props.parish?.office_address || '',
     city: props.parish?.city || '',
     website_url: props.parish?.website_url || '',
@@ -37,7 +29,6 @@
     (newValue) => {
       if (newValue?.id) {
         form.name = props.parish?.name || '';
-        form.diocese_id = props.parish?.diocese_id || '';
         form.office_address = props.parish?.office_address || '';
         form.contact_email = props.parish?.contact_email || '';
         form.office_address = props.parish?.office_address || '';
@@ -60,9 +51,9 @@
 
     const method = isEditing.value ? 'put' : 'post';
 
+    form.diocese_id = props.diocese?.id;
+
     return form[method](url, {
-      preserveState: true,
-      preserveScroll: true,
       onSuccess: ({ data }) => {
         const message = isEditing.value
           ? 'Parish was updated successfully'
@@ -104,16 +95,15 @@
           </div>
 
           <div class="tw-mt-4">
-            <SelectInput
-              v-model="form.diocese_id"
+            <TextInput
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.diocese_id"
-              item-title="name"
-              item-value="id"
-              :items="dioceses"
               label="Diocese*"
+              :model-value="diocese?.name"
+              readonly
               required
               type="text"
+              variant="solo"
             />
           </div>
 

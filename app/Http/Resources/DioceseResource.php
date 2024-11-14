@@ -17,6 +17,8 @@ class DioceseResource extends JsonResource
             'name' => $this->name,
             'type' => $this->type,
             'contact_email' => $this->contact_email,
+            'parishes_count' => $this->whenCounted('parishes'),
+            'parishes' => ParishResource::collection($this->whenLoaded('parishes')),
             'website_url' => $this->website_url,
             'office_address' => $this->office_address,
             'postal_address' => $this->postal_address,

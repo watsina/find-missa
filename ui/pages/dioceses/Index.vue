@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue';
-  import { mdiPencilOutline } from '@mdi/js';
+  import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import { http } from '@/plugins';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -20,7 +20,7 @@
     { title: 'Contact Email', value: 'contact_email' },
     { title: 'Website', value: 'website_url' },
     { title: 'Office Address', value: 'office_address' },
-    { title: 'Postal Address', value: 'postal_address' },
+    { title: 'Number of Parishes', value: 'parishes_count', align: 'center' },
     { title: '', value: 'actions' },
   ];
 
@@ -31,7 +31,7 @@
   const fetchDioceses = () => {
     isFetching.value = true;
     http
-      .get('/api/v1/diocese')
+      .get('/api/v1/dioceses')
       .then(({ data }) => {
         dioceses.value = data?.data;
       })
@@ -97,12 +97,19 @@
             </template>
             <template #item.actions="{ item }">
               <v-icon
-                class="tw-cursor-pointer"
+                class="tw-cursor-pointer tw-mr-2"
                 color="primary"
                 :icon="mdiPencilOutline"
                 title="Edit Diocese"
                 @click="showModal(item)"
               ></v-icon>
+              <v-btn
+                color="primary"
+                :icon="mdiEyeOutline"
+                title="View Diocese Details"
+                :to="{ name: 'dioceses.show', params: { dioceseId: item.id } }"
+                variant="text"
+              ></v-btn>
             </template>
           </data-table>
         </v-col>

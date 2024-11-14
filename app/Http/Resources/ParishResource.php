@@ -18,6 +18,7 @@ class ParishResource extends JsonResource
             'diocese_id' => $this->diocese_id,
             'diocese' => new DioceseResource($this->whenLoaded('diocese')),
             'contact_email' => $this->contact_email,
+            'churches_count' => $this->whenCounted('churches'),
             'website_url' => $this->website_url,
             'office_address' => $this->office_address,
             'city' => $this->city,

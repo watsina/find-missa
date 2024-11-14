@@ -13,7 +13,7 @@ class DioceseController extends Controller
 {
     public function index(Request $request): DioceseCollection
     {
-        $dioceses = Diocese::all();
+        $dioceses = Diocese::withCount('parishes')->paginate(20);
 
         return new DioceseCollection($dioceses);
     }
@@ -22,17 +22,23 @@ class DioceseController extends Controller
     {
         $diocese = Diocese::create($request->validated());
 
+        $diocese->loadMissing('parishes');
+
         return new DioceseResource($diocese);
     }
 
     public function show(Request $request, Diocese $diocese): DioceseResource
     {
+        $diocese->loadMissing('parishes');
+
         return new DioceseResource($diocese);
     }
 
     public function update(DioceseRequest $request, Diocese $diocese): DioceseResource
     {
         $diocese->update($request->validated());
+
+        $diocese->loadMissing('parishes');
 
         return new DioceseResource($diocese);
     }

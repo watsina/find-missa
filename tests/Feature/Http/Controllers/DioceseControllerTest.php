@@ -16,7 +16,7 @@ test('index behaves as expected', function (): void {
     $this->actingAsUserWithTeam();
     Diocese::factory()->count(3)->create();
 
-    get(route('diocese.index'))->assertOk()->assertJsonStructure([]);
+    get(route('dioceses.index'))->assertOk()->assertJsonStructure([]);
 });
 
 test('store uses form request validation')
@@ -33,7 +33,7 @@ test('store saves', function (): void {
         'name' => fake()->name(),
         'type' => fake()->randomElement(['diocese', 'archdiocese']),
     ];
-    post(route('diocese.store'), $data)
+    post(route('dioceses.store'), $data)
         ->assertCreated()
         ->assertJsonStructure([]);
 
@@ -45,7 +45,7 @@ test('show behaves as expected', function (): void {
 
     $diocese = Diocese::factory()->create();
 
-    $response = get(route('diocese.show', $diocese));
+    $response = get(route('dioceses.show', $diocese));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -67,7 +67,7 @@ test('update behaves as expected', function (): void {
         'type' => fake()->randomElement(['diocese', 'archdiocese']),
     ];
 
-    put(route('diocese.update', $diocese), $data)
+    put(route('dioceses.update', $diocese), $data)
         ->assertOk()
         ->assertJsonStructure([]);
 
@@ -82,7 +82,7 @@ test('destroy deletes and responds with', function (): void {
 
     $diocese = Diocese::factory()->create();
 
-    $response = delete(route('diocese.destroy', $diocese));
+    $response = delete(route('dioceses.destroy', $diocese));
 
     $response->assertNoContent();
 

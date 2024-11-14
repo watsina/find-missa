@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Diocese extends BaseModel
@@ -16,4 +17,9 @@ class Diocese extends BaseModel
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function parishes(): HasMany
+    {
+        return $this->hasMany(Parish::class);
+    }
 }
