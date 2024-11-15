@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue';
-  import { mdiPencilOutline } from '@mdi/js';
+  import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -80,6 +80,14 @@
             :icon="mdiPencilOutline"
             @click="showModal(item)"
           ></v-icon>
+          <v-btn
+            class="tw-mr-2"
+            color="primary"
+            :icon="mdiEyeOutline"
+            title="View SubParish Details"
+            :to="{ name: 'sub-parishes.show', params: { subParishId: item.id } }"
+            variant="text"
+          ></v-btn>
         </template>
       </DataTable>
     </v-col>

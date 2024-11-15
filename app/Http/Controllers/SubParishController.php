@@ -29,7 +29,7 @@ class SubParishController extends Controller
 
     public function show(Request $request, SubParish $subParish): SubParishResource
     {
-        $subParish->loadMissing('parish');
+        $subParish->loadMissing('parish', 'churches');
 
         return new SubParishResource($subParish);
     }
@@ -37,8 +37,6 @@ class SubParishController extends Controller
     public function update(SubParishRequest $request, SubParish $subParish): SubParishResource
     {
         $subParish->update($request->validated());
-
-        $subParish->loadMissing('parish');
 
         return new SubParishResource($subParish);
     }

@@ -85,7 +85,7 @@
             class="tw-mr-2"
             color="primary"
             :icon="mdiEyeOutline"
-            title="View Diocese Details"
+            title="View Parish Details"
             :to="{ name: 'parishes.show', params: { parishId: item.id } }"
             variant="text"
           ></v-btn>

@@ -15,7 +15,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     $subParishes = SubParish::factory()->count(3)->create();
 
-    $response = get(route('sub-parish.index'));
+    $response = get(route('sub-parishes.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -31,7 +31,7 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $data = SubParish::factory()->raw();
 
-    $response = post(route('sub-parish.store'), $data);
+    $response = post(route('sub-parishes.store'), $data);
 
     $response->assertCreated();
     $response->assertJsonStructure([]);
@@ -45,7 +45,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $subParish = SubParish::factory()->create();
 
-    $response = get(route('sub-parish.show', $subParish));
+    $response = get(route('sub-parishes.show', $subParish));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -62,7 +62,7 @@ test('update behaves as expected', function (): void {
     $subParish = SubParish::factory()->create();
     $data = SubParish::factory()->raw();
 
-    $response = put(route('sub-parish.update', $subParish), $data);
+    $response = put(route('sub-parishes.update', $subParish), $data);
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -75,7 +75,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $subParish = SubParish::factory()->create();
 
-    $response = delete(route('sub-parish.destroy', $subParish));
+    $response = delete(route('sub-parishes.destroy', $subParish));
 
     $response->assertNoContent();
 

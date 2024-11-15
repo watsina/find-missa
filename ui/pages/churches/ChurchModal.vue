@@ -31,7 +31,7 @@
       parishes.value = data?.data;
     });
     // fetch subparishes
-    http.get('/api/v1/sub-parish').then(({ data }) => {
+    http.get('/api/v1/sub-parishes').then(({ data }) => {
       subParishes.value = data?.data;
     });
   });

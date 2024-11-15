@@ -48,8 +48,8 @@
 
   const submit = () => {
     const url = isEditing.value
-      ? `/api/v1/sub-parish/${props.subParish?.id}`
-      : `/api/v1/sub-parish`;
+      ? `/api/v1/sub-parishes/${props.subParish?.id}`
+      : `/api/v1/sub-parishes`;
 
     const method = isEditing.value ? 'put' : 'post';
 

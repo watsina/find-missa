@@ -35,7 +35,7 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('dioceses', App\Http\Controllers\DioceseController::class)->except('destroy');
     Route::apiResource('parishes', App\Http\Controllers\ParishController::class)->except('destroy');
     Route::apiResource('priest', App\Http\Controllers\PriestController::class)->except('destroy');
-    Route::apiResource('sub-parish', App\Http\Controllers\SubParishController::class)->except('destroy');
+    Route::apiResource('sub-parishes', App\Http\Controllers\SubParishController::class)->except('destroy');
     Route::apiResource('activity-time', App\Http\Controllers\ActivityTimeController::class)->except('destroy');
     Route::apiResource('activity-time-exceptions', App\Http\Controllers\ActivityTimeExceptionController::class)->except('destroy');
 });

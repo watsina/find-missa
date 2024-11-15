@@ -66,7 +66,7 @@
     },
     {
       name: 'sub parishes',
-      routeName: 'subParishes.index',
+      routeName: 'sub-parishes.index',
       icon: mdiHomeGroup,
       current: true,
       show: true,
