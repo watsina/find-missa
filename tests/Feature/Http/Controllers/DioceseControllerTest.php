@@ -13,7 +13,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
     Diocese::factory()->count(3)->create();
 
     get(route('dioceses.index'))->assertOk()->assertJsonStructure([]);
@@ -27,7 +27,7 @@ test('store uses form request validation')
     );
 
 test('store saves', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
 
     $data = [
         'name' => fake()->name(),
@@ -41,7 +41,7 @@ test('store saves', function (): void {
 });
 
 test('show behaves as expected', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
 
     $diocese = Diocese::factory()->create();
 
@@ -59,7 +59,7 @@ test('update uses form request validation')
     );
 
 test('update behaves as expected', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
 
     $diocese = Diocese::factory()->create();
     $data = [
@@ -78,7 +78,7 @@ test('update behaves as expected', function (): void {
 });
 
 test('destroy deletes and responds with', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
 
     $diocese = Diocese::factory()->create();
 
