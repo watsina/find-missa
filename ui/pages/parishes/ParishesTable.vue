@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue';
-  import { mdiPencilOutline } from '@mdi/js';
+  import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -21,9 +21,10 @@
     { title: 'Name', value: 'name' },
     { title: 'Diocese', value: 'diocese' },
     { title: 'City', value: 'city' },
+    { title: 'Number of Churches', value: 'churches_count', align: 'center' },
+    { title: 'Number of SubParishes', value: 'sub_parishes_count', align: 'center' },
     { title: 'Contact Email', value: 'contact_email' },
     { title: 'Website', value: 'website_url' },
-    { title: 'Office Address', value: 'office_address' },
     { title: '', value: 'actions' },
   ];
 
@@ -47,7 +48,6 @@
       v-model:show-modal="showingModal"
       :diocese="diocese"
       :parish="parishToEdit"
-      :search="search"
       @created="parishes.push($event)"
       @updated="updateParish"
     ></parish-modal>
@@ -57,7 +57,7 @@
       <PrimaryButton v-if="diocese?.id" @click="showModal"> Add Parish</PrimaryButton>
     </v-col>
     <v-col cols="12">
-      <DataTable :headers="headers" :items="parishes || []">
+      <DataTable :headers="headers" :items="parishes || []" :search="search">
         <template #top>
           <TextInput
             id="search"
@@ -81,6 +81,14 @@
             :icon="mdiPencilOutline"
             @click="showModal(item)"
           ></v-icon>
+          <v-btn
+            class="tw-mr-2"
+            color="primary"
+            :icon="mdiEyeOutline"
+            title="View Diocese Details"
+            :to="{ name: 'parishes.show', params: { parishId: item.id } }"
+            variant="text"
+          ></v-btn>
         </template>
       </DataTable>
     </v-col>

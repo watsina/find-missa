@@ -13,7 +13,7 @@ class ParishController extends Controller
 {
     public function index(Request $request): ParishCollection
     {
-        $parishes = Parish::with('diocese')->withCount('churches')->paginate(20);
+        $parishes = Parish::with('diocese')->withCount('churches', 'subParishes')->paginate(20);
 
         return new ParishCollection($parishes);
     }
@@ -29,7 +29,7 @@ class ParishController extends Controller
 
     public function show(Request $request, Parish $parish): ParishResource
     {
-        $parish->loadMissing('diocese');
+        $parish->loadMissing('diocese', 'subParishes');
 
         return new ParishResource($parish);
     }

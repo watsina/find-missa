@@ -27,7 +27,7 @@ class SubParishRequest extends FormRequest
                 'string',
                 Rule::unique('sub_parishes', 'name')
                     ->where('parish_id', $this->parish_id)
-                    ->ignore($this->subParish ?? ''),
+                    ->ignore($this->sub_parish ?? ''),
             ],
             'website_url' => ['nullable', 'url', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],

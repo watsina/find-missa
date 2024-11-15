@@ -5,20 +5,7 @@
   import ParishesTable from './ParishesTable.vue';
 
   const parishes = ref([]);
-  const search = ref('');
   const isFetching = ref(false);
-  const showingModal = ref(false);
-  const parishToEdit = ref(null);
-
-  const headers = [
-    { title: 'Name', value: 'name' },
-    { title: 'Diocese', value: 'diocese.name' },
-    { title: 'City', value: 'city' },
-    { title: 'Contact Email', value: 'contact_email' },
-    { title: 'Website', value: 'website_url' },
-    { title: 'Office Address', value: 'office_address' },
-    { title: '', value: 'actions' },
-  ];
 
   onMounted(() => {
     fetchParishes();
@@ -26,7 +13,7 @@
 
   const fetchParishes = () => {
     isFetching.value = true;
-    http.get('/api/v1/parish').then(({ data }) => {
+    http.get('/api/v1/parishes').then(({ data }) => {
       parishes.value = data?.data;
     });
   };

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,11 @@ class Parish extends BaseModel
         'id' => 'integer',
         'diocese_id' => 'integer',
     ];
+
+    public function subParishes(): HasMany
+    {
+        return $this->hasMany(SubParish::class);
+    }
 
     public function diocese(): BelongsTo
     {

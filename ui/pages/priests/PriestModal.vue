@@ -19,7 +19,7 @@
 
   onMounted(() => {
     // fetch parishes
-    http.get('/api/v1/parish').then(({ data }) => {
+    http.get('/api/v1/parishes').then(({ data }) => {
       parishes.value = data?.data;
     });
   });

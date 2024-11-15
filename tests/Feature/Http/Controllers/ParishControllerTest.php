@@ -15,7 +15,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     $parishes = Parish::factory()->count(3)->create();
 
-    $response = get(route('parish.index'));
+    $response = get(route('parishes.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -31,7 +31,7 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $data = Parish::factory()->raw();
 
-    $response = post(route('parish.store'), $data);
+    $response = post(route('parishes.store'), $data);
     $response->assertCreated();
     $response->assertJsonStructure([]);
 
@@ -44,7 +44,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $parish = Parish::factory()->create();
 
-    get(route('parish.show', $parish))
+    get(route('parishes.show', $parish))
         ->assertOk()
         ->assertJsonStructure([]);
 });
@@ -60,7 +60,7 @@ test('update behaves as expected', function (): void {
     $parish = Parish::factory()->create();
     $data = Parish::factory()->raw();
 
-    put(route('parish.update', $parish), $data)
+    put(route('parishes.update', $parish), $data)
         ->assertOk()
         ->assertJsonStructure([]);
 
@@ -72,7 +72,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $parish = Parish::factory()->create();
 
-    delete(route('parish.destroy', $parish))->assertNoContent();
+    delete(route('parishes.destroy', $parish))->assertNoContent();
 
     assertModelMissing($parish);
 })->todo('not yet supported');
