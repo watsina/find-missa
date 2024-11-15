@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportDataController;
 use App\Http\Controllers\SwitchTeamController;
 use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\UserActionLogController;
 
 require __DIR__.'/auth.php';
 
@@ -19,6 +20,8 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', App\Http\Controllers\UserController::class)->except('destroy');
     Route::apiResource('teams', App\Http\Controllers\TeamController::class)->except('destroy');
+
+    Route::get('action-logs', UserActionLogController::class);
     // acl
     Route::get('roles-permissions', App\Http\Controllers\Acl\GetRolesAndPermissionsController::class);
     Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
