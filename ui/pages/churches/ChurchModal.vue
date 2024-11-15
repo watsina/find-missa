@@ -1,6 +1,6 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue';
-  import { http, useForm } from '@/plugins';
+  import { computed, watch } from 'vue';
+  import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -10,36 +10,33 @@
 
   const props = defineProps({
     church: { type: Object, default: null },
+    parish: { type: Object, required: true },
+    parishType: {
+      required: true,
+      validator(value, props) {
+        return ['parish', 'sub-parish'].includes(value);
+      },
+    },
   });
 
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
 
-  const parishes = ref([]);
-  const subParishes = ref([]);
-
-  const churchTypes = [
-    { title: 'Parish', value: 'parish' },
-    { title: 'SubParish', value: 'sub-parish' },
-    { title: 'Basilica', value: 'basilica' },
-    { title: 'Minor Basilica', value: 'minor-basilica' },
-  ];
-
-  onMounted(() => {
-    // fetch parishes
-    http.get('/api/v1/parishes').then(({ data }) => {
-      parishes.value = data?.data;
-    });
-    // fetch subparishes
-    http.get('/api/v1/sub-parishes').then(({ data }) => {
-      subParishes.value = data?.data;
-    });
+  const churchTypes = computed(() => {
+    if (props.parishType === 'sub-parish') {
+      return [{ title: 'SubParish', value: 'sub-parish' }];
+    }
+    return [
+      { title: 'Parish', value: 'parish' },
+      { title: 'Basilica', value: 'basilica' },
+      { title: 'Minor Basilica', value: 'minor-basilica' },
+    ];
   });
 
   const form = useForm({
     name: props.church?.name || '',
     type: props.church?.type || '',
-    parishable_id: props.church?.parishable_id || '',
+    parishable_id: props.parish?.id,
     latitude: props.church?.latitude || '',
     longitude: props.church?.longitude || '',
     contact_email: props.church?.contact_email || '',
@@ -48,13 +45,6 @@
     street_address: props.church?.street_address || '',
     city: props.church?.city || '',
     postal_address: props.church?.postal_address || '',
-  });
-
-  const parishable = computed(() => {
-    if (form.type === 'sub-parish') {
-      return subParishes.value;
-    }
-    return parishes.value;
   });
 
   watch(
@@ -69,7 +59,6 @@
         form.website_url = props.church?.website_url || '';
         form.contact_phone = props.church?.contact_phone || '';
         form.street_address = props.church?.street_address || '';
-        form.parishable_id = props.church?.parishable_id || '';
         form.city = props.church?.city || '';
         form.postal_address = props.church?.postal_address || '';
       }
@@ -87,11 +76,12 @@
   const isEditing = computed(() => !!props.church?.id);
 
   const submit = () => {
-    const url = isEditing.value ? `/api/v1/church/${props.church?.id}` : `/api/v1/church`;
+    const url = isEditing.value ? `/api/v1/churches/${props.church?.id}` : `/api/v1/churches`;
 
     const method = isEditing.value ? 'put' : 'post';
 
     form.type = form.type?.toLowerCase();
+    form.parishable_id = props.parish?.id;
 
     return form[method](url, {
       onSuccess: ({ data }) => {
@@ -147,17 +137,15 @@
           </div>
 
           <div class="tw-mt-4">
-            <SelectInput
-              v-model="form.parishable_id"
+            <TextInput
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
               :error="form.errors.parishable_id"
               hint="Name of parish/subParish that the church belongs to."
-              :item-title="(item) => (item?.id ? `${item?.name} - ${item?.city || ''}` : '')"
-              item-value="id"
-              :items="parishable"
-              :label="form.type === 'sub-parish' ? 'SubParish*' : 'Parish*'"
-              required
+              :label="parishType === 'sub-parish' ? 'SubParish*' : 'Parish*'"
+              :model-value="`${parish?.name} - ${parish?.city || ''}`"
+              readonly
               type="text"
+              variant="solo"
             />
           </div>
 

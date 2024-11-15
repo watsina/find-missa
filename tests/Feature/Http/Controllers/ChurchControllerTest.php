@@ -19,7 +19,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     Church::factory()->count(3)->create();
 
-    $response = get(route('church.index'));
+    $response = get(route('churches.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -35,7 +35,7 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $church = Church::factory()->raw();
 
-    post(route('church.store'), $church)->assertCreated();
+    post(route('churches.store'), $church)->assertCreated();
 
     $churches = Church::query()
         ->where('name', $church['name'])
@@ -48,14 +48,14 @@ test('store saves', function (): void {
 test('store saves the parishable relation.', function (): void {
     $church = Church::factory()->raw();
 
-    post(route('church.store'), $church)->assertCreated();
+    post(route('churches.store'), $church)->assertCreated();
 
     $church = Church::first();
 
     expect($church->parishable)->not->toBeNull();
 });
 
-test('parish is properly validated when creating a church.', function (): void {
+test('parish is properly validated when creating a churches.', function (): void {
     $name = fake()->name();
     $type = fake()->randomElement(['parish', 'basilica', 'minor-basilica']);
 
@@ -65,7 +65,7 @@ test('parish is properly validated when creating a church.', function (): void {
         'parishable_id' => SubParish::factory()->createOne(['parish_id' => null])->id,
     ]);
 
-    post(route('church.store'), $data)->assertInvalid('parishable_id');
+    post(route('churches.store'), $data)->assertInvalid('parishable_id');
 
     $churches = Church::query()
         ->where('name', $name)
@@ -75,7 +75,7 @@ test('parish is properly validated when creating a church.', function (): void {
 
     $data['parishable_id'] = Parish::factory()->createOne()->id;
 
-    post(route('church.store'), $data)->assertCreated();
+    post(route('churches.store'), $data)->assertCreated();
 
     $churches = Church::query()
         ->where('name', $name)
@@ -84,7 +84,7 @@ test('parish is properly validated when creating a church.', function (): void {
     expect($churches)->toHaveCount(1);
 });
 
-test('sub-parish is properly validated when creating a church.', function (): void {
+test('sub-parish is properly validated when creating a churches.', function (): void {
     $name = fake()->name();
     $type = 'sub-parish';
 
@@ -94,7 +94,7 @@ test('sub-parish is properly validated when creating a church.', function (): vo
         'parishable_id' => Parish::factory()->createOne()->id,
     ]);
 
-    post(route('church.store'), $data)->assertInvalid('parishable_id');
+    post(route('churches.store'), $data)->assertInvalid('parishable_id');
 
     $churches = Church::query()
         ->where('name', $name)
@@ -104,7 +104,7 @@ test('sub-parish is properly validated when creating a church.', function (): vo
 
     $data['parishable_id'] = SubParish::factory()->createOne(['parish_id' => null])->id;
 
-    post(route('church.store'), $data)->assertCreated();
+    post(route('churches.store'), $data)->assertCreated();
 
     $churches = Church::query()
         ->where('name', $name)
@@ -116,7 +116,7 @@ test('sub-parish is properly validated when creating a church.', function (): vo
 test('it shows the church with its activities', function (): void {
     $church = Church::factory()->has(ActivityTime::factory(3), 'activities')->create();
 
-    get(route('church.show', $church))
+    get(route('churches.show', $church))
         ->assertOk()
         ->assertJsonCount(3, 'data.activities');
 });
@@ -136,7 +136,7 @@ test('update behaves as expected', function (): void {
         'name' => $name,
     ]);
 
-    put(route('church.update', $church), $data)
+    put(route('churches.update', $church), $data)
         ->assertOk()
         ->assertJsonStructure([]);
 
@@ -149,7 +149,7 @@ test('update also updates the parishable relation.', function (): void {
     $church = Church::factory()->create();
     $newParish = SubParish::factory()->createOne();
 
-    put(route('church.update', $church), [
+    put(route('churches.update', $church), [
         ...$church->getAttributes(),
         'type' => 'sub-parish',
         'parishable_id' => $newParish->id,
@@ -164,7 +164,7 @@ test('update also updates the parishable relation.', function (): void {
 test('destroy deletes and responds with', function (): void {
     $church = Church::factory()->create();
 
-    $response = delete(route('church.destroy', $church));
+    $response = delete(route('churches.destroy', $church));
 
     $response->assertNoContent();
 

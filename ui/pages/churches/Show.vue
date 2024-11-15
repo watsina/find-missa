@@ -40,7 +40,7 @@
     if (!props.churchId) return;
     isFetching.value = true;
     http
-      .get(`/api/v1/church/${props.churchId}`)
+      .get(`/api/v1/churches/${props.churchId}`)
       .then(({ data }) => {
         church.value = data?.data;
       })

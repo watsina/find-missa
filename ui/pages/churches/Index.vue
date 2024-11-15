@@ -13,7 +13,7 @@
 
   const fetchChurches = () => {
     isFetching.value = true;
-    http.get('/api/v1/church').then(({ data }) => {
+    http.get('/api/v1/churches').then(({ data }) => {
       churches.value = data?.data;
     });
   };

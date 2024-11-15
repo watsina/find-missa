@@ -31,7 +31,7 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard.index');
     Route::put('switch-team', SwitchTeamController::class);
     Route::apiResource('team.members', TeamMemberController::class)->only('index', 'show', 'update', 'destroy');
-    Route::apiResource('church', App\Http\Controllers\ChurchController::class)->except('destroy');
+    Route::apiResource('churches', App\Http\Controllers\ChurchController::class)->except('destroy');
     Route::apiResource('dioceses', App\Http\Controllers\DioceseController::class)->except('destroy');
     Route::apiResource('parishes', App\Http\Controllers\ParishController::class)->except('destroy');
     Route::apiResource('priest', App\Http\Controllers\PriestController::class)->except('destroy');

@@ -54,7 +54,7 @@
 
     <v-col class="tw-flex tw-justify-between" cols="12">
       <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the churches.</p>
-      <PrimaryButton @click="showModal"> Add Church</PrimaryButton>
+      <PrimaryButton v-if="parishType && parish?.id" @click="showModal"> Add Church</PrimaryButton>
     </v-col>
     <v-col cols="12">
       <data-table :headers="headers" :items="churches || []" :search="search">

@@ -1,7 +1,7 @@
 <template>
   <v-text-field
     ref="input"
-    v-bind="{ ...$attrs }"
+    v-bind="$attrs"
     v-model="model"
     :color="color"
     :density="density"
