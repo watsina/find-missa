@@ -16,7 +16,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     $priests = Priest::factory()->count(3)->create();
 
-    $response = get(route('priest.index'));
+    $response = get(route('priests.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -32,7 +32,7 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $name = fake()->name();
 
-    $response = post(route('priest.store'), [
+    $response = post(route('priests.store'), [
         'name' => $name,
     ]);
 
@@ -49,7 +49,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $priest = Priest::factory()->create();
 
-    $response = get(route('priest.show', $priest));
+    $response = get(route('priests.show', $priest));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -66,7 +66,7 @@ test('update behaves as expected', function (): void {
     $priest = Priest::factory()->create();
     $name = fake()->name();
 
-    $response = put(route('priest.update', $priest), [
+    $response = put(route('priests.update', $priest), [
         'name' => $name,
     ]);
 
@@ -81,7 +81,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $priest = Priest::factory()->create();
 
-    $response = delete(route('priest.destroy', $priest));
+    $response = delete(route('priests.destroy', $priest));
 
     $response->assertNoContent();
 

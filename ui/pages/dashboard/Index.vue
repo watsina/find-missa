@@ -3,6 +3,7 @@
   import NavLink from '@/components/NavLink.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import ImportDataModal from './ImportDataModal.vue';
+  import ActionLogs from './ActionLogs.vue';
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';
@@ -28,9 +29,10 @@
 
   const cards = computed(() =>
     Object.keys(stats.value)?.map((key) => {
+      const route = key === 'subParishes' ? 'sub-parishes' : key;
       return {
         name: `Number of ${key}`,
-        routeName: `${key}.index`,
+        routeName: `${route}.index`,
         // icon: UserGroupIcon,
         count: stats.value[key],
       };

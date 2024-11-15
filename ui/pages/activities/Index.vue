@@ -28,7 +28,7 @@
 
   const fetchActivities = () => {
     isFetching.value = true;
-    http.get('/api/v1/activity-time').then(({ data }) => {
+    http.get('/api/v1/activity-times').then(({ data }) => {
       activities.value = data?.data;
     });
   };

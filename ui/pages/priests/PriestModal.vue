@@ -53,7 +53,7 @@
   const isEditing = computed(() => !!props.priest?.id);
 
   const submit = () => {
-    const url = isEditing.value ? `/api/v1/priest/${props.priest?.id}` : `/api/v1/priest`;
+    const url = isEditing.value ? `/api/v1/priests/${props.priest?.id}` : `/api/v1/priests`;
 
     const method = isEditing.value ? 'put' : 'post';
 

@@ -28,7 +28,7 @@
 
   const fetchPriests = () => {
     isFetching.value = true;
-    http.get('/api/v1/priest').then(({ data }) => {
+    http.get('/api/v1/priests').then(({ data }) => {
       priests.value = data?.data;
     });
   };

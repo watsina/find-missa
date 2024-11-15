@@ -15,7 +15,7 @@ beforeEach(fn () => $this->actingAsUserWithTeam());
 test('index behaves as expected', function (): void {
     $activityTimes = ActivityTime::factory()->count(3)->create();
 
-    $response = get(route('activity-time.index'));
+    $response = get(route('activity-times.index'));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -31,7 +31,7 @@ test('store uses form request validation')
 test('store saves', function (): void {
     $data = ActivityTime::factory()->raw();
 
-    post(route('activity-time.store'), $data)
+    post(route('activity-times.store'), $data)
         ->assertCreated()
         ->assertJsonStructure([]);
 
@@ -48,7 +48,7 @@ test('store saves', function (): void {
 test('show behaves as expected', function (): void {
     $activityTime = ActivityTime::factory()->create();
 
-    $response = get(route('activity-time.show', $activityTime));
+    $response = get(route('activity-times.show', $activityTime));
 
     $response->assertOk();
     $response->assertJsonStructure([]);
@@ -65,7 +65,7 @@ test('update behaves as expected', function (): void {
     $activityTime = ActivityTime::factory()->create();
     $data = ActivityTime::factory()->raw();
 
-    put(route('activity-time.update', $activityTime), [
+    put(route('activity-times.update', $activityTime), [
         'type' => $data['type'],
         'start_time' => $data['start_time'],
         'end_time' => $data['end_time'],
@@ -89,7 +89,7 @@ test('update behaves as expected', function (): void {
 test('destroy deletes and responds with', function (): void {
     $activityTime = ActivityTime::factory()->create();
 
-    $response = delete(route('activity-time.destroy', $activityTime));
+    $response = delete(route('activity-times.destroy', $activityTime));
 
     $response->assertNoContent();
 

@@ -73,8 +73,8 @@
     }
 
     const url = isEditing.value
-      ? `/api/v1/activity-time/${props.activity?.id}`
-      : `/api/v1/activity-time`;
+      ? `/api/v1/activity-times/${props.activity?.id}`
+      : `/api/v1/activity-times`;
 
     const method = isEditing.value ? 'put' : 'post';
 

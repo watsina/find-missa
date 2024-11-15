@@ -36,7 +36,7 @@
     if (!props.activityId) return;
     isFetching.value = true;
     http
-      .get(`/api/v1/activity-time/${props.activityId}`)
+      .get(`/api/v1/activity-times/${props.activityId}`)
       .then(({ data }) => {
         activity.value = data?.data;
       })
