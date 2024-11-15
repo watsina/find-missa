@@ -99,8 +99,9 @@
             </v-card-actions>
           </v-card>
         </v-col>
-        <v-col cols="12"></v-col>
-        <v-col cols="12"></v-col>
+        <v-col v-if="user?.is_admin" cols="12">
+          <action-logs />
+        </v-col>
       </v-row>
     </v-container>
   </AppLayout>

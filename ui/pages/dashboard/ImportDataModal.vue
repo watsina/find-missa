@@ -17,7 +17,12 @@
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onSuccess: () => closeModal(),
+      onSuccess: () => {
+        closeModal();
+        notify.success('Data imported successfully.');
+
+        window.location.reload();
+      },
       onError: (error) => {
         notify.error('Something went wrong importing the data');
         console.info({ error });
@@ -47,6 +52,7 @@
               class="tw-block tw-w-full tw-mt-1 tw-border-0 tw-outline-none focus:tw-outline-none file:tw-border-0 file:tw-mr-4 file:tw-py-2 file:tw-px-4 file:tw-rounded-full file:tw-text-sm file:tw-font-semibold file:tw-bg-indigo-50 file:tw-text-indigo-700 hover:file:tw-bg-indigo-100"
               :error="form.errors.file"
               label="Upload data file (.csv,.xls,.xlsx)"
+              :loading="form.processing"
               placeholder="Choose a file..."
               required
             />
@@ -64,6 +70,7 @@
           class="tw-ml-3"
           :class="{ 'tw-opacity-25 tw-cursor-progress': form.processing }"
           :disabled="form.processing"
+          :loading="form.processing"
           @click="submit"
         >
           Upload Data

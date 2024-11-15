@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Concerns\HasProfilePhoto;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Concerns\RecordsUserActions;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasRoles;
     use HasTeams;
     use Notifiable;
+    use RecordsUserActions;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 

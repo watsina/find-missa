@@ -1,5 +1,5 @@
 import './styles/app.scss';
-import { date, notify } from '@/utils';
+import { notify, useDayjs } from '@/utils';
 import { registerPlugins, useForm } from '@/plugins';
 import App from './App.vue';
 
@@ -9,7 +9,7 @@ const app = createApp(App);
 
 registerPlugins(app);
 
-app.config.globalProperties.$date = date;
+app.config.globalProperties.$date = useDayjs;
 app.config.globalProperties.$useForm = useForm;
 app.config.globalProperties.$notify = notify;
 
