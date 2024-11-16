@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SubParish;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\SubParishRequest;
 use App\Http\Resources\SubParishResource;
 use App\Http\Resources\SubParishCollection;
@@ -13,6 +14,8 @@ class SubParishController extends Controller
 {
     public function index(Request $request): SubParishCollection
     {
+        Gate::authorize('viewAny', SubParish::class);
+
         $subParishes = SubParish::with('parish')->withCount('churches')->paginate(20);
 
         return new SubParishCollection($subParishes);
@@ -20,6 +23,8 @@ class SubParishController extends Controller
 
     public function store(SubParishRequest $request): SubParishResource
     {
+        Gate::authorize('view', SubParish::class);
+
         $subParish = SubParish::create($request->validated());
 
         $subParish->loadMissing('parish');
@@ -29,6 +34,8 @@ class SubParishController extends Controller
 
     public function show(Request $request, SubParish $subParish): SubParishResource
     {
+        Gate::authorize('view', $subParish);
+
         $subParish->loadMissing('parish', 'churches');
 
         return new SubParishResource($subParish);
@@ -36,6 +43,8 @@ class SubParishController extends Controller
 
     public function update(SubParishRequest $request, SubParish $subParish): SubParishResource
     {
+        Gate::authorize('update', $subParish);
+
         $subParish->update($request->validated());
 
         return new SubParishResource($subParish);
@@ -43,6 +52,8 @@ class SubParishController extends Controller
 
     public function destroy(Request $request, SubParish $subParish): Response
     {
+        Gate::authorize('delete', $subParish);
+
         $subParish->delete();
 
         return response()->noContent();
