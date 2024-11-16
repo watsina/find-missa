@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Priest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\PriestResource;
 use App\Http\Resources\PriestCollection;
 use App\Http\Requests\PriestStoreRequest;
@@ -14,6 +15,8 @@ class PriestController extends Controller
 {
     public function index(Request $request): PriestCollection
     {
+        Gate::authorize('viewAny', Priest::class);
+
         $priests = Priest::all();
 
         return new PriestCollection($priests);
@@ -21,6 +24,8 @@ class PriestController extends Controller
 
     public function store(PriestStoreRequest $request): PriestResource
     {
+        Gate::authorize('create', Priest::class);
+
         $priest = Priest::create($request->validated());
 
         return new PriestResource($priest);
@@ -28,11 +33,15 @@ class PriestController extends Controller
 
     public function show(Request $request, Priest $priest): PriestResource
     {
+        Gate::authorize('view', $priest);
+
         return new PriestResource($priest);
     }
 
     public function update(PriestUpdateRequest $request, Priest $priest): PriestResource
     {
+        Gate::authorize('update', $priest);
+
         $priest->update($request->validated());
 
         return new PriestResource($priest);
@@ -40,6 +49,8 @@ class PriestController extends Controller
 
     public function destroy(Request $request, Priest $priest): Response
     {
+        Gate::authorize('delete', $priest);
+
         $priest->delete();
 
         return response()->noContent();
