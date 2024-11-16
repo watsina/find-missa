@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\TeamMember;
 use Illuminate\Http\Request;
 use App\Models\TeamInvitation;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\TeamInvitationResource;
 use App\Http\Resources\TeamInvitationCollection;
 
@@ -15,6 +17,8 @@ class TeamInvitationController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', TeamMember::class);
+
         $invitations = TeamInvitation::all();
 
         return new TeamInvitationCollection($invitations);
@@ -25,6 +29,8 @@ class TeamInvitationController extends Controller
      */
     public function store(Request $request, Team $team)
     {
+        Gate::authorize('create', TeamMember::class);
+
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users|unique:team_invitations',

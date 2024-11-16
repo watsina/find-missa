@@ -17,7 +17,7 @@ class TeamController extends Controller
      */
     public function index()
     {
-        Gate::authorize('viewAll', Team::class);
+        Gate::authorize('viewAny', Team::class);
 
         $teams = Team::all();
 
@@ -29,6 +29,8 @@ class TeamController extends Controller
      */
     public function store(CreateTeam $createTeam, Request $request)
     {
+        Gate::authorize('create', Team::class);
+
         $team = $createTeam->handle($request);
 
         return new TeamResource($team);
@@ -51,6 +53,8 @@ class TeamController extends Controller
      */
     public function update(UpdateTeamName $updateTeamName, Request $request, Team $team)
     {
+        Gate::authorize('update', $team);
+
         $updateTeamName->handle($request, $team);
 
         return response()->noContent();
@@ -61,6 +65,8 @@ class TeamController extends Controller
      */
     public function destroy(Team $team)
     {
+        Gate::authorize('delete', $team);
+
         //
     }
 }
