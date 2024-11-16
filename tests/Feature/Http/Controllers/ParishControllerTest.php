@@ -10,7 +10,7 @@ use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\assertModelMissing;
 
-beforeEach(fn () => $this->actingAsUserWithTeam());
+beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
 
 test('index behaves as expected', function (): void {
     $parishes = Parish::factory()->count(3)->create();
