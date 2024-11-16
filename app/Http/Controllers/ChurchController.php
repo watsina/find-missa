@@ -8,6 +8,7 @@ use App\Models\SubParish;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Requests\ChurchRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\ChurchResource;
 use App\Http\Resources\ChurchCollection;
 
@@ -15,6 +16,8 @@ class ChurchController extends Controller
 {
     public function index(Request $request): ChurchCollection
     {
+        Gate::authorize('viewAny', Church::class);
+
         $churches = Church::with('activities', 'parishable:id,name,city')->paginate(20);
 
         return new ChurchCollection($churches);
@@ -22,6 +25,8 @@ class ChurchController extends Controller
 
     public function store(ChurchRequest $request): ChurchResource
     {
+        Gate::authorize('create', Church::class);
+
         $church = Church::create($request->safe()->except('parishable_id'));
         $data = $request->validated();
 
@@ -40,6 +45,8 @@ class ChurchController extends Controller
 
     public function show(Request $request, Church $church): ChurchResource
     {
+        Gate::authorize('view', $church);
+
         $church->loadMissing('activities', 'parishable:id,name,city');
 
         return new ChurchResource($church);
@@ -47,6 +54,8 @@ class ChurchController extends Controller
 
     public function update(ChurchRequest $request, Church $church): ChurchResource
     {
+        Gate::authorize('update', $church);
+
         $church->update($request->safe()->except('parishable_id'));
         $data = $request->validated();
 
@@ -66,6 +75,8 @@ class ChurchController extends Controller
 
     public function destroy(Request $request, Church $church): Response
     {
+        Gate::authorize('delete', $church);
+
         // first make sure the user has deleted all the activites
         $church->delete();
 
