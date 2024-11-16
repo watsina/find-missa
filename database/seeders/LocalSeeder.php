@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Team;
 use App\Models\User;
 use App\Models\Church;
 use App\Models\Parish;
@@ -35,16 +36,16 @@ class LocalSeeder extends Seeder
 
         $team->members()->attach([$user->id]);
 
-        $this->seedData();
+        $this->seedData($team);
     }
 
-    protected function seedData()
+    protected function seedData(Team $team)
     {
-        $dioceses = Diocese::factory(8)->create();
-        $parishes = Parish::factory(10)->recycle($dioceses)->create();
-        SubParish::factory(15)->recycle($parishes)->create();
-        $churches = Church::factory(10)->recycle($parishes)->create();
-        ActivityTime::factory()->recycle($churches)->create();
-        Priest::factory(10)->recycle($parishes)->create();
+        $dioceses = Diocese::factory(8)->create(['team_id' => $team->id]);
+        $parishes = Parish::factory(10)->recycle($dioceses)->create(['team_id' => $team->id]);
+        SubParish::factory(15)->recycle($parishes)->create(['team_id' => $team->id]);
+        $churches = Church::factory(10)->recycle($parishes)->create(['team_id' => $team->id]);
+        ActivityTime::factory(10)->recycle($churches)->create(['team_id' => $team->id]);
+        Priest::factory(10)->recycle($parishes)->create(['team_id' => $team->id]);
     }
 }
