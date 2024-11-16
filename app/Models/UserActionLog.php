@@ -2,14 +2,24 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTeam;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserActionLog extends Model
 {
+    use BelongsToTeam;
+
     /** @use HasFactory<\Database\Factories\UserActionLogFactory> */
     use HasFactory;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
 
     protected $casts = ['before' => 'array', 'after' => 'array', 'occurred_at' => 'datetime'];
 

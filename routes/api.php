@@ -21,7 +21,7 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::apiResource('users', App\Http\Controllers\UserController::class)->except('destroy');
     Route::apiResource('teams', App\Http\Controllers\TeamController::class)->except('destroy');
 
-    Route::get('action-logs', UserActionLogController::class);
+    Route::get('action-logs', UserActionLogController::class)->middleware('userWithTeam');
     // acl
     Route::get('roles-permissions', App\Http\Controllers\Acl\GetRolesAndPermissionsController::class);
     Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');

@@ -36,7 +36,7 @@ class LocalSeeder extends Seeder
 
         $team->members()->attach([$user->id]);
 
-        $this->seedData($team);
+        // $this->seedData($team);
     }
 
     protected function seedData(Team $team)

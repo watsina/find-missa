@@ -2,6 +2,7 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import SubParishesTable from '@/pages/sub-parishes/SubParishesTable.vue';
+  import ChurchesTable from '@/pages/churches/ChurchesTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ParishDetails from './ParishDetails.vue';
   import { notify } from '@/utils';
@@ -33,7 +34,7 @@
 <template>
   <app-layout>
     <template #head>
-      <h2>Diocose Details</h2>
+      <h2>Parish Details</h2>
     </template>
     <v-container>
       <v-skeleton-loader v-if="isFetching" type="card"></v-skeleton-loader>
@@ -43,6 +44,14 @@
       <v-row v-else class="tw-py-12">
         <v-col cols="12">
           <ParishDetails v-model:parish="parish" />
+        </v-col>
+        <v-col cols="12">
+          <ChurchesTable
+            :churches="parish?.churches || []"
+            :is-fetching="isFetching"
+            :parish="parish"
+            parish-type="parish"
+          />
         </v-col>
         <v-col cols="12">
           <SubParishesTable
