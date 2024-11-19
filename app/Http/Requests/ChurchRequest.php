@@ -35,8 +35,8 @@ class ChurchRequest extends FormRequest
                     ->where('parishable_type', $this->type === 'sub-parish' ? 'subParish' : 'parish')
                     ->ignore($this->church ?? ''),
             ],
-            'latitude' => ['nullable', 'numeric', 'between:-90.9999999,90.9999999'],
-            'longitude' => ['nullable', 'numeric', 'between:-180.9999999,180.9999999'],
+            'latitude' => ['required', 'numeric', 'between:-90.9999999,90.9999999'],
+            'longitude' => ['required', 'numeric', 'between:-180.9999999,180.9999999'],
             'street_address' => ['nullable', 'string'],
             'city' => ['required', 'string'],
             'postal_address' => ['nullable', 'string'],
