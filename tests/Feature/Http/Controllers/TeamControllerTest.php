@@ -3,6 +3,8 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Team;
+use App\Actions\Teams\CreateTeam;
+use App\Actions\Teams\UpdateTeamName;
 
 test('index behaves as expected', function (): void {
     $this->actingAsSuperAdmin();
@@ -23,6 +25,18 @@ test('store works as expected', function () {
         ->assertCreated();
 });
 
+test('store uses the create team action...', function () {
+    $spy = $this->spy(CreateTeam::class);
+
+    $this->actingAsSuperAdmin()
+        ->post('/api/v1/teams', [
+            'name' => 'Test Team',
+            'country' => 'Uganda',
+        ]);
+
+    $spy->shouldHaveReceived('handle');
+});
+
 test('show behaves as expected', function (): void {
     $this->actingAsSuperAdmin();
 
@@ -40,4 +54,16 @@ test('update works as expected', function () {
     $this->put('/api/v1/teams/'.$team->id, [
         'name' => 'Update Team',
     ])->assertNoContent();
+});
+
+test('udpate uses the update team action...', function () {
+    $spy = $this->spy(UpdateTeamName::class);
+
+    $team = Team::factory()->create();
+    $this->actingAsSuperAdmin()
+        ->put('/api/v1/teams/'.$team->id, [
+            'name' => 'Update Team',
+        ]);
+
+    $spy->shouldHaveReceived('handle');
 });

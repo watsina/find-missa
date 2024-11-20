@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
@@ -56,6 +58,17 @@ class AppServiceProvider extends ServiceProvider
             return App::isProduction()
                 ? $rule->mixedCase()->numbers()->uncompromised()
                 : $rule;
+        });
+
+        $this->defineMacros();
+    }
+
+    protected function defineMacros()
+    {
+        Collection::macro('toLower', function () {
+            return $this->map(function (string $value) {
+                return Str::lower($value);
+            });
         });
 
         Builder::macro('getMorphAttributes', function (string $name): array {

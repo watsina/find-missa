@@ -4,6 +4,7 @@ namespace App\Actions\Teams;
 
 use App\Models\Team;
 use Illuminate\Http\Request;
+use App\Rules\IsValidCountry;
 use Illuminate\Support\Facades\Gate;
 
 class CreateTeam
@@ -19,7 +20,7 @@ class CreateTeam
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'country' => ['required', 'string', 'max:255', 'unique:teams'],
+            'country' => ['required', 'string', 'max:255', 'unique:teams', new IsValidCountry],
         ]);
 
         $user = $request->user();
