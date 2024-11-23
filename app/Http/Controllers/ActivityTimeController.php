@@ -16,7 +16,7 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('viewAny', ActivityTime::class);
 
-        $activityTimes = ActivityTime::all();
+        $activityTimes = ActivityTime::paginate(20);
 
         return new ActivityTimeCollection($activityTimes);
     }

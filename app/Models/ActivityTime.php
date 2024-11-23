@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,14 @@ class ActivityTime extends BaseModel
         'church_id' => 'integer',
         'date' => 'datetime',
     ];
+
+    /**
+     * Scope a query to only include users of a given type.
+     */
+    public function scopeOfType(Builder $query, string $type): void
+    {
+        $query->where('type', $type);
+    }
 
     public function church(): BelongsTo
     {

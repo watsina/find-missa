@@ -35,4 +35,34 @@ class ActivityTimeFactory extends Factory
             'team_id' => Team::factory(),
         ];
     }
+
+    public function daily($type)
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'day_of_week' => null,
+            'occurrence' => 'daily',
+            'date' => null,
+        ]);
+    }
+
+    public function oneTime($type, $date)
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'day_of_week' => null,
+            'occurrence' => 'one-time',
+            'date' => $date,
+        ]);
+    }
+
+    public function weekly($type, $dayOfWeek)
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'day_of_week' => $dayOfWeek,
+            'occurrence' => 'weekly',
+            'date' => null,
+        ]);
+    }
 }
