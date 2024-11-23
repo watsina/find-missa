@@ -58,8 +58,6 @@
     const method = isEditing.value ? 'put' : 'post';
 
     return form[method](url, {
-      preserveState: true,
-      preserveScroll: true,
       onSuccess: ({ data }) => {
         const message = isEditing.value
           ? 'Priest was updated successfully'

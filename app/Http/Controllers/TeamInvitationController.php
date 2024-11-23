@@ -33,7 +33,7 @@ class TeamInvitationController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users|unique:team_invitations',
+            'email' => 'required|email|unique:users|unique:team_invitations|lowercase',
             'role_id' => 'required|exists:roles,id',
         ]);
 

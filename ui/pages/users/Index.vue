@@ -1,17 +1,17 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
-  // import UserInvitationModal from './UserInvitationModal.vue';
+  import { mdiPencilOutline } from '@mdi/js';
+  import UserModal from './UserModal.vue';
 
   const users = ref([]);
-  const invitedUsers = ref([]);
   const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
+  const userToEdit = ref(null);
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -23,7 +23,6 @@
 
   onMounted(() => {
     fetchUsers();
-    fetchInvitedUsers();
   });
 
   const fetchUsers = () => {
@@ -33,15 +32,18 @@
     });
   };
 
-  const fetchInvitedUsers = () => {
-    isFetching.value = true;
-    http.get('/api/v1/user-invitations').then(({ data }) => {
-      invitedUsers.value = data?.data;
-    });
-  };
-
-  function showModal() {
+  function showModal(user) {
+    userToEdit.value = user;
     showingModal.value = true;
+  }
+
+  function updateUser(updatedUser) {
+    users.value = users.value?.map((user) => {
+      if (user?.id === updatedUser?.id) {
+        return { ...user, ...updatedUser };
+      }
+      return user;
+    });
   }
 </script>
 
@@ -50,12 +52,11 @@
     <template #head>
       <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Users</h2>
     </template>
-    <user-invitation-modal v-model:show-modal="showingModal" @created="invitedUsers.push($event)" />
+    <user-modal v-model:show-modal="showingModal" :user="userToEdit" @updated="updateUser" />
     <v-container>
       <v-row class="tw-py-12">
         <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the users.</p>
-          <PrimaryButton @click="showModal"> Invite User</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <data-table :headers="headers" :items="users || []" :search="search">
@@ -83,7 +84,7 @@
               </v-chip>
             </template>
             <template #item.actions="{ item }">
-              <!-- <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon> -->
+              <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>
           </data-table>
         </v-col>

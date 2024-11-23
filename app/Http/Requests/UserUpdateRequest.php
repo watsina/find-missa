@@ -22,8 +22,6 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'email' => ['required', 'email'],
-            'role_id' => ['nullable', 'integer'],
-            'remember_token' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

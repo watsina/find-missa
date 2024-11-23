@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\DataImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rules\File;
+use App\Imports\ParishChurchDataImport;
 
 class ImportDataController extends Controller
 {
@@ -18,7 +18,7 @@ class ImportDataController extends Controller
             'file' => ['required', File::types(['csv', 'xls', 'xlsx'])],
         ]);
 
-        Excel::import(new DataImport, $request->file);
+        Excel::import(new ParishChurchDataImport, $request->file);
 
         return response()->noContent();
     }

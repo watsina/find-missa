@@ -26,7 +26,7 @@
       onError: (error) => {
         notify.error('Something went wrong importing the data');
         console.info({ error });
-        // form.errors.file = error;
+        form.errors.file = error;
       },
     });
   };
