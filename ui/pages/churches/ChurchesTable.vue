@@ -23,6 +23,7 @@
     { title: 'Type', value: 'type' },
     { title: 'Parish', value: 'parish' },
     { title: 'City/Town', value: 'city' },
+    { title: 'District/State', value: 'district' },
     { title: 'Coordinates', value: 'coordinates' },
     { title: '', value: 'actions' },
   ];
@@ -76,6 +77,7 @@
         </template>
         <template #item.actions="{ item }">
           <v-icon
+            v-if="parish?.id && parishType"
             class="md:tw-mr-2"
             color="primary"
             :icon="mdiPencilOutline"

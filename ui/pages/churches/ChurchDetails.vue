@@ -11,11 +11,11 @@
 <template>
   <v-row>
     <church-modal
-      v-if="church?.parish?.id && church?.type"
+      v-if="church?.parish?.id && church?.parishable_type"
       v-model:show-modal="showingModal"
       :church="churchToEdit"
       :parish="church?.parish"
-      :parish-type="church?.type"
+      :parish-type="church?.parishable_type"
       @updated="(church = $event), (churchToEdit = null)"
     />
     <v-col cols="12">
@@ -24,7 +24,7 @@
           <div class="tw-px-4 sm:tw-px-0 tw-flex tw-justify-between">
             <h3 class="text-base/7 tw-font-semibold tw-text-gray-900">Church Information</h3>
             <PrimaryButton
-              v-if="church?.parish?.id && church?.type"
+              v-if="church?.parish?.id && church?.parishable_type"
               variant="outlined"
               @click="(churchToEdit = church), (showingModal = true)"
             >
@@ -44,6 +44,14 @@
               <div
                 class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
               >
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Parish</dt>
+                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
+                  {{ church?.parish?.name }}
+                </dd>
+              </div>
+              <div
+                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
+              >
                 <dt class="text-sm/6 tw-font-medium tw-text-gray-900">City/Town</dt>
                 <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
                   {{ church?.city }}
@@ -52,17 +60,9 @@
               <div
                 class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
               >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Diocese</dt>
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">District/State</dt>
                 <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ church?.diocese?.name }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Parish</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ church?.parish?.name }}
+                  {{ church?.district }}
                 </dd>
               </div>
               <div

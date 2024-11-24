@@ -27,7 +27,9 @@
       return [{ title: 'SubParish', value: 'sub-parish' }];
     }
     return [
-      { title: 'Parish', value: 'parish' },
+      { title: 'Parish Church', value: 'parish' },
+      { title: 'Chapel', value: 'chapel' },
+      { title: 'Cathedral', value: 'cathedral' },
       { title: 'Basilica', value: 'basilica' },
       { title: 'Minor Basilica', value: 'minor-basilica' },
     ];
@@ -44,6 +46,7 @@
     contact_phone: props.church?.contact_phone || '',
     street_address: props.church?.street_address || '',
     city: props.church?.city || '',
+    district: props.church?.district || '',
     postal_address: props.church?.postal_address || '',
   });
 
@@ -60,6 +63,7 @@
         form.contact_phone = props.church?.contact_phone || '';
         form.street_address = props.church?.street_address || '';
         form.city = props.church?.city || '';
+        form.district = props.church?.district || '';
         form.postal_address = props.church?.postal_address || '';
       }
     },
@@ -154,7 +158,18 @@
               v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.city"
-              label="City/Town"
+              label="City/Town*"
+              placeholder="Kampala"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.district"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.district"
+              label="District/State*"
               placeholder="Kampala"
               required
             />

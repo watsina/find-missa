@@ -39,6 +39,7 @@ class ChurchRequest extends FormRequest
             'longitude' => ['required', 'numeric', 'between:-180.9999999,180.9999999'],
             'street_address' => ['nullable', 'string'],
             'city' => ['required', 'string'],
+            'district' => ['required', 'string'],
             'postal_address' => ['nullable', 'string'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],

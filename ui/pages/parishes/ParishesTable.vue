@@ -20,8 +20,8 @@
   const headers = [
     { title: 'Name', value: 'name' },
     { title: 'Diocese', value: 'diocese' },
-    { title: 'City', value: 'city' },
-    { title: 'District', value: 'district' },
+    { title: 'City/Town', value: 'city' },
+    { title: 'District/State', value: 'district' },
     { title: 'Number of Churches', value: 'churches_count', align: 'center' },
     { title: 'Number of SubParishes', value: 'sub_parishes_count', align: 'center' },
     { title: '', value: 'actions' },

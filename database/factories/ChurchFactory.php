@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Team;
 use App\Models\Church;
 use App\Models\Parish;
+use Faker\Provider\en_US\Address;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ChurchFactory extends Factory
@@ -31,6 +32,7 @@ class ChurchFactory extends Factory
             'contact_email' => $this->faker->safeEmail(),
             'website_url' => $this->faker->url(),
             'city' => $this->faker->city,
+            'district' => Address::state(),
             'contact_phone' => $this->faker->phoneNumber(),
             'parishable_id' => Parish::factory(),
             'parishable_type' => Parish::class,
