@@ -11,7 +11,7 @@ use App\Http\Controllers\AppUsers\SearchActivitiesController;
 
 require __DIR__.'/auth.php';
 
-Route::post('/search', SearchActivitiesController::class)->name('search');
+Route::get('/search', SearchActivitiesController::class)->name('search');
 
 Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();

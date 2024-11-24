@@ -2,34 +2,26 @@
 
 namespace Tests\Feature\Http\Controllers\AppUsers;
 
+use App\Models\Church;
 use App\Models\ActivityTime;
-use Illuminate\Support\Carbon;
 
-use function Pest\Laravel\post;
-use function Pest\Laravel\travelTo;
-use function Pest\Laravel\travelBack;
-
-// set the date to Thursday Novemer 11th 2024 (date on which the findmissa.com domain was purchased)
-beforeEach(fn () => travelTo(Carbon::createFromDate('2024', '11', '07')));
-
-// reset the date
-afterEach(fn () => travelBack());
+use function Pest\Laravel\get;
 
 test('users can search masses by date', function () {
     //activities that happen on the given date
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();
     $confessionToday = ActivityTime::factory()->daily('confession')->create();
     $dailyMass = ActivityTime::factory()->daily('mass')->create();
-    $weeklyMass = ActivityTime::factory()->weekly('mass', now()->dayName)->create();
-    $oneTimeMass = ActivityTime::factory()->oneTime('mass', now())->create();
+    $weeklyMass = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
+    $oneTimeMass = ActivityTime::factory()->oneTime(now(), 'mass')->create();
     // activities that happen on another date
-    $massOnOtherDay = ActivityTime::factory()->weekly('mass', 'Monday')->create();
-    $massOnOtherDate = ActivityTime::factory()->oneTime('mass', now()->addDay())->create();
+    $massOnOtherDay = ActivityTime::factory()->weekly(now()->addDay()->dayName, 'mass')->create();
+    $massOnOtherDate = ActivityTime::factory()->oneTime(now()->addDay(), 'mass')->create();
 
-    post(route('search'), [
+    get(route('search', [
         'type' => 'mass',
-        'date' => now(),
-    ])
+        'date' => now()->toDateString(),
+    ]))
         ->assertOk()
         ->assertJsonCount('3', 'data')
         // check that all the activities that happen on the given date are returned
@@ -48,16 +40,18 @@ test('users are able to search adorations for a given date', function () {
     $massToday = ActivityTime::factory()->daily('mass')->create();
     $confessionToday = ActivityTime::factory()->daily('confession')->create();
     $dailyAdoration = ActivityTime::factory()->daily('adoration')->create();
-    $weeklyAdoration = ActivityTime::factory()->weekly('adoration', now()->dayName)->create();
-    $oneTimeAdoration = ActivityTime::factory()->oneTime('adoration', now())->create();
+    $weeklyAdoration = ActivityTime::factory()->weekly(now()->dayName, 'adoration')->create();
+    $oneTimeAdoration = ActivityTime::factory()->oneTime(now(), 'adoration')->create();
     // activities that happen on another date
-    $adorationOnOtherDay = ActivityTime::factory()->weekly('adoration', 'Monday')->create();
-    $adorationOnOtherDate = ActivityTime::factory()->oneTime('adoration', now()->addDay())->create();
+    $adorationOnOtherDay = ActivityTime::factory()->weekly(now()->addDay()->dayName, 'adoration')->create();
+    $adorationOnOtherDate = ActivityTime::factory()->oneTime(now()->addDay(), 'adoration')->create();
 
-    post(route('search'), [
-        'type' => 'adoration',
-        'date' => now(),
-    ])
+    get(
+        route('search', [
+            'type' => 'adoration',
+            'date' => now()->toDateString(),
+        ])
+    )
         ->assertOk()
         ->assertJsonCount('3', 'data')
         // check that all the activities that happen on the given date are returned
@@ -71,18 +65,60 @@ test('users are able to search adorations for a given date', function () {
         ->assertJsonMissing(['id' => $confessionToday->id]);
 });
 
-test('it returns confession times for the day', function () {
-    //
-})->todo('users should be able to search confessions');
+test('users can search confessions on a given date.', function () {
+    //activities that happen on the given date
+    $massToday = ActivityTime::factory()->daily('mass')->create();
+    $adorationToday = ActivityTime::factory()->daily('adoration')->create();
+    $dailyConfession = ActivityTime::factory()->daily('confession')->create();
+    $weeklyConfession = ActivityTime::factory()->weekly(now()->dayName, 'confession')->create();
+    $oneTimeConfession = ActivityTime::factory()->oneTime(now(), 'confession')->create();
+    // activities that happen on another date
+    $confessionOnOtherDay = ActivityTime::factory()->weekly(now()->addDay()->dayName, 'confession')->create();
+    $confessionOnOtherDate = ActivityTime::factory()->oneTime(now()->addDay(), 'confession')->create();
 
-test('users can search by church name.', function () {
-    //users should be able to search by the church name..
-})->todo('users should be able to search by the church name..');
+    get(
+        route('search', [
+            'type' => 'confession',
+            'date' => now()->toDateString(),
+        ])
+    )
+        ->assertOk()
+        ->assertJsonCount('3', 'data')
+        // check that all the activities that happen on the given date are returned
+        ->assertJsonFragment(['id' => $dailyConfession->id])
+        ->assertJsonFragment(['id' => $weeklyConfession->id])
+        ->assertJsonFragment(['id' => $oneTimeConfession->id])
+        // check that the activities that don't happen on that date are not returned.
+        ->assertJsonMissing(['id' => $confessionOnOtherDay->id])
+        ->assertJsonMissing(['id' => $confessionOnOtherDate->id])
+        ->assertJsonMissing(['id' => $massToday->id])
+        ->assertJsonMissing(['id' => $adorationToday->id]);
+});
+
+test('users can search by church name and activity type on a given date.', function () {
+    $church = Church::factory()->create(['name' => 'Christ The King']);
+
+    $massAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['church_id' => $church->id]);
+    $adorationAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'adoration')->create(['church_id' => $church->id]);
+    $confessionAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'confession')->create(['church_id' => $church->id]);
+    //activity in another church
+    $massAtOtherChurch = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
+    get(
+        route('search', [
+            'type' => 'mass',
+            'date' => now()->toDateString(),
+            'church_name' => $church->name,
+        ])
+    )
+        ->assertOk()
+        ->assertJsonCount('1', 'data')
+        ->assertJsonFragment(['id' => $massAtChurch->id])
+        // check that the activities that don't happen on that date are not returned.
+        ->assertJsonMissing(['id' => $confessionAtChurch->id])
+        ->assertJsonMissing(['id' => $adorationAtChurch->id])
+        ->assertJsonMissing(['id' => $massAtOtherChurch->id]);
+});
 
 test('users can search by district.', function () {
     //users should be able to search by district that the church belongs to...
 })->todo('users should be able to search by district that the church belongs to...');
-
-test('users can search by town', function () {
-    //users should be able to search by church town
-})->todo('users should be able to search by church town');

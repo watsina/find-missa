@@ -19,7 +19,7 @@ class ActivityTime extends BaseModel
     protected $casts = [
         'id' => 'integer',
         'church_id' => 'integer',
-        'date' => 'datetime',
+        'date' => 'datetime:Y-m-d',
     ];
 
     /**

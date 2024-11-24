@@ -46,7 +46,7 @@ class ActivityTimeFactory extends Factory
         ]);
     }
 
-    public function oneTime($type, $date)
+    public function oneTime($date, $type)
     {
         return $this->state(fn (array $attributes) => [
             'type' => $type,
@@ -56,7 +56,7 @@ class ActivityTimeFactory extends Factory
         ]);
     }
 
-    public function weekly($type, $dayOfWeek)
+    public function weekly($dayOfWeek, $type)
     {
         return $this->state(fn (array $attributes) => [
             'type' => $type,

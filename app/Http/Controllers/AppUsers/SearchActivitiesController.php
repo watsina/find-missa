@@ -19,16 +19,24 @@ class SearchActivitiesController extends Controller
         $data = $request->validate([
             'type' => 'required|string|in:mass,confession,adoration',
             'date' => 'required|date',
+            'church_name' => 'nullable|string',
         ]);
 
         $date = Carbon::createFromDate($data['date']);
 
         $activities = ActivityTime::ofType($data['type'])
+            ->when(
+                isset($data['church_name']),
+                fn (Builder $query) => $query->whereHas(
+                    'church',
+                    fn (Builder $query) => $query->where('name', 'like', "%{$data['church_name']}%")
+                )
+            )
             ->where(
-                fn (Builder $query) => $query->where([
-                    ['occurrence', '=', 'one-time'],
-                    ['date', '=', $date],
-                ])
+                fn (Builder $query) => $query->where(
+                    fn (Builder $query) => $query->where('occurrence', 'one-time')
+                        ->whereDate('date', $date)
+                )
                     ->orWhere('day_of_week', $date->dayName)
                     ->orWhere('occurrence', 'daily')
             )->get();
