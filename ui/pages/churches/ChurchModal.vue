@@ -45,8 +45,8 @@
     website_url: props.church?.website_url || '',
     contact_phone: props.church?.contact_phone || '',
     street_address: props.church?.street_address || '',
-    city: props.church?.city || '',
-    district: props.church?.district || '',
+    city: props.church?.city || props.parish?.city || '',
+    district: props.church?.district || props.parish?.district || '',
     postal_address: props.church?.postal_address || '',
   });
 
