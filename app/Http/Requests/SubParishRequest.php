@@ -32,6 +32,7 @@ class SubParishRequest extends FormRequest
             'website_url' => ['nullable', 'url', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'city' => ['required', 'string'],
+            'district' => ['required', 'string'],
             'office_address' => ['nullable', 'string'],
         ];
     }

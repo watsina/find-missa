@@ -20,10 +20,9 @@
   const headers = [
     { title: 'Name', value: 'name' },
     { title: 'Parish', value: 'parish' },
-    { title: 'City', value: 'city' },
+    { title: 'City/Town', value: 'city' },
+    { title: 'District/State', value: 'district' },
     { title: 'Contact Email', value: 'contact_email' },
-    { title: 'Website', value: 'website_url' },
-    { title: 'Office Address', value: 'office_address' },
     { title: '', value: 'actions' },
   ];
 

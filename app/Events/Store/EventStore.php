@@ -11,7 +11,7 @@ class EventStore
 {
     protected static $events = [];
 
-    public static $persistOnCount = 5;
+    public static $persistOnCount = 3;
 
     public static $isRecording = true;
 

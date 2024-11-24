@@ -20,6 +20,7 @@
     parish_id: props.parish?.id,
     office_address: props.subParish?.office_address || '',
     city: props.subParish?.city || '',
+    district: props.subParish?.district || '',
     website_url: props.subParish?.website_url || '',
     contact_email: props.subParish?.contact_email || '',
   });
@@ -31,6 +32,7 @@
         form.name = props.subParish?.name || '';
         form.office_address = props.subParish?.office_address || '';
         form.city = props.subParish?.city || '';
+        form.district = props.subParish?.district || '';
         form.website_url = props.subParish?.website_url || '';
         form.contact_email = props.subParish?.contact_email || '';
       }
@@ -56,8 +58,6 @@
     form.parish_id = props.parish?.id;
 
     return form[method](url, {
-      preserveState: true,
-      preserveScroll: true,
       onSuccess: ({ data }) => {
         const message = isEditing.value
           ? 'Sub Parish was updated successfully'
@@ -116,7 +116,18 @@
               v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.city"
-              label="City"
+              label="City/Town*"
+              placeholder="Kampala"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.district"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.district"
+              label="District/State*"
               placeholder="Kampala"
               required
             />

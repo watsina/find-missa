@@ -11,10 +11,10 @@
 <template>
   <v-row>
     <SubParishModal
-      v-if="subParish?.diocese"
+      v-if="subParish?.parish"
       v-model:show-modal="showingModal"
-      :diocese="subParish?.diocese"
-      :parish="subParishToEdit"
+      :parish="subParish?.parish"
+      :sub-parish="subParishToEdit"
       @updated="(subParish = { ...subParish, ...$event }), (subParishToEdit = null)"
     ></SubParishModal>
     <v-col cols="12">
@@ -42,7 +42,15 @@
               <div
                 class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
               >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">City</dt>
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Parish</dt>
+                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
+                  {{ subParish?.parish?.name }}
+                </dd>
+              </div>
+              <div
+                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
+              >
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">City/Town</dt>
                 <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
                   {{ subParish?.city }}
                 </dd>
@@ -50,9 +58,9 @@
               <div
                 class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
               >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Parish</dt>
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">District/State</dt>
                 <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
-                  {{ subParish?.parish?.name }}
+                  {{ subParish?.district }}
                 </dd>
               </div>
               <div
