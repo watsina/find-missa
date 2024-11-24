@@ -120,5 +120,25 @@ test('users can search by church name and activity type on a given date.', funct
 });
 
 test('users can search by district.', function () {
-    //users should be able to search by district that the church belongs to...
-})->todo('users should be able to search by district that the church belongs to...');
+    $church = Church::factory()->create(['district' => 'Rukungiri']);
+
+    $massInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['church_id' => $church->id]);
+    $adorationInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'adoration')->create(['church_id' => $church->id]);
+    $confessionInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'confession')->create(['church_id' => $church->id]);
+    //activity in another church
+    $massInOtherDistrict = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
+    get(
+        route('search', [
+            'type' => 'mass',
+            'date' => now()->toDateString(),
+            'district_name' => $church->district,
+        ])
+    )
+        ->assertOk()
+        ->assertJsonCount('1', 'data')
+        ->assertJsonFragment(['id' => $massInDistrict->id])
+        // check that the activities that don't happen on that date are not returned.
+        ->assertJsonMissing(['id' => $confessionInDistrict->id])
+        ->assertJsonMissing(['id' => $adorationInDistrict->id])
+        ->assertJsonMissing(['id' => $massInOtherDistrict->id]);
+});

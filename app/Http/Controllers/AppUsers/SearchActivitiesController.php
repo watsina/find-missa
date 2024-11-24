@@ -20,6 +20,7 @@ class SearchActivitiesController extends Controller
             'type' => 'required|string|in:mass,confession,adoration',
             'date' => 'required|date',
             'church_name' => 'nullable|string',
+            'district_name' => 'nullable|string',
         ]);
 
         $date = Carbon::createFromDate($data['date']);
@@ -30,6 +31,13 @@ class SearchActivitiesController extends Controller
                 fn (Builder $query) => $query->whereHas(
                     'church',
                     fn (Builder $query) => $query->where('name', 'like', "%{$data['church_name']}%")
+                )
+            )
+            ->when(
+                isset($data['district_name']),
+                fn (Builder $query) => $query->whereHas(
+                    'church',
+                    fn (Builder $query) => $query->where('district', 'like', "%{$data['district_name']}%")
                 )
             )
             ->where(
