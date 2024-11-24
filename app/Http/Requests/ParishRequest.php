@@ -33,6 +33,7 @@ class ParishRequest extends FormRequest
             'contact_email' => ['nullable', 'email', 'max:255'],
             'office_address' => ['nullable', 'string'],
             'city' => ['required', 'string'],
+            'district' => ['required', 'string'],
         ];
     }
 }

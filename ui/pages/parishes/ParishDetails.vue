@@ -42,9 +42,25 @@
               <div
                 class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
               >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">City</dt>
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Diocese</dt>
+                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
+                  {{ parish?.diocese?.name }}
+                </dd>
+              </div>
+              <div
+                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
+              >
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">City/State</dt>
                 <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
                   {{ parish?.city }}
+                </dd>
+              </div>
+              <div
+                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
+              >
+                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">District/State</dt>
+                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
+                  {{ parish?.district }}
                 </dd>
               </div>
               <div

@@ -20,6 +20,7 @@
     diocese_id: props.diocese?.id,
     office_address: props.parish?.office_address || '',
     city: props.parish?.city || '',
+    district: props.parish?.district || '',
     website_url: props.parish?.website_url || '',
     contact_email: props.parish?.contact_email || '',
   });
@@ -33,6 +34,7 @@
         form.contact_email = props.parish?.contact_email || '';
         form.office_address = props.parish?.office_address || '';
         form.city = props.parish?.city || '';
+        form.district = props.parish?.district || '';
       }
     },
   );
@@ -112,7 +114,18 @@
               v-model="form.city"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.city"
-              label="City"
+              label="City/Town*"
+              placeholder="Kampala"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.district"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.district"
+              label="District/State*"
               placeholder="Kampala"
               required
             />

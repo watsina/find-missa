@@ -25,6 +25,7 @@ class ParishResource extends JsonResource
             'website_url' => $this->website_url,
             'office_address' => $this->office_address,
             'city' => $this->city,
+            'district' => $this->district,
         ];
     }
 }
