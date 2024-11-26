@@ -8,6 +8,7 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
+use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
@@ -43,6 +44,17 @@ test('store saves', function (): void {
         ->where('occurrence', $data['occurrence'])
         ->get();
     expect($activityTimes)->toHaveCount(1);
+});
+
+test('user can save multiple weekly records', function () {
+    // we have cases where multiple days have the same details
+    $data = ActivityTime::factory()->weekly()->raw(['day_of_week' => null]);
+
+    post(route('activity-times.store'), [...$data, 'days_of_week' => ['Monday', 'Tuesday', 'Wednesday']])
+        ->assertCreated()
+        ->assertJsonStructure([]);
+
+    assertEquals(3, ActivityTime::count());
 });
 
 test('show behaves as expected', function (): void {

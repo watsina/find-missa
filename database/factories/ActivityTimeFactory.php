@@ -56,7 +56,7 @@ class ActivityTimeFactory extends Factory
         ]);
     }
 
-    public function weekly($dayOfWeek, $type)
+    public function weekly($dayOfWeek = 'Sunday', $type = 'mass')
     {
         return $this->state(fn (array $attributes) => [
             'type' => $type,

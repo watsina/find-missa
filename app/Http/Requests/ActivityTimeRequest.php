@@ -20,8 +20,19 @@ class ActivityTimeRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, mixed>
      */
-    public function rules(): array
+    public function rules()
+    {
+        if ($this->method() === 'POST') {
+            return $this->createRules();
+        }
+
+        return $this->updateRules();
+    }
+
+    protected function commonRules(): array
     {
         return [
             'type' => ['required', Rule::enum(ActivityType::class)],
@@ -31,8 +42,37 @@ class ActivityTimeRequest extends FormRequest
             'church_id' => ['nullable', 'integer', 'exists:churches,id'],
             'occurrence' => ['required', Rule::enum(ActivityOccurrence::class)],
             'date' => ['required_if:occurrence,one-time', 'exclude_unless:occurrence,one-time', 'nullable', 'date'],
-            'day_of_week' => ['required_if:occurrence,weekly', 'exclude_unless:occurrence,weekly',  new DayOfWeek],
         ];
+    }
+
+    protected function createRules(): array
+    {
+        return array_merge($this->commonRules(), [
+            'day_of_week' => [
+                Rule::requiredIf(function () {
+                    return $this->occurrence === 'weekly' && ! $this->days_of_week;
+                }),
+                'exclude_unless:occurrence,weekly',
+                'nullable',
+                new DayOfWeek,
+            ],
+            'days_of_week' => [
+                Rule::requiredIf(function () {
+                    return $this->occurrence === 'weekly' && ! $this->day_of_week;
+                }),
+                'exclude_unless:occurrence,weekly',
+                'nullable',
+                'array',
+            ],
+            'days_of_week.*' => ['required', 'string',  new DayOfWeek],
+        ]);
+    }
+
+    protected function updateRules(): array
+    {
+        return array_merge($this->commonRules(), [
+            'day_of_week' => ['required_if:occurrence,weekly', 'exclude_unless:occurrence,weekly',  new DayOfWeek],
+        ]);
     }
 
     public function messages()

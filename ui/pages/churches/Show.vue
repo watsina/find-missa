@@ -9,6 +9,7 @@
   import ChurchDetails from './ChurchDetails.vue';
   import ActivityTimeModal from '@/pages/activities/ActivityTimeModal.vue';
   import { notify } from '@/utils';
+  import { isArray } from 'lodash';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
@@ -59,6 +60,12 @@
       return activity;
     });
   }
+  function createdActivities(activities) {
+    if (isArray(activities)) {
+      return church.value.activities.push(...activities);
+    }
+    church.value.activities.push(activities);
+  }
 </script>
 
 <template>
@@ -80,7 +87,7 @@
           v-model:show-modal="showingModal"
           :activity="activityToEdit"
           :church="church"
-          @created="church.activities.push($event)"
+          @created="createdActivities"
           @updated="updateActivity"
         />
         <v-col class="tw-flex tw-justify-between" cols="12">
@@ -110,12 +117,14 @@
             </template>
             <template #item.actions="{ item }">
               <v-icon
+                v-if="item?.id"
                 class="tw-mr-2"
                 color="primary"
                 :icon="mdiPencilOutline"
                 @click="showModal(item)"
               ></v-icon>
               <v-btn
+                v-if="item?.id"
                 color="primary"
                 :icon="mdiEyeOutline"
                 title="View Activity Details"

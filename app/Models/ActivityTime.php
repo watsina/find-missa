@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Timecast;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,15 +13,20 @@ class ActivityTime extends BaseModel
     use HasFactory;
 
     /**
-     * The attributes that should be cast to native types.
+     * Get the attributes that should be cast.
      *
-     * @var array
+     * @return array<string, string>
      */
-    protected $casts = [
-        'id' => 'integer',
-        'church_id' => 'integer',
-        'date' => 'datetime:Y-m-d',
-    ];
+    protected function casts()
+    {
+        return [
+            'id' => 'integer',
+            'church_id' => 'integer',
+            'date' => 'datetime:Y-m-d',
+            'start_time' => Timecast::class,
+            'end_time' => Timecast::class,
+        ];
+    }
 
     /**
      * Scope a query to only include users of a given type.

@@ -30,6 +30,17 @@
     { title: 'One Time', value: 'one-time' },
   ];
 
+  const daysOfWeek = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
   const form = useForm({
     type: props.activity?.type || '',
     start_time: props.activity?.start_time || '',
@@ -38,6 +49,7 @@
     occurrence: props.activity?.occurrence || '',
     date: props.activity?.date || null,
     day_of_week: props.activity?.day_of_week || '',
+    days_of_week: [],
     church_id: props.church?.id || '',
   });
 
@@ -81,6 +93,9 @@
     // some clean up to ensure that the data matches what we expect
     if (form.occurrence === 'weekly') {
       form.date = null;
+      if (!isEditing.value) {
+        form.day_of_week = null;
+      }
     } else if (form.occurrence === 'daily') {
       form.day_of_week = '';
       form.date = null;
@@ -104,7 +119,7 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data?.id && !isEditing.value) emit('created', data);
+    if ((data?.id || data?.length) && !isEditing.value) emit('created', data);
     if (data?.id && isEditing.value) emit('updated', data);
 
     showModal.value = false;
@@ -163,11 +178,26 @@
           </div>
 
           <div v-if="form.occurrence === 'weekly'" class="tw-mt-4">
-            <TextInput
+            <SelectInput
+              v-if="isEditing"
               v-model="form.day_of_week"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.day_of_week"
+              :items="daysOfWeek"
               label="Day of Week"
+              placeholder="Sunday"
+              required
+            />
+            <!-- if we are creating an activity we provide an option for adding them in bulk -->
+            <SelectInput
+              v-else
+              v-model="form.days_of_week"
+              chips
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.days_of_week"
+              :items="daysOfWeek"
+              label="Days of Week"
+              multiple
               placeholder="Sunday"
               required
             />

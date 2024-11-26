@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,16 +17,28 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('viewAny', ActivityTime::class);
 
-        $activityTimes = ActivityTime::paginate(20);
+        $activityTimes = ActivityTime::paginate(2);
 
         return new ActivityTimeCollection($activityTimes);
     }
 
-    public function store(ActivityTimeRequest $request): ActivityTimeResource
+    public function store(ActivityTimeRequest $request)
     {
         Gate::authorize('create', ActivityTime::class);
 
-        $activityTime = ActivityTime::create($request->validated());
+        $data = $request->validated();
+
+        if ($data['occurrence'] === 'weekly' && isset($data['days_of_week'])) {
+            $info = Arr::except($data, ['day_of_week', 'days_of_week']);
+            $activities = [];
+
+            foreach ($data['days_of_week'] as $day) {
+                $activities[] = ActivityTime::create([...$info, 'day_of_week' => $day]);
+            }
+
+            return (new ActivityTimeCollection($activities))->response()->setStatusCode(201);
+        }
+        $activityTime = ActivityTime::create($data);
 
         return new ActivityTimeResource($activityTime);
     }

@@ -19,6 +19,7 @@
       transition="scale-transition"
     >
       <v-time-picker
+        v-if="dialog"
         v-bind="{ ...$attrs }"
         v-model="model"
         :color="color"
@@ -36,16 +37,9 @@
 
 <script setup>
   import { ref } from 'vue';
-  import { v4 as uuid } from 'uuid';
   import { mdiClockTimeFourOutline } from '@mdi/js';
 
   defineProps({
-    id: {
-      type: String,
-      default() {
-        return `text-input-${uuid()}`;
-      },
-    },
     type: { type: String, default: 'text' },
     format: { type: String, default: '24hr' },
     error: { type: [String, Array], default: '' },
