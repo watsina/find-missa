@@ -26,6 +26,7 @@ class SearchActivitiesController extends Controller
         $date = Carbon::createFromDate($data['date']);
 
         $activities = ActivityTime::ofType($data['type'])
+            ->with('church')
             ->when(
                 isset($data['church_name']),
                 fn (Builder $query) => $query->whereHas(
@@ -47,7 +48,8 @@ class SearchActivitiesController extends Controller
                 )
                     ->orWhere('day_of_week', $date->dayName)
                     ->orWhere('occurrence', 'daily')
-            )->get();
+            )
+            ->get();
 
         return new ActivityTimeCollection($activities);
     }

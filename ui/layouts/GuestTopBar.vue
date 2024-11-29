@@ -1,12 +1,9 @@
 <template>
   <v-app-bar app elevate-on-scroll elevation="1" flat>
     <template #prepend>
-      <v-app-bar-nav-icon variant="text"></v-app-bar-nav-icon>
-      <div class="tw-flex tw-items-center shrink-0 tw-mr-4">
+      <div class="tw-flex tw-items-center shrink-0 tw-mx-4">
         <!-- TODO: add link for app home page -->
-        <NavLink>
-          <ApplicationMark class="tw-block tw-w-auto tw-h-9" />
-        </NavLink>
+        <ApplicationMark class="tw-block tw-w-auto tw-h-9" />
       </div>
       <v-app-bar-title>Find Missa</v-app-bar-title>
     </template>
@@ -22,6 +19,5 @@
 </template>
 
 <script setup>
-  import NavLink from '@/components/NavLink';
   import ApplicationMark from '@/components/ApplicationMark';
 </script>

@@ -1,3 +1,4 @@
+import appUsers from './app-users';
 import auth from './auth';
 import dashboard from './dashboard';
 import users from './users';
@@ -12,6 +13,8 @@ import priests from './priests';
 import errors from './errors';
 
 export default [
+  // app user routes (guest)
+  ...appUsers,
   // backoffice routes
   {
     path: '/backoffice',
