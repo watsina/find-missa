@@ -7,7 +7,6 @@
     :density="density"
     :error-messages="error"
     hide-details="auto"
-    :hint="hint"
     :label="label"
     :placeholder="placeholder"
     :type="type"
@@ -27,7 +26,6 @@
     },
     type: { type: String, default: 'text' },
     error: { type: [String, Array], default: '' },
-    hint: { type: String, default: '' },
     label: { type: String, default: '' },
     placeholder: { type: String, default: '' },
     density: { type: String, default: 'default' },

@@ -175,6 +175,8 @@ export default function useForm(...args) {
 
       if (method === 'delete') {
         request = http.delete(url, { ..._options, data });
+      } else if (method === 'get') {
+        request = http.get(url, { params: { ...data }, ..._options });
       } else {
         request = http[method](url, data, _options);
       }
