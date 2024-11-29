@@ -8,6 +8,7 @@
 
   const isFetching = ref(false);
   const results = ref(null);
+  const search = ref('');
   const type = ref('mass');
   const date = ref(useDate().format('keyboardDate'));
 
@@ -37,7 +38,7 @@
           </v-btn-toggle>
         </v-col>
         <v-col cols="12">
-          <TextInput label="Search" rounded variant="solo"></TextInput>
+          <TextInput v-model="search" label="Search" rounded variant="solo"></TextInput>
         </v-col>
         <template v-if="isFetching">
           <v-col v-for="i in 6" :key="i" cols="12" md="4">
@@ -51,15 +52,13 @@
               class="tw-flex tw-justify-around"
               height="300"
             >
-              <v-card-content class="tw-mx-auto tw-p-12 tw-my-auto">
-                No activities found
-              </v-card-content>
+              <v-card-text class="tw-mx-auto tw-p-12 tw-my-auto"> No activities found </v-card-text>
             </v-card>
-            <v-timeline v-else align="start" side="end">
+            <v-timeline v-else class="tw-ml-4" density="comfortable" side="end">
               <v-timeline-item
                 v-for="activity in results"
                 :key="activity?.id"
-                dot-color="teal-lighten-3"
+                dot-color="primary"
                 size="small"
               >
                 <div class="d-flex">

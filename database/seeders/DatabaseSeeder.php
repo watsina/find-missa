@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
 
         if (App::environment('local')) {
             $this->call(LocalSeeder::class);
+            $this->call(ActivitySeeder::class);
         } elseif (App::environment('staging')) {
             $this->call(StagingSeeder::class);
         }

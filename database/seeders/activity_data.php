@@ -5,6 +5,22 @@ return [
         'diocese_details' => ['name' => 'Kampala Archdiocese', 'type' => 'archdiocese'],
         'parishes' => [
             [
+                'details' => ['name' => 'St Augustine Chaplaincy', 'city' => 'Makerere', 'district' => 'Kampala'],
+                'church_details' => [
+                    [
+                        'details' => ['name' => 'St Augustine', 'type' => 'chapel', 'city' => 'Makerere', 'district' => 'Kampala'],
+                    ],
+                ],
+            ],
+            [
+                'details' => ['name' => 'Ntinda', 'city' => 'Ntinda', 'district' => 'Kampala'],
+                'church_details' => [
+                    [
+                        'details' => ['name' => 'Ntinda', 'type' => 'parish', 'city' => 'Ntinda', 'district' => 'Kampala'],
+                    ],
+                ],
+            ],
+            [
                 'details' => ['name' => 'Kigoowa', 'city' => 'Kisaasi', 'district' => 'Kampala'],
                 'church_details' => [
                     [
