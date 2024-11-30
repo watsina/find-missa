@@ -9,8 +9,10 @@
   import { useDate } from 'vuetify/lib/framework.mjs';
 
   const results = ref(null);
+  const dateUsed = ref(null);
   const parser = useDate();
   const currentDate = new Date().toLocaleDateString('en-US');
+  const date = ref(parser.date(currentDate));
 
   const form = useForm({
     church_name: '',
@@ -20,15 +22,17 @@
   });
 
   const showDate = computed(() =>
-    useDayjs().isSame(useDayjs(form.date).format('YYYY-MM-DD'), 'day')
+    useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day')
       ? 'Today'
-      : parser.format(form.date, 'fullDateWithWeekday'),
+      : parser.format(dateUsed.value, 'fullDateWithWeekday'),
   );
 
   function getResults() {
+    form.date = useDayjs(date.value).format('YYYY-MM-DD');
     form.get('/api/v1/search', {
       onSuccess: ({ data }) => {
         results.value = data || [];
+        dateUsed.value = form.date;
       },
       onError: () => notify.error('Something went wrong...'),
     });
@@ -52,7 +56,7 @@
         </v-col>
         <v-col class="tw-flex tw-justify-around tw-gap-2 tw-items-center" cols="12">
           <DateInput
-            v-model="form.date"
+            v-model="date"
             density="compact"
             label="Date"
             :min="currentDate"
@@ -69,42 +73,42 @@
         </template>
         <v-col v-else cols="12">
           <v-sheet>
+            <v-divider opacity="10"></v-divider>
+            <v-card-title>
+              {{ showDate }}
+            </v-card-title>
+            <v-divider opacity="10"></v-divider>
             <v-card
               v-if="!results || !results?.length"
               class="tw-flex tw-justify-around"
-              height="300"
+              height="150"
             >
-              <v-card-text class="tw-mx-auto tw-p-12 tw-my-auto"> No activities found </v-card-text>
-            </v-card>
-            <div v-else>
-              <v-divider opacity="10"></v-divider>
-              <v-card-title>
-                {{ showDate }}
+              <v-card-title class="tw-mx-auto tw-p-12 tw-my-auto">
+                No activities found
               </v-card-title>
-              <v-divider opacity="10"></v-divider>
-              <v-timeline class="tw-ml-4" density="comfortable" side="end">
-                <v-timeline-item
-                  v-for="activity in results"
-                  :key="activity?.id"
-                  dot-color="primary"
-                  size="small"
-                >
-                  <div class="d-flex">
-                    <strong class="me-4">
-                      {{ `${activity?.start_time} - ${activity?.end_time}` }}
+            </v-card>
+            <v-timeline v-else class="tw-ml-4" density="comfortable" side="end">
+              <v-timeline-item
+                v-for="activity in results"
+                :key="activity?.id"
+                dot-color="primary"
+                size="small"
+              >
+                <div class="d-flex">
+                  <strong class="me-4">
+                    {{ `${activity?.start_time} - ${activity?.end_time}` }}
+                  </strong>
+                  <div>
+                    <strong class="tw-capitalize">
+                      {{ `${activity?.occurrence} ${activity?.type} (${activity?.language})` }}
                     </strong>
-                    <div>
-                      <strong class="tw-capitalize">
-                        {{ `${activity?.occurrence} ${activity?.type} (${activity?.language})` }}
-                      </strong>
-                      <div class="text-caption">
-                        {{ `${activity?.church?.name} - ${activity?.church?.city}` }}
-                      </div>
+                    <div class="text-caption">
+                      {{ `${activity?.church?.name} - ${activity?.church?.city}` }}
                     </div>
                   </div>
-                </v-timeline-item>
-              </v-timeline>
-            </div>
+                </div>
+              </v-timeline-item>
+            </v-timeline>
           </v-sheet>
         </v-col>
       </v-row>
