@@ -15,6 +15,7 @@
   const mass = ref([]);
   const confession = ref([]);
   const adoration = ref([]);
+  const panel = ref(0);
 
   const headers = [
     { title: 'Start Time', value: 'start_time' },
@@ -64,14 +65,30 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>
         </v-col>
         <v-col cols="12">
-          <v-expansion-panels>
-            <v-expansion-panel title="Mass">
+          <v-expansion-panels v-model="panel">
+            <v-expansion-panel>
+              <v-expansion-panel-title
+                :class="{
+                  'tw-text-md tw-uppercase tw-font-semibold': true,
+                  'tw-bg-gray-100': panel === 0,
+                }"
+              >
+                Mass
+              </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <data-table class="tw-capitalize" has-search :headers="headers" :items="mass || []">
                 </data-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel title="Confession">
+            <v-expansion-panel>
+              <v-expansion-panel-title
+                :class="{
+                  'tw-text-md tw-uppercase tw-font-semibold': true,
+                  'tw-bg-gray-100': panel === 1,
+                }"
+              >
+                Confession
+              </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <data-table
                   class="tw-capitalize"
@@ -82,7 +99,15 @@
                 </data-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel title="Adoration">
+            <v-expansion-panel>
+              <v-expansion-panel-title
+                :class="{
+                  'tw-text-md tw-uppercase tw-font-semibold': true,
+                  'tw-bg-gray-100': panel === 2,
+                }"
+              >
+                Adoration
+              </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <data-table
                   class="tw-capitalize"
