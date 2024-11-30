@@ -3,7 +3,6 @@
   import { http } from '@/plugins';
   import { mdiPencilOutline, mdiEyeOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
-  import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ChurchDetails from './ChurchDetails.vue';
@@ -16,7 +15,6 @@
   });
 
   const church = ref(null);
-  const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
   const activityToEdit = ref(null);
@@ -98,23 +96,10 @@
           <!-- church activities -->
           <data-table
             class="tw-capitalize"
+            has-search
             :headers="headers"
             :items="church?.activities || []"
-            :search="search"
           >
-            <template #top>
-              <TextInput
-                id="search"
-                v-model="search"
-                autofocus
-                class="tw-block tw-mb-2 tw-mx-2"
-                error=""
-                label="Search"
-                placeholder="Search activities..."
-                required
-                type="text"
-              />
-            </template>
             <template #item.actions="{ item }">
               <v-icon
                 v-if="item?.id"

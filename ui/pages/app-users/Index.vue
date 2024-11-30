@@ -1,5 +1,6 @@
 <script setup>
   import DateInput from '@/components/DateInput.vue';
+  import NavLink from '@/components/NavLink.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
@@ -103,7 +104,14 @@
                       {{ `${activity?.occurrence} ${activity?.type} (${activity?.language})` }}
                     </strong>
                     <div class="text-caption">
-                      {{ `${activity?.church?.name} - ${activity?.church?.city}` }}
+                      <NavLink
+                        :href="{
+                          name: 'church.details',
+                          params: { churchId: activity?.church?.id },
+                        }"
+                      >
+                        {{ `${activity?.church?.name} - ${activity?.church?.city}` }}
+                      </NavLink>
                     </div>
                   </div>
                 </div>

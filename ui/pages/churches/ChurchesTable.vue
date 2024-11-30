@@ -2,7 +2,6 @@
   import { ref } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
-  import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import ChurchModal from './ChurchModal.vue';
 
@@ -14,7 +13,6 @@
 
   const churches = defineModel('churches', { type: Array, default: () => [] });
 
-  const search = ref('');
   const showingModal = ref(false);
   const churchToEdit = ref(null);
 
@@ -58,20 +56,7 @@
       <PrimaryButton v-if="parishType && parish?.id" @click="showModal"> Add Church</PrimaryButton>
     </v-col>
     <v-col cols="12">
-      <data-table :headers="headers" :items="churches || []" :search="search">
-        <template #top>
-          <TextInput
-            id="search"
-            v-model="search"
-            autofocus
-            class="tw-block tw-mb-2 tw-mx-2"
-            error=""
-            label="Search"
-            placeholder="Search churches..."
-            required
-            type="text"
-          />
-        </template>
+      <data-table has-search :headers="headers" :items="churches || []">
         <template #item.parish="{ item }">
           {{ item?.parish?.id ? `${item?.parish?.name} - ${item?.parish?.city}` : '' }}
         </template>

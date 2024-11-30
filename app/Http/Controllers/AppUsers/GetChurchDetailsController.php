@@ -14,7 +14,7 @@ class GetChurchDetailsController extends Controller
      */
     public function __invoke(Request $request, Church $church)
     {
-        $church->loadMissing('activities');
+        $church->loadMissing('activities', 'parishable');
 
         return new ChurchDetailsResource($church);
     }

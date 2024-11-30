@@ -2,14 +2,12 @@
   import { ref, onMounted } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import { http } from '@/plugins';
-  import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DioceseModal from './DioceseModal.vue';
 
   const dioceses = ref([]);
-  const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
   const editDiocese = ref(null);
@@ -73,25 +71,12 @@
         </v-col>
         <v-col cols="12">
           <data-table
+            has-search
             :headers="headers"
             :items="dioceses || []"
             :loading="isFetching"
             no-data-text="No dioceses have been added yet..."
-            :search="search"
           >
-            <template #top>
-              <TextInput
-                id="search"
-                v-model="search"
-                autofocus
-                class="tw-block tw-mb-2 tw-mx-2"
-                error=""
-                label="Search"
-                placeholder="Search dioceses..."
-                required
-                type="text"
-              />
-            </template>
             <template #item.name="{ item }" class="tw-capitalize">
               {{ item.name }}
             </template>

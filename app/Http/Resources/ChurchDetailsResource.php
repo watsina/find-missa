@@ -31,9 +31,9 @@ class ChurchDetailsResource extends JsonResource
                 'latitude' => $this->latitude,
                 'parish' => $this->whenLoaded('parishable'),
             ],
-            'mass' => $this->activities()->whereType('mass')->get(),
-            'confession' => $this->activities()->whereType('confession')->get(),
-            'adoration' => $this->activities()->whereType('adoration')->get(),
+            'mass' => $this->activities->where('type', 'mass')->toArray(),
+            'confession' => $this->activities->where('type', 'confession')->toArray(),
+            'adoration' => $this->activities->where('type', 'adoration')->toArray(),
         ];
     }
 }

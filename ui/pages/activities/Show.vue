@@ -3,7 +3,6 @@
   import { http } from '@/plugins';
   import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
-  import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ActivityDetails from './ActivityDetails.vue';
@@ -16,7 +15,6 @@
   });
 
   const activity = ref(null);
-  const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
   const exceptionToEdit = ref(null);
@@ -87,23 +85,10 @@
         <v-col cols="12">
           <data-table
             class="tw-capitalize"
+            has-search
             :headers="headers"
             :items="activity?.exceptions || []"
-            :search="search"
           >
-            <template #top>
-              <TextInput
-                id="search"
-                v-model="search"
-                autofocus
-                class="tw-block tw-mb-2 tw-mx-2"
-                error=""
-                label="Search"
-                placeholder="Search exceptions..."
-                required
-                type="text"
-              />
-            </template>
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>

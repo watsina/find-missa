@@ -4,12 +4,10 @@
   import { mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
-  import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
   import PriestModal from './PriestModal.vue';
 
   const priests = ref([]);
-  const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
   const priestToEdit = ref(null);
@@ -64,20 +62,7 @@
           <PrimaryButton @click="showModal"> Add Priest</PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <data-table :headers="headers" :items="priests || []" :search="search">
-            <template #top>
-              <TextInput
-                id="search"
-                v-model="search"
-                autofocus
-                class="tw-block tw-mb-2 tw-mx-2"
-                error=""
-                label="Search"
-                placeholder="Search priests..."
-                required
-                type="text"
-              />
-            </template>
+          <data-table has-search :headers="headers" :items="priests || []">
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>

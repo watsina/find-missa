@@ -2,13 +2,11 @@
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import DataTable from '@/components/DataTable.vue';
-  import TextInput from '@/components/TextInput.vue';
   import AppLayout from '@/layouts/AppLayout';
   import { mdiPencilOutline } from '@mdi/js';
   import UserModal from './UserModal.vue';
 
   const users = ref([]);
-  const search = ref('');
   const isFetching = ref(false);
   const showingModal = ref(false);
   const userToEdit = ref(null);
@@ -59,20 +57,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the users.</p>
         </v-col>
         <v-col cols="12">
-          <data-table :headers="headers" :items="users || []" :search="search">
-            <template #top>
-              <TextInput
-                id="search"
-                v-model="search"
-                autofocus
-                class="tw-block tw-mb-2 tw-mx-2"
-                error=""
-                label="Search"
-                placeholder="Search users..."
-                required
-                type="text"
-              />
-            </template>
+          <data-table has-search :headers="headers" :items="users || []">
             <template #item.two_factor_enabled="{ item }">
               <v-chip :color="item.two_factor_enabled ? 'primary' : ''" size="small" variant="flat">
                 {{ item.two_factor_enabled ? 'true' : 'false' }}
