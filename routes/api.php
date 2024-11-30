@@ -7,11 +7,13 @@ use App\Http\Controllers\ImportDataController;
 use App\Http\Controllers\SwitchTeamController;
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\UserActionLogController;
+use App\Http\Controllers\AppUsers\GetChurchDetailsController;
 use App\Http\Controllers\AppUsers\SearchActivitiesController;
 
 require __DIR__.'/auth.php';
 
 Route::get('/search', SearchActivitiesController::class)->name('search');
+Route::get('/church-details/{church}', GetChurchDetailsController::class)->name('church-details');
 
 Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();
