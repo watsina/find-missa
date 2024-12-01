@@ -105,12 +105,15 @@
                     </strong>
                     <div class="text-caption">
                       <NavLink
+                        class="tw-text-indigo-600"
                         :href="{
                           name: 'church.details',
                           params: { churchId: activity?.church?.id },
                         }"
                       >
-                        {{ `${activity?.church?.name} - ${activity?.church?.city}` }}
+                        {{
+                          `${activity?.church?.name} - ${activity?.church?.district} (${activity?.church?.city})`
+                        }}
                       </NavLink>
                     </div>
                   </div>

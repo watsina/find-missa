@@ -8,8 +8,8 @@
 
   const props = defineProps({
     ...RouterLink.props,
-    inactiveClass: String,
-    activeClass: String,
+    inactiveClass: { type: String, default: '' },
+    activeClass: { type: String, default: '' },
   });
 
   const isExternalLink = computed(() => {
@@ -18,16 +18,16 @@
 </script>
 
 <template>
-  <a v-if="isExternalLink" v-bind="$attrs" :href="to" target="_blank" :class="inactiveClass">
+  <a v-if="isExternalLink" v-bind="$attrs" :class="inactiveClass" :href="to" target="_blank">
     <slot />
   </a>
 
-  <router-link v-else v-bind="$props" custom v-slot="{ isActive, href, navigate }">
+  <router-link v-else v-slot="{ isActive, href, navigate }" v-bind="$props" custom>
     <a
       v-bind="$attrs"
+      :class="isActive ? activeClass : inactiveClass"
       :href="href"
       @click="navigate"
-      :class="isActive ? activeClass : inactiveClass"
     >
       <slot />
     </a>

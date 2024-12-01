@@ -76,7 +76,7 @@
       <v-card v-else-if="!church">
         <v-card-title> No church found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-12">
+      <v-row v-else class="tw-py-4">
         <!-- show church details -->
         <v-col cols="12">
           <ChurchDetails v-model:church="church" />
