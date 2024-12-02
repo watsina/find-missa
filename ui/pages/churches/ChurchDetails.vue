@@ -24,8 +24,9 @@
       { icon: mdiCity, text: 'City/Town', value: data?.city },
       { icon: mdiTownHall, text: 'District/State', value: data?.district },
       { icon: mdiMapMarker, text: 'Coordinates', value: data?.coordinates },
+      { icon: mdiMapMarker, text: 'Directions', value: data?.google_maps_link, is_link: true },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
-      { icon: mdiWeb, text: 'Website', value: data?.website_url },
+      { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
       { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
     ];
   });
@@ -42,23 +43,27 @@
       @updated="(church = $event), (churchToEdit = null)"
     />
     <v-card-title class="tw-py-2">
-      <div class="tw-mx-2 tw-flex tw-justify-between">
-        <h5 class="tw-text-font-bold tw-text-lg">
-          {{ `${church?.name} - ${church?.city}` }}
-        </h5>
-        <PrimaryButton
-          v-if="church?.parish?.id && church?.parishable_type"
-          variant="outlined"
-          @click="(churchToEdit = church), (showingModal = true)"
-        >
-          Update Church
-        </PrimaryButton>
-      </div>
+      <v-row>
+        <v-col cols="12" md="8">
+          <h5 class="tw-text-font-bold tw-text-lg">
+            {{ `${church?.name} - ${church?.city}` }}
+          </h5>
+        </v-col>
+        <v-col class="tw-text-right" cols="12" md="4">
+          <PrimaryButton
+            v-if="church?.parish?.id && church?.parishable_type"
+            variant="outlined"
+            @click="(churchToEdit = church), (showingModal = true)"
+          >
+            Update Church
+          </PrimaryButton>
+        </v-col>
+      </v-row>
     </v-card-title>
     <v-card class="tw-mt-2">
       <v-card-text>
         <v-row dense no-gutters>
-          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" md="4">
+          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
             <v-list>
               <v-list-item dense>
                 <template #prepend>
@@ -67,7 +72,16 @@
                 <v-list-item-title>
                   {{ field.text }}
                 </v-list-item-title>
-                <v-list-item-subtitle>
+                <v-list-item-subtitle
+                  v-if="field?.is_link && field?.value"
+                  class="tw-text-indigo-700"
+                  :href="field?.value"
+                  tag="a"
+                  target="_blank"
+                >
+                  {{ field.value || '....' }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle v-else>
                   {{ field.value || '....' }}
                 </v-list-item-subtitle>
               </v-list-item>

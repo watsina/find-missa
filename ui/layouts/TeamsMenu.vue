@@ -5,6 +5,9 @@
   import { http } from '@/plugins';
   import { notify } from '@/utils';
   import { useRouter } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+
+  const { smAndDown } = useDisplay();
 
   const authStore = useAuthStore();
 

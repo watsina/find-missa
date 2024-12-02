@@ -31,6 +31,7 @@ class ChurchFactory extends Factory
             'postal_address' => $this->faker->postcode(),
             'contact_email' => $this->faker->safeEmail(),
             'website_url' => $this->faker->url(),
+            'google_maps_link' => $this->faker->url(),
             'city' => $this->faker->city,
             'district' => Address::state(),
             'contact_phone' => $this->faker->phoneNumber(),

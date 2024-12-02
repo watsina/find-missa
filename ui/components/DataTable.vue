@@ -18,6 +18,7 @@
   <v-data-table
     v-bind="$attrs"
     :headers="headers"
+    :hide-default-header="smAndDown"
     :items="items"
     :mobile="smAndDown"
     mobile-breakpoint="md"

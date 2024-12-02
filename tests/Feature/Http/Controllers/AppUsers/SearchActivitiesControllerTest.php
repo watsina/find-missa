@@ -7,12 +7,30 @@ use App\Models\ActivityTime;
 
 use function Pest\Laravel\get;
 
+test('It organises the data by start time...', function () {
+    //activities that happen at different times
+    $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
+    $massEarlier = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['start_time' => '07:00', 'end_time' => '07:30']);
+    $massInMiddle = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => now()->toDateString(),
+    ]))
+        ->assertOk()
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('data.0.id', $massEarlier->id)
+        ->assertJsonPath('data.1.id', $massInMiddle->id)
+        ->assertJsonPath('data.2.id', $massLater->id);
+});
+
 test('users can search masses by date', function () {
     //activities that happen on the given date
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();
     $confessionToday = ActivityTime::factory()->daily('confession')->create();
     $dailyMass = ActivityTime::factory()->daily('mass')->create();
     $weeklyMass = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
+    $weeklyAnticipationMass = ActivityTime::factory()->weekly(now()->dayName, 'anticipation-mass')->create();
     $oneTimeMass = ActivityTime::factory()->oneTime(now(), 'mass')->create();
     // activities that happen on another date
     $massOnOtherDay = ActivityTime::factory()->weekly(now()->addDay()->dayName, 'mass')->create();
@@ -23,10 +41,11 @@ test('users can search masses by date', function () {
         'date' => now()->toDateString(),
     ]))
         ->assertOk()
-        ->assertJsonCount('3', 'data')
+        ->assertJsonCount(4, 'data')
         // check that all the activities that happen on the given date are returned
         ->assertJsonFragment(['id' => $dailyMass->id])
         ->assertJsonFragment(['id' => $weeklyMass->id])
+        ->assertJsonFragment(['id' => $weeklyAnticipationMass->id])
         ->assertJsonFragment(['id' => $oneTimeMass->id])
         // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $massOnOtherDay->id])

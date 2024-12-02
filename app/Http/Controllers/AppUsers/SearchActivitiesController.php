@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
-use App\Http\Resources\ActivityTimeCollection;
+use App\Http\Resources\ActivityTimeDetailsResource;
 
 class SearchActivitiesController extends Controller
 {
@@ -25,7 +25,13 @@ class SearchActivitiesController extends Controller
 
         $date = Carbon::createFromDate($data['date']);
 
-        $activities = ActivityTime::ofType($data['type'])
+        if ($data['type'] === 'mass') {
+            $types = ['mass', 'anticipation-mass'];
+        } else {
+            $types = [$data['type']];
+        }
+
+        $activities = ActivityTime::ofType($types)
             ->with('church')
             ->when(
                 isset($data['church_name']),
@@ -49,8 +55,9 @@ class SearchActivitiesController extends Controller
                     ->orWhere('day_of_week', $date->dayName)
                     ->orWhere('occurrence', 'daily')
             )
+            ->orderBy('start_time', 'asc')
             ->get();
 
-        return new ActivityTimeCollection($activities);
+        return ActivityTimeDetailsResource::collection($activities);
     }
 }

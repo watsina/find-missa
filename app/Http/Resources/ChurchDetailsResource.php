@@ -26,6 +26,7 @@ class ChurchDetailsResource extends JsonResource
                 'postal_address' => $this->postal_address,
                 'contact_email' => $this->contact_email,
                 'website_url' => $this->website_url,
+                'google_maps_link' => $this->google_maps_link,
                 'contact_phone' => $this->contact_phone,
                 'longitude' => $this->longitude,
                 'latitude' => $this->latitude,

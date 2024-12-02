@@ -31,9 +31,9 @@ class ActivityTime extends BaseModel
     /**
      * Scope a query to only include users of a given type.
      */
-    public function scopeOfType(Builder $query, string $type): void
+    public function scopeOfType(Builder $query, array $types): void
     {
-        $query->where('type', $type);
+        $query->whereIn('type', $types);
     }
 
     public function church(): BelongsTo

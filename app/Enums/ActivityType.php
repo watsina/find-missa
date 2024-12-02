@@ -9,6 +9,7 @@ enum ActivityType: string
     use EnumToArray;
 
     case Mass = 'mass';
+    case AnticipationMass = 'anticipation-mass';
     case Confession = 'confession';
     case Adoration = 'adoration';
 }

@@ -20,6 +20,7 @@
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
+    { title: 'Anticipation Mass', value: 'anticipation-mass' },
     { title: 'Confession', value: 'confession' },
     { title: 'Adoration', value: 'adoration' },
   ];

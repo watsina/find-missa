@@ -63,8 +63,18 @@
             :min="currentDate"
             variant="outlined"
           ></DateInput>
-          <TextInput v-model="form.church_name" label="Church Name" variant="outlined"></TextInput>
-          <TextInput v-model="form.district_name" label="District" variant="outlined"></TextInput>
+          <TextInput
+            v-model="form.church_name"
+            clearable
+            label="Church Name"
+            variant="outlined"
+          ></TextInput>
+          <TextInput
+            v-model="form.district_name"
+            clearable
+            label="District"
+            variant="outlined"
+          ></TextInput>
           <PrimaryButton variant="outlined" @click="getResults"> Search </PrimaryButton>
         </v-col>
         <template v-if="form.processing">

@@ -43,6 +43,7 @@
     longitude: props.church?.longitude || '',
     contact_email: props.church?.contact_email || '',
     website_url: props.church?.website_url || '',
+    google_maps_link: props.church?.google_maps_link || '',
     contact_phone: props.church?.contact_phone || '',
     street_address: props.church?.street_address || '',
     city: props.church?.city || props.parish?.city || '',
@@ -60,6 +61,7 @@
         form.longitude = props.church?.longitude || '';
         form.contact_email = props.church?.contact_email || '';
         form.website_url = props.church?.website_url || '';
+        form.google_maps_link = props.church?.google_maps_link || '';
         form.contact_phone = props.church?.contact_phone || '';
         form.street_address = props.church?.street_address || '';
         form.city = props.church?.city || '';
@@ -177,6 +179,29 @@
 
           <div class="tw-mt-4">
             <TextInput
+              v-model="form.google_maps_link"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.google_maps_link"
+              label="Google Maps Link*"
+              required
+              type="url"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
+              v-model="form.website_url"
+              class="tw-block tw-w-full tw-mt-1"
+              :error="form.errors.website_url"
+              label="Website Url"
+              placeholder="www.church.com"
+              required
+              type="url"
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <TextInput
               v-model="form.latitude"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.latitude"
@@ -206,18 +231,6 @@
               placeholder="church@email.com"
               required
               type="email"
-            />
-          </div>
-
-          <div class="tw-mt-4">
-            <TextInput
-              v-model="form.website_url"
-              class="tw-block tw-w-full tw-mt-1"
-              :error="form.errors.website_url"
-              label="Website Url"
-              placeholder="www.church.com"
-              required
-              type="url"
             />
           </div>
 

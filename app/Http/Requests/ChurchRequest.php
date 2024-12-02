@@ -42,6 +42,7 @@ class ChurchRequest extends FormRequest
             'district' => ['required', 'string'],
             'postal_address' => ['nullable', 'string'],
             'website_url' => ['nullable', 'url', 'max:255'],
+            'google_maps_link' => ['required', 'url', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'contact_phone' => ['nullable', 'string'],
             'priest_id' => ['nullable', 'integer', 'exists:priests,id'],

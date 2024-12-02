@@ -3,7 +3,6 @@
     mdiCity,
     mdiEmailFast,
     mdiHomeCity,
-    mdiMapMarker,
     mdiPhoneClassic,
     mdiTownHall,
     mdiWeb,
@@ -19,9 +18,9 @@
       { icon: mdiHomeCity, text: 'Parish', value: data?.parish?.name },
       { icon: mdiCity, text: 'City/Town', value: data?.city },
       { icon: mdiTownHall, text: 'District/State', value: data?.district },
-      { icon: mdiMapMarker, text: 'Coordinates', value: data?.coordinates },
+      // { icon: mdiMapMarker, text: 'Coordinates', value: data?.coordinates },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
-      { icon: mdiWeb, text: 'Website', value: data?.website_url },
+      { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
       { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
     ];
   });
@@ -34,12 +33,20 @@
         <h5 class="tw-text-font-bold tw-text-lg">
           {{ `${church?.name} - ${church?.city}` }}
         </h5>
+        <a
+          v-if="church?.google_maps_link"
+          class="text-caption tw-text-indigo-600"
+          :href="church?.google_maps_link"
+          target="_blank"
+        >
+          Get Directions >
+        </a>
       </div>
     </v-card-title>
     <v-card class="tw-mt-2">
       <v-card-text>
         <v-row dense no-gutters>
-          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" md="4">
+          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
             <v-list>
               <v-list-item dense>
                 <template #prepend>
@@ -48,7 +55,16 @@
                 <v-list-item-title>
                   {{ field.text }}
                 </v-list-item-title>
-                <v-list-item-subtitle>
+                <v-list-item-subtitle
+                  v-if="field?.is_link && field?.value"
+                  class="tw-text-indigo-700"
+                  :href="field?.value"
+                  tag="a"
+                  target="_blank"
+                >
+                  {{ field.value || '....' }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle v-else>
                   {{ field.value || '....' }}
                 </v-list-item-subtitle>
               </v-list-item>
