@@ -1,86 +1,87 @@
 <script setup>
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DioceseModal from './DioceseModal.vue';
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
+  import {
+    mdiCity,
+    mdiEmailFast,
+    mdiHomeCity,
+    mdiPhoneClassic,
+    mdiPostageStamp,
+    mdiWeb,
+  } from '@mdi/js';
 
   const showingModal = ref(false);
   const diocese = defineModel('diocese', { type: Object, required: true });
   const dioceseToEdit = ref(null);
+
+  const fields = computed(() => {
+    const data = diocese.value;
+
+    return [
+      { icon: mdiHomeCity, text: 'Type', value: data?.type },
+      { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
+      { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
+      { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
+      { icon: mdiCity, text: 'Office Address', value: data?.office_address },
+      { icon: mdiPostageStamp, text: 'Postal Address', value: data?.postal_address },
+    ];
+  });
 </script>
 
 <template>
-  <v-row>
+  <div>
     <DioceseModal
       v-model:show-modal="showingModal"
       :diocese="dioceseToEdit"
       @updated="(diocese = { ...diocese, ...$event }), (dioceseToEdit = null)"
     />
-    <v-col cols="12">
-      <v-sheet>
-        <v-container>
-          <div class="tw-px-4 sm:tw-px-0 tw-flex tw-justify-between">
-            <h3 class="text-base/7 tw-font-semibold tw-text-gray-900">Diocese Information</h3>
-            <PrimaryButton
-              variant="outlined"
-              @click="(dioceseToEdit = diocese), (showingModal = true)"
-            >
-              Update Diocese
-            </PrimaryButton>
-          </div>
-          <div class="tw-mt-6">
-            <dl class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2">
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Diocese Name</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
-                  {{ diocese?.name }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Diocese Type</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2 tw-capitalize">
-                  {{ diocese?.type }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Contact Email</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ diocese?.contact_email }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Website URL</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ diocese?.website_url }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Office Address</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ diocese?.office_address }}
-                </dd>
-              </div>
-              <div
-                class="tw-border-t tw-border-gray-100 tw-px-4 tw-py-6 sm:tw-col-span-1 sm:tw-px-0"
-              >
-                <dt class="text-sm/6 tw-font-medium tw-text-gray-900">Postal Address</dt>
-                <dd class="tw-mt-1 text-sm/6 tw-text-gray-700 sm:tw-mt-2">
-                  {{ diocese?.postal_address }}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </v-container>
-      </v-sheet>
-    </v-col>
-  </v-row>
+    <v-card-title class="tw-py-2">
+      <v-row>
+        <v-col cols="12" md="8">
+          <h5 class="tw-text-font-bold tw-text-lg">
+            {{ `${diocese?.name}` }}
+          </h5>
+        </v-col>
+        <v-col class="tw-text-right" cols="12" md="4">
+          <PrimaryButton
+            variant="outlined"
+            @click="(dioceseToEdit = diocese), (showingModal = true)"
+          >
+            Update Diocese
+          </PrimaryButton>
+        </v-col>
+      </v-row>
+    </v-card-title>
+    <v-card class="tw-mt-2">
+      <v-card-text>
+        <v-row dense no-gutters>
+          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
+            <v-list>
+              <v-list-item dense>
+                <template #prepend>
+                  <v-icon :color="field.color || ''">{{ field.icon }}</v-icon>
+                </template>
+                <v-list-item-title>
+                  {{ field.text }}
+                </v-list-item-title>
+                <v-list-item-subtitle
+                  v-if="field?.is_link && field?.value"
+                  class="tw-text-indigo-700"
+                  :href="field?.value"
+                  tag="a"
+                  target="_blank"
+                >
+                  {{ field.value || '....' }}
+                </v-list-item-subtitle>
+                <v-list-item-subtitle v-else>
+                  {{ field.value || '....' }}
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>

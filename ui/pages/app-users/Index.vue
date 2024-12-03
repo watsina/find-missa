@@ -107,7 +107,7 @@
               >
                 <div class="d-flex">
                   <strong class="me-4">
-                    {{ `${activity?.start_time} - ${activity?.end_time}` }}
+                    {{ `${activity?.start_time}` }}
                   </strong>
                   <div>
                     <strong class="tw-capitalize">

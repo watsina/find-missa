@@ -19,7 +19,6 @@
 
   const headers = [
     { title: 'Start Time', value: 'start_time' },
-    { title: 'End Time', value: 'end_time' },
     { title: 'Language', value: 'language' },
     { title: 'Occurrence', value: 'occurrence' },
     { title: 'Day of Week', value: 'day_of_week' },
