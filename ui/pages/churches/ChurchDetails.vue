@@ -11,9 +11,10 @@
     mdiTownHall,
     mdiWeb,
   } from '@mdi/js';
+  import EntityDetails from '@/components/EntityDetails.vue';
 
-  const showingModal = ref(false);
   const church = defineModel('church', { type: Object, required: true });
+  const showingModal = ref(false);
   const churchToEdit = ref(null);
 
   const fields = computed(() => {
@@ -42,53 +43,16 @@
       :parish-type="church?.parishable_type"
       @updated="(church = $event), (churchToEdit = null)"
     />
-    <v-card-title class="tw-py-2">
-      <v-row>
-        <v-col cols="12" md="8">
-          <h5 class="tw-text-font-bold tw-text-lg">
-            {{ `${church?.name} - ${church?.city}` }}
-          </h5>
-        </v-col>
-        <v-col class="tw-text-right" cols="12" md="4">
-          <PrimaryButton
-            v-if="church?.parish?.id && church?.parishable_type"
-            variant="outlined"
-            @click="(churchToEdit = church), (showingModal = true)"
-          >
-            Update Church
-          </PrimaryButton>
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <v-card class="tw-mt-2">
-      <v-card-text>
-        <v-row dense no-gutters>
-          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
-            <v-list>
-              <v-list-item dense>
-                <template #prepend>
-                  <v-icon :color="field.color || ''">{{ field.icon }}</v-icon>
-                </template>
-                <v-list-item-title>
-                  {{ field.text }}
-                </v-list-item-title>
-                <v-list-item-subtitle
-                  v-if="field?.is_link && field?.value"
-                  class="tw-text-indigo-700"
-                  :href="field?.value"
-                  tag="a"
-                  target="_blank"
-                >
-                  {{ field.value || '....' }}
-                </v-list-item-subtitle>
-                <v-list-item-subtitle v-else>
-                  {{ field.value || '....' }}
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+    <EntityDetails :fields="fields" :title="`${church?.name} - ${church?.city}`">
+      <template #action>
+        <PrimaryButton
+          v-if="church?.parish?.id && church?.parishable_type"
+          variant="outlined"
+          @click="(churchToEdit = church), (showingModal = true)"
+        >
+          Update Church
+        </PrimaryButton>
+      </template>
+    </EntityDetails>
   </div>
 </template>

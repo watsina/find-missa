@@ -6,6 +6,9 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const props = defineProps({
     parish: { type: Object, default: null },
@@ -62,6 +65,9 @@
           : 'Parish was added successfully.';
         notify.success(message);
         closeModal(data);
+        if (!isEditing?.value) {
+          router.push({ name: 'parishes.show', params: { parishId: data?.id } });
+        }
       },
       onError: () => notify.error('There was an error saving the information.'),
     });

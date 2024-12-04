@@ -1,10 +1,18 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
   import DataTable from '@/components/DataTable.vue';
   import AppUserLayout from '@/layouts/AppUserLayout';
-  import ChurchInfo from './ChurchInfo.vue';
   import { notify } from '@/utils';
+  import EntityDetails from '@/components/EntityDetails.vue';
+  import {
+    mdiCity,
+    mdiEmailFast,
+    mdiHomeCity,
+    mdiPhoneClassic,
+    mdiTownHall,
+    mdiWeb,
+  } from '@mdi/js';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
@@ -24,6 +32,20 @@
     { title: 'Day of Week', value: 'day_of_week' },
     { title: 'Date', value: 'date' },
   ];
+
+  const fields = computed(() => {
+    const data = church.value;
+
+    return [
+      { icon: mdiHomeCity, text: 'Parish', value: data?.parish?.name },
+      { icon: mdiCity, text: 'City/Town', value: data?.city },
+      { icon: mdiTownHall, text: 'District/State', value: data?.district },
+      // { icon: mdiMapMarker, text: 'Coordinates', value: data?.coordinates },
+      { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
+      { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
+      { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
+    ];
+  });
 
   onMounted(() => {
     fetchChurchDetails();
@@ -58,7 +80,18 @@
       <v-row v-else class="tw-py-4">
         <!-- show church details -->
         <v-col cols="12">
-          <ChurchInfo v-model:church="church" />
+          <EntityDetails :fields="fields" :title="`${church?.name} - ${church?.city}`">
+            <template #subtitle>
+              <a
+                v-if="church?.google_maps_link"
+                class="text-caption tw-text-indigo-600"
+                :href="church?.google_maps_link"
+                target="_blank"
+              >
+                Get Directions >
+              </a>
+            </template>
+          </EntityDetails>
         </v-col>
         <v-col class="tw-flex tw-justify-between" cols="12">
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>

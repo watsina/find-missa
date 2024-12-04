@@ -7,6 +7,7 @@
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import SelectInput from '@/components/SelectInput.vue';
   import TextInput from '@/components/TextInput.vue';
+  import { useRouter } from 'vue-router';
 
   const props = defineProps({
     church: { type: Object, default: null },
@@ -19,6 +20,7 @@
     },
   });
 
+  const router = useRouter();
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
 
@@ -96,6 +98,9 @@
           : 'Church was added successfully.';
         notify.success(message);
         closeModal(data);
+        if (!isEditing?.value) {
+          router.push({ name: 'churches.show', params: { churchId: data?.id } });
+        }
       },
       onError: () => notify.error('There was an error saving the information.'),
     });

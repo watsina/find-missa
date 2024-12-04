@@ -6,6 +6,9 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import { useRouter } from 'vue-router';
+  import SelectInput from '@/components/SelectInput.vue';
+  const router = useRouter();
 
   const props = defineProps({
     diocese: { type: Object, default: null },
@@ -23,6 +26,11 @@
     website_url: props.diocese?.website_url || '',
     contact_email: props.diocese?.contact_email || '',
   });
+
+  const dioceseTypes = [
+    { title: 'Diocese', value: 'diocese' },
+    { title: 'ArchDiocese', value: 'archdiocese' },
+  ];
 
   watch(
     () => props.diocese,
@@ -61,6 +69,9 @@
           : 'Diocese was added successfully.';
         notify.success(message);
         closeModal(data);
+        if (!isEditing?.value) {
+          router.push({ name: 'dioceses.show', params: { dioceseId: data?.id } });
+        }
       },
       onError: () => notify.error('There was an error saving the information.'),
     });
@@ -85,7 +96,6 @@
           <div class="tw-mt-4">
             <TextInput
               v-model="form.name"
-              autofocus
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.name"
               label="Diocese Name*"
@@ -96,15 +106,14 @@
           </div>
 
           <div class="tw-mt-4">
-            <TextInput
+            <SelectInput
               v-model="form.type"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.type"
-              hint="diocese/archdiocese"
+              :items="dioceseTypes"
               label="Type*"
               placeholder="diocese"
               required
-              type="text"
             />
           </div>
 

@@ -3,8 +3,8 @@
   import SubParishModal from './SubParishModal.vue';
   import { ref } from 'vue';
 
-  const showingModal = ref(false);
   const subParish = defineModel('subParish', { type: Object, required: true });
+  const showingModal = ref(false);
   const subParishToEdit = ref(null);
 </script>
 
