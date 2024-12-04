@@ -17,7 +17,7 @@ class PriestController extends Controller
     {
         Gate::authorize('viewAny', Priest::class);
 
-        $priests = Priest::all();
+        $priests = Priest::with('parish:id,name,city')->paginate(20);
 
         return new PriestCollection($priests);
     }
@@ -27,6 +27,7 @@ class PriestController extends Controller
         Gate::authorize('create', Priest::class);
 
         $priest = Priest::create($request->validated());
+        $priest->loadMissing('parish:id,name,city');
 
         return new PriestResource($priest);
     }
@@ -34,6 +35,7 @@ class PriestController extends Controller
     public function show(Request $request, Priest $priest): PriestResource
     {
         Gate::authorize('view', $priest);
+        $priest->loadMissing('parish:id,name,city');
 
         return new PriestResource($priest);
     }

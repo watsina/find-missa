@@ -28,6 +28,7 @@
       <TextInput
         v-model="search"
         class="tw-block tw-mb-2 tw-mx-2"
+        clearable
         label="Search"
         placeholder="Search..."
         type="text"

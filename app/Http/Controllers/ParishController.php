@@ -36,7 +36,7 @@ class ParishController extends Controller
     {
         Gate::authorize('view', $parish);
 
-        $parish->loadMissing('diocese', 'subParishes', 'churches');
+        $parish->loadMissing('diocese', 'subParishes', 'churches', 'priests');
 
         return new ParishResource($parish);
     }

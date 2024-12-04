@@ -35,4 +35,9 @@ class Parish extends BaseModel
     {
         return $this->morphMany(Church::class, 'parishable');
     }
+
+    public function priests(): HasMany
+    {
+        return $this->hasMany(Priest::class);
+    }
 }

@@ -1,34 +1,25 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue';
-  import { http, useForm } from '@/plugins';
+  import { computed, watch } from 'vue';
+  import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
-  import SelectInput from '@/components/SelectInput.vue';
   import TextInput from '@/components/TextInput.vue';
 
   const props = defineProps({
     priest: { type: Object, default: null },
+    parish: { type: Object, required: true },
   });
 
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
 
-  const parishes = ref([]);
-
-  onMounted(() => {
-    // fetch parishes
-    http.get('/api/v1/parishes').then(({ data }) => {
-      parishes.value = data?.data;
-    });
-  });
-
   const form = useForm({
     name: props.priest?.name || '',
     email: props.priest?.email || '',
     phone: props.priest?.phone || '',
-    parish_id: props.priest?.parish_id || '',
+    parish_id: props.parish?.id || '',
   });
 
   watch(
@@ -56,6 +47,7 @@
     const url = isEditing.value ? `/api/v1/priests/${props.priest?.id}` : `/api/v1/priests`;
 
     const method = isEditing.value ? 'put' : 'post';
+    form.parish_id = props.parish?.id;
 
     return form[method](url, {
       onSuccess: ({ data }) => {
@@ -71,8 +63,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (data && !isEditing.value) emit('created', data);
-    if (data && isEditing.value) emit('updated', data);
+    if (data?.id && !isEditing.value) emit('created', data);
+    if (data?.id && isEditing.value) emit('updated', data);
 
     showModal.value = false;
   };
@@ -99,16 +91,14 @@
           </div>
 
           <div class="tw-mt-4">
-            <SelectInput
-              v-model="form.parish_id"
+            <TextInput
               class="tw-block tw-w-full tw-mt-1 tw-capitalize"
-              :error="form.errors.parish_id"
-              :item-title="(item) => (item?.id ? `${item?.name} - ${item?.city || ''}` : '')"
-              item-value="id"
-              :items="parishes"
-              label="Parish*"
-              required
+              :error="form.errors.parishable_id"
+              label="Parish"
+              :model-value="`${parish?.name} - ${parish?.city || ''}`"
+              readonly
               type="text"
+              variant="solo"
             />
           </div>
 

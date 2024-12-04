@@ -34,7 +34,7 @@
 
   const input = ref(null);
   const model = defineModel({
-    type: [String, Number],
+    type: [String, Number, null],
     required: true,
   });
 

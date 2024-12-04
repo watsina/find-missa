@@ -18,6 +18,7 @@
   import ParishModal from './ParishModal.vue';
   import { notify } from '@/utils';
   import EntityDetails from '@/components/EntityDetails.vue';
+  import PriestsTable from '../priests/PriestsTable.vue';
 
   const props = defineProps({
     parishId: { type: [String, Number], required: true },
@@ -103,6 +104,13 @@
             :is-fetching="isFetching"
             :parish="parish"
             :sub-parishes="parish?.sub_parishes || []"
+          />
+        </v-col>
+        <v-col cols="12">
+          <PriestsTable
+            :is-fetching="isFetching"
+            :parish="parish"
+            :priests="parish?.priests || []"
           />
         </v-col>
       </v-row>
