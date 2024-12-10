@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClearDataController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportDataController;
 use App\Http\Controllers\SwitchTeamController;
@@ -21,6 +22,7 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
 
 //admin routes
 Route::middleware('auth', 'admin')->group(function () {
+    Route::delete('clear-data', ClearDataController::class)->name('clear-data');
     Route::post('import-data', ImportDataController::class)->middleware('userWithTeam')->name('import-data');
     Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', App\Http\Controllers\UserController::class)->except('destroy');
