@@ -5,12 +5,19 @@
   import DialogModal from '@/components/DialogModal.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import FileInput from '@/components/FileInput.vue';
+  import SelectInput from '@/components/SelectInput.vue';
 
   const showModal = defineModel('showModal', { type: Boolean });
 
   const form = useForm({
     file: null,
+    type: 'masses',
   });
+
+  const importTypes = [
+    { title: 'Masses', value: 'masses' },
+    { title: 'Parishes', value: 'parishes' },
+  ];
 
   const submit = () => {
     return form.post('/api/v1/import-data', {
@@ -43,6 +50,16 @@
 
       <template #content>
         <form>
+          <div class="tw-mt-4">
+            <SelectInput
+              v-model="form.type"
+              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              :error="form.errors.type"
+              :items="importTypes"
+              label="Import Type*"
+              required
+            />
+          </div>
           <div class="tw-mt-4">
             <FileInput
               id="file_upload"
