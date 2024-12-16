@@ -5,8 +5,9 @@ namespace App\Exports;
 use App\Models\Diocese;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class DiocesesExport implements FromCollection, WithHeadings
+class DiocesesExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
     public function headings(): array
     {
