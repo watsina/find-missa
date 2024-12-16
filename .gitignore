@@ -22,3 +22,5 @@ yarn-error.log
 /draft.yaml
 /.blueprint
 *.testing
+/storage/exports
+*.zip

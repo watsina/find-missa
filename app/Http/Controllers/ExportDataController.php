@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use ZipArchive;
 use App\Models\Diocese;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -18,18 +19,26 @@ class ExportDataController extends Controller
     {
         $data = $request->validate([
             'type' => 'required|string|in:dioceses,parishes',
-            'diocese_id' => 'required_if:type,parishes|nullable|exists:dioceses,id',
         ]);
 
         if ($data['type'] === 'dioceses') {
-            return Excel::download(new DiocesesExport, 'dioceses.xlsx');
+            return Excel::download(new DiocesesExport, 'Dioceses.xlsx');
         }
 
-        $diocese = Diocese::findOrFail($data['diocese_id']);
+        $folderName = $request->user()->currentTeam->name;
+        // $zipName = 'parishes-export.zip';
+        $zipName = storage_path("exports/{$folderName}/parishes-export.zip");
+        $zip = new ZipArchive;
+        $zip->open($zipName, ZipArchive::CREATE);
 
-        return Excel::download(
-            new ParishesExport($diocese),
-            strtolower(Str::kebab($diocese->name)."-{$diocese->type}-parishes.xlsx"),
-        );
+        foreach (Diocese::all() as $diocese) {
+            $fileName = ucwords(Str::kebab($diocese->name)." {$diocese->type} parishes.xlsx");
+            if (Excel::store(new ParishesExport($diocese), "{$folderName}/".$fileName, 'exports')) {
+                $zip->addFile(storage_path("exports/{$folderName}/".$fileName), $fileName);
+            }
+        }
+        $zip->close();
+
+        return response()->download($zipName);
     }
 }
