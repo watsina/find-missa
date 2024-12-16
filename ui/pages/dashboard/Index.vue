@@ -3,6 +3,7 @@
   import NavLink from '@/components/NavLink.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import ImportDataModal from './ImportDataModal.vue';
+  import ExportDataModal from './ExportDataModal.vue';
   import ActionLogs from './ActionLogs.vue';
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
@@ -16,6 +17,7 @@
   const isFetching = ref(false);
   const isDeleting = ref(false);
   const showUploadModal = ref(false);
+  const showExportModal = ref(false);
 
   const stats = ref([]);
 
@@ -80,6 +82,8 @@
       v-model:show-modal="showUploadModal"
     ></import-data-modal>
 
+    <export-data-modal v-if="user.is_admin" v-model:show-modal="showExportModal" />
+
     <v-container>
       <v-row class="py-12">
         <v-col class="tw-flex tw-justify-between" cols="12">
@@ -87,6 +91,9 @@
           <div>
             <PrimaryButton v-if="user.is_admin" class="tw-mr-2" @click="showUploadModal = true">
               Upload data
+            </PrimaryButton>
+            <PrimaryButton v-if="user.is_admin" class="tw-mr-2" @click="showExportModal = true">
+              Export data
             </PrimaryButton>
             <PrimaryButton v-if="user.is_admin" @click="clearData"> Clear data </PrimaryButton>
           </div>

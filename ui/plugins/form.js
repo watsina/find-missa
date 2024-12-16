@@ -128,7 +128,7 @@ export default function useForm(...args) {
             return options.onProgress(event);
           }
         },
-        onSuccess: async (page) => {
+        onSuccess: async (data, response) => {
           this.processing = false;
           this.progress = null;
           this.clearErrors();
@@ -136,18 +136,18 @@ export default function useForm(...args) {
           this.recentlySuccessful = true;
           recentlySuccessfulTimeoutId = setTimeout(() => (this.recentlySuccessful = false), 2000);
 
-          const onSuccess = options.onSuccess ? await options.onSuccess(page) : null;
+          const onSuccess = options.onSuccess ? await options.onSuccess(data, response) : null;
           defaults = cloneDeep(this.data());
           this.isDirty = false;
           return onSuccess;
         },
-        onError: (errors) => {
+        onError: (errors, error) => {
           this.processing = false;
           this.progress = null;
           this.clearErrors().setError(errors);
 
           if (options.onError) {
-            return options.onError(errors);
+            return options.onError(errors, error);
           }
         },
         onCancel: () => {

@@ -8,14 +8,7 @@
   import DioceseModal from './DioceseModal.vue';
   import { notify } from '@/utils';
   import EntityDetails from '@/components/EntityDetails.vue';
-  import {
-    mdiCity,
-    mdiEmailFast,
-    mdiHomeCity,
-    mdiPhoneClassic,
-    mdiPostageStamp,
-    mdiWeb,
-  } from '@mdi/js';
+  import { mdiCity, mdiEmailFast, mdiHomeCity, mdiPostageStamp, mdiWeb } from '@mdi/js';
 
   const showingModal = ref(false);
 
@@ -38,7 +31,7 @@
       { icon: mdiHomeCity, text: 'Type', value: data?.type },
       { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
-      { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
+      // { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
       { icon: mdiCity, text: 'Office Address', value: data?.office_address },
       { icon: mdiPostageStamp, text: 'Postal Address', value: data?.postal_address },
     ];

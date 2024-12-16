@@ -7,7 +7,6 @@
     mdiEmailNewsletter,
     mdiHomeCity,
     mdiOfficeBuildingMarker,
-    mdiPhoneClassic,
     mdiTownHall,
     mdiWeb,
   } from '@mdi/js';
@@ -42,7 +41,7 @@
       { icon: mdiTownHall, text: 'District/State', value: data?.district },
       { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
-      { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
+      // { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
       { icon: mdiOfficeBuildingMarker, text: 'Office Address', value: data?.office_address },
       { icon: mdiEmailNewsletter, text: 'Postal Address', value: data?.postal_address },
     ];
