@@ -35,28 +35,8 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "21"
-
-      - name: Setup PHP with xdebug extension and composer v2
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          coverage: xdebug
-          tools: composer:v2
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
-        run: echo dir=$(composer config cache-files-dir) >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          key: composer-cache-${{ hashFiles('**/composer.lock') }}
-          path: ${{ steps.composer-cache-dir.outputs.dir }}
-          restore-keys: composer-cache-
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Install Dependencies
         run: |
