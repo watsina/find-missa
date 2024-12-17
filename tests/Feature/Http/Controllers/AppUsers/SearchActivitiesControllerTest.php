@@ -24,6 +24,23 @@ test('It organises the data by start time...', function () {
         ->assertJsonPath('data.2.id', $massLater->id);
 });
 
+test('User can search activities by start time...', function () {
+    //activities that happen at different times
+    $massEarlier = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['start_time' => '07:00', 'end_time' => '07:30']);
+    $massInMiddle = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
+    $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
+
+    get(route('search', [
+        'type' => 'mass',
+        'start_time' => '13:00',
+        'date' => now()->toDateString(),
+    ]))
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.id', $massInMiddle->id)
+        ->assertJsonPath('data.1.id', $massLater->id);
+});
+
 test('users can search masses by date', function () {
     //activities that happen on the given date
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();

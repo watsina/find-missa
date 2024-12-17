@@ -19,6 +19,7 @@ class SearchActivitiesController extends Controller
         $data = $request->validate([
             'type' => 'required|string|in:mass,confession,adoration',
             'date' => 'required|date',
+            'start_time' => 'nullable|date_format:H:i',
             'church_name' => 'nullable|string',
             'district_name' => 'nullable|string',
         ]);
@@ -46,6 +47,10 @@ class SearchActivitiesController extends Controller
                     'church',
                     fn (Builder $query) => $query->where('district', 'like', "%{$data['district_name']}%")
                 )
+            )
+            ->when(
+                isset($data['start_time']),
+                fn (Builder $query) => $query->where('start_time', '>=', $data['start_time'])
             )
             ->where(
                 fn (Builder $query) => $query->where(

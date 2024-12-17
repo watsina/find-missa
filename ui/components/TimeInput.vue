@@ -1,15 +1,13 @@
 <template>
   <v-text-field
+    v-bind="$attrs"
     v-model="model"
     :active="dialog"
     :density="density"
     :error-messages="error"
     :focus="dialog"
     hide-details="auto"
-    :hint="hint"
-    :label="label"
-    :placeholder="placeholder"
-    :prepend-icon="mdiClockTimeFourOutline"
+    :prepend-inner-icon="mdiClockTimeFourOutline"
     readonly
   >
     <v-menu
@@ -43,9 +41,6 @@
     type: { type: String, default: 'text' },
     format: { type: String, default: '24hr' },
     error: { type: [String, Array], default: '' },
-    hint: { type: String, default: '' },
-    label: { type: String, default: '' },
-    placeholder: { type: String, default: '' },
     density: { type: String, default: 'compact' },
     color: { type: String, default: 'primary' },
   });

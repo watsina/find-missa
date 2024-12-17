@@ -32,7 +32,7 @@ class ExportDataController extends Controller
         $zip->open($zipName, ZipArchive::CREATE);
 
         foreach (Diocese::all() as $diocese) {
-            $fileName = ucwords(Str::kebab($diocese->name)." {$diocese->type} parishes.xlsx");
+            $fileName = ucwords(Str::kebab($diocese->name)." {$diocese->type} parishes and sub parishes.xlsx");
             if (Excel::store(new ParishesExport($diocese), "{$folderName}/".$fileName, 'exports')) {
                 $zip->addFile(storage_path("exports/{$folderName}/".$fileName), $fileName);
             }

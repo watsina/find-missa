@@ -4,6 +4,7 @@
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
+  import TimeInput from '@/components/TimeInput.vue';
   import { useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import { ref, onMounted, computed } from 'vue';
@@ -16,6 +17,7 @@
   const date = ref(parser.date(currentDate));
 
   const form = useForm({
+    start_time: parser.format(new Date(), 'fullTime24h')?.substring(0, 5),
     church_name: '',
     district_name: '',
     type: 'mass',
@@ -63,6 +65,13 @@
             :min="currentDate"
             variant="outlined"
           ></DateInput>
+          <TimeInput
+            v-model="form.start_time"
+            :error="form.errors.start_time"
+            label="Start Time (24h)"
+            required
+            variant="outlined"
+          />
           <TextInput
             v-model="form.church_name"
             clearable
@@ -95,7 +104,7 @@
               height="150"
             >
               <v-card-title class="tw-mx-auto tw-p-12 tw-my-auto">
-                No activities found
+                No {{ form.type || 'activities' }} found
               </v-card-title>
             </v-card>
             <v-timeline v-else class="tw-ml-4" density="comfortable" side="end">
