@@ -19,7 +19,7 @@ class TeamFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->word,
-            'country' => $this->faker->country,
+            'country' => $this->faker->unique()->country,
             'user_id' => User::factory(),
         ];
     }

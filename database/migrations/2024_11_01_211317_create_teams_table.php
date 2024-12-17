@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('country')->index();
             $table->foreignId('user_id')->index();
             $table->timestamps();
-
-            $table->unique('name', 'country');
         });
     }
 
