@@ -1,0 +1,64 @@
+name: Build and Test
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    services:
+      mysql:
+        image: mysql:8.3
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "21"
+
+      - name: Setup PHP with xdebug extension and composer v2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: echo dir=$(composer config cache-files-dir) >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          key: composer-cache-${{ hashFiles('**/composer.lock') }}
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          restore-keys: composer-cache-
+
+      - name: Install Dependencies
+        run: |
+          composer install --prefer-dist --no-interaction
+          npm ci
+          npm run build
+
+      - name: Setup Environment
+        run: |
+          export APP_ENV=testing
+          cp .env.ci .env
+
+      - name: Test
+        run: |
+          php artisan test --parallel --coverage --stop-on-failure
