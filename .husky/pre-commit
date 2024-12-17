@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# first run tests
+php artisan test --parallel
+
 # fix the lint issues
 composer lint:fix
 npm run lint:fix
-
-# first run tests
-php artisan test --parallel
 
 # ensure it builds
 npm run build

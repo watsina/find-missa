@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - Build and Test
+    types:
+      - completed
+    branches:
+      - "main"
+  release:
+    types:
+      - published
+
+jobs:
+  deploy:
+    name: Deploy App
+    runs-on: ubuntu-22.04
+    environment: ${{ github.event_name == 'workflow_run' && 'staging' || 'production' }}
+    defaults:
+      run:
+        shell: bash
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Server
+        env:
+          HOST_IP: ${{ secrets.HOST_IP }}
+          HOST_USERNAME: ${{ secrets.HOST_USERNAME }}
+          DIR: ${{ secrets.DIR }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: $HOST_IP
+          port: 22
+          username: $HOST_USERNAME
+          key: $PRIVATE_KEY
+          script: |
+            cd $DIR
+            git reset --hard
+            git pull origin main
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+            php artisan migrate --force
+            php artisan optimize
+            php artisan pulse:restart
+            sudo service php8.3-fpm reload
+            source /usr/local/nvm/nvm.sh
+            node -v
+            npm -v
+            npm ci
+            npm run build
