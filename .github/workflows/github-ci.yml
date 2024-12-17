@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build_and_test:
-    uses: watsina/find-mass/.github/workflows/build_and_test.yml@main
+    uses: watsina/find-mass/.github/workflows/build-and-test.yml@main
 
   dependabot:
     name: Auto approve and merge Dependabot Pull Requests
