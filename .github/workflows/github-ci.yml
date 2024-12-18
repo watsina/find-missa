@@ -1,4 +1,4 @@
-name: Web Build & Test (Deploy staging if mainline)
+name: Web Build and Test
 
 on:
   push:
