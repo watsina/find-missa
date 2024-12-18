@@ -1,4 +1,4 @@
-name: Web Build and Test
+name: Web Build & Test (Deploy staging if mainline)
 
 on:
   push:
@@ -48,3 +48,34 @@ jobs:
         id: auto-merge-dependabot-prs-for-semver-patch-updates
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
         run: gh pr merge --auto --merge "$PR_URL"
+
+  deploy_staging:
+    name: Deploy to testing site
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    needs: build_and_test
+    if: success() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.HOST_IP}}
+          port: 22
+          username: ${{secrets.HOST_USERNAME}}
+          key: ${{secrets.PRIVATE_KEY}}
+          script: |
+            cd ${{secrets.TESTING_DIR}}
+            git reset --hard
+            git pull origin main
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+            php artisan migrate --force
+            php artisan optimize
+            php artisan pulse:restart
+            sudo service php8.3-fpm reload
+            source /usr/local/nvm/nvm.sh
+            node -v
+            npm -v
+            npm ci
+            npm run build
