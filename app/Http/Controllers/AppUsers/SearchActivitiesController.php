@@ -61,7 +61,7 @@ class SearchActivitiesController extends Controller
                     ->orWhere('occurrence', 'daily')
             )
             ->orderBy('start_time', 'asc')
-            ->get();
+            ->paginate(50);
 
         return ActivityTimeDetailsResource::collection($activities);
     }
