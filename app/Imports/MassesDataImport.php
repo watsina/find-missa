@@ -32,8 +32,6 @@ class MassesDataImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
 
         foreach ($rows as $row) {
 
-            // dd($row);
-
             $diocese = Diocese::firstOrCreate(['name' => $row['diocese_name']]);
 
             $parishType = 'parish';

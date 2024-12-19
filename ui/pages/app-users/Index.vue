@@ -7,8 +7,9 @@
   import TimeInput from '@/components/TimeInput.vue';
   import { useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
-  import { ref, onMounted, computed } from 'vue';
+  import { ref, onMounted, computed, watch } from 'vue';
   import { useDate } from 'vuetify/lib/framework.mjs';
+  import { debounce } from 'lodash';
 
   const results = ref(null);
   const dateUsed = ref(null);
@@ -28,6 +29,13 @@
     useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day')
       ? 'Today'
       : parser.format(dateUsed.value, 'fullDateWithWeekday'),
+  );
+
+  watch(
+    () => form.type,
+    debounce(() => {
+      getResults();
+    }, 300),
   );
 
   function getResults() {
