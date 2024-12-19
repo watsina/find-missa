@@ -76,7 +76,7 @@
             <v-btn value="adoration">Adoration</v-btn>
           </v-btn-toggle>
         </v-col>
-        <v-col class="tw-flex tw-justify-around tw-gap-2 tw-items-center" cols="12">
+        <v-col cols="12" md="3">
           <DateInput
             v-model="date"
             density="compact"
@@ -84,25 +84,33 @@
             :min="currentDate"
             variant="outlined"
           ></DateInput>
+        </v-col>
+        <v-col cols="12" md="2">
           <TimeInput
             v-model="form.start_time"
             :error="form.errors.start_time"
-            label="Start Time (24h)"
+            label="From Time (24h)"
             required
             variant="outlined"
           />
+        </v-col>
+        <v-col cols="12" md="3">
           <TextInput
             v-model="form.church_name"
             clearable
             label="Church Name"
             variant="outlined"
           ></TextInput>
+        </v-col>
+        <v-col cols="12" md="3">
           <TextInput
             v-model="form.district_name"
             clearable
             label="District"
             variant="outlined"
           ></TextInput>
+        </v-col>
+        <v-col class="d-flex align-end" cols="12" md="1">
           <PrimaryButton variant="outlined" @click="getResults"> Search </PrimaryButton>
         </v-col>
         <template v-if="form.processing">
@@ -126,7 +134,7 @@
                 No {{ form.type || 'activities' }} found
               </v-card-title>
             </v-card>
-            <v-timeline v-else class="tw-ml-4" density="comfortable" side="end">
+            <v-timeline v-else class="md:tw-ml-4" density="comfortable" side="end">
               <v-timeline-item
                 v-for="activity in results"
                 :key="activity?.id"
