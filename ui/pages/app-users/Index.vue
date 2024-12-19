@@ -50,6 +50,17 @@
   <AppUserLayout>
     <v-container>
       <v-row class="py-4">
+        <v-col cols="12">
+          <v-alert
+            class="tw-uppercase tw-font-semibold tw-text-lg"
+            prominent
+            type="warning"
+            variant="tonal"
+          >
+            This app is still in development, we are still gathering data and the app is undergoing
+            testing and is not yet ready for public use.
+          </v-alert>
+        </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
           <v-btn-toggle v-model="form.type" color="primary" group rounded>
             <v-btn value="mass">Mass</v-btn>
