@@ -67,7 +67,7 @@ class MassesDataImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
                     [
                         'occurrence' => 'weekly',
                         'church_id' => $church->id,
-                        'type' => $row['activity_type'],
+                        'type' => Str::kebab($row['activity_type']),
                         'start_time' => $row['start_time'],
                         'day_of_week' => $dayOfWeek,
                     ],

@@ -21,6 +21,7 @@
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
     { title: 'Anticipation Mass', value: 'anticipation-mass' },
+    { title: 'Traditional Latin Mass', value: 'traditional-latin-mass' },
     { title: 'Confession', value: 'confession' },
     { title: 'Adoration', value: 'adoration' },
   ];

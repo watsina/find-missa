@@ -10,6 +10,7 @@ enum ActivityType: string
 
     case Mass = 'mass';
     case AnticipationMass = 'anticipation-mass';
+    case TraditionalLatinMass = 'traditional-latin-mass';
     case Confession = 'confession';
     case Adoration = 'adoration';
 }
