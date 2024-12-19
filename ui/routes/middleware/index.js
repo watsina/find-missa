@@ -1,7 +1,7 @@
 import useAuthStore from '@/stores/useAuthStore';
 
 export async function ensureUserIsAuthorized(to, from, next) {
-  if (['home.dashboard', 'errors.404', 'errors.403'].includes(to.name)) {
+  if (['errors.404', 'errors.403'].includes(to.name) || to?.meta?.requiresAuth === false) {
     return next();
   }
 
