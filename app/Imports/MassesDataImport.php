@@ -29,9 +29,7 @@ class MassesDataImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
      */
     public function collection(Collection $rows)
     {
-
         foreach ($rows as $row) {
-
             $diocese = Diocese::firstOrCreate(['name' => $row['diocese_name']]);
 
             $parishType = 'parish';
@@ -69,7 +67,7 @@ class MassesDataImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
                         'church_id' => $church->id,
                         'type' => Str::kebab($row['activity_type']),
                         'start_time' => $row['start_time'],
-                        'day_of_week' => $dayOfWeek,
+                        'day_of_week' => trim($dayOfWeek),
                     ],
                     ['language' => $row['language']]
                 );
