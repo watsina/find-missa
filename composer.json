@@ -19,6 +19,7 @@
     "laravel/scout": "^10.11",
     "laravel/tinker": "^2.8",
     "maatwebsite/excel": "^3.1",
+    "opcodesio/log-viewer": "^3.12",
     "spatie/laravel-permission": "^6.9",
     "tightenco/ziggy": "^1.0"
   },

@@ -48,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('viewPulse', fn (User $user) => $user->is_admin);
 
+        Gate::define('viewLogViewer', fn (User $user) => $user->is_admin);
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
