@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use PostHog\PostHog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -43,6 +44,13 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         Relation::enforceMorphMap(config('morph'));
+
+        PostHog::init(
+            config('services.posthog.key'),
+            [
+                'host' => config('services.posthog.host'),
+            ]
+        );
 
         Gate::before(fn (User $user, string $ability) => $user->is_admin ? true : null);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\AppUsers;
 
+use PostHog\PostHog;
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,18 @@ class SearchActivitiesController extends Controller
      */
     public function __invoke(Request $request)
     {
+        PostHog::capture([
+            'distinctId' => $request->user()?->email ?? 'guest-user',
+            'event' => 'home-page-search',
+            'properties' => [
+                'ip' => $request->getClientIp(),
+                'request_body' => $request->all(),
+            ],
+            '$groups' => [
+                'environment' => env('APP_ENV'),
+            ],
+        ]);
+
         $data = $request->validate([
             'type' => 'required|string|in:mass,confession,adoration',
             'date' => 'required|date',
