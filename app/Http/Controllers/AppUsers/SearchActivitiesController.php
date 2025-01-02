@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\AppUsers;
 
-use PostHog\PostHog;
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
+use QodeNL\LaravelPosthog\Facades\Posthog;
 use App\Http\Resources\ActivityTimeDetailsResource;
 
 class SearchActivitiesController extends Controller
@@ -17,17 +18,19 @@ class SearchActivitiesController extends Controller
      */
     public function __invoke(Request $request)
     {
-        PostHog::capture([
-            'distinctId' => $request->user()?->email ?? 'guest-user',
-            'event' => 'home-page-search',
-            'properties' => [
-                'ip' => $request->getClientIp(),
-                'request_body' => $request->all(),
-            ],
-            '$groups' => [
-                'environment' => env('APP_ENV'),
-            ],
-        ]);
+        if (App::environment('staging', 'production')) {
+            Posthog::capture([
+                'distinctId' => $request->user()?->email ?? 'guest-user',
+                'event' => 'home-page-search',
+                'properties' => [
+                    'ip' => $request->getClientIp(),
+                    'request_body' => $request->all(),
+                ],
+                '$groups' => [
+                    'environment' => env('APP_ENV'),
+                ],
+            ]);
+        }
 
         $data = $request->validate([
             'type' => 'required|string|in:mass,confession,adoration',

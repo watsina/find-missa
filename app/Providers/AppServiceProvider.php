@@ -45,12 +45,14 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap(config('morph'));
 
-        PostHog::init(
-            config('services.posthog.key'),
-            [
-                'host' => config('services.posthog.host'),
-            ]
-        );
+        if (App::environment('staging', 'production')) {
+            PostHog::init(
+                config('services.posthog.key'),
+                [
+                    'host' => config('services.posthog.host'),
+                ]
+            );
+        }
 
         Gate::before(fn (User $user, string $ability) => $user->is_admin ? true : null);
 
