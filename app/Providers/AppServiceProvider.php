@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap(config('morph'));
 
-        if (App::environment('staging', 'production')) {
+        if (App::environment('staging', 'production') && config('services.posthog.key')) {
             PostHog::init(
                 config('services.posthog.key'),
                 [

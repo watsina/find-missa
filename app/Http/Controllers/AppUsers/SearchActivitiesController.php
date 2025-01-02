@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\AppUsers;
 
+use PostHog\PostHog;
 use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
-use QodeNL\LaravelPosthog\Facades\Posthog;
 use App\Http\Resources\ActivityTimeDetailsResource;
 
 class SearchActivitiesController extends Controller
@@ -18,8 +18,8 @@ class SearchActivitiesController extends Controller
      */
     public function __invoke(Request $request)
     {
-        if (App::environment('staging', 'production')) {
-            Posthog::capture([
+        if (App::environment('staging', 'production') && config('services.posthog.key')) {
+            PostHog::capture([
                 'distinctId' => $request->user()?->email ?? 'guest-user',
                 'event' => 'home-page-search',
                 'properties' => [
