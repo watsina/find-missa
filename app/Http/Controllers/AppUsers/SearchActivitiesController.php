@@ -20,7 +20,7 @@ class SearchActivitiesController extends Controller
     {
         if (App::environment('staging', 'production') && config('services.posthog.key')) {
             PostHog::capture([
-                'distinctId' => $request->user()?->email ?? 'guest-user',
+                'distinctId' => $request->user()?->email ?? 'guest-user:'.sha1(session()->getId()),
                 'event' => 'home-page-search',
                 'properties' => [
                     'ip' => $request->getClientIp(),
