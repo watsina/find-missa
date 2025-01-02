@@ -27,7 +27,7 @@ class SearchActivitiesController extends Controller
                     'request_body' => $request->all(),
                 ],
                 '$groups' => [
-                    'environment' => env('APP_ENV'),
+                    'environment' => config('app.env'),
                 ],
             ]);
         }
