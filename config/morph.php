@@ -3,6 +3,7 @@
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Login;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Priest;
@@ -16,6 +17,7 @@ use App\Models\ActivityTimeException;
 
 return [
     'user' => User::class,
+    'login' => Login::class,
     'team' => Team::class,
     'team-invitation' => TeamInvitation::class,
     'team-member' => TeamMember::class,

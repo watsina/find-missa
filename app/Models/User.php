@@ -112,6 +112,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return (bool) $this->is_super_admin;
     }
 
+    public function scopeWithLastLoginAt($query)
+    {
+        $query->addSelect([
+            'last_login_at' => Login::select('created_at')
+                ->whereColumn('user_id', 'users.id')
+                ->latest()
+                ->take(1),
+        ])->withCasts(['last_login_at' => 'datetime']);
+    }
+
     public function info()
     {
         $teamId = session()->get('current_team_id');
