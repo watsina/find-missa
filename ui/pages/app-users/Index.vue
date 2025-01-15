@@ -60,7 +60,7 @@
       <v-row class="py-4">
         <v-col cols="12">
           <v-alert
-            class="tw-uppercase tw-font-semibold tw-text-lg"
+            class="tw-uppercase tw-font-semibold tw-text-md"
             prominent
             type="warning"
             variant="tonal"
@@ -98,7 +98,7 @@
           <TextInput
             v-model="form.church_name"
             clearable
-            label="Church Name"
+            label="Parish/Church Name"
             variant="outlined"
           ></TextInput>
         </v-col>

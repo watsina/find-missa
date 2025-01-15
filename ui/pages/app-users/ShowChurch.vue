@@ -1,7 +1,6 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
-  import DataTable from '@/components/DataTable.vue';
   import AppUserLayout from '@/layouts/AppUserLayout';
   import { notify } from '@/utils';
   import EntityDetails from '@/components/EntityDetails.vue';
@@ -13,6 +12,7 @@
     mdiTownHall,
     mdiWeb,
   } from '@mdi/js';
+  import { groupBy } from 'lodash';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
@@ -25,13 +25,7 @@
   const adoration = ref([]);
   const panel = ref(0);
 
-  const headers = [
-    { title: 'Start Time', value: 'start_time' },
-    { title: 'Language', value: 'language' },
-    { title: 'Occurrence', value: 'occurrence' },
-    { title: 'Day of Week', value: 'day_of_week' },
-    { title: 'Date', value: 'date' },
-  ];
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   const fields = computed(() => {
     const data = church.value;
@@ -58,9 +52,9 @@
       .get(`/api/v1/church-details/${props.churchId}`)
       .then(({ data }) => {
         church.value = data?.data?.details || {};
-        mass.value = data?.data?.mass || [];
-        adoration.value = data?.data?.adoration || [];
-        confession.value = data?.data?.confession || [];
+        mass.value = groupBy(data?.data?.mass || [], 'day_of_week');
+        adoration.value = groupBy(data?.data?.adoration || [], 'day_of_week');
+        confession.value = groupBy(data?.data?.confession || [], 'day_of_week');
       })
       .catch(() => notify.error('Something went wrong fetching the church details.'))
       .finally(() => (isFetching.value = false));
@@ -108,8 +102,26 @@
                 Mass
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <data-table class="tw-capitalize" has-search :headers="headers" :items="mass || []">
-                </data-table>
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Mass Schedule</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(day, index) in daysOfWeek" :key="index">
+                      <td>{{ day }}</td>
+                      <td>
+                        <ul>
+                          <li v-for="dayMass in mass[day]" :key="dayMass.id" class="tw-mr-2">
+                            {{ dayMass?.start_time }} ({{ dayMass?.language }})
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
             <v-expansion-panel>
@@ -122,13 +134,27 @@
                 Confession
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <data-table
-                  class="tw-capitalize"
-                  has-search
-                  :headers="headers"
-                  :items="confession || []"
-                >
-                </data-table>
+                <div v-if="!confession?.length">No data available</div>
+                <v-table v-else>
+                  <thead>
+                    <tr>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Confession Schedule</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(confessions, index) in confession" :key="index">
+                      <td>{{ index }}</td>
+                      <td>
+                        <ul>
+                          <li v-for="conf in confessions" :key="conf.id" class="tw-mr-2">
+                            {{ conf?.start_time }}-({{ conf?.language }})
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
             <v-expansion-panel>
@@ -141,13 +167,25 @@
                 Adoration
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <data-table
-                  class="tw-capitalize"
-                  has-search
-                  :headers="headers"
-                  :items="adoration || []"
-                >
-                </data-table>
+                <div v-if="!confession?.length">No data available</div>
+                <v-table v-else>
+                  <thead>
+                    <tr>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
+                      <th class="tw-uppercase tw-text-left tw-font-bold">Adoration Schedule</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(adorations, index) in adoration" :key="index">
+                      <td>{{ index }}</td>
+                      <td>
+                        <span v-for="ador in adorations" :key="ador.id" class="tw-mr-2">
+                          {{ ador?.start_time }}-({{ ador?.language }})
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
