@@ -103,14 +103,14 @@
           v-model:show-modal="showingActivityModal"
           :activity="activityToEdit"
           :church="activity?.church"
-          @updated="(activity = { ...activity, ...$event }), (activityToEdit = null)"
+          @updated="((activity = { ...activity, ...$event }), (activityToEdit = null))"
         />
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="activity?.type">
             <template #action>
               <PrimaryButton
                 variant="outlined"
-                @click="(activityToEdit = activity), (showingActivityModal = true)"
+                @click="((activityToEdit = activity), (showingActivityModal = true))"
               >
                 Update Activity
               </PrimaryButton>

@@ -15,7 +15,7 @@
       v-model:show-modal="showingModal"
       :parish="subParish?.parish"
       :sub-parish="subParishToEdit"
-      @updated="(subParish = { ...subParish, ...$event }), (subParishToEdit = null)"
+      @updated="((subParish = { ...subParish, ...$event }), (subParishToEdit = null))"
     ></SubParishModal>
     <v-col cols="12">
       <v-sheet>
@@ -24,7 +24,7 @@
             <h3 class="text-base/7 tw-font-semibold tw-text-gray-900">SubParish Information</h3>
             <PrimaryButton
               variant="outlined"
-              @click="(subParishToEdit = subParish), (showingModal = true)"
+              @click="((subParishToEdit = subParish), (showingModal = true))"
             >
               Update SubParish
             </PrimaryButton>

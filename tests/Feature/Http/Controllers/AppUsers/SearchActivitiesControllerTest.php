@@ -8,7 +8,7 @@ use App\Models\ActivityTime;
 use function Pest\Laravel\get;
 
 test('It organises the data by start time...', function () {
-    //activities that happen at different times
+    // activities that happen at different times
     $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
     $massEarlier = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['start_time' => '07:00', 'end_time' => '07:30']);
     $massInMiddle = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
@@ -25,7 +25,7 @@ test('It organises the data by start time...', function () {
 });
 
 test('User can search activities by start time...', function () {
-    //activities that happen at different times
+    // activities that happen at different times
     $massEarlier = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['start_time' => '07:00', 'end_time' => '07:30']);
     $massInMiddle = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
     $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
@@ -42,7 +42,7 @@ test('User can search activities by start time...', function () {
 });
 
 test('users can search masses by date', function () {
-    //activities that happen on the given date
+    // activities that happen on the given date
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();
     $confessionToday = ActivityTime::factory()->daily('confession')->create();
     $dailyMass = ActivityTime::factory()->daily('mass')->create();
@@ -72,7 +72,7 @@ test('users can search masses by date', function () {
 });
 
 test('users are able to search adorations for a given date', function () {
-    //activities that happen on the given date
+    // activities that happen on the given date
     $massToday = ActivityTime::factory()->daily('mass')->create();
     $confessionToday = ActivityTime::factory()->daily('confession')->create();
     $dailyAdoration = ActivityTime::factory()->daily('adoration')->create();
@@ -102,7 +102,7 @@ test('users are able to search adorations for a given date', function () {
 });
 
 test('users can search confessions on a given date.', function () {
-    //activities that happen on the given date
+    // activities that happen on the given date
     $massToday = ActivityTime::factory()->daily('mass')->create();
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();
     $dailyConfession = ActivityTime::factory()->daily('confession')->create();
@@ -137,7 +137,7 @@ test('users can search by church name and activity type on a given date.', funct
     $massAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['church_id' => $church->id]);
     $adorationAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'adoration')->create(['church_id' => $church->id]);
     $confessionAtChurch = ActivityTime::factory()->weekly(now()->dayName, 'confession')->create(['church_id' => $church->id]);
-    //activity in another church
+    // activity in another church
     $massAtOtherChurch = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
     get(
         route('search', [
@@ -161,7 +161,7 @@ test('users can search by district.', function () {
     $massInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create(['church_id' => $church->id]);
     $adorationInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'adoration')->create(['church_id' => $church->id]);
     $confessionInDistrict = ActivityTime::factory()->weekly(now()->dayName, 'confession')->create(['church_id' => $church->id]);
-    //activity in another church
+    // activity in another church
     $massInOtherDistrict = ActivityTime::factory()->weekly(now()->dayName, 'mass')->create();
     get(
         route('search', [

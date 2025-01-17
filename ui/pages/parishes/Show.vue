@@ -76,14 +76,14 @@
           v-model:show-modal="showingModal"
           :diocese="parish?.diocese"
           :parish="parishToEdit"
-          @updated="(parish = { ...parish, ...$event }), (parishToEdit = null)"
+          @updated="((parish = { ...parish, ...$event }), (parishToEdit = null))"
         ></parish-modal>
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="parish?.name">
             <template #action>
               <PrimaryButton
                 variant="outlined"
-                @click="(parishToEdit = parish), (showingModal = true)"
+                @click="((parishToEdit = parish), (showingModal = true))"
               >
                 Update Parish
               </PrimaryButton>

@@ -21,7 +21,7 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
     return $request->user();
 })->name('auth.user');
 
-//admin routes
+// admin routes
 Route::middleware('auth', 'admin')->group(function () {
     Route::delete('clear-data', ClearDataController::class)->name('clear-data');
     Route::post('import-data', ImportDataController::class)->middleware('userWithTeam')->name('import-data');

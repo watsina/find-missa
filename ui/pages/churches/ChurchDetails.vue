@@ -41,14 +41,14 @@
       :church="churchToEdit"
       :parish="church?.parish"
       :parish-type="church?.parishable_type"
-      @updated="(church = $event), (churchToEdit = null)"
+      @updated="((church = $event), (churchToEdit = null))"
     />
     <EntityDetails :fields="fields" :title="`${church?.name} - ${church?.city}`">
       <template #action>
         <PrimaryButton
           v-if="church?.parish?.id && church?.parishable_type"
           variant="outlined"
-          @click="(churchToEdit = church), (showingModal = true)"
+          @click="((churchToEdit = church), (showingModal = true))"
         >
           Update Church
         </PrimaryButton>
