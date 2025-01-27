@@ -13,7 +13,7 @@
     mdiWeb,
   } from '@mdi/js';
   import { groupBy } from 'lodash';
-  import { useHead } from '@unhead/vue';
+  import { useSeoMeta } from '@unhead/vue';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
@@ -30,14 +30,9 @@
       : 'Church Details: Mass, Confession and Adoration times.',
   );
 
-  useHead({
+  useSeoMeta({
     title: () => pageTitle.value,
-    meta: [
-      {
-        name: 'description',
-        content: () => pageDescription.value,
-      },
-    ],
+    description: () => pageDescription.value,
   });
 
   const isFetching = ref(false);

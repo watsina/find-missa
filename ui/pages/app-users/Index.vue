@@ -10,17 +10,12 @@
   import { ref, onMounted, computed, watch } from 'vue';
   import { useDate } from 'vuetify/lib/framework.mjs';
   import { debounce } from 'lodash';
-  import { useHead } from '@unhead/vue';
+  import { useSeoMeta } from '@unhead/vue';
 
-  useHead({
+  useSeoMeta({
     title: 'Find Missa',
-    meta: [
-      {
-        name: 'description',
-        content:
-          'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.',
-      },
-    ],
+    description:
+      'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.',
   });
 
   const results = ref(null);

@@ -61,9 +61,9 @@
   import Checkbox from '@/components/Checkbox.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
-  import { useHead } from '@unhead/vue';
+  import { useSeoMeta } from '@unhead/vue';
 
-  useHead({
+  useSeoMeta({
     title: 'Login - Find Missa',
   });
 
