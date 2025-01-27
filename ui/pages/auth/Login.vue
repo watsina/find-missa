@@ -61,6 +61,11 @@
   import Checkbox from '@/components/Checkbox.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
+  import { useHead } from '@unhead/vue';
+
+  useHead({
+    title: 'Login - Find Missa',
+  });
 
   const router = useRouter();
 

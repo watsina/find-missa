@@ -13,12 +13,33 @@
     mdiWeb,
   } from '@mdi/js';
   import { groupBy } from 'lodash';
+  import { useHead } from '@unhead/vue';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
   });
 
   const church = ref(null);
+
+  const pageTitle = computed(() =>
+    church.value?.id ? `${church.value.name} - ${church.value.city || ''}` : 'Find Missa',
+  );
+  const pageDescription = computed(() =>
+    church.value?.id
+      ? `Mass, Confession and Adoration times at ${church.value.name} - ${church.value.city}`
+      : 'Church Details: Mass, Confession and Adoration times.',
+  );
+
+  useHead({
+    title: () => pageTitle.value,
+    meta: [
+      {
+        name: 'description',
+        content: () => pageDescription.value,
+      },
+    ],
+  });
+
   const isFetching = ref(false);
   const mass = ref([]);
   const confession = ref([]);

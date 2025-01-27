@@ -10,6 +10,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">
 
+        @if(!App::environment('production'))
+            <meta name="robots" content="noindex">
+        @endif
         <!-- Scripts -->
         <script>
             @isset($auth)
