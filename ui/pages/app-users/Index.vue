@@ -12,10 +12,15 @@
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
 
+  const title = 'Find Missa';
+  const description =
+    'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.';
   useSeoMeta({
-    title: 'Find Missa',
-    description:
-      'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.',
+    title: title,
+    description: description,
+    ogTitle: title,
+    ogDescription: description,
+    ogUrl: 'https://findmissa.com',
   });
 
   const results = ref(null);

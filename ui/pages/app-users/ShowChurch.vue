@@ -33,6 +33,9 @@
   useSeoMeta({
     title: () => pageTitle.value,
     description: () => pageDescription.value,
+    ogTitle: () => pageTitle.value,
+    ogDescription: () => pageDescription.value,
+    ogUrl: `https://findmissa.com/church-details/${props.churchId}`,
   });
 
   const isFetching = ref(false);
