@@ -160,7 +160,7 @@
                   </strong>
                   <div>
                     <strong class="tw-capitalize">
-                      {{ `${activity?.occurrence} ${activity?.type} (${activity?.language})` }}
+                      {{ `${activity?.type} (${activity?.language})` }}
                     </strong>
                     <div class="text-caption">
                       <NavLink
