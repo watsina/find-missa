@@ -54,7 +54,7 @@
   function getResults() {
     form.date = useDayjs(date.value).format('YYYY-MM-DD');
     form.get('/api/v1/search', {
-      onSuccess: ({ data }) => {
+      onSuccess: (data) => {
         results.value = data || [];
         dateUsed.value = form.date;
       },
@@ -134,12 +134,17 @@
         <v-col v-else cols="12">
           <v-sheet>
             <v-divider opacity="10"></v-divider>
-            <v-card-title>
-              {{ showDate }}
+            <v-card-title class="!tw-flex tw-justify-between">
+              <span>
+                {{ showDate }}
+              </span>
+              <span class="tw-text-base">
+                {{ `Showing: ${results?.data?.length} of ${results?.meta?.total} results` }}
+              </span>
             </v-card-title>
             <v-divider opacity="10"></v-divider>
             <v-card
-              v-if="!results || !results?.length"
+              v-if="!results?.data || !results?.data?.length"
               class="tw-flex tw-justify-around"
               height="150"
             >
@@ -149,7 +154,7 @@
             </v-card>
             <v-timeline v-else class="md:tw-ml-4" density="comfortable" side="end">
               <v-timeline-item
-                v-for="activity in results"
+                v-for="activity in results?.data"
                 :key="activity?.id"
                 dot-color="primary"
                 size="small"
