@@ -92,7 +92,7 @@
                 color="primary"
                 :icon="mdiEyeOutline"
                 title="View Diocese Details"
-                :to="{ name: 'dioceses.show', params: { dioceseId: item.id } }"
+                :to="{ name: 'dioceses.show', params: { dioceseId: item.code_name } }"
                 variant="text"
               ></v-btn>
             </template>

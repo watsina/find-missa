@@ -70,7 +70,7 @@
         notify.success(message);
         closeModal(data);
         if (!isEditing?.value) {
-          router.push({ name: 'dioceses.show', params: { dioceseId: data?.id } });
+          router.push({ name: 'dioceses.show', params: { dioceseId: data?.code_name } });
         }
       },
       onError: () => notify.error('There was an error saving the information.'),

@@ -167,7 +167,7 @@
                         class="tw-text-indigo-600"
                         :href="{
                           name: 'church.details',
-                          params: { churchId: activity?.church?.id },
+                          params: { churchId: activity?.church?.code_name },
                         }"
                       >
                         {{

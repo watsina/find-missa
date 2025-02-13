@@ -15,6 +15,7 @@ class ParishResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'code_name' => $this->code_name,
             'diocese_id' => $this->diocese_id,
             'contact_email' => $this->contact_email,
             'website_url' => $this->website_url,

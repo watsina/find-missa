@@ -15,6 +15,7 @@ class ChurchResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'code_name' => $this->code_name,
             'type' => $this->type,
             'coordinates' => $this->when($this->longitude || $this->latitude, "($this->longitude, $this->latitude)"),
             'street_address' => $this->street_address,
