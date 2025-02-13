@@ -16,14 +16,15 @@ router.beforeEach((to, from, next) => {
   NProgress.start();
 
   if (from.path !== to.path) {
-    posthog.capture('$pageleave');
+    posthog?.capture('$pageleave');
   }
 
   ensureUserIsAuthorized(to, from, next);
 });
 
 router.afterEach(() => {
-  posthog.capture('$pageview');
+  posthog?.capture('$pageview');
+
   NProgress.done();
   notify.close();
 });

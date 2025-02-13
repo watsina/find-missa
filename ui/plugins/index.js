@@ -1,6 +1,7 @@
 // exports
 export { default as http } from './http';
 export { default as useForm } from './form';
+export { default as notify } from './notify';
 
 // Plugins
 import vuetify from './vuetify';

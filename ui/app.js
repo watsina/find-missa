@@ -9,8 +9,8 @@ const app = createApp(App);
 
 registerPlugins(app);
 
-app.config.globalProperties.$date = useDayjs;
-app.config.globalProperties.$useForm = useForm;
+// app.config.globalProperties.$date = useDayjs;
+// app.config.globalProperties.$useForm = useForm;
 app.config.globalProperties.$notify = notify;
 
 app.mount('#app');

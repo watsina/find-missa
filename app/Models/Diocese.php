@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Diocese extends BaseModel
 {
+    use HasCodeName;
     use HasFactory;
 
     /**
@@ -17,6 +20,13 @@ class Diocese extends BaseModel
     protected $casts = [
         'id' => 'integer',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->code_name = Str::kebab($model->name.' '.$model->type);
+        });
+    }
 
     public function parishes(): HasMany
     {

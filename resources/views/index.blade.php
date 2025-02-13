@@ -6,6 +6,13 @@
 
         <title >{{ config('app.name', 'Find Mass') }}</title>
 
+        <meta property="og:image" content="/android-chrome-512x512.png">
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:image" content="/android-chrome-512x512.png">
+        <meta name="description" content="Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.">
+
+        <link rel="manifest" href="/site.webmanifest">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">

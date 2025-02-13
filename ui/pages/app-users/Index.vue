@@ -12,10 +12,16 @@
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
 
+  const title = 'Find Missa';
+  const description =
+    'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.';
+
   useSeoMeta({
-    title: 'Find Missa',
-    description:
-      'Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.',
+    title: title,
+    description: description,
+    ogTitle: title,
+    ogDescription: description,
+    ogUrl: 'https://findmissa.com',
   });
 
   const results = ref(null);
@@ -27,7 +33,7 @@
   const form = useForm({
     start_time: parser.format(new Date(), 'fullTime24h')?.substring(0, 5),
     church_name: '',
-    district_name: '',
+    district: '',
     type: 'mass',
     date: parser.date(currentDate),
   });
@@ -48,7 +54,7 @@
   function getResults() {
     form.date = useDayjs(date.value).format('YYYY-MM-DD');
     form.get('/api/v1/search', {
-      onSuccess: ({ data }) => {
+      onSuccess: (data) => {
         results.value = data || [];
         dateUsed.value = form.date;
       },
@@ -111,9 +117,9 @@
         </v-col>
         <v-col cols="12" md="3">
           <TextInput
-            v-model="form.district_name"
+            v-model="form.district"
             clearable
-            label="District"
+            label="District/Town"
             variant="outlined"
           ></TextInput>
         </v-col>
@@ -128,12 +134,17 @@
         <v-col v-else cols="12">
           <v-sheet>
             <v-divider opacity="10"></v-divider>
-            <v-card-title>
-              {{ showDate }}
+            <v-card-title class="!tw-flex tw-justify-between">
+              <span>
+                {{ showDate }}
+              </span>
+              <span class="tw-text-base">
+                {{ `Showing: ${results?.data?.length} of ${results?.meta?.total} results` }}
+              </span>
             </v-card-title>
             <v-divider opacity="10"></v-divider>
             <v-card
-              v-if="!results || !results?.length"
+              v-if="!results?.data || !results?.data?.length"
               class="tw-flex tw-justify-around"
               height="150"
             >
@@ -143,7 +154,7 @@
             </v-card>
             <v-timeline v-else class="md:tw-ml-4" density="comfortable" side="end">
               <v-timeline-item
-                v-for="activity in results"
+                v-for="activity in results?.data"
                 :key="activity?.id"
                 dot-color="primary"
                 size="small"
@@ -154,14 +165,14 @@
                   </strong>
                   <div>
                     <strong class="tw-capitalize">
-                      {{ `${activity?.occurrence} ${activity?.type} (${activity?.language})` }}
+                      {{ `${activity?.type} (${activity?.language})` }}
                     </strong>
                     <div class="text-caption">
                       <NavLink
                         class="tw-text-indigo-600"
                         :href="{
                           name: 'church.details',
-                          params: { churchId: activity?.church?.id },
+                          params: { churchId: activity?.church?.code_name },
                         }"
                       >
                         {{

@@ -15,6 +15,7 @@ class DioceseResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'code_name' => $this->code_name,
             'type' => $this->type,
             'contact_email' => $this->contact_email,
             'parishes_count' => $this->whenCounted('parishes'),

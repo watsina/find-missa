@@ -27,7 +27,6 @@ jobs:
           key: ${{secrets.PRIVATE_KEY_PROD}}
           script: |
             cd ${{secrets.PROD_DIR}}
-            git reset --hard
             git pull origin main
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
             php artisan migrate --force

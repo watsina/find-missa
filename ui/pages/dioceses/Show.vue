@@ -1,12 +1,13 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue';
-  import { http } from '@/plugins';
+  import { notify, http } from '@/plugins';
+  import useAuthStore from '@/stores/useAuthStore';
   import ParishesTable from '@/pages/parishes/ParishesTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   // import DioceseDetails from './DioceseDetails.vue';
+  import ImportDataModal from '@/components/ImportDataModal';
   import DioceseModal from './DioceseModal.vue';
-  import { notify } from '@/utils';
   import EntityDetails from '@/components/EntityDetails.vue';
   import { mdiCity, mdiEmailFast, mdiHomeCity, mdiPostageStamp, mdiWeb } from '@mdi/js';
 
@@ -16,13 +17,32 @@
     dioceseId: { type: [String, Number], required: true },
   });
 
+  const store = useAuthStore();
+
+  const user = computed(() => store?.user);
+
   const diocese = ref(null);
   const isFetching = ref(false);
+  const showUploadModal = ref(false);
 
   onMounted(() => {
     fetchDioceseDetails();
   });
   const dioceseToEdit = ref(null);
+  const importUrl = ref('');
+
+  const importData = (type) => {
+    if (!type) {
+      return;
+    }
+    if (type === 'parishes') {
+      importUrl.value = `/api/v1/import-churches/${props.dioceseId}`;
+    } else {
+      importUrl.value = `/api/v1/import-activities/${props.dioceseId}`;
+    }
+
+    showUploadModal.value = true;
+  };
 
   const fields = computed(() => {
     const data = diocese.value;
@@ -66,9 +86,30 @@
           :diocese="dioceseToEdit"
           @updated="((diocese = { ...diocese, ...$event }), (dioceseToEdit = null))"
         />
+
+        <import-data-modal
+          v-if="user.is_admin"
+          v-model:show-modal="showUploadModal"
+          :import-url="importUrl"
+        ></import-data-modal>
+
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="diocese?.name">
             <template #action>
+              <PrimaryButton
+                v-if="user.is_admin"
+                class="tw-mr-2"
+                @click="() => importData('parishes')"
+              >
+                Upload Parishes
+              </PrimaryButton>
+              <PrimaryButton
+                v-if="user.is_admin"
+                class="tw-mr-2"
+                @click="() => importData('activities')"
+              >
+                Upload Activities
+              </PrimaryButton>
               <PrimaryButton
                 variant="outlined"
                 @click="((dioceseToEdit = diocese), (showingModal = true))"
