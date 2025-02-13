@@ -33,5 +33,8 @@ jobs:
             php artisan optimize
             php artisan pulse:restart
             sudo service php8.3-fpm reload
+            source /usr/local/nvm/nvm.sh
+            node -v
+            npm -v
             npm ci
             npm run build
