@@ -16,7 +16,9 @@ class ParishController extends Controller
     {
         Gate::authorize('viewAny', Parish::class);
 
-        $parishes = Parish::with('diocese')->withCount('churches', 'subParishes')->paginate(20);
+        $parishes = Parish::search($request->search)
+            ->query(fn ($q) => $q->with('diocese')->withCount('churches', 'subParishes'))
+            ->paginate(20);
 
         return new ParishCollection($parishes);
     }

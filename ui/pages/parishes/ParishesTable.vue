@@ -1,10 +1,12 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
+  import { http } from '@/plugins';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import ParishModal from './ParishModal.vue';
+  import { debounce } from 'lodash';
 
   defineProps({
     isFetching: Boolean,
@@ -16,6 +18,22 @@
   const search = ref('');
   const showingModal = ref(false);
   const parishToEdit = ref(null);
+  const isFetching = ref(false);
+
+  const searchParishes = () => {
+    isFetching.value = true;
+    http
+      .get('/api/v1/parishes', { params: { search: search.value } })
+      .then(({ data }) => {
+        parishes.value = data?.data;
+      })
+      .finally(() => (isFetching.value = false));
+  };
+
+  watch(
+    search,
+    debounce(() => searchParishes(), 300),
+  );
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -56,7 +74,7 @@
       <PrimaryButton v-if="diocese?.id" @click="showModal"> Add Parish</PrimaryButton>
     </v-col>
     <v-col cols="12">
-      <DataTable :headers="headers" :items="parishes || []" :search="search">
+      <DataTable :headers="headers" :items="parishes || []" :loading="isFetching">
         <template #top>
           <TextInput
             id="search"

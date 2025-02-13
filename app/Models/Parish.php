@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Parish extends BaseModel
 {
     use HasFactory;
+    use Searchable;
 
     /**
      * The attributes that should be cast to native types.
@@ -20,6 +22,16 @@ class Parish extends BaseModel
         'id' => 'integer',
         'diocese_id' => 'integer',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('name');
+    }
 
     public function subParishes(): HasMany
     {

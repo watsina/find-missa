@@ -9,6 +9,7 @@ use App\Http\Controllers\ImportDataController;
 use App\Http\Controllers\SwitchTeamController;
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\UserActionLogController;
+use App\Http\Controllers\ImportActivitesController;
 use App\Http\Controllers\ImportDioceseChurchesController;
 use App\Http\Controllers\AppUsers\GetChurchDetailsController;
 use App\Http\Controllers\AppUsers\SearchActivitiesController;
@@ -27,6 +28,7 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::delete('clear-data', ClearDataController::class)->name('clear-data');
     // Route::post('import-data', ImportDataController::class)->middleware('userWithTeam')->name('import-data');
     Route::post('import-churches/{diocese}', ImportDioceseChurchesController::class)->middleware('userWithTeam')->name('import-churches');
+    Route::post('import-activities/{diocese}', ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
     Route::post('export-data', ExportDataController::class)->middleware('userWithTeam')->name('export-data');
 
     Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');

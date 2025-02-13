@@ -29,6 +29,20 @@
     fetchDioceseDetails();
   });
   const dioceseToEdit = ref(null);
+  const importUrl = ref('');
+
+  const importData = (type) => {
+    if (!type) {
+      return;
+    }
+    if (type === 'parishes') {
+      importUrl.value = `/api/v1/import-churches/${props.dioceseId}`;
+    } else {
+      importUrl.value = `/api/v1/import-activities/${props.dioceseId}`;
+    }
+
+    showUploadModal.value = true;
+  };
 
   const fields = computed(() => {
     const data = diocese.value;
@@ -76,14 +90,25 @@
         <import-data-modal
           v-if="user.is_admin"
           v-model:show-modal="showUploadModal"
-          :import-url="`/api/v1/import-churches/${props.dioceseId}`"
+          :import-url="importUrl"
         ></import-data-modal>
 
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="diocese?.name">
             <template #action>
-              <PrimaryButton v-if="user.is_admin" class="tw-mr-2" @click="showUploadModal = true">
-                Upload data
+              <PrimaryButton
+                v-if="user.is_admin"
+                class="tw-mr-2"
+                @click="() => importData('parishes')"
+              >
+                Upload Parishes
+              </PrimaryButton>
+              <PrimaryButton
+                v-if="user.is_admin"
+                class="tw-mr-2"
+                @click="() => importData('activities')"
+              >
+                Upload Activities
               </PrimaryButton>
               <PrimaryButton
                 variant="outlined"
