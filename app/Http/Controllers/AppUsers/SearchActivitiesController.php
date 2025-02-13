@@ -37,7 +37,7 @@ class SearchActivitiesController extends Controller
             'date' => 'required|date',
             'start_time' => 'nullable|date_format:H:i',
             'church_name' => 'nullable|string',
-            'district_name' => 'nullable|string',
+            'district' => 'nullable|string',
         ]);
 
         $date = Carbon::createFromDate($data['date']);
@@ -58,10 +58,12 @@ class SearchActivitiesController extends Controller
                 )
             )
             ->when(
-                isset($data['district_name']),
+                isset($data['district']),
                 fn (Builder $query) => $query->whereHas(
                     'church',
-                    fn (Builder $query) => $query->where('district', 'like', "%{$data['district_name']}%")
+                    fn (Builder $query) => $query
+                        ->where('district', 'like', "%{$data['district']}%")
+                        ->orWhere('city', 'like', "%{$data['district']}%")
                 )
             )
             ->when(

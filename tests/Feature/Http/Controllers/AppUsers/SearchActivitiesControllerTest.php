@@ -167,7 +167,7 @@ test('users can search by district.', function () {
         route('search', [
             'type' => 'mass',
             'date' => now()->toDateString(),
-            'district_name' => $church->district,
+            'district' => $church->district,
         ])
     )
         ->assertOk()

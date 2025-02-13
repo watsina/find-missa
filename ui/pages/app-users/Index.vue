@@ -33,7 +33,7 @@
   const form = useForm({
     start_time: parser.format(new Date(), 'fullTime24h')?.substring(0, 5),
     church_name: '',
-    district_name: '',
+    district: '',
     type: 'mass',
     date: parser.date(currentDate),
   });
@@ -117,9 +117,9 @@
         </v-col>
         <v-col cols="12" md="3">
           <TextInput
-            v-model="form.district_name"
+            v-model="form.district"
             clearable
-            label="District"
+            label="District/Town"
             variant="outlined"
           ></TextInput>
         </v-col>
