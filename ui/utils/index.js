@@ -1,2 +1,2 @@
 export { default as useDayjs } from './date';
-export { default as notify } from './notify';
+export { default as notify } from '@/plugins/notify';

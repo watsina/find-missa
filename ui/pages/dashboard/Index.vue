@@ -2,13 +2,11 @@
   import AppLayout from '@/layouts/AppLayout.vue';
   import NavLink from '@/components/NavLink.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
-  import ImportDataModal from './ImportDataModal.vue';
   import ExportDataModal from './ExportDataModal.vue';
   import ActionLogs from './ActionLogs.vue';
   import { ref, onMounted, computed } from 'vue';
-  import { http } from '@/plugins';
+  import { http, notify } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';
-  import { notify } from '@/utils';
 
   const store = useAuthStore();
 
@@ -16,7 +14,6 @@
 
   const isFetching = ref(false);
   const isDeleting = ref(false);
-  const showUploadModal = ref(false);
   const showExportModal = ref(false);
 
   const stats = ref([]);
@@ -77,11 +74,6 @@
       </h2>
     </template>
 
-    <import-data-modal
-      v-if="user.is_admin"
-      v-model:show-modal="showUploadModal"
-    ></import-data-modal>
-
     <export-data-modal v-if="user.is_admin" v-model:show-modal="showExportModal" />
 
     <v-container>
@@ -89,9 +81,6 @@
         <v-col class="tw-flex tw-justify-between" cols="12">
           <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to your dashboard</div>
           <div>
-            <PrimaryButton v-if="user.is_admin" class="tw-mr-2" @click="showUploadModal = true">
-              Upload data
-            </PrimaryButton>
             <PrimaryButton v-if="user.is_admin" class="tw-mr-2" @click="showExportModal = true">
               Export data
             </PrimaryButton>
