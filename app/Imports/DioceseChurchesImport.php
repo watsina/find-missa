@@ -24,50 +24,50 @@ class DioceseChurchesImport implements SkipsEmptyRows, ToCollection, WithHeading
             $subParish = null;
 
             $parish = Parish::firstOrCreate(
-                ['name' => $row['parish_name'], 'diocese_id' => $this->diocese->id],
+                ['name' => trim($row['parish_name']), 'diocese_id' => $this->diocese->id],
                 [
-                    'district' => $row['district'],
-                    'city' => $row['town'],
-                    'contact_email' => $row['contact_email'],
-                    'office_address' => $row['office_address'],
-                    'website_url' => $row['website_url'],
+                    'district' => trim($row['district']),
+                    'city' => trim($row['town']),
+                    'contact_email' => trim($row['contact_email']),
+                    'office_address' => trim($row['office_address']),
+                    'website_url' => trim($row['website_url']),
                 ],
             );
 
             if (isset($row['sub_parish_name'])) {
                 $parishType = 'subParish';
                 $subParish = SubParish::firstOrCreate(
-                    ['name' => $row['sub_parish_name'], 'parish_id' => $parish->id],
+                    ['name' => trim($row['sub_parish_name']), 'parish_id' => $parish->id],
                     [
-                        'district' => $row['district'],
-                        'city' => $row['town'],
-                        'contact_email' => $row['contact_email'],
-                        'office_address' => $row['office_address'],
-                        'website_url' => $row['website_url'],
+                        'district' => trim($row['district']),
+                        'city' => trim($row['town']),
+                        'contact_email' => trim($row['contact_email']),
+                        'office_address' => trim($row['office_address']),
+                        'website_url' => trim($row['website_url']),
                     ],
                 );
             }
 
             Church::firstOrCreate(
                 [
-                    'name' => $row['church_name'],
+                    'name' => trim($row['church_name']),
                     'parishable_id' => $parishType === 'parish' ? $parish->id : $subParish->id,
                     'parishable_type' => $parishType,
                 ],
                 [
                     'type' => Str::kebab($parishType),
-                    'city' => $row['town'],
-                    'district' => $row['district'],
-                    'contact_email' => $row['contact_email'],
-                    'contact_phone' => $row['church_contact_phone'],
-                    'street_address' => $row['office_address'],
-                    'website_url' => $row['website_url'],
+                    'city' => trim($row['town']),
+                    'district' => trim($row['district']),
+                    'contact_email' => trim($row['contact_email']),
+                    'contact_phone' => trim($row['church_contact_phone']),
+                    'street_address' => trim($row['office_address']),
+                    'website_url' => trim($row['website_url']),
                     'latitude' => $row['latitude'],
                     'longitude' => $row['longitude'],
-                    'street_address' => $row['office_address'],
-                    'postal_address' => $row['postal_address'],
-                    'google_maps_link' => $row['google_maps_link'],
-                    'district' => $row['district'],
+                    'street_address' => trim($row['office_address']),
+                    'postal_address' => trim($row['postal_address']),
+                    'google_maps_link' => trim($row['google_maps_link']),
+                    'district' => trim($row['district']),
                 ],
             );
         }

@@ -12,7 +12,7 @@
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
 
-  const title = 'Find Missa';
+  const title = 'Find Catholic Mass - Uganda';
   const description =
     'A web app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district...';
 

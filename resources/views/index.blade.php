@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title >{{ config('app.name', 'Find Mass') }}</title>
+        {{-- <title >{{ config('app.name', 'Find Mass') }}</title> --}}
+        <title>Find Catholic Mass - Uganda</title>
 
         <meta property="og:image" content="/android-chrome-512x512.png">
         <meta property="twitter:card" content="summary_large_image">

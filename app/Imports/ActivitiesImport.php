@@ -8,6 +8,8 @@ use App\Models\Diocese;
 use App\Models\SubParish;
 use Illuminate\Support\Str;
 use App\Models\ActivityTime;
+use Illuminate\Validation\Rule;
+use App\Enums\ImportActivityType;
 use Illuminate\Support\Collection;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use Maatwebsite\Excel\DefaultValueBinder;
@@ -29,26 +31,26 @@ class ActivitiesImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
             $parishType = 'parish';
             $subParish = null;
 
-            $parish = Parish::where('name', $row['parish_name'])
+            $parish = Parish::where('name', trim($row['parish_name']))
                 ->where('diocese_id', $this->diocese->id)
-                ->firstOrFail();
+                // ->firstOrFail();
+                ->first();
+
+            if (! $parish) {
+                dd($row['parish_name']);
+            }
 
             if (isset($row['sub_parish_name'])) {
                 $parishType = 'subParish';
-                $subParish = SubParish::where('name', $row['sub_parish_name'])
+                $subParish = SubParish::where('name', trim($row['sub_parish_name']))
                     ->where('parish_id', $parish->id)
                     ->firstOrFail();
             }
 
-            $church = Church::where('name', $row['church_name'])
+            $church = Church::where('name', trim($row['church_name']))
                 ->where('parishable_id', $parishType === 'parish' ? $parish->id : $subParish->id)
                 ->where('parishable_type', $parishType)
                 ->firstOrFail();
-            // ->first();
-
-            // if (!$church) {
-            //     dd($row['church_name']);
-            // }
 
             foreach (explode(',', $row['day_of_week']) as $dayOfWeek) {
                 ActivityTime::firstOrCreate(
@@ -59,7 +61,7 @@ class ActivitiesImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
                         'start_time' => $row['start_time'],
                         'day_of_week' => trim($dayOfWeek),
                     ],
-                    ['language' => $row['language']]
+                    ['language' => trim($row['language'])]
                 );
             }
         }
@@ -102,6 +104,7 @@ class ActivitiesImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
         $required = 'required|string|max:255';
         $parish = 'required|string|exists:parishes,name';
         $subParish = 'nullable|string|exists:sub_parishes,name';
+        $type = ['required', Rule::enum(ImportActivityType::class)];
         $optional = 'nullable|string|max:255';
 
         return [
@@ -123,8 +126,8 @@ class ActivitiesImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
             'start_time' => ['required', 'date_format:H:i'],
             '*.start_time' => ['required', 'date_format:H:i'],
 
-            'activity_type' => $required,
-            '*.activity_type' => $required,
+            'activity_type' => $type,
+            '*.activity_type' => $type,
         ];
     }
 }
