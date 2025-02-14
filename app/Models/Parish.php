@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,13 +24,6 @@ class Parish extends BaseModel
         'id' => 'integer',
         'diocese_id' => 'integer',
     ];
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->code_name = Str::kebab($model->name.' '.$model->city);
-        });
-    }
 
     /**
      * Get the indexable data array for the model.

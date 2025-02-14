@@ -153,7 +153,7 @@
                 Confession
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <div v-if="!confession?.length">No data available</div>
+                <div v-if="!Object.keys(confession)?.length">No data available</div>
                 <v-table v-else>
                   <thead>
                     <tr>
@@ -162,16 +162,18 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(confessions, index) in confession" :key="index">
-                      <td>{{ index }}</td>
-                      <td>
-                        <ul>
-                          <li v-for="conf in confessions" :key="conf.id" class="tw-mr-2">
-                            {{ conf?.start_time }}-({{ conf?.language }})
-                          </li>
-                        </ul>
-                      </td>
-                    </tr>
+                    <template v-for="(day, index) in daysOfWeek" :key="index">
+                      <tr v-if="adoration[day]">
+                        <td>{{ day }}</td>
+                        <td>
+                          <ul>
+                            <li v-for="ador in adoration[day]" :key="ador.id" class="tw-mr-2">
+                              {{ ador?.start_time }} ({{ ador?.language }})
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </template>
                   </tbody>
                 </v-table>
               </v-expansion-panel-text>
@@ -186,7 +188,7 @@
                 Adoration
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <div v-if="!confession?.length">No data available</div>
+                <div v-if="!Object.keys(adoration)?.length">No data available</div>
                 <v-table v-else>
                   <thead>
                     <tr>
@@ -195,14 +197,18 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(adorations, index) in adoration" :key="index">
-                      <td>{{ index }}</td>
-                      <td>
-                        <span v-for="ador in adorations" :key="ador.id" class="tw-mr-2">
-                          {{ ador?.start_time }}-({{ ador?.language }})
-                        </span>
-                      </td>
-                    </tr>
+                    <template v-for="(day, index) in daysOfWeek" :key="index">
+                      <tr v-if="adoration[day]">
+                        <td>{{ day }}</td>
+                        <td>
+                          <ul>
+                            <li v-for="ador in adoration[day]" :key="ador.id" class="tw-mr-2">
+                              {{ ador?.start_time }} ({{ ador?.language }})
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </template>
                   </tbody>
                 </v-table>
               </v-expansion-panel-text>
