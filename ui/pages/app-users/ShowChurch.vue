@@ -163,12 +163,12 @@
                   </thead>
                   <tbody>
                     <template v-for="(day, index) in daysOfWeek" :key="index">
-                      <tr v-if="adoration[day]">
+                      <tr v-if="confession[day]">
                         <td>{{ day }}</td>
                         <td>
                           <ul>
-                            <li v-for="ador in adoration[day]" :key="ador.id" class="tw-mr-2">
-                              {{ ador?.start_time }} ({{ ador?.language }})
+                            <li v-for="conf in confession[day]" :key="conf.id" class="tw-mr-2">
+                              {{ conf?.start_time }} ({{ conf?.language }})
                             </li>
                           </ul>
                         </td>
