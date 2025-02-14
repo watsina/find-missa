@@ -72,14 +72,14 @@
     <v-container>
       <v-row class="py-4">
         <v-col cols="12">
-          <v-alert
-            class="tw-uppercase tw-font-semibold tw-text-md"
-            prominent
-            type="warning"
-            variant="tonal"
-          >
-            This app is still in development, we are still gathering data and the app is undergoing
-            testing and is not yet ready for public use.
+          <v-alert class="tw-font-semibold tw-text-md" prominent type="info" variant="tonal">
+            We are still gathering information from various Catholic parishes in Uganda. If you
+            notice any inaccuracies or missing details, please share updates with us using this
+            Google Form
+            <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
+            <br />
+            Currently, we only display schedules for Uganda, but we will support other countries
+            soon.
           </v-alert>
         </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
