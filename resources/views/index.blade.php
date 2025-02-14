@@ -9,7 +9,7 @@
         <meta property="og:image" content="/android-chrome-512x512.png">
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:image" content="/android-chrome-512x512.png">
-        <meta name="description" content="Find Missa is an application that helps you find mass, confession and adoration in a parish or subparish near you. Choose the country and search for mass, adoration and confession by church name, town or district.">
+        <meta name="description" content="An app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district.">
 
         <link rel="manifest" href="/site.webmanifest">
 
