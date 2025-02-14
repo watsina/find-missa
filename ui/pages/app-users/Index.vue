@@ -8,7 +8,7 @@
   import { useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import { ref, onMounted, computed, watch } from 'vue';
-  import { useDate } from 'vuetify/lib/framework.mjs';
+  import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
 
@@ -24,6 +24,7 @@
     ogUrl: 'https://findmissa.com',
   });
 
+  const { smAndDown } = useDisplay();
   const results = ref(null);
   const dateUsed = ref(null);
   const parser = useDate();
@@ -38,11 +39,13 @@
     date: parser.date(currentDate),
   });
 
-  const showDate = computed(() =>
-    useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day')
-      ? 'Today'
-      : parser.format(dateUsed.value, 'fullDateWithWeekday'),
-  );
+  const showDate = computed(() => {
+    const date = smAndDown.value
+      ? parser.format(dateUsed.value, 'fullDate')
+      : parser.format(dateUsed.value, 'fullDateWithWeekday');
+
+    return useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day') ? 'Today' : date;
+  });
 
   watch(
     () => form.type,
@@ -78,8 +81,8 @@
             Google Form
             <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
             <br />
-            Currently, we only display schedules for Uganda, but we will support other countries
-            soon.
+            Currently, we only display mass, confession and adoration schedules for Uganda, but we
+            will support other countries soon.
           </v-alert>
         </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
@@ -135,11 +138,13 @@
           <v-sheet>
             <v-divider opacity="10"></v-divider>
             <v-card-title class="!tw-flex tw-justify-between">
-              <span>
+              <span :class="{ 'tw-text-base': smAndDown, 'tw-text-md': !smAndDown }">
                 {{ showDate }}
               </span>
               <span class="tw-text-base">
-                {{ `Showing: ${results?.data?.length} of ${results?.meta?.total} results` }}
+                {{
+                  `${!smAndDown ? 'Showing:' : ''} ${results?.data?.length} of ${results?.meta?.total} results`
+                }}
               </span>
             </v-card-title>
             <v-divider opacity="10"></v-divider>
