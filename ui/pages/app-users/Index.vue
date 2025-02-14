@@ -14,7 +14,7 @@
 
   const title = 'Find Missa';
   const description =
-    'An app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district...';
+    'A web app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district...';
 
   useSeoMeta({
     title: title,
