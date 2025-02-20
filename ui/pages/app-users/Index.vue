@@ -80,9 +80,6 @@
             notice any inaccuracies or missing details, please share updates with us using this
             Google Form
             <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
-            <br />
-            Currently, we only display mass, confession and adoration schedules for Uganda, but we
-            will support other countries soon.
           </v-alert>
         </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
