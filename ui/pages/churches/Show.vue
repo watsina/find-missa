@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { mdiPencilOutline, mdiEyeOutline } from '@mdi/js';
+  import { mdiPencilOutline, mdiEyeOutline, mdiDeleteOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
@@ -9,14 +9,18 @@
   import ActivityTimeModal from '@/pages/activities/ActivityTimeModal.vue';
   import { notify } from '@/utils';
   import { isArray } from 'lodash';
+  import useAuthStore from '@/stores/useAuthStore';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
   });
 
+  const store = useAuthStore();
+
   const church = ref(null);
   const isFetching = ref(false);
   const showingModal = ref(false);
+  const deletingActivity = ref(false);
   const activityToEdit = ref(null);
 
   const headers = [
@@ -45,6 +49,25 @@
       })
       .catch(() => notify.error('Something went wrong fetching the church details.'))
       .finally(() => (isFetching.value = false));
+  };
+
+  const deleteActivity = async (activityId) => {
+    if (
+      !(await notify.confirm('You are about to delete this activity, this action is irreversible.'))
+    ) {
+      return;
+    }
+
+    deletingActivity.value = true;
+    http
+      .delete(`/api/v1/activity-times/${activityId}`)
+      .then(() => {
+        const items = church.value.activities;
+        church.value.activities = items.filter((activity) => activity.id !== activityId);
+        notify.success('Activity removed successfully');
+      })
+      .catch(() => notify.error('Failed to remove the activity.'))
+      .finally(() => (deletingActivity.value = false));
   };
 
   function showModal(data = null) {
@@ -107,15 +130,22 @@
                 color="primary"
                 :icon="mdiPencilOutline"
                 @click="showModal(item)"
-              ></v-icon>
-              <v-btn
+              />
+              <v-icon
                 v-if="item?.id"
                 color="primary"
                 :icon="mdiEyeOutline"
                 title="View Activity Details"
                 :to="{ name: 'activities.show', params: { activityId: item.id } }"
                 variant="text"
-              ></v-btn>
+              />
+              <v-icon
+                v-if="store.user.is_admin"
+                color="error"
+                @click="deleteActivity(item.id)"
+                :disabled="deletingActivity"
+                :icon="mdiDeleteOutline"
+              />
             </template>
           </data-table>
         </v-col>
