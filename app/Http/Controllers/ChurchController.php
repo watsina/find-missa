@@ -18,7 +18,9 @@ class ChurchController extends Controller
     {
         Gate::authorize('viewAny', Church::class);
 
-        $churches = Church::with('activities', 'parishable:id,name,city')->paginate(20);
+        $churches = Church::search($request->search)
+            ->query(fn ($q) => $q->with('parishable:id,name,city'))
+            ->paginate(20);
 
         return new ChurchCollection($churches);
     }
