@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ class Church extends BaseModel
 {
     use HasCodeName;
     use HasFactory;
+    use Searchable;
 
     /**
      * The attributes that should be cast to native types.
@@ -25,6 +27,16 @@ class Church extends BaseModel
         'latitude' => 'decimal:4',
         'longitude' => 'decimal:4',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('name', 'city', 'district');
+    }
 
     /**
      * Get the parent parishable model (parish or sub-parish).
