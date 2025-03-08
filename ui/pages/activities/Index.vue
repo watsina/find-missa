@@ -1,12 +1,7 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { http } from '@/plugins';
   import { mdiEyeOutline } from '@mdi/js';
-  import DataTable from '@/components/DataTable.vue';
+  import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
-
-  const activities = ref([]);
-  const isFetching = ref(false);
 
   const headers = [
     { title: 'Activity Type', value: 'type' },
@@ -19,17 +14,6 @@
     { title: 'Day of Week', value: 'day_of_week' },
     { title: '', value: 'actions' },
   ];
-
-  onMounted(() => {
-    fetchActivities();
-  });
-
-  const fetchActivities = () => {
-    isFetching.value = true;
-    http.get('/api/v1/activity-times').then(({ data }) => {
-      activities.value = data?.data;
-    });
-  };
 </script>
 
 <template>
@@ -43,7 +27,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the activities.</p>
         </v-col>
         <v-col cols="12">
-          <data-table class="tw-capitalize" has-search :headers="headers" :items="activities || []">
+          <DataTableServer :headers="headers" url="/api/v1/activity-times" item-value="id">
             <template #item.actions="{ item }">
               <v-btn
                 color="primary"
@@ -53,7 +37,7 @@
                 variant="text"
               ></v-btn>
             </template>
-          </data-table>
+          </DataTableServer>
         </v-col>
       </v-row>
     </v-container>
