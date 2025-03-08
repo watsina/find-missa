@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,7 @@ class Diocese extends BaseModel
 {
     use HasCodeName;
     use HasFactory;
+    use Searchable;
 
     /**
      * The attributes that should be cast to native types.
@@ -19,6 +21,16 @@ class Diocese extends BaseModel
     protected $casts = [
         'id' => 'integer',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('name', 'code_name');
+    }
 
     public function parishes(): HasMany
     {

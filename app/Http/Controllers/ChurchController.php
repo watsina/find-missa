@@ -18,7 +18,12 @@ class ChurchController extends Controller
     {
         Gate::authorize('viewAny', Church::class);
 
-        $churches = Church::with('activities', 'parishable:id,name,city')->paginate(20);
+        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $itemsPerPage = $items > 100 ? 100 : $items;
+
+        $churches = Church::search($request->search)
+            ->query(fn ($q) => $q->with('parishable:id,name,city'))
+            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return new ChurchCollection($churches);
     }

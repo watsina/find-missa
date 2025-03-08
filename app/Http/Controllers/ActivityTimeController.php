@@ -17,7 +17,12 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('viewAny', ActivityTime::class);
 
-        $activityTimes = ActivityTime::paginate(50);
+        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $itemsPerPage = $items > 100 ? 100 : $items;
+
+        $activityTimes = ActivityTime::search($request->search)
+            ->query(fn ($q) => $q->with('church:id,name'))
+            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return new ActivityTimeCollection($activityTimes);
     }

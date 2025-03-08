@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -11,6 +12,7 @@ class SubParish extends BaseModel
 {
     use HasCodeName;
     use HasFactory;
+    use Searchable;
 
     /**
      * The attributes that should be cast to native types.
@@ -21,6 +23,16 @@ class SubParish extends BaseModel
         'id' => 'integer',
         'parish_id' => 'integer',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('name', 'city', 'district');
+    }
 
     public function parish(): BelongsTo
     {

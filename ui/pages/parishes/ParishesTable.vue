@@ -1,12 +1,10 @@
 <script setup>
-  import { ref, watch } from 'vue';
+  import { ref } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
-  import { http } from '@/plugins';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import ParishModal from './ParishModal.vue';
-  import { debounce } from 'lodash';
 
   defineProps({
     isFetching: Boolean,
@@ -15,25 +13,9 @@
 
   const parishes = defineModel('parishes', { type: Array, default: () => [] });
 
-  const search = ref('');
   const showingModal = ref(false);
   const parishToEdit = ref(null);
   const isFetching = ref(false);
-
-  const searchParishes = () => {
-    isFetching.value = true;
-    http
-      .get('/api/v1/parishes', { params: { search: search.value } })
-      .then(({ data }) => {
-        parishes.value = data?.data;
-      })
-      .finally(() => (isFetching.value = false));
-  };
-
-  watch(
-    search,
-    debounce(() => searchParishes(), 300),
-  );
 
   const headers = [
     { title: 'Name', value: 'name' },
@@ -75,19 +57,6 @@
     </v-col>
     <v-col cols="12">
       <DataTable :headers="headers" :items="parishes || []" :loading="isFetching">
-        <template #top>
-          <TextInput
-            id="search"
-            v-model="search"
-            autofocus
-            class="tw-block tw-mb-2 tw-mx-2"
-            error=""
-            label="Search"
-            placeholder="Search parishes..."
-            required
-            type="text"
-          />
-        </template>
         <template #item.diocese="{ item }">
           {{ item?.diocese?.name || diocese?.name }}
         </template>
