@@ -2,7 +2,7 @@
   import { ref, onMounted } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import { http } from '@/plugins';
-  import DataTable from '@/components/DataTable.vue';
+  import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DioceseModal from './DioceseModal.vue';
@@ -21,20 +21,6 @@
     { title: 'Number of Parishes', value: 'parishes_count', align: 'center' },
     { title: '', value: 'actions' },
   ];
-
-  onMounted(() => {
-    fetchDioceses();
-  });
-
-  const fetchDioceses = () => {
-    isFetching.value = true;
-    http
-      .get('/api/v1/dioceses')
-      .then(({ data }) => {
-        dioceses.value = data?.data;
-      })
-      .finally(() => (isFetching.value = false));
-  };
 
   function updateDioceses(updated) {
     dioceses.value = dioceses.value?.map((diocese) => {
@@ -70,11 +56,10 @@
           <PrimaryButton @click="showModal"> Add a diocese </PrimaryButton>
         </v-col>
         <v-col cols="12">
-          <data-table
-            has-search
+          <data-table-server
             :headers="headers"
-            :items="dioceses || []"
-            :loading="isFetching"
+            url="/api/v1/dioceses"
+            v-model:items="dioceses"
             no-data-text="No dioceses have been added yet..."
           >
             <template #item.name="{ item }" class="tw-capitalize">
@@ -96,7 +81,7 @@
                 variant="text"
               ></v-btn>
             </template>
-          </data-table>
+          </data-table-server>
         </v-col>
       </v-row>
     </v-container>
