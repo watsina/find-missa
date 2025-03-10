@@ -1,13 +1,11 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { http } from '@/plugins';
-  import DataTable from '@/components/DataTable.vue';
+  import { ref } from 'vue';
+  import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
   import { mdiPencilOutline } from '@mdi/js';
   import UserModal from './UserModal.vue';
 
   const users = ref([]);
-  const isFetching = ref(false);
   const showingModal = ref(false);
   const userToEdit = ref(null);
 
@@ -18,17 +16,6 @@
     { title: 'Super Admin', value: 'is_admin' },
     { title: '', value: 'actions' },
   ];
-
-  onMounted(() => {
-    fetchUsers();
-  });
-
-  const fetchUsers = () => {
-    isFetching.value = true;
-    http.get('/api/v1/users').then(({ data }) => {
-      users.value = data?.data;
-    });
-  };
 
   function showModal(user) {
     userToEdit.value = user;
@@ -57,7 +44,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the users.</p>
         </v-col>
         <v-col cols="12">
-          <data-table has-search :headers="headers" :items="users || []">
+          <data-table-server :headers="headers" url="/api/v1/users" v-model:items="users">
             <template #item.two_factor_enabled="{ item }">
               <v-chip :color="item.two_factor_enabled ? 'primary' : ''" size="small" variant="flat">
                 {{ item.two_factor_enabled ? 'true' : 'false' }}
@@ -71,7 +58,7 @@
             <template #item.actions="{ item }">
               <v-icon color="primary" :icon="mdiPencilOutline" @click="showModal(item)"></v-icon>
             </template>
-          </data-table>
+          </data-table-server>
         </v-col>
       </v-row>
     </v-container>

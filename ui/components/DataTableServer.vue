@@ -14,9 +14,9 @@
 
   const { smAndDown } = useDisplay();
 
+  const items = defineModel('items', { type: Array, default: () => [] });
   const search = ref('');
   const isFetching = ref(false);
-  const items = ref([]);
   const meta = ref({ per_page: 10, total: 100 });
   const page = ref(1);
   const itemsPerPage = ref(10);

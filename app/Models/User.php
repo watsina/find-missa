@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use Laravel\Fortify\Features;
+use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasTeams;
     use Notifiable;
     use RecordsUserActions;
+    use Searchable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 
@@ -83,6 +85,16 @@ class User extends Authenticatable implements MustVerifyEmail
                 $user->password = Hash::make(Str::random(10));
             }
         });
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('name', 'email');
     }
 
     public function twoFactorEnabled(): Attribute
