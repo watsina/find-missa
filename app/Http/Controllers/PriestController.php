@@ -17,7 +17,12 @@ class PriestController extends Controller
     {
         Gate::authorize('viewAny', Priest::class);
 
-        $priests = Priest::with('parish:id,name,city')->paginate(20);
+        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $itemsPerPage = $items > 100 ? 100 : $items;
+
+        $priests = Priest::search($request->search)
+            ->query(fn ($q) => $q->with('parish:id,name,city'))
+            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return new PriestCollection($priests);
     }
