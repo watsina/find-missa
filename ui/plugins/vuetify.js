@@ -71,6 +71,7 @@ export default createVuetify({
     },
 
     VDataTable: dataTableOptions,
+    VDataTableServer: dataTableOptions,
   },
   icons: {
     defaultSet: 'mdi',
