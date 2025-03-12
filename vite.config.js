@@ -69,6 +69,7 @@ export default defineConfig(({ mode }) => ({
       refresh: true,
     }),
     vue({
+      autoImport: { labs: true },
       template: {
         transformAssetUrls: {
           base: null,
