@@ -23,8 +23,8 @@ const dataTableOptions = {
 export default createVuetify({
   theme: {
     themes: {
-      dark: false,
-      colors,
+      dark: { colors },
+      light: { colors },
     },
   },
   components: {
