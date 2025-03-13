@@ -7,6 +7,8 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'plugin:vue/vue3-strongly-recommended',
     'prettier',
+    'plugin:vue/base',
+    'plugin:vuetify/base',
   ],
   plugins: ['vue', 'unused-imports'],
   rules: {

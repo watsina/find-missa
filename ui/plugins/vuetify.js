@@ -27,10 +27,10 @@ export default createVuetify({
       colors,
     },
   },
-  // components: {
-  //   VTimePicker,
-  //   VDateInput,
-  // },
+  components: {
+    VTimePicker,
+    VDateInput,
+  },
   defaults: {
     VCol: {
       cols: 12,
