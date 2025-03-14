@@ -9,6 +9,12 @@
   background: #212121 !important;
 }
 
+.v-btn,
+.v-field,
+.v-card {
+  border-radius: 8px !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

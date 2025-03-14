@@ -3,10 +3,7 @@
     ref="input"
     v-bind="$attrs"
     v-model="model"
-    :color="color"
-    :density="density"
     :error-messages="error"
-    hide-details="auto"
     :label="label"
     :placeholder="placeholder"
     :type="type"
@@ -28,8 +25,6 @@
     error: { type: [String, Array], default: '' },
     label: { type: String, default: '' },
     placeholder: { type: String, default: '' },
-    density: { type: String, default: 'default' },
-    color: { type: String, default: 'primary' },
   });
 
   const input = ref(null);

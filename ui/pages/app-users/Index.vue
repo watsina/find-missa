@@ -84,45 +84,47 @@
           </v-alert>
         </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
-          <v-btn-toggle v-model="form.type" color="primary" group rounded>
-            <v-btn value="mass">Mass</v-btn>
-            <v-btn value="confession">Confession</v-btn>
-            <v-btn value="adoration">Adoration</v-btn>
+          <v-btn-toggle v-model="form.type" color="primary" mandatory group rounded>
+            <v-btn rounded="0" value="mass">Mass</v-btn>
+            <v-btn rounded="0" value="confession">Confession</v-btn>
+            <v-btn rounded="0" value="adoration">Adoration</v-btn>
           </v-btn-toggle>
         </v-col>
         <v-col cols="12" md="3">
           <DateInput
             v-model="date"
-            density="compact"
             label="Date"
             :min="currentDate"
-            variant="outlined"
+            variant="underlined"
           ></DateInput>
         </v-col>
         <v-col cols="12" md="2">
           <TimeInput
             v-model="form.start_time"
+            title="Select Mass Time"
             :error="form.errors.start_time"
             label="From Time (24h)"
             required
-            variant="outlined"
+            variant="underlined"
           />
         </v-col>
         <v-col cols="12" md="3">
-          <TextInput
+          <v-text-field
             v-model="form.church_name"
+            density="default"
+            variant="underlined"
             clearable
             label="Parish/Church Name"
-            variant="outlined"
-          ></TextInput>
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <TextInput
+          <v-text-field
             v-model="form.district"
+            variant="underlined"
+            density="default"
             clearable
             label="District/Town"
-            variant="outlined"
-          ></TextInput>
+          ></v-text-field>
         </v-col>
         <v-col class="tw-flex tw-items-end" cols="12" md="1">
           <PrimaryButton variant="outlined" @click="getResults"> Search </PrimaryButton>

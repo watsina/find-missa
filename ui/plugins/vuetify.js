@@ -1,6 +1,3 @@
-// Styles
-// import 'vuetify/styles';
-// import '@mdi/font/css/materialdesignicons.css';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import colors from '@/utils/colors';
 import { VTimePicker } from 'vuetify/labs/VTimePicker';
@@ -19,12 +16,19 @@ const dataTableOptions = {
   ],
 };
 
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
+const theme = {
+  dark: false,
+  colors,
+};
+
 export default createVuetify({
   theme: {
+    defaultTheme: 'theme',
+    options: {
+      customProperties: true,
+    },
     themes: {
-      dark: { colors },
-      light: { colors },
+      theme,
     },
   },
   components: {
@@ -40,6 +44,7 @@ export default createVuetify({
       variant: 'outlined',
       density: 'compact',
       color: 'primary',
+      hideDetails: 'auto',
     },
 
     VTextarea: {
@@ -60,10 +65,10 @@ export default createVuetify({
       color: 'primary',
     },
     VBtn: {
-      rounded: '3px',
+      // rounded: '3px',
     },
     VCard: {
-      rounded: '3px',
+      // rounded: '3px',
     },
     VBtnToggle: {
       density: 'compact',

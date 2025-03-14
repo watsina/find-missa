@@ -4,7 +4,9 @@
     v-model="model"
     :error-messages="error"
     hide-details="auto"
+    density="compact"
     prepend-icon=""
+    color="primary"
     prepend-inner-icon="$calendar"
   >
   </v-date-input>
@@ -13,7 +15,6 @@
 <script setup>
   defineProps({
     error: { type: [String, Array], default: '' },
-    color: { type: String, default: 'primary' },
   });
 
   const model = defineModel({

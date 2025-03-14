@@ -27,7 +27,7 @@
                 window.Auth = @json($auth)
             @endisset
         </script>
-        @vite(['ui/app.js'])
+        @vite(['ui/app.js', 'ui/styles/app.css'])
     </head>
     <body class="tw-font-sans tw-antialiased">
         <div id="app"/>

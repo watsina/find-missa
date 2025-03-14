@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     laravel({
-      input: 'ui/app.js',
+      input: ['ui/app.js', 'ui/styles/app.css'],
       refresh: true,
     }),
     vue({

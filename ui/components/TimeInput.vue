@@ -3,10 +3,8 @@
     v-bind="$attrs"
     v-model="model"
     :active="dialog"
-    :density="density"
     :error-messages="error"
     :focus="dialog"
-    hide-details="auto"
     :prepend-inner-icon="mdiClockTimeFourOutline"
     readonly
   >
@@ -18,10 +16,10 @@
     >
       <v-time-picker
         v-if="dialog"
-        v-bind="{ ...$attrs }"
+        v-bind="$attrs"
         v-model="model"
-        :color="color"
         :format="format"
+        color="primary"
         full-width
         scrollable
       >
@@ -41,8 +39,6 @@
     type: { type: String, default: 'text' },
     format: { type: String, default: '24hr' },
     error: { type: [String, Array], default: '' },
-    density: { type: String, default: 'compact' },
-    color: { type: String, default: 'primary' },
   });
 
   const dialog = ref(false);
