@@ -6,6 +6,7 @@
   import EntityDetails from '@/components/EntityDetails.vue';
   import {
     mdiCity,
+    mdiDirections,
     mdiEmailFast,
     mdiHomeCity,
     mdiPhoneClassic,
@@ -95,14 +96,21 @@
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="`${church?.name} - ${church?.city}`">
             <template #subtitle>
-              <a
+              <v-btn
                 v-if="church?.google_maps_link"
-                class="text-caption tw-text-indigo-600"
+                class="tw-text-sm"
                 :href="church?.google_maps_link"
                 target="_blank"
+                size="small"
+                variant="plain"
+                flat
+                slim
+                :ripple="false"
+                color="primary"
               >
-                Get Directions >
-              </a>
+                Get Directions
+                <v-icon :icon="mdiDirections" end size="large"></v-icon>
+              </v-btn>
             </template>
           </EntityDetails>
         </v-col>

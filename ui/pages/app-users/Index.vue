@@ -11,6 +11,7 @@
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
+  import { mdiPageNextOutline, mdiShareAllOutline } from '@mdi/js';
 
   const title = 'Find Catholic Mass - Uganda';
   const description =
@@ -123,7 +124,7 @@
             variant="outlined"
           ></TextInput>
         </v-col>
-        <v-col class="d-flex align-end" cols="12" md="1">
+        <v-col class="tw-flex tw-items-end" cols="12" md="1">
           <PrimaryButton variant="outlined" @click="getResults"> Search </PrimaryButton>
         </v-col>
         <template v-if="form.processing">
@@ -161,15 +162,15 @@
                 dot-color="primary"
                 size="small"
               >
-                <div class="d-flex">
-                  <strong class="me-4">
+                <div class="tw-flex">
+                  <strong class="tw-me-4">
                     {{ `${activity?.start_time}` }}
                   </strong>
                   <div>
                     <strong class="tw-capitalize">
                       {{ `${activity?.type} (${activity?.language})` }}
                     </strong>
-                    <div class="text-caption">
+                    <div>
                       <NavLink
                         class="tw-text-indigo-600"
                         :href="{
@@ -180,6 +181,7 @@
                         {{
                           `${activity?.church?.name} - ${activity?.church?.district} (${activity?.church?.city})`
                         }}
+                        <v-icon :icon="mdiShareAllOutline" end></v-icon>
                       </NavLink>
                     </div>
                   </div>

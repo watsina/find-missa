@@ -1,5 +1,5 @@
 <template>
-  <v-layout class="rounded rounded-md">
+  <v-layout class="tw-rounded-md">
     <session-expired-modal v-model="showSessionExpiredModal" />
     <top-bar v-if="authUser" v-model:drawer="drawer" v-model:rail="rail">
       <template v-if="$slots.head" #header>
@@ -10,7 +10,7 @@
 
     <nav-drawer v-if="authUser" v-model:drawer="drawer" v-model:rail="rail" />
 
-    <v-main class="d-flex align-center justify-center" style="min-height: 300px">
+    <v-main class="tw-flex tw-items-center tw-justify-center" style="min-height: 300px">
       <slot />
     </v-main>
   </v-layout>
