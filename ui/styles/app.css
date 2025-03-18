@@ -15,6 +15,10 @@
   border-radius: 8px !important;
 }
 
+.rounded-0 {
+  border-radius: 0 !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
