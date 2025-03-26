@@ -25,7 +25,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the churches.</p>
         </v-col>
         <v-col cols="12">
-          <DataTableServer :headers="headers" url="/api/v1/churches" item-value="id">
+          <DataTableServer :headers="headers" item-value="id" url="/api/v1/churches">
             <template #item.parish="{ item }">
               {{ item?.parish?.id ? `${item?.parish?.name} - ${item?.parish?.city}` : '' }}
             </template>

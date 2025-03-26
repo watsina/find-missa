@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app elevate-on-scroll elevation="1" flat>
+  <v-app-bar app elevation="1" flat scroll-behavior="elevate">
     <template #prepend>
       <div class="tw-flex tw-items-center shrink-0 tw-mx-4">
         <NavLink class="tw-border-none" :href="{ name: 'home' }">

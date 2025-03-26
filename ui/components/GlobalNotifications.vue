@@ -7,7 +7,7 @@
       v-bind="$notify.props"
       :color="$notify.color"
       :model-value="!!$notify.text"
-      @input="!$event && $notify.close()"
+      @update:model-value="!$event && $notify.close()"
     >
       {{ $notify.text }}
       <template #actions>

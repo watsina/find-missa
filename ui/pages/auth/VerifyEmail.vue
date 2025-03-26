@@ -22,17 +22,17 @@
 
         <div>
           <a
-            :href="route('profile.show')"
             class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+            :href="route('profile.show')"
           >
             Edit Profile
           </a>
 
           <a
-            :href="route('logout')"
-            method="post"
             as="button"
             class="tw-ml-2 tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+            :href="route('logout')"
+            method="post"
           >
             Log Out
           </a>

@@ -30,16 +30,16 @@
             <!-- Profile Photo File Input -->
             <div class="tw-flex tw-justify-between">
               <FileInput
+                v-model="form.photo"
                 accept="image/png,image/jpeg,image/jpg, image/webp"
                 autofocus
-                v-model="form.photo"
                 class="tw-mt-2 tw-w-1/2 tw-mr-2"
-                :prepend-icon="mdiCamera"
-                :error="form.errors.photo"
                 density="compact"
-                variant="underlined"
+                :error="form.errors.photo"
                 label="Upload Profile Photo (jpg, jpeg, png, webp)"
                 placeholder="Choose a file..."
+                :prepend-icon="mdiCamera"
+                variant="underlined"
               />
 
               <SecondaryButton
@@ -67,8 +67,8 @@
           <v-col cols="12" md="12" sm="6">
             <TextInput
               v-model="form.email"
-              disabled
               class="tw-block tw-w-full tw-mt-1"
+              disabled
               :error="form.errors.email"
               label="Email"
               type="email"
@@ -122,7 +122,6 @@
   import { mdiCamera } from '@mdi/js';
   import ActionMessage from '@/components/ActionMessage.vue';
   import FormSection from '@/components/FormSection.vue';
-  import InputError from '@/components/InputError.vue';
   import FileInput from '@/components/FileInput.vue';
   import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';

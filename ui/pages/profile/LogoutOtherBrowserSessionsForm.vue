@@ -35,10 +35,10 @@
 
             <svg
               v-else
+              class="tw-w-8 tw-h-8 tw-text-gray-500"
               fill="none"
               stroke="currentColor"
               stroke-linecap="round"
-              class="tw-w-8 tw-h-8 tw-text-gray-500"
               stroke-linejoin="round"
               stroke-width="2"
               viewBox="0 0 24 24"

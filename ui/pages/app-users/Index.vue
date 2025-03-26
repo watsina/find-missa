@@ -1,8 +1,6 @@
 <script setup>
   import DateInput from '@/components/DateInput.vue';
   import NavLink from '@/components/NavLink.vue';
-  import PrimaryButton from '@/components/PrimaryButton.vue';
-  import TextInput from '@/components/TextInput.vue';
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
   import TimeInput from '@/components/TimeInput.vue';
   import { useForm } from '@/plugins';
@@ -11,7 +9,7 @@
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
-  import { mdiMagnify, mdiPageNextOutline, mdiShareAllOutline } from '@mdi/js';
+  import { mdiMagnify, mdiShareAllOutline } from '@mdi/js';
 
   const title = 'Find Catholic Mass - Uganda';
   const description =
@@ -84,7 +82,7 @@
           </v-alert>
         </v-col>
         <v-col class="tw-flex tw-justify-around" cols="12">
-          <v-btn-toggle v-model="form.type" color="primary" mandatory group rounded>
+          <v-btn-toggle v-model="form.type" color="primary" group mandatory rounded>
             <v-btn rounded="0" value="mass">Mass</v-btn>
             <v-btn rounded="0" value="confession">Confession</v-btn>
             <v-btn rounded="0" value="adoration">Adoration</v-btn>
@@ -101,32 +99,32 @@
         <v-col cols="12" md="2">
           <TimeInput
             v-model="form.start_time"
-            title="Select Mass Time"
             :error="form.errors.start_time"
             label="From Time (24h)"
             required
+            title="Select Mass Time"
             variant="underlined"
           />
         </v-col>
         <v-col cols="12" md="3">
           <v-text-field
             v-model="form.district"
-            variant="underlined"
-            density="default"
             clearable
+            density="default"
             label="District/Town"
+            variant="underlined"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" md="4" class="tw-flex tw-items-end tw-justify-between">
+        <v-col class="tw-flex tw-items-end tw-justify-between" cols="12" md="4">
           <v-text-field
-            class="tw-mr-3"
             v-model="form.church_name"
-            density="default"
-            variant="underlined"
+            class="tw-mr-3"
             clearable
+            density="default"
             label="Parish/Church Name"
+            variant="underlined"
           ></v-text-field>
-          <v-btn :prepend-icon="mdiMagnify" variant="elevated" rounded="xl" @click="getResults">
+          <v-btn :prepend-icon="mdiMagnify" rounded="xl" variant="elevated" @click="getResults">
             Search
           </v-btn>
         </v-col>
@@ -184,7 +182,7 @@
                         {{
                           `${activity?.church?.name} - ${activity?.church?.district} (${activity?.church?.city})`
                         }}
-                        <v-icon :icon="mdiShareAllOutline" end></v-icon>
+                        <v-icon end :icon="mdiShareAllOutline"></v-icon>
                       </NavLink>
                     </div>
                   </div>

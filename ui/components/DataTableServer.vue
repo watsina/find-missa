@@ -59,16 +59,16 @@
 <template>
   <v-data-table-server
     v-bind="$attrs"
+    v-model:items-per-page="itemsPerPage"
     :headers="headers"
     :hide-default-header="smAndDown"
-    :items-per-page-options="perPageOptions"
     :items="items"
+    :items-length="meta.total"
+    :items-per-page-options="perPageOptions"
+    :loading="isFetching"
     :mobile="smAndDown"
     mobile-breakpoint="md"
     :search="search"
-    :loading="isFetching"
-    v-model:items-per-page="itemsPerPage"
-    :items-length="meta.total"
     @update:options="refreshData"
   >
     <template v-if="hasSearch" #top>

@@ -23,7 +23,7 @@
         <v-row dense no-gutters>
           <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
             <v-list>
-              <v-list-item dense>
+              <v-list-item density="compact">
                 <template #prepend>
                   <v-icon :color="field.color || ''">{{ field.icon }}</v-icon>
                 </template>

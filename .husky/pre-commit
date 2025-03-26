@@ -6,7 +6,7 @@ php artisan test --parallel
 
 # fix the lint issues
 composer lint:fix
-npm run lint:fix
+# npm run lint:fix
 
 # ensure it builds
 npm run build

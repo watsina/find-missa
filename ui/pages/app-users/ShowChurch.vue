@@ -99,17 +99,16 @@
               <v-btn
                 v-if="church?.google_maps_link"
                 class="tw-text-sm"
-                :href="church?.google_maps_link"
-                target="_blank"
-                size="small"
-                variant="plain"
-                flat
-                slim
-                :ripple="false"
                 color="primary"
+                :href="church?.google_maps_link"
+                :ripple="false"
+                size="small"
+                slim
+                target="_blank"
+                variant="plain"
               >
                 Get Directions
-                <v-icon :icon="mdiDirections" end size="large"></v-icon>
+                <v-icon end :icon="mdiDirections" size="large"></v-icon>
               </v-btn>
             </template>
           </EntityDetails>

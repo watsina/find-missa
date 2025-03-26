@@ -18,13 +18,13 @@
         v-if="dialog"
         v-bind="$attrs"
         v-model="model"
-        :format="format"
         color="primary"
+        :format="format"
         full-width
         scrollable
       >
         <template #actions>
-          <v-btn color="primary" text @click="dialog = false">Done</v-btn>
+          <v-btn color="primary" variant="text" @click="dialog = false">Done</v-btn>
         </template>
       </v-time-picker>
     </v-menu>

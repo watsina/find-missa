@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build && vite build",
     "lint": "prettier --check ui/",
-    "lint:fix": "prettier --write ui/",
+    "lint:fix": "npx eslint ui --fix",
     "prepare": "husky install"
   },
   "devDependencies": {

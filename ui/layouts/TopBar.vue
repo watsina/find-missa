@@ -12,7 +12,7 @@
 </script>
 
 <template>
-  <v-app-bar app elevate-on-scroll elevation="1">
+  <v-app-bar app elevation="1" scroll-behavior="elevate">
     <template #prepend>
       <v-app-bar-nav-icon
         variant="text"

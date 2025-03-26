@@ -25,7 +25,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the parishes.</p>
         </v-col>
         <v-col cols="12">
-          <DataTableServer :headers="headers" url="/api/v1/parishes" item-value="id">
+          <DataTableServer :headers="headers" item-value="id" url="/api/v1/parishes">
             <template #item.diocese="{ item }">
               {{ item?.diocese?.name || diocese?.name }}
             </template>

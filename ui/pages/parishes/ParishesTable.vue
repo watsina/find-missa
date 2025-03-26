@@ -2,7 +2,6 @@
   import { ref } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
-  import TextInput from '@/components/TextInput.vue';
   import DataTable from '@/components/DataTable.vue';
   import ParishModal from './ParishModal.vue';
 

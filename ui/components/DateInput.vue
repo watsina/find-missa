@@ -2,11 +2,11 @@
   <v-date-input
     v-bind="$attrs"
     v-model="model"
+    color="primary"
+    density="compact"
     :error-messages="error"
     hide-details="auto"
-    density="compact"
     prepend-icon=""
-    color="primary"
     prepend-inner-icon="$calendar"
   >
   </v-date-input>

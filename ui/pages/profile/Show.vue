@@ -20,7 +20,7 @@
 
             <SectionBorder />
 
-            <LogoutOtherBrowserSessionsForm :sessions="sessions" class="tw-mt-10 sm:tw-mt-0" />
+            <LogoutOtherBrowserSessionsForm class="tw-mt-10 sm:tw-mt-0" :sessions="sessions" />
 
             <template v-if="false">
               <SectionBorder />

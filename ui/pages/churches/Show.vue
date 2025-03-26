@@ -142,9 +142,9 @@
               <v-icon
                 v-if="store.user.is_admin"
                 color="error"
-                @click="deleteActivity(item.id)"
                 :disabled="deletingActivity"
                 :icon="mdiDeleteOutline"
+                @click="deleteActivity(item.id)"
               />
             </template>
           </data-table>

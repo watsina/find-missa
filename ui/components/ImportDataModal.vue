@@ -5,7 +5,6 @@
   import DialogModal from '@/components/DialogModal.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import FileInput from '@/components/FileInput.vue';
-  import SelectInput from '@/components/SelectInput.vue';
 
   const props = defineProps({
     importUrl: { type: String, required: true },

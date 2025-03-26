@@ -3,7 +3,6 @@
   import { useForm } from '@/plugins';
   import AuthenticationCard from '@/components/AuthenticationCard.vue';
   import AuthenticationCardLogo from '@/components/AuthenticationCardLogo.vue';
-  import InputError from '@/components/InputError.vue';
   import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
@@ -59,36 +58,36 @@
     <form @submit.prevent="submit">
       <div v-if="!recovery">
         <TextInput
-          label="Code"
           ref="codeInput"
           v-model="form.code"
-          type="text"
-          inputmode="numeric"
-          class="mt-1 block w-full"
-          autofocus
           autocomplete="one-time-code"
+          autofocus
+          class="mt-1 block w-full"
           :error="form.errors.code"
+          inputmode="numeric"
+          label="Code"
+          type="text"
         />
       </div>
 
       <div v-else>
         <InputLabel for="recovery_code" />
         <TextInput
-          label="Recovery Code"
           ref="recoveryCodeInput"
           v-model="form.recovery_code"
-          type="text"
+          autocomplete="one-time-code"
           class="mt-1 block w-full"
           clearable
-          autocomplete="one-time-code"
           :error="form.errors.recovery_code"
+          label="Recovery Code"
+          type="text"
         />
       </div>
 
       <div class="flex items-center justify-end mt-4">
         <button
-          type="button"
           class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
+          type="button"
           @click.prevent="toggleRecovery"
         >
           <template v-if="!recovery"> Use a recovery code </template>
@@ -98,9 +97,9 @@
 
         <PrimaryButton
           class="ms-4"
-          type="submit"
-          :loading="form.processing"
           :disabled="form.processing"
+          :loading="form.processing"
+          type="submit"
           @click="submit"
         >
           Log in

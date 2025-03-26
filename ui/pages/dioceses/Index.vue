@@ -1,7 +1,6 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref } from 'vue';
   import { mdiEyeOutline, mdiPencilOutline } from '@mdi/js';
-  import { http } from '@/plugins';
   import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
   import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -57,10 +56,10 @@
         </v-col>
         <v-col cols="12">
           <data-table-server
-            :headers="headers"
-            url="/api/v1/dioceses"
             v-model:items="dioceses"
+            :headers="headers"
             no-data-text="No dioceses have been added yet..."
+            url="/api/v1/dioceses"
           >
             <template #item.name="{ item }" class="tw-capitalize">
               {{ item.name }}

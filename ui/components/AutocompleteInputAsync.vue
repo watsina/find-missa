@@ -10,7 +10,7 @@
     :error-messages="error"
     hide-details="auto"
     :hint="hint"
-    item-text="title"
+    item-title="title"
     item-value="value"
     :items="items"
     :label="label"

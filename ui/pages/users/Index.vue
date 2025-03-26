@@ -44,7 +44,7 @@
           <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the users.</p>
         </v-col>
         <v-col cols="12">
-          <data-table-server :headers="headers" url="/api/v1/users" v-model:items="users">
+          <data-table-server v-model:items="users" :headers="headers" url="/api/v1/users">
             <template #item.two_factor_enabled="{ item }">
               <v-chip :color="item.two_factor_enabled ? 'primary' : ''" size="small" variant="flat">
                 {{ item.two_factor_enabled ? 'true' : 'false' }}

@@ -4,7 +4,6 @@
   import { notify } from '@/utils';
   import ActionMessage from '@/components/ActionMessage.vue';
   import FormSection from '@/components/FormSection.vue';
-  import InputLabel from '@/components/InputLabel.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
 
