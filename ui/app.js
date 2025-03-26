@@ -1,17 +1,16 @@
 import { notify, useDayjs } from '@/utils';
-import { registerPlugins, useForm } from '@/plugins';
+import { registerPlugins } from '@/plugins';
 import App from './App.vue';
+
+import '@/styles/vuetify.app.scss';
 
 import { createApp } from 'vue';
 
 const app = createApp(App);
 
-import '@/styles/vuetify.app.scss';
-
 registerPlugins(app);
 
 app.config.globalProperties.$date = useDayjs;
-app.config.globalProperties.$useForm = useForm;
 app.config.globalProperties.$notify = notify;
 
-window.$app = app.mount('#app');
+app.mount('#app');

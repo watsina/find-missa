@@ -35,6 +35,7 @@ export default [
   ...errors,
   {
     path: '/:catchAll(.*)',
+    name: 'NotFound',
     component: () => import('@/errors/Error404'),
   },
 ];

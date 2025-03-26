@@ -1,6 +1,8 @@
 <template>
   <v-layout class="tw-rounded-md">
     <session-expired-modal v-model="showSessionExpiredModal" />
+    <global-notifications />
+    <global-confirmation-dialog />
     <top-bar v-if="authUser" v-model:drawer="drawer" v-model:rail="rail">
       <template v-if="$slots.head" #header>
         <slot name="head" />
@@ -17,14 +19,15 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { computed, ref, onMounted } from 'vue';
   import { http } from '@/plugins';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
   import GuestTopBar from './GuestTopBar';
   import SessionExpiredModal from '@/pages/auth/SessionExpiredModal';
+  import GlobalNotifications from '@/components/GlobalNotifications';
+  import GlobalConfirmationDialog from '@/components/GlobalConfirmationDialog';
   import useAuthStore from '@/stores/useAuthStore';
-  import { computed } from 'vue';
 
   const authStore = useAuthStore();
 

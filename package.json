@@ -46,6 +46,7 @@
     "@unhead/vue": "^1.11.18",
     "@vueuse/core": "^11.0.3",
     "dayjs": "^1.11.13",
+    "eslint-plugin-prettier": "^5.2.5",
     "laravel-precognition-vue": "^0.5.9",
     "leaflet": "^1.9.4",
     "nprogress": "^0.2.0",

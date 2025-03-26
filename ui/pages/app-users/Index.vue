@@ -11,7 +11,7 @@
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
-  import { mdiPageNextOutline, mdiShareAllOutline } from '@mdi/js';
+  import { mdiMagnify, mdiPageNextOutline, mdiShareAllOutline } from '@mdi/js';
 
   const title = 'Find Catholic Mass - Uganda';
   const description =
@@ -110,15 +110,6 @@
         </v-col>
         <v-col cols="12" md="3">
           <v-text-field
-            v-model="form.church_name"
-            density="default"
-            variant="underlined"
-            clearable
-            label="Parish/Church Name"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="3">
-          <v-text-field
             v-model="form.district"
             variant="underlined"
             density="default"
@@ -126,8 +117,18 @@
             label="District/Town"
           ></v-text-field>
         </v-col>
-        <v-col class="tw-flex tw-items-end" cols="12" md="1">
-          <PrimaryButton variant="outlined" @click="getResults"> Search </PrimaryButton>
+        <v-col cols="12" md="4" class="tw-flex tw-items-end tw-justify-between">
+          <v-text-field
+            class="tw-mr-3"
+            v-model="form.church_name"
+            density="default"
+            variant="underlined"
+            clearable
+            label="Parish/Church Name"
+          ></v-text-field>
+          <v-btn :prepend-icon="mdiMagnify" variant="elevated" rounded="xl" @click="getResults">
+            Search
+          </v-btn>
         </v-col>
         <template v-if="form.processing">
           <v-col cols="12">
