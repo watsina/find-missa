@@ -14,7 +14,7 @@
     parish: { type: Object, required: true },
     parishType: {
       required: true,
-      validator(value, props) {
+      validator(value) {
         return ['parish', 'sub-parish'].includes(value);
       },
     },

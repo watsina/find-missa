@@ -6,7 +6,7 @@
   import useAuthStore from '@/stores/useAuthStore';
   import { useForm } from '@/plugins';
 
-  const props = defineProps({
+  defineProps({
     availableRoles: { type: Array, required: true },
   });
 
@@ -27,9 +27,9 @@
   const teamMemberBeingRemoved = ref(null);
 
   const manageRole = (teamMember) => {
-    // managingRoleFor.value = teamMember;
-    // updateRoleForm.role = teamMember.membership.role;
-    // currentlyManagingRole.value = true;
+    managingRoleFor.value = teamMember;
+    updateRoleForm.role = teamMember.membership.role;
+    currentlyManagingRole.value = true;
   };
 
   const confirmLeavingTeam = () => {
@@ -40,9 +40,9 @@
     teamMemberBeingRemoved.value = teamMember;
   };
 
-  const displayableRole = (role) => {
-    // return props.availableRoles.find((r) => r.id === role).name;
-  };
+  // const displayableRole = (role) => {
+  //   return props.availableRoles.find((r) => r.id === role).name;
+  // };
 </script>
 
 <template>

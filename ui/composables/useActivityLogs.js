@@ -49,6 +49,7 @@ export const useActivityLogs = () => {
     //expand formatted description.
     return formattedDescription.replaceAll(
       /{{event.([a-zA-Z0-9-_.]+)}}/g,
+      // eslint-disable-next-line no-unused-vars
       (match, variableName, index) => {
         if (variableName?.startsWith('attributes.')) {
           const attributeName = variableName.substring(11);

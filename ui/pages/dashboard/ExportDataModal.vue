@@ -5,9 +5,7 @@
   import DialogModal from '@/components/DialogModal.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import SelectInput from '@/components/SelectInput.vue';
-  import { ref } from 'vue';
 
-  const isFetching = ref(false);
   const showModal = defineModel('showModal', { type: Boolean });
 
   const form = useForm({

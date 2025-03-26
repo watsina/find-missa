@@ -7,7 +7,6 @@
   import DioceseModal from './DioceseModal.vue';
 
   const dioceses = ref([]);
-  const isFetching = ref(false);
   const showingModal = ref(false);
   const editDiocese = ref(null);
 
@@ -61,8 +60,10 @@
             no-data-text="No dioceses have been added yet..."
             url="/api/v1/dioceses"
           >
-            <template #item.name="{ item }" class="tw-capitalize">
-              {{ item.name }}
+            <template #item.name="{ item }">
+              <span class="tw-capitalize">
+                {{ item.name }}
+              </span>
             </template>
             <template #item.actions="{ item }">
               <v-icon

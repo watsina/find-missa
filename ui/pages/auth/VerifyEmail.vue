@@ -56,7 +56,7 @@
   const form = useForm();
 
   const submit = () => {
-    form.post(route('verification.send'));
+    form.post('/api/v1/email/verification-notification');
   };
 
   const verificationLinkSent = computed(() => props.status === 'verification-link-sent');

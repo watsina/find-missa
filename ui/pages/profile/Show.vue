@@ -43,9 +43,6 @@
   import TwoFactorAuthenticationForm from './TwoFactorAuthenticationForm.vue';
   import UpdatePasswordForm from './UpdatePasswordForm.vue';
   import UpdateProfileInformationForm from './UpdateProfileInformationForm.vue';
-  import useAuthStore from '@/stores/useAuthStore';
-
-  const store = useAuthStore();
 
   defineProps({
     sessions: Array,

@@ -5,9 +5,6 @@
   import { http } from '@/plugins';
   import { notify } from '@/utils';
   import { useRouter } from 'vue-router';
-  import { useDisplay } from 'vuetify';
-
-  const { smAndDown } = useDisplay();
 
   const authStore = useAuthStore();
 
@@ -31,9 +28,9 @@
 
 <template>
   <!-- Teams Dropdown -->
-  <v-menu offset-y>
+  <v-menu>
     <template #activator="{ props }">
-      <v-btn dark v-bind="props">
+      <v-btn v-bind="props">
         {{ authStore.current_team?.name || 'No team selected' }}
         <v-icon v-if="canViewTeam || hasManyTeams" :icon="mdiUnfoldMoreHorizontal"></v-icon>
       </v-btn>

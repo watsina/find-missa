@@ -122,7 +122,7 @@
   });
 
   const submit = () => {
-    form.post(route('register'), {
+    form.post(`/api/v1/register`, {
       onFinish: () => form.reset('password', 'password_confirmation'),
     });
   };

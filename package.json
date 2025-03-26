@@ -4,8 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && vite build",
-    "lint": "prettier --check ui/",
-    "lint:fix": "npx eslint ui --fix",
+    "lint": "eslint ui/ --ext .js",
+    "lint:fix": "npx eslint ui/ --fix",
     "prepare": "husky install"
   },
   "devDependencies": {

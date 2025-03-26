@@ -1,9 +1,5 @@
 <script setup>
-  import { computed } from 'vue';
-
-  const emit = defineEmits(['update:checked']);
-
-  const props = defineProps({
+  defineProps({
     error: { type: [String, Array], default: '' },
     hint: { type: String, default: '' },
     label: { type: String, default: '' },
@@ -14,15 +10,6 @@
   const model = defineModel({
     type: [Array, Boolean],
     required: true,
-  });
-  const proxyChecked = computed({
-    get() {
-      return props.checked;
-    },
-
-    set(val) {
-      emit('update:checked', val);
-    },
   });
 </script>
 

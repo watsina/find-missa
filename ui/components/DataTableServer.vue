@@ -8,7 +8,6 @@
   const props = defineProps({
     headers: { type: Array, required: true },
     url: { type: String, required: true },
-    perPageOptions: { type: Array, default: [5, 10, 20, 30] },
     hasSearch: { type: Boolean, default: true },
   });
 
@@ -64,7 +63,6 @@
     :hide-default-header="smAndDown"
     :items="items"
     :items-length="meta.total"
-    :items-per-page-options="perPageOptions"
     :loading="isFetching"
     :mobile="smAndDown"
     mobile-breakpoint="md"

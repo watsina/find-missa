@@ -53,10 +53,8 @@ export default reactive({
     return new Promise((resolve, reject) => {
       this.confirmation.resolve = resolve;
       this.confirmation.reject = reject;
-    })
-      .catch((e) => {})
-      .finally(() => {
-        this.confirmation = {};
-      });
+    }).finally(() => {
+      this.confirmation = {};
+    });
   },
 });

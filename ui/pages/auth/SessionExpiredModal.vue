@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="model" max-width="500" overlay-opacity="0.7" persistent :persistent="false">
+  <v-dialog v-model="model" max-width="500" opacity="0.7" persistent>
     <v-card title="Session Expired">
       <v-card-text> Your session has expired. Please login again to continue. </v-card-text>
 

@@ -14,7 +14,6 @@
 
   const showingModal = ref(false);
   const parishToEdit = ref(null);
-  const isFetching = ref(false);
 
   const headers = [
     { title: 'Name', value: 'name' },

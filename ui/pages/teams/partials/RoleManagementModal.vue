@@ -5,7 +5,7 @@
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import { useForm } from '@/plugins';
 
-  const props = defineProps({
+  defineProps({
     availableRoles: { type: Array, required: true },
   });
 
@@ -15,8 +15,8 @@
 
   const currentlyManagingRole = ref(false);
   const managingRoleFor = ref(null);
-  const confirmingLeavingTeam = ref(false);
-  const teamMemberBeingRemoved = ref(null);
+  // const confirmingLeavingTeam = ref(false);
+  // const teamMemberBeingRemoved = ref(null);
 
   const updateRole = () => {
     // updateRoleForm.put(route('team-members.update', [props.team, managingRoleFor.value]), {
