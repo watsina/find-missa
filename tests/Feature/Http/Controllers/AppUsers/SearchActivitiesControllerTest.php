@@ -45,18 +45,18 @@ test('User can search activities by start time...', function () {
 
 test('It doesnot return activities that have exceptions for the given date.', function () {
     // activities that happen at different times
-    $mass1 = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
+    $mass1 = ActivityTime::factory()->oneTime('2025-03-28', 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
     $mass2 = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
     //  massWithException
     ActivityTime::factory()
-        ->has(ActivityTimeException::factory(), 'exceptions')
-        ->weekly(now()->dayName, 'mass')
+        ->has(ActivityTimeException::factory()->state(['start_date' => '2025-03-28', 'end_date' => '2025-03-28']), 'exceptions')
+        ->weekly('Friday', 'mass')
         ->create(['start_time' => '07:00', 'end_time' => '07:30']);
 
     get(route('search', [
         'type' => 'mass',
         'start_time' => '06:00',
-        'date' => now()->toDateString(),
+        'date' => '2025-03-28',
     ]))
         ->assertOk()
         ->assertJsonCount(2, 'data')
