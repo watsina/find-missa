@@ -1,5 +1,6 @@
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import colors from '@/utils/colors';
+import { md3 } from 'vuetify/blueprints';
 // import { VTimePicker } from 'vuetify/labs/VTimePicker';
 // import { VDateInput } from 'vuetify/labs/VDateInput';
 
@@ -22,7 +23,7 @@ const theme = {
 };
 
 export default createVuetify({
-  // blueprint: md3,
+  blueprint: md3,
   theme: {
     defaultTheme: 'theme',
     options: {
@@ -67,6 +68,7 @@ export default createVuetify({
     },
     VBtn: {
       rounded: 'lg',
+      color: 'default',
     },
     VCard: {
       rounded: 'md',

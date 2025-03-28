@@ -124,7 +124,9 @@
             label="Parish/Church Name"
             variant="underlined"
           ></v-text-field>
-          <v-btn :prepend-icon="mdiMagnify" variant="elevated" @click="getResults"> Search </v-btn>
+          <v-btn color="primary" :prepend-icon="mdiMagnify" variant="elevated" @click="getResults">
+            Search
+          </v-btn>
         </v-col>
         <template v-if="form.processing">
           <v-col cols="12">
