@@ -24,7 +24,7 @@ class ActivityTime extends BaseModel
         return [
             'id' => 'integer',
             'church_id' => 'integer',
-            'date' => 'datetime:Y-m-d',
+            'date' => 'date:Y-m-d',
             'start_time' => Timecast::class,
             'end_time' => Timecast::class,
         ];

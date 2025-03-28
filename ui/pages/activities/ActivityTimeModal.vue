@@ -1,7 +1,7 @@
 <script setup>
-  import { computed, watch } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useForm } from '@/plugins';
-  import { notify } from '@/utils';
+  import { notify, useDayjs } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
@@ -9,6 +9,7 @@
   import TextInput from '@/components/TextInput.vue';
   import TimeInput from '@/components/TimeInput.vue';
   import DateInput from '@/components/DateInput.vue';
+  import { useDate } from 'vuetify/lib/framework.mjs';
 
   const props = defineProps({
     activity: { type: Object, default: null },
@@ -17,6 +18,9 @@
 
   const showModal = defineModel('showModal', { type: Boolean });
   const emit = defineEmits(['created', 'updated']);
+  const parser = useDate();
+  const currentDate = new Date().toLocaleDateString('en-US');
+  const date = ref(parser.date(currentDate));
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
@@ -67,6 +71,8 @@
         form.date = newValue?.date || null;
         form.day_of_week = newValue?.day_of_week || '';
         form.church_id = newValue?.church_id || '';
+
+        date.value = parser.date(newValue?.date || currentDate);
       }
     },
     { deep: true },
@@ -103,6 +109,7 @@
       form.date = null;
     } else if (form.occurrence === 'one-time') {
       form.day_of_week = '';
+      form.date = useDayjs(date.value).format('YYYY-MM-DD');
     }
 
     form.church_id = props.church.id;
@@ -170,7 +177,7 @@
 
           <div v-if="form.occurrence === 'one-time'" class="tw-mt-4">
             <DateInput
-              v-model="form.date"
+              v-model="date"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.date"
               label="Date"
