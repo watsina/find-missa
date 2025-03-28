@@ -7,6 +7,8 @@ use App\Models\ActivityTime;
 
 use function Pest\Laravel\get;
 
+use App\Models\ActivityTimeException;
+
 test('It organises the data by start time...', function () {
     // activities that happen at different times
     $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
@@ -41,6 +43,27 @@ test('User can search activities by start time...', function () {
         ->assertJsonPath('data.1.id', $massLater->id);
 });
 
+test('It doesnot return activities that have exceptions for the given date.', function () {
+    // activities that happen at different times
+    $mass1 = ActivityTime::factory()->oneTime(now(), 'mass')->create(['start_time' => '13:00', 'end_time' => '13:30']);
+    $mass2 = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);
+    //  massWithException
+    ActivityTime::factory()
+        ->has(ActivityTimeException::factory(), 'exceptions')
+        ->weekly(now()->dayName, 'mass')
+        ->create(['start_time' => '07:00', 'end_time' => '07:30']);
+
+    get(route('search', [
+        'type' => 'mass',
+        'start_time' => '06:00',
+        'date' => now()->toDateString(),
+    ]))
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.id', $mass1->id)
+        ->assertJsonPath('data.1.id', $mass2->id);
+});
+
 test('users can search masses by date', function () {
     // activities that happen on the given date
     $adorationToday = ActivityTime::factory()->daily('adoration')->create();
@@ -59,12 +82,12 @@ test('users can search masses by date', function () {
     ]))
         ->assertOk()
         ->assertJsonCount(4, 'data')
-        // check that all the activities that happen on the given date are returned
+      // check that all the activities that happen on the given date are returned
         ->assertJsonFragment(['id' => $dailyMass->id])
         ->assertJsonFragment(['id' => $weeklyMass->id])
         ->assertJsonFragment(['id' => $weeklyAnticipationMass->id])
         ->assertJsonFragment(['id' => $oneTimeMass->id])
-        // check that the activities that don't happen on that date are not returned.
+      // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $massOnOtherDay->id])
         ->assertJsonMissing(['id' => $massOnOtherDate->id])
         ->assertJsonMissing(['id' => $adorationToday->id])
@@ -90,11 +113,11 @@ test('users are able to search adorations for a given date', function () {
     )
         ->assertOk()
         ->assertJsonCount('3', 'data')
-        // check that all the activities that happen on the given date are returned
+      // check that all the activities that happen on the given date are returned
         ->assertJsonFragment(['id' => $dailyAdoration->id])
         ->assertJsonFragment(['id' => $weeklyAdoration->id])
         ->assertJsonFragment(['id' => $oneTimeAdoration->id])
-        // check that the activities that don't happen on that date are not returned.
+      // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $adorationOnOtherDay->id])
         ->assertJsonMissing(['id' => $adorationOnOtherDate->id])
         ->assertJsonMissing(['id' => $massToday->id])
@@ -120,11 +143,11 @@ test('users can search confessions on a given date.', function () {
     )
         ->assertOk()
         ->assertJsonCount('3', 'data')
-        // check that all the activities that happen on the given date are returned
+      // check that all the activities that happen on the given date are returned
         ->assertJsonFragment(['id' => $dailyConfession->id])
         ->assertJsonFragment(['id' => $weeklyConfession->id])
         ->assertJsonFragment(['id' => $oneTimeConfession->id])
-        // check that the activities that don't happen on that date are not returned.
+      // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $confessionOnOtherDay->id])
         ->assertJsonMissing(['id' => $confessionOnOtherDate->id])
         ->assertJsonMissing(['id' => $massToday->id])
@@ -149,7 +172,7 @@ test('users can search by church name and activity type on a given date.', funct
         ->assertOk()
         ->assertJsonCount('1', 'data')
         ->assertJsonFragment(['id' => $massAtChurch->id])
-        // check that the activities that don't happen on that date are not returned.
+      // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $confessionAtChurch->id])
         ->assertJsonMissing(['id' => $adorationAtChurch->id])
         ->assertJsonMissing(['id' => $massAtOtherChurch->id]);
@@ -173,7 +196,7 @@ test('users can search by district.', function () {
         ->assertOk()
         ->assertJsonCount('1', 'data')
         ->assertJsonFragment(['id' => $massInDistrict->id])
-        // check that the activities that don't happen on that date are not returned.
+      // check that the activities that don't happen on that date are not returned.
         ->assertJsonMissing(['id' => $confessionInDistrict->id])
         ->assertJsonMissing(['id' => $adorationInDistrict->id])
         ->assertJsonMissing(['id' => $massInOtherDistrict->id]);

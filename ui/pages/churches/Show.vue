@@ -136,8 +136,8 @@
                 color="primary"
                 :icon="mdiEyeOutline"
                 title="View Activity Details"
-                :to="{ name: 'activities.show', params: { activityId: item.id } }"
                 variant="text"
+                @click="$router.push({ name: 'activities.show', params: { activityId: item.id } })"
               />
               <v-icon
                 v-if="store.user.is_admin"
