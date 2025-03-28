@@ -1,12 +1,13 @@
 <script setup>
-  import { computed, watch } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useForm } from '@/plugins';
-  import { notify } from '@/utils';
+  import { notify, useDayjs } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import TextInput from '@/components/TextInput.vue';
   import DateInput from '@/components/DateInput.vue';
+  import { useDate } from 'vuetify';
 
   const props = defineProps({
     exception: { type: Object, default: null },
@@ -22,6 +23,10 @@
     start_date: props.exception?.start_date || null,
     end_date: props.exception?.end_date || null,
   });
+  const parser = useDate();
+  const currentDate = new Date().toLocaleDateString('en-US');
+  const start_date = ref(parser.date(props.exception?.start_date || currentDate));
+  const end_date = ref(parser.date(props.exception?.end_date || currentDate));
 
   watch(
     () => props.exception,
@@ -30,6 +35,8 @@
         form.reason = newValue?.reason || '';
         form.start_date = newValue?.start_date || null;
         form.end_date = newValue?.end_date || null;
+        start_date.value = parser.date(newValue?.start_date || currentDate);
+        end_date.value = parser.date(newValue?.end_date || currentDate);
       }
     },
     { deep: true },
@@ -52,6 +59,8 @@
     const method = isEditing.value ? 'put' : 'post';
 
     form.activity_time_id = props.activityId;
+    form.start_date = useDayjs(start_date.value).format('YYYY-MM-DD');
+    form.end_date = useDayjs(end_date.value).format('YYYY-MM-DD');
 
     return form[method](url, {
       onSuccess: ({ data }) => {
@@ -96,7 +105,7 @@
 
           <div class="tw-mt-4">
             <DateInput
-              v-model="form.start_date"
+              v-model="start_date"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.start_date"
               label="Start Date"
@@ -107,7 +116,7 @@
 
           <div class="tw-mt-4">
             <DateInput
-              v-model="form.end_date"
+              v-model="end_date"
               class="tw-block tw-w-full tw-mt-1"
               :error="form.errors.end_date"
               label="End Date"
