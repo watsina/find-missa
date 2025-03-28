@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build && vite build",
     "lint": "eslint ui/ --ext .js",
-    "lint:fix": "npx eslint ui/ --fix",
+    "lint:fix": "eslint ui/ --ext .js --fix",
     "prepare": "husky install"
   },
   "devDependencies": {

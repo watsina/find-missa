@@ -1,8 +1,7 @@
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import colors from '@/utils/colors';
-import { md3 } from 'vuetify/blueprints';
-import { VTimePicker } from 'vuetify/labs/VTimePicker';
-import { VDateInput } from 'vuetify/labs/VDateInput';
+// import { VTimePicker } from 'vuetify/labs/VTimePicker';
+// import { VDateInput } from 'vuetify/labs/VDateInput';
 
 // Composables
 import { createVuetify } from 'vuetify';
@@ -23,7 +22,7 @@ const theme = {
 };
 
 export default createVuetify({
-  blueprint: md3,
+  // blueprint: md3,
   theme: {
     defaultTheme: 'theme',
     options: {
@@ -34,8 +33,8 @@ export default createVuetify({
     },
   },
   components: {
-    VTimePicker,
-    VDateInput,
+    // VTimePicker,
+    // VDateInput,
   },
   defaults: {
     VCol: {
@@ -67,14 +66,13 @@ export default createVuetify({
       color: 'primary',
     },
     VBtn: {
-      color: 'primary',
+      rounded: 'lg',
     },
     VCard: {
-      // rounded: '3px',
+      rounded: 'md',
     },
     VBtnToggle: {
       density: 'compact',
-      color: 'primary',
     },
 
     VDataTable: dataTableOptions,

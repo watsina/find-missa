@@ -36,7 +36,6 @@
   import { mdiClockTimeFourOutline } from '@mdi/js';
 
   defineProps({
-    type: { type: String, default: 'text' },
     format: { type: String, default: '24hr' },
     error: { type: [String, Array], default: '' },
   });
@@ -46,10 +45,4 @@
     type: [String, Number],
     required: true,
   });
-</script>
-
-<script>
-  export default {
-    inheritAttrs: false,
-  };
 </script>
