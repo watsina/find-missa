@@ -188,7 +188,10 @@
               height="150"
             >
               <v-card-title class="tw-mx-auto tw-p-12 tw-my-auto">
-                No {{ form.type || 'activities' }} found
+                No {{ form.type || 'activities' }} found for the
+                {{
+                  form.district || form.church_name ? ' selected search query.' : ' selected time. '
+                }}
               </v-card-title>
             </v-card>
             <v-timeline v-else class="md:tw-ml-4" density="comfortable" side="end">
