@@ -36,7 +36,24 @@
   const router = useRouter();
   const route = useRoute();
 
-  const queryParams = computed(() => route.query);
+  const queryParams = computed(() => {
+    const query = route.query;
+    // validate that pattern matches HH:MM
+    const timeReg = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+    if (!query?.fromTime || !timeReg.test(query?.fromTime)) {
+      query.fromTime = startTime;
+    }
+    // validate date
+    if (!query?.date || useDayjs(query.date).isValid()) {
+      query.date = parser.date(currentDate);
+    }
+    //validate types
+    if (!['mass', 'confession', 'adoration'].includes(query?.type)) {
+      query.type = 'mass';
+    }
+
+    return query;
+  });
 
   const form = useForm({
     start_time: queryParams.value?.fromTime || startTime,
