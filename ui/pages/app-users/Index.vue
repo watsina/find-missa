@@ -10,6 +10,7 @@
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
   import { mdiMagnify, mdiShareAllOutline } from '@mdi/js';
+  import { useRoute, useRouter } from 'vue-router';
 
   const title = 'Find Catholic Mass - Uganda';
   const description =
@@ -24,18 +25,25 @@
   });
 
   const { smAndDown } = useDisplay();
+
   const results = ref(null);
   const dateUsed = ref(null);
   const parser = useDate();
   const currentDate = new Date().toLocaleDateString('en-US');
   const date = ref(parser.date(currentDate));
+  const startTime = parser.format(new Date(), 'fullTime24h')?.substring(0, 5);
+
+  const router = useRouter();
+  const route = useRoute();
+
+  const queryParams = computed(() => route.query);
 
   const form = useForm({
-    start_time: parser.format(new Date(), 'fullTime24h')?.substring(0, 5),
-    church_name: '',
-    district: '',
-    type: 'mass',
-    date: parser.date(currentDate),
+    start_time: queryParams.value?.fromTime || startTime,
+    church_name: queryParams.value?.name || '',
+    district: queryParams.value?.location || '',
+    type: queryParams.value?.type || 'mass',
+    date: queryParams.value?.date || parser.date(currentDate),
   });
 
   const showDate = computed(() => {
@@ -59,6 +67,16 @@
       onSuccess: (data) => {
         results.value = data || [];
         dateUsed.value = form.date;
+
+        router.replace({
+          query: {
+            date: form.date,
+            fromTime: form.start_time,
+            location: form.district,
+            type: form.type,
+            name: form.church_name,
+          },
+        });
       },
       onError: () => notify.error('Something went wrong...'),
     });
