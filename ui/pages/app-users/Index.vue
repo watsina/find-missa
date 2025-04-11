@@ -56,6 +56,8 @@
 
   const searchedQuery = ref({});
 
+  const shareTitle = computed(() => `Share ${searchedQuery.value?.type || 'mass'} times`);
+
   const shareDescription = computed(() => {
     const query = searchedQuery.value;
 
@@ -203,7 +205,7 @@
             Search
           </v-btn>
         </v-col>
-        <share-button :description="shareDescription" />
+        <share-button :description="shareDescription" :title="shareTitle" />
         <template v-if="form.processing">
           <v-col cols="12">
             <v-skeleton-loader type="card"></v-skeleton-loader>

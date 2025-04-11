@@ -2,6 +2,7 @@
   import { notify } from '@/utils';
   import {
     mdiClipboardMultipleOutline,
+    mdiClose,
     mdiEmailOutline,
     mdiFacebook,
     mdiShareOutline,
@@ -117,9 +118,16 @@
       Share
     </v-btn>
 
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card rounded="lg" :title="title">
-        <v-card-text class="tw-flex tw-justify-around !tw-py-0 !tw-px-0">
+    <v-dialog v-model="dialog" closable max-width="500">
+      <v-card rounded="lg">
+        <v-card-title class="!tw-capitalize !tw-flex">
+          <span>
+            {{ title }}
+          </span>
+          <v-icon class="tw-ms-auto" :icon="mdiClose" size="x-small" @click="closeShareModal" />
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text class="tw-flex tw-justify-around !tw-pt-0 sm:!tw-px-0">
           <v-slide-group class="!tw-px-0" show-arrows>
             <v-slide-group-item v-for="media in shareOptions" :key="media.name">
               <div class="tw-flex tw-px-2 tw-flex-col tw-items-center">
@@ -136,9 +144,6 @@
             </v-slide-group-item>
           </v-slide-group>
         </v-card-text>
-        <template v-slot:actions>
-          <v-btn class="tw-ms-auto" @click="closeShareModal"> Done </v-btn>
-        </template>
       </v-card>
     </v-dialog>
   </div>
