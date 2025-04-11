@@ -117,21 +117,24 @@
       Share
     </v-btn>
 
-    <v-dialog v-model="dialog" width="auto">
-      <v-card min-width="500" rounded="lg" :title="title">
-        <v-card-text class="tw-flex tw-justify-around">
-          <v-row no-gutters>
-            <v-col
-              v-for="media in shareOptions"
-              :key="media.name"
-              class="tw-flex tw-mx-1 tw-flex-col tw-items-center"
-              cols="2"
-            >
-              <v-btn :color="media.color" :icon="media.icon" rounded="xl" @click="media.function">
-              </v-btn>
-              <span class="tw-text-sm"> {{ media.name }}</span>
-            </v-col>
-          </v-row>
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card rounded="lg" :title="title">
+        <v-card-text class="tw-flex tw-justify-around !tw-py-0 !tw-px-0">
+          <v-slide-group class="!tw-px-0" show-arrows>
+            <v-slide-group-item v-for="media in shareOptions" :key="media.name">
+              <div class="tw-flex tw-px-2 tw-flex-col tw-items-center">
+                <v-btn
+                  :color="media.color"
+                  :icon="media.icon"
+                  rounded="xl"
+                  size="small"
+                  @click="media.function"
+                >
+                </v-btn>
+                <span class="tw-text-sm"> {{ media.name }}</span>
+              </div>
+            </v-slide-group-item>
+          </v-slide-group>
         </v-card-text>
         <template v-slot:actions>
           <v-btn class="tw-ms-auto" @click="closeShareModal"> Done </v-btn>
