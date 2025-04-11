@@ -3,6 +3,7 @@
   import NavLink from '@/components/NavLink.vue';
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
   import TimeInput from '@/components/TimeInput.vue';
+  import ShareButton from '@/components/ShareButton.vue';
   import { useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import { ref, onMounted, computed, watch } from 'vue';
@@ -35,6 +36,43 @@
 
   const router = useRouter();
   const route = useRoute();
+  function convertTo12Hour(time24) {
+    // Split the time string into hours and minutes
+    const [hours, minutes] = time24.split(':');
+
+    // Convert hours to number
+    const hoursNum = parseInt(hours, 10);
+
+    // Determine AM or PM
+    const period = hoursNum >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format
+    let hours12 = hoursNum % 12;
+    hours12 = hours12 === 0 ? 12 : hours12; // Handle midnight (0 becomes 12)
+
+    // Return formatted string
+    return `${hours12}:${minutes} ${period}`;
+  }
+
+  const searchedQuery = ref({});
+
+  const shareDescription = computed(() => {
+    const query = searchedQuery.value;
+
+    let description = `Checkout ${query.type || 'mass'} times`;
+
+    if (query?.location) {
+      description += ` in ${query.location}`;
+    } else if (query?.name) {
+      description += ` in ${query.name}`;
+    }
+
+    if (query?.fromTime) {
+      description += ` from ${convertTo12Hour(query.fromTime)} onwards.`;
+    }
+
+    return description;
+  });
 
   const queryParams = computed(() => {
     const query = route.query;
@@ -85,14 +123,16 @@
         results.value = data || [];
         dateUsed.value = form.date;
 
+        searchedQuery.value = {
+          date: form.date,
+          fromTime: form.start_time,
+          location: form.district,
+          type: form.type,
+          name: form.church_name,
+        };
+
         router.replace({
-          query: {
-            date: form.date,
-            fromTime: form.start_time,
-            location: form.district,
-            type: form.type,
-            name: form.church_name,
-          },
+          query: searchedQuery.value,
         });
       },
       onError: () => notify.error('Something went wrong...'),
@@ -163,6 +203,7 @@
             Search
           </v-btn>
         </v-col>
+        <share-button :description="shareDescription" />
         <template v-if="form.processing">
           <v-col cols="12">
             <v-skeleton-loader type="card"></v-skeleton-loader>
