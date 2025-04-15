@@ -15,13 +15,12 @@ use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
 
-test('index behaves as expected', function (): void {
-    $activityTimeExceptions = ActivityTimeException::factory()->count(3)->create();
+test('index behaves as expected returns the expected number of items', function (): void {
+    ActivityTimeException::factory()->count(3)->create();
 
-    $response = get(route('activity-time-exceptions.index'));
-
-    $response->assertOk();
-    $response->assertJsonStructure([]);
+    get(route('activity-time-exceptions.index'))
+        ->assertOk()
+        ->assertJsonCount(3, 'data');
 });
 
 test('store uses form request validation')

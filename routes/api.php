@@ -55,4 +55,5 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('sub-parishes', App\Http\Controllers\SubParishController::class)->except('destroy');
     Route::apiResource('activity-times', App\Http\Controllers\ActivityTimeController::class);
     Route::apiResource('activity-time-exceptions', App\Http\Controllers\ActivityTimeExceptionController::class)->except('destroy');
+    Route::apiResource('global-activity-time-exceptions', App\Http\Controllers\GlobalActivityTimeExceptionController::class)->except('destroy');
 });
