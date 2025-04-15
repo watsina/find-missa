@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Gate;
 use App\Models\GlobalActivityTimeException;
-use App\Http\Requests\StoreGlobalActivityTimeExceptionRequest;
-use App\Http\Requests\UpdateGlobalActivityTimeExceptionRequest;
+use App\Http\Requests\GlobalActivityTimeExceptionRequest;
 
 class GlobalActivityTimeExceptionController extends Controller
 {
@@ -22,9 +21,13 @@ class GlobalActivityTimeExceptionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreGlobalActivityTimeExceptionRequest $request)
+    public function store(GlobalActivityTimeExceptionRequest $request)
     {
-        //
+        Gate::authorize('create', GlobalActivityTimeException::class);
+
+        $activityTimeException = GlobalActivityTimeException::create($request->validated());
+
+        return $activityTimeException->toResource();
     }
 
     /**
@@ -32,15 +35,21 @@ class GlobalActivityTimeExceptionController extends Controller
      */
     public function show(GlobalActivityTimeException $globalActivityTimeException)
     {
-        //
+        Gate::authorize('view', $globalActivityTimeException);
+
+        return $globalActivityTimeException->toResource();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateGlobalActivityTimeExceptionRequest $request, GlobalActivityTimeException $globalActivityTimeException)
+    public function update(GlobalActivityTimeExceptionRequest $request, GlobalActivityTimeException $globalActivityTimeException)
     {
-        //
+        Gate::authorize('update', $globalActivityTimeException);
+
+        $globalActivityTimeException->update($request->validated());
+
+        return $globalActivityTimeException->toResource();
     }
 
     /**
@@ -48,6 +57,10 @@ class GlobalActivityTimeExceptionController extends Controller
      */
     public function destroy(GlobalActivityTimeException $globalActivityTimeException)
     {
-        //
+        Gate::authorize('delete', $globalActivityTimeException);
+
+        $globalActivityTimeException->delete();
+
+        return response()->noContent();
     }
 }

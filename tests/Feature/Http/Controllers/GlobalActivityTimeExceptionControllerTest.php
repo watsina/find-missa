@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\ActivityTime;
-
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
@@ -14,7 +12,7 @@ use App\Models\GlobalActivityTimeException;
 use function Pest\Laravel\assertModelMissing;
 
 test('index behaves as expected returns the expected number of items', function (): void {
-    $this->actingAsUserWithTeam();
+    $this->actingAsSuperAdminWithTeam();
 
     GlobalActivityTimeException::factory()->count(3)->create();
 
@@ -27,71 +25,62 @@ test('store uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\GlobalActivityTimeExceptionController::class,
         'store',
-        \App\Http\Requests\StoreGlobalActivityTimeExceptionRequest::class
+        \App\Http\Requests\GlobalActivityTimeExceptionRequest::class
     );
 
 test('store saves', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
-    $activity_time = ActivityTime::factory()->create();
-    $data = GlobalActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
+    $data = GlobalActivityTimeException::factory()->raw();
 
-    $response = post(route('global-activity-time-exceptions.store'), $data);
-    $response->assertCreated();
-    $response->assertJsonStructure([]);
+    post(route('global-activity-time-exceptions.store'), $data)
+        ->assertCreated()
+        ->assertJsonStructure([]);
 
-    $activityTimeExceptions = GlobalActivityTimeException::query()
-        ->where('activity_time_id', $activity_time->id)
+    $globalActivityTimeExceptions = GlobalActivityTimeException::query()
+        ->where('reason', $data['reason'])
         ->get();
 
-    expect($activityTimeExceptions)->toHaveCount(1);
-})->skip('to refactor');
+    expect($globalActivityTimeExceptions)->toHaveCount(1);
+});
 
 test('show behaves as expected', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
-    $activityTimeException = GlobalActivityTimeException::factory()->create();
+    $globalActivityTimeException = GlobalActivityTimeException::factory()->create();
 
-    $response = get(route('global-activity-time-exceptions.show', $activityTimeException));
-
-    $response->assertOk();
-    $response->assertJsonStructure([]);
-})->skip('to refactor');
+    get(route('global-activity-time-exceptions.show', $globalActivityTimeException))->assertOk()->assertJsonStructure([]);
+});
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
         \App\Http\Controllers\GlobalActivityTimeExceptionController::class,
         'update',
-        \App\Http\Requests\UpdateGlobalActivityTimeExceptionRequest::class
+        \App\Http\Requests\GlobalActivityTimeExceptionRequest::class
     );
 
 test('update behaves as expected', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
-    $activityTimeException = GlobalActivityTimeException::factory()->create();
-    $activity_time = ActivityTime::factory()->create();
-    $data = GlobalActivityTimeException::factory()->raw(['activity_time_id' => $activity_time->id]);
+    $globalActivityTimeException = GlobalActivityTimeException::factory()->create();
+    $data = GlobalActivityTimeException::factory()->raw();
 
-    $response = put(route('global-activity-time-exceptions.update', $activityTimeException), $data);
+    put(route('global-activity-time-exceptions.update', $globalActivityTimeException), $data)
+        ->assertOk()
+        ->assertJsonStructure([]);
 
-    $response->assertOk();
-    $response->assertJsonStructure([]);
+    $globalActivityTimeException->refresh();
 
-    $activityTimeException->refresh();
-
-    expect($activity_time->id)->toEqual($activityTimeException->activity_time_id);
-    expect($data['start_date'])->toEqual($activityTimeException->start_date->format('Y-m-d'));
-    expect($data['end_date'])->toEqual($activityTimeException->end_date->format('Y-m-d'));
-})->skip('to refactor');
+    expect($data['start_date'])->toEqual($globalActivityTimeException->start_date->format('Y-m-d'));
+    expect($data['end_date'])->toEqual($globalActivityTimeException->end_date->format('Y-m-d'));
+});
 
 test('destroy deletes and responds with', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
-    $activityTimeException = GlobalActivityTimeException::factory()->create();
+    $globalActivityTimeException = GlobalActivityTimeException::factory()->create();
 
-    $response = delete(route('global-activity-time-exceptions.destroy', $activityTimeException));
+    delete(route('global-activity-time-exceptions.destroy', $globalActivityTimeException))->assertNoContent();
 
-    $response->assertNoContent();
-
-    assertModelMissing($activityTimeException);
-})->todo('not suppported at the moment');
+    assertModelMissing($globalActivityTimeException);
+});

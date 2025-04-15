@@ -15,8 +15,6 @@ class ActivityTimeException extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'activity_time_id' => 'integer',
         'start_date' => 'date',
         'end_date' => 'date',
     ];
