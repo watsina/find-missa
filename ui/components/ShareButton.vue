@@ -37,7 +37,7 @@
   // Copy URL to clipboard
   function copyUrl() {
     navigator.clipboard
-      .writeText(shareUrl)
+      .writeText(shareText.value + '\n ' + shareUrl.value)
       .then(() => {
         notify.success('Link copied to clipboard!');
         closeShareModal();

@@ -61,7 +61,7 @@
   const shareDescription = computed(() => {
     const query = searchedQuery.value;
 
-    let description = `Checkout ${query.type || 'mass'} times`;
+    let description = `Checkout ${query.type || 'mass'} times on ${parser.format(dateUsed.value, 'fullDateWithWeekday')}`;
 
     if (query?.location) {
       description += ` in ${query.location}`;
@@ -133,7 +133,7 @@
           name: form.church_name,
         };
 
-        router.replace({
+        router.push({
           query: searchedQuery.value,
         });
       },
