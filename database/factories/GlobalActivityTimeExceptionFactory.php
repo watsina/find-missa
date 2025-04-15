@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class GlobalActivityTimeExceptionFactory extends Factory
             'message' => $this->faker->words(5, true),
             'start_date' => now()->format('Y-m-d'),
             'end_date' => now()->addDay()->format('Y-m-d'),
+            'team_id' => Team::factory(),
         ];
     }
 }
