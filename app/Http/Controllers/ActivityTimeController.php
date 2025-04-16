@@ -32,18 +32,37 @@ class ActivityTimeController extends Controller
         Gate::authorize('create', ActivityTime::class);
 
         $data = $request->validated();
+        $hasStartingTimes = $request->safe()->only('starting_times');
 
         if ($data['occurrence'] === 'weekly' && isset($data['days_of_week'])) {
-            $info = Arr::except($data, ['day_of_week', 'days_of_week']);
+            $info = Arr::except($data, ['day_of_week', 'days_of_week', 'starting_times']);
             $activities = [];
 
             foreach ($data['days_of_week'] as $day) {
-                $activities[] = ActivityTime::create([...$info, 'day_of_week' => $day]);
+                $info['day_of_week'] = $day;
+                if ($hasStartingTimes) {
+                    foreach ($data['starting_times'] as $time) {
+                        $info['start_time'] = $time;
+                        $activities[] = ActivityTime::create($info);
+                    }
+                } else {
+                    $activities[] = ActivityTime::create($info);
+                }
             }
 
             return (new ActivityTimeCollection($activities))->response()->setStatusCode(201);
         }
-        $activityTime = ActivityTime::create($data);
+
+        if ($hasStartingTimes) {
+            $info = $request->safe()->except('starting_times');
+            foreach ($data['starting_times'] as $time) {
+                $info['start_time'] = $time;
+                $activities[] = ActivityTime::create($info);
+            }
+
+            return (new ActivityTimeCollection($activities))->response()->setStatusCode(201);
+        }
+        $activityTime = ActivityTime::create(Arr::except($data, ['starting_times']));
 
         return new ActivityTimeResource($activityTime);
     }
