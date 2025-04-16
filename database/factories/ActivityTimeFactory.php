@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Team;
 use App\Models\Church;
-use App\Enums\ActivityType;
 use App\Models\ActivityTime;
 use App\Enums\ActivityOccurrence;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,8 +23,8 @@ class ActivityTimeFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => $this->faker->randomElement(ActivityType::values()),
-            'activity_type_description' => $this->faker->randomElement(ActivityType::values()),
+            'type' => 'mass',
+            'activity_type_description' => 'mass',
             'start_time' => '10:00',
             'end_time' => '11:00',
             'language' => $this->faker->languageCode,

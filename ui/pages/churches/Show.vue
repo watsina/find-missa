@@ -25,6 +25,7 @@
 
   const headers = [
     { title: 'Activity Type', value: 'type' },
+    { title: 'Activity Description', value: 'activity_type_description' },
     { title: 'Church', value: 'church.name' },
     { title: 'Start Time', value: 'start_time' },
     { title: 'End Time', value: 'end_time' },

@@ -16,6 +16,7 @@ class ActivityTimeDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => Str::replace('-', ' ', $this->type),
+            'activity_type_description' => $this->activity_type_description,
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
             'language' => $this->language,

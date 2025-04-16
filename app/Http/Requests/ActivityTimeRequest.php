@@ -6,7 +6,9 @@ use App\Rules\DayOfWeek;
 use App\Enums\ActivityType;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityOccurrence;
+use App\Enums\ActivityTypeDescription;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\ValidateActivityTypeDescription;
 
 class ActivityTimeRequest extends FormRequest
 {
@@ -36,7 +38,7 @@ class ActivityTimeRequest extends FormRequest
     {
         return [
             'type' => ['required', Rule::enum(ActivityType::class)],
-            'activity_type_description' => ['required', 'min:4', 'max:255'],
+            'activity_type_description' => ['required', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'language' => ['required', 'string', 'max:100'],

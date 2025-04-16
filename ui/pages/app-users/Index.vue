@@ -251,7 +251,7 @@
                   </strong>
                   <div>
                     <strong class="tw-capitalize">
-                      {{ `${activity?.type} (${activity?.language})` }}
+                      {{ `${activity?.activity_type_description} (${activity?.language})` }}
                     </strong>
                     <div>
                       <NavLink

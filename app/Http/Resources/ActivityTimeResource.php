@@ -15,6 +15,7 @@ class ActivityTimeResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
+            'activity_type_description' => $this->activity_type_description,
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
             'language' => $this->language,

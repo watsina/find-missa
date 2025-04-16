@@ -24,7 +24,17 @@
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
+    { title: 'Confession', value: 'confession' },
+    { title: 'Adoration', value: 'adoration' },
+  ];
+
+  const activityTypeDescriptions = [
+    { title: 'Mass', value: 'mass' },
     { title: 'Anticipation Mass', value: 'anticipation-mass' },
+    { title: 'Good Friday Service', value: 'good-friday-service' },
+    { title: 'Easter Vigil Mass', value: 'easter-vigil-mass' },
+    { title: 'Easter Mass', value: 'easter-mass' },
+    { title: 'Easter Monday Mass', value: 'easter-monday-mass' },
     { title: 'Traditional Latin Mass', value: 'traditional-latin-mass' },
     { title: 'Confession', value: 'confession' },
     { title: 'Adoration', value: 'adoration' },
@@ -49,6 +59,7 @@
 
   const form = useForm({
     type: props.activity?.type || '',
+    activity_type_description: props.activity?.activity_type_description || '',
     start_time: props.activity?.start_time || '',
     end_time: props.activity?.end_time || '',
     language: props.activity?.language || '',
@@ -64,6 +75,7 @@
     (newValue) => {
       if (newValue?.id) {
         form.type = newValue?.type || '';
+        form.activity_type_description = newValue?.activity_type_description || '';
         form.start_time = newValue?.start_time || '';
         form.end_time = newValue?.end_time || '';
         form.language = newValue?.language || '';
@@ -160,6 +172,17 @@
               :error="form.errors.type"
               :items="activityTypes"
               label="Activity Type*"
+              required
+            />
+          </div>
+
+          <div class="tw-mt-4">
+            <SelectInput
+              v-model="form.activity_type_description"
+              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              :error="form.errors.activity_type_description"
+              :items="activityTypeDescriptions"
+              label="Activity Type Description*"
               required
             />
           </div>
