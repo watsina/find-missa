@@ -8,6 +8,7 @@
   import SelectInput from '@/components/SelectInput.vue';
   import TextInput from '@/components/TextInput.vue';
   import TimeInput from '@/components/TimeInput.vue';
+  import MultiTimeInput from '@/components/MultiTimeInput.vue';
   import DateInput from '@/components/DateInput.vue';
   import { useDate } from 'vuetify/lib/framework.mjs';
 
@@ -21,6 +22,7 @@
   const parser = useDate();
   const currentDate = new Date().toLocaleDateString('en-US');
   const date = ref(parser.date(currentDate));
+  const isAddingBulk = ref(false);
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
@@ -62,6 +64,7 @@
     type: props.activity?.type || '',
     activity_type_description: props.activity?.activity_type_description || '',
     start_time: props.activity?.start_time || '',
+    starting_times: [], // for bulk inserts
     end_time: props.activity?.end_time || '',
     language: props.activity?.language || '',
     occurrence: props.activity?.occurrence || '',
@@ -141,6 +144,9 @@
 
   const closeModal = (data = null) => {
     form.reset();
+    if (isAddingBulk.value) {
+      return;
+    }
     if ((data?.id || data?.length) && !isEditing.value) emit('created', data);
     if (data?.id && isEditing.value) emit('updated', data);
 
@@ -236,7 +242,16 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div v-if="isAddingBulk" class="tw-mt-4">
+            <MultiTimeInput
+              v-model="form.starting_times"
+              :error="form.errors.starting_times"
+              label="Start Times"
+              required
+            />
+          </div>
+
+          <div v-if="!isAddingBulk" class="tw-mt-4">
             <TimeInput
               v-model="form.start_time"
               :error="form.errors.start_time"
@@ -245,7 +260,7 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div v-if="!isAddingBulk" class="tw-mt-4">
             <TimeInput
               v-model="form.end_time"
               :error="form.errors.end_time"
@@ -263,8 +278,16 @@
               label="Language"
               placeholder="Ruhororo"
               required
-              type="text"
             />
+          </div>
+
+          <div class="tw-mt-4">
+            <v-checkbox
+              v-model="isAddingBulk"
+              color="primary"
+              hide-details="auto"
+              label="Add More Activities"
+            ></v-checkbox>
           </div>
         </form>
       </template>

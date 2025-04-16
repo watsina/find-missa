@@ -13,14 +13,6 @@ use App\Rules\ValidateActivityTypeDescription;
 class ActivityTimeRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
@@ -40,7 +32,7 @@ class ActivityTimeRequest extends FormRequest
             'type' => ['required', Rule::enum(ActivityType::class)],
             'activity_type_description' => ['required', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['required', 'string', 'max:100'],
             'church_id' => ['nullable', 'integer', 'exists:churches,id'],
             'occurrence' => ['required', Rule::enum(ActivityOccurrence::class)],
@@ -51,6 +43,8 @@ class ActivityTimeRequest extends FormRequest
     protected function createRules(): array
     {
         return array_merge($this->commonRules(), [
+            'starting_times' => ['required_if:start_time,null', 'exclude_unless:start_time,null', 'nullable', 'array'],
+            'starting_times.*' => ['required', 'date_format:H:i'],
             'day_of_week' => [
                 Rule::requiredIf(function () {
                     return $this->occurrence === 'weekly' && ! $this->days_of_week;
