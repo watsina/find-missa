@@ -87,6 +87,7 @@ test('update behaves as expected', function (): void {
 
     put(route('activity-times.update', $activityTime), [
         'type' => $data['type'],
+        'activity_type_description' => $data['activity_type_description'],
         'start_time' => $data['start_time'],
         'end_time' => $data['end_time'],
         'language' => $data['language'],

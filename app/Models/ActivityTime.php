@@ -14,6 +14,15 @@ class ActivityTime extends BaseModel
     use HasFactory;
     use Searchable;
 
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (! $model->activity_type_description) {
+                $model->activity_type_description = $model->type;
+            }
+        });
+    }
+
     /**
      * Get the attributes that should be cast.
      *

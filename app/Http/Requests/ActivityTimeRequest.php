@@ -36,6 +36,7 @@ class ActivityTimeRequest extends FormRequest
     {
         return [
             'type' => ['required', Rule::enum(ActivityType::class)],
+            'activity_type_description' => ['required', 'min:4', 'max:255'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'language' => ['required', 'string', 'max:100'],

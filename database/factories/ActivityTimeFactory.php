@@ -25,6 +25,7 @@ class ActivityTimeFactory extends Factory
     {
         return [
             'type' => $this->faker->randomElement(ActivityType::values()),
+            'activity_type_description' => $this->faker->randomElement(ActivityType::values()),
             'start_time' => '10:00',
             'end_time' => '11:00',
             'language' => $this->faker->languageCode,
