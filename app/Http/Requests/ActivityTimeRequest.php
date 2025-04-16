@@ -31,7 +31,7 @@ class ActivityTimeRequest extends FormRequest
         return [
             'type' => ['required', Rule::enum(ActivityType::class)],
             'activity_type_description' => ['required', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
-            'start_time' => ['required', 'date_format:H:i'],
+            'start_time' => ['required_if:starting_times,null', 'nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['required', 'string', 'max:100'],
             'church_id' => ['nullable', 'integer', 'exists:churches,id'],

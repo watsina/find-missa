@@ -61,6 +61,39 @@ test('user can save multiple weekly records', function () {
     assertEquals(3, ActivityTime::count());
 });
 
+test('user can save multiple bulk time records', function () {
+    $this->actingAsSuperAdminWithTeam();
+    // we have cases where multiple days have the same details
+    $data = ActivityTime::factory()->weekly()->raw();
+
+    post(route('activity-times.store'), [
+        ...$data,
+        'start_time' => null,
+        'starting_times' => ['07:00', '13:00', '18:00'],
+    ])
+        ->assertCreated()
+        ->assertJsonStructure([]);
+
+    assertEquals(3, ActivityTime::count());
+});
+
+test('user can save multiple bulk time records with multiply weekly records', function () {
+    $this->actingAsSuperAdminWithTeam();
+    // we have cases where multiple days have the same details
+    $data = ActivityTime::factory()->weekly()->raw(['day_of_week' => null]);
+
+    post(route('activity-times.store'), [
+        ...$data,
+        'days_of_week' => ['Monday', 'Tuesday', 'Wednesday'],
+        'start_time' => null,
+        'starting_times' => ['07:00', '13:00', '18:00'],
+    ])
+        ->assertCreated()
+        ->assertJsonStructure([]);
+
+    assertEquals(9, ActivityTime::count());
+});
+
 test('show behaves as expected', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
