@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\GlobalActivityTimeException;
 use App\Http\Resources\ActivityTimeDetailsResource;
 
 class SearchActivitiesController extends Controller
@@ -40,6 +41,9 @@ class SearchActivitiesController extends Controller
         ]);
 
         $date = Carbon::createFromDate($data['date']);
+        $dayHasGlobalException = GlobalActivityTimeException::whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->exists();
 
         if ($data['type'] === 'mass') {
             $types = ['mass', 'anticipation-mass'];
@@ -77,9 +81,12 @@ class SearchActivitiesController extends Controller
                 fn (Builder $query) => $query->where(
                     fn (Builder $query) => $query->where('occurrence', 'one-time')
                         ->whereDate('date', $date)
+                )->when(
+                    ! $dayHasGlobalException,
+                    fn (Builder $query) => $query->orWhere('day_of_week', $date->dayName)
+                        ->orWhere('occurrence', 'daily')
                 )
-                    ->orWhere('day_of_week', $date->dayName)
-                    ->orWhere('occurrence', 'daily')
+
             )
             ->orderBy('start_time', 'asc')
             ->paginate(50)

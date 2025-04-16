@@ -54,6 +54,7 @@ export default createVuetify({
       density: 'compact',
       color: 'primary',
       autoGrow: true,
+      rows: 2,
     },
     VAutocomplete: {
       variant: 'outlined',

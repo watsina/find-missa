@@ -5,6 +5,7 @@
     color="primary"
     density="compact"
     :error-messages="error"
+    :hide-actions="true"
     hide-details="auto"
     prepend-icon=""
     prepend-inner-icon="$calendar"

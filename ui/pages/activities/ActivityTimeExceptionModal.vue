@@ -19,7 +19,7 @@
 
   const form = useForm({
     activity_time_id: props.activityId,
-    reason: props.exception?.type || '',
+    reason: props.exception?.reason || '',
     start_date: props.exception?.start_date || null,
     end_date: props.exception?.end_date || null,
   });

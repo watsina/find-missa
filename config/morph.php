@@ -14,6 +14,7 @@ use App\Models\TeamMember;
 use App\Models\ActivityTime;
 use App\Models\TeamInvitation;
 use App\Models\ActivityTimeException;
+use App\Models\GlobalActivityTimeException;
 
 return [
     'user' => User::class,
@@ -28,6 +29,7 @@ return [
     'subParish' => SubParish::class,
     'church' => Church::class,
     'activity-time' => ActivityTime::class,
-    'activity-exception' => ActivityTimeException::class,
+    'activity-time-exception' => ActivityTimeException::class,
     'priest' => Priest::class,
+    'global-activity-time-exception' => GlobalActivityTimeException::class,
 ];

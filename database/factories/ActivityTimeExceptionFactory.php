@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use App\Models\ActivityTime;
 use App\Models\ActivityTimeException;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,7 +23,7 @@ class ActivityTimeExceptionFactory extends Factory
     {
         return [
             'activity_time_id' => ActivityTime::factory(),
-            'team_id' => ActivityTime::factory(),
+            'team_id' => Team::factory(),
             'start_date' => now()->format('Y-m-d'),
             'end_date' => now()->addDay()->format('Y-m-d'),
             'reason' => $this->faker->words(3, true),

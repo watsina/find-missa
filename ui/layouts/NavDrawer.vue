@@ -34,13 +34,15 @@
     mdiRunFast,
     mdiAccountDetailsOutline,
     mdiAccountGroup,
+    mdiTimerStopOutline,
   } from '@mdi/js';
   import useAuthStore from '@/stores/useAuthStore';
 
-  const store = useAuthStore();
+  const authStore = useAuthStore();
 
   const drawer = defineModel('drawer', { type: Boolean });
   const rail = defineModel('rail', { type: Boolean });
+  const authUser = computed(() => authStore.user);
 
   const links = [
     {
@@ -86,6 +88,13 @@
       show: true,
     },
     {
+      name: 'global exceptions',
+      routeName: 'global-activity-exceptions.index',
+      icon: mdiTimerStopOutline,
+      current: true,
+      show: authUser.value.is_admin,
+    },
+    {
       name: 'priests',
       routeName: 'priests.index',
       icon: mdiAccountDetailsOutline,
@@ -97,7 +106,7 @@
       routeName: 'users.index',
       icon: mdiAccountGroup,
       current: true,
-      show: !!store?.user?.is_admin,
+      show: authUser.value.is_admin,
     },
   ];
 

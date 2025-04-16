@@ -1,23 +1,14 @@
 <?php
 
+use App\Http\Controllers;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AppUsers;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClearDataController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExportDataController;
-use App\Http\Controllers\ImportDataController;
-use App\Http\Controllers\SwitchTeamController;
-use App\Http\Controllers\TeamMemberController;
-use App\Http\Controllers\UserActionLogController;
-use App\Http\Controllers\ImportActivitesController;
-use App\Http\Controllers\ImportDioceseChurchesController;
-use App\Http\Controllers\AppUsers\GetChurchDetailsController;
-use App\Http\Controllers\AppUsers\SearchActivitiesController;
 
 require __DIR__.'/auth.php';
 
-Route::get('/search', SearchActivitiesController::class)->name('search');
-Route::get('/church-details/{church}', GetChurchDetailsController::class)->name('church-details');
+Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
+Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
 
 Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();
@@ -25,34 +16,35 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
 
 // admin routes
 Route::middleware('auth', 'admin')->group(function () {
-    Route::delete('clear-data', ClearDataController::class)->name('clear-data');
-    // Route::post('import-data', ImportDataController::class)->middleware('userWithTeam')->name('import-data');
-    Route::post('import-churches/{diocese}', ImportDioceseChurchesController::class)->middleware('userWithTeam')->name('import-churches');
-    Route::post('import-activities/{diocese}', ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
-    Route::post('export-data', ExportDataController::class)->middleware('userWithTeam')->name('export-data');
+    Route::delete('clear-data', Controllers\ClearDataController::class)->name('clear-data');
+    // Route::post('import-data', Controllers\ImportDataController::class)->middleware('userWithTeam')->name('import-data');
+    Route::post('import-churches/{diocese}', Controllers\ImportDioceseChurchesController::class)->middleware('userWithTeam')->name('import-churches');
+    Route::post('import-activities/{diocese}', Controllers\ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
+    Route::post('export-data', Controllers\ExportDataController::class)->middleware('userWithTeam')->name('export-data');
 
-    Route::apiResource('team.invitations', App\Http\Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
-    Route::apiResource('users', App\Http\Controllers\UserController::class)->except('destroy');
-    Route::apiResource('teams', App\Http\Controllers\TeamController::class)->except('destroy');
+    Route::apiResource('team.invitations', Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
+    Route::apiResource('users', Controllers\UserController::class)->except('destroy');
+    Route::apiResource('teams', Controllers\TeamController::class)->except('destroy');
 
-    Route::get('action-logs', UserActionLogController::class)->middleware('userWithTeam');
+    Route::get('action-logs', Controllers\UserActionLogController::class)->middleware('userWithTeam');
     // acl
-    Route::get('roles-permissions', App\Http\Controllers\Acl\GetRolesAndPermissionsController::class);
-    Route::apiResource('roles', App\Http\Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
-    Route::apiResource('permissions', App\Http\Controllers\Acl\PermissionsController::class)->only('index', 'show', 'store', 'update');
-    Route::apiResource('user.roles', App\Http\Controllers\Acl\UserRolesController::class)->only('index', 'store')->middleware('userWithTeam');
+    Route::get('roles-permissions', Controllers\Acl\GetRolesAndPermissionsController::class);
+    Route::apiResource('roles', Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
+    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('index', 'show', 'store', 'update');
+    Route::apiResource('user.roles', Controllers\Acl\UserRolesController::class)->only('index', 'store')->middleware('userWithTeam');
 });
 
 Route::middleware('auth', 'userWithTeam')->group(function () {
 
-    Route::get('dashboard', DashboardController::class)->name('dashboard.index');
-    Route::put('switch-team', SwitchTeamController::class);
-    Route::apiResource('team.members', TeamMemberController::class)->only('index', 'show', 'update', 'destroy');
-    Route::apiResource('churches', App\Http\Controllers\ChurchController::class)->except('destroy');
-    Route::apiResource('dioceses', App\Http\Controllers\DioceseController::class)->except('destroy');
-    Route::apiResource('parishes', App\Http\Controllers\ParishController::class)->except('destroy');
-    Route::apiResource('priests', App\Http\Controllers\PriestController::class)->except('destroy');
-    Route::apiResource('sub-parishes', App\Http\Controllers\SubParishController::class)->except('destroy');
-    Route::apiResource('activity-times', App\Http\Controllers\ActivityTimeController::class);
-    Route::apiResource('activity-time-exceptions', App\Http\Controllers\ActivityTimeExceptionController::class)->except('destroy');
+    Route::get('dashboard', Controllers\DashboardController::class)->name('dashboard.index');
+    Route::put('switch-team', Controllers\SwitchTeamController::class);
+    Route::apiResource('team.members', Controllers\TeamMemberController::class)->only('index', 'show', 'update', 'destroy');
+    Route::apiResource('churches', Controllers\ChurchController::class)->except('destroy');
+    Route::apiResource('dioceses', Controllers\DioceseController::class)->except('destroy');
+    Route::apiResource('parishes', Controllers\ParishController::class)->except('destroy');
+    Route::apiResource('priests', Controllers\PriestController::class)->except('destroy');
+    Route::apiResource('sub-parishes', Controllers\SubParishController::class)->except('destroy');
+    Route::apiResource('activity-times', Controllers\ActivityTimeController::class);
+    Route::apiResource('activity-time-exceptions', Controllers\ActivityTimeExceptionController::class);
+    Route::apiResource('global-activity-time-exceptions', Controllers\GlobalActivityTimeExceptionController::class);
 });
