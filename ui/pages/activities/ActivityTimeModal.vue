@@ -31,6 +31,7 @@
   const activityTypeDescriptions = [
     { title: 'Mass', value: 'mass' },
     { title: 'Anticipation Mass', value: 'anticipation-mass' },
+    { title: 'Mass of the Lords Supper', value: 'mass-of-the-lords-supper' },
     { title: 'Good Friday Service', value: 'good-friday-service' },
     { title: 'Easter Vigil Mass', value: 'easter-vigil-mass' },
     { title: 'Easter Mass', value: 'easter-mass' },

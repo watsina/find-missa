@@ -9,6 +9,7 @@ enum ActivityTypeDescription: string
     use EnumToArray;
 
     case Mass = 'mass';
+    case MassOfTheLordsSupper = 'mass-of-the-lords-supper';
     case GoodFridayService = 'good-friday-service';
     case EasterVigilMass = 'easter-vigil-mass';
     case EasterMass = 'easter-mass';
