@@ -17,7 +17,7 @@ class GlobalActivityTimeExceptionRequest extends FormRequest
             'reason' => ['string', 'required', 'min:6', 'max:255'],
             'message' => ['string', 'nullable', 'min:10'],
             'start_date' => ['date', 'required'],
-            'end_date' => ['date', 'required'],
+            'end_date' => ['date', 'required', 'after_or_equal:start_date'],
         ];
     }
 }

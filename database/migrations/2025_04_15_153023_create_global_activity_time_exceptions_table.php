@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('global_activity_time_exceptions', function (Blueprint $table) {
             $table->id();
             $table->string('reason');
+            $table->string('activity_type', 50)->default('all');
             $table->text('message')->nullable();
             $table->dateTime('start_date')->index();
             $table->dateTime('end_date')->index();

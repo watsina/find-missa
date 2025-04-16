@@ -168,6 +168,7 @@
         <v-col cols="12" md="3">
           <DateInput
             v-model="date"
+            :hide-actions="false"
             label="Date"
             :min="currentDate"
             variant="underlined"

@@ -14,6 +14,12 @@ class GlobalActivityTimeExceptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'reason' => $this->reason,
+            'message' => $this->message,
+            'start_date' => $this->start_date->format('Y-m-d'),
+            'end_date' => $this->end_date->format('Y-m-d'),
+        ];
     }
 }

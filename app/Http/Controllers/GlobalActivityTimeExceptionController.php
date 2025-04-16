@@ -15,7 +15,7 @@ class GlobalActivityTimeExceptionController extends Controller
     {
         Gate::authorize('viewAny', GlobalActivityTimeException::class);
 
-        return GlobalActivityTimeException::all()->toResourceCollection();
+        return GlobalActivityTimeException::paginate(10)->toResourceCollection();
     }
 
     /**

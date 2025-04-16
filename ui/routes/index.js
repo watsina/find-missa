@@ -7,6 +7,7 @@ import acl from './acl';
 import parishes from './parishes';
 import churches from './churches';
 import activities from './activities';
+import globalExceptions from './global-activity-exceptions';
 import subParishes from './sub-parishes';
 import dioceses from './dioceses';
 import priests from './priests';
@@ -26,6 +27,7 @@ export default [
       ...acl,
       ...dioceses,
       ...activities,
+      ...globalExceptions,
       ...parishes,
       ...churches,
       ...priests,
