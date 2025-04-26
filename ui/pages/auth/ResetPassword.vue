@@ -9,7 +9,7 @@
         <TextInput
           v-model="form.email"
           autofocus
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.email"
           label="Email"
           required
@@ -17,11 +17,11 @@
         />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <TextInput
           v-model="form.password"
           autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.password"
           label="Password"
           required
@@ -29,11 +29,11 @@
         />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <TextInput
           v-model="form.password_confirmation"
           autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.password_confirmation"
           label="Confirm Password"
           required
@@ -41,8 +41,8 @@
         />
       </div>
 
-      <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <NavLink class="tw-underline tw-mr-2" :href="{ name: 'auth.login' }">
+      <div class="tw:flex tw:items-center tw:justify-end tw:mt-4">
+        <NavLink class="tw:underline tw:mr-2" :href="{ name: 'auth.login' }">
           Back to Login
         </NavLink>
         <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">

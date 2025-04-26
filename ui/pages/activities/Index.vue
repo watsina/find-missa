@@ -19,12 +19,12 @@
 <template>
   <app-layout>
     <template #head>
-      <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Activities</h2>
+      <h2 class="tw:text-xl tw:font-semibold tw:leading-tight tw:text-gray-800">Activities</h2>
     </template>
     <v-container>
-      <v-row class="tw-py-12">
+      <v-row class="tw:py-12">
         <v-col cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the activities.</p>
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of all the activities.</p>
         </v-col>
         <v-col cols="12">
           <DataTableServer :headers="headers" item-value="id" url="/api/v1/activity-times">

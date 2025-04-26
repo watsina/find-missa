@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="tw-h-full tw-bg-gray-100">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="tw:h-full tw:bg-gray-100">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,7 +29,7 @@
         </script>
         @vite(['ui/app.js', 'ui/styles/app.css'])
     </head>
-    <body class="tw-font-sans tw-antialiased">
+    <body class="tw:font-sans tw:antialiased">
         <div id="app"/>
     </body>
 </html>

@@ -100,7 +100,7 @@
       <v-card v-else-if="!church">
         <v-card-title> No church found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-4">
+      <v-row v-else class="tw:py-4">
         <!-- show church details -->
         <v-col cols="12">
           <ChurchDetails v-model:church="church" />
@@ -112,14 +112,14 @@
           @created="createdActivities"
           @updated="updateActivity"
         />
-        <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>
+        <v-col class="tw:flex tw:justify-between" cols="12">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of church activities.</p>
           <PrimaryButton @click="showModal"> Add Activity</PrimaryButton>
         </v-col>
         <v-col cols="12">
           <!-- church activities -->
           <data-table
-            class="tw-capitalize"
+            class="tw:capitalize"
             has-search
             :headers="headers"
             :items="church?.activities || []"
@@ -127,7 +127,7 @@
             <template #item.actions="{ item }">
               <v-icon
                 v-if="item?.id"
-                class="tw-mr-2"
+                class="tw:mr-2"
                 color="primary"
                 :icon="mdiPencilOutline"
                 @click="showModal(item)"

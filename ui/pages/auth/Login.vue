@@ -5,11 +5,11 @@
     </template>
 
     <form @submit.prevent="submit">
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <TextInput
           v-model="form.email"
           autofocus
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.email"
           label="Email"
           required
@@ -17,11 +17,11 @@
         />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <TextInput
           v-model="form.password"
           autocomplete="current-password"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.password"
           label="Password"
           required
@@ -29,18 +29,18 @@
         />
       </div>
 
-      <div class="tw-block tw-mt-4">
+      <div class="tw:block tw:mt-4">
         <Checkbox v-model="form.remember" label="Remember me" />
       </div>
 
-      <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
-        <NavLink class="tw-underline" :href="{ name: 'auth.forgot-password' }">
+      <div class="tw:flex tw:items-center tw:justify-end tw:mt-4">
+        <NavLink class="tw:underline" :href="{ name: 'auth.forgot-password' }">
           Forgot your password?
         </NavLink>
 
         <PrimaryButton
-          class="tw-ml-4"
-          :class="{ 'tw-opacity-25': form.processing }"
+          class="tw:ml-4"
+          :class="{ 'tw:opacity-25': form.processing }"
           :disabled="form.processing"
           type="submit"
         >

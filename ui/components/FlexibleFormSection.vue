@@ -20,20 +20,20 @@
       </template>
     </SectionTitle>
 
-    <div class="tw-mt-5">
+    <div class="tw:mt-5">
       <form @submit.prevent="$emit('submitted')">
         <div
-          class="tw-px-4 tw-py-5 tw-bg-white tw-shadow sm:tw-p-6"
-          :class="hasActions ? 'sm:tw-rounded-tl-md sm:tw-rounded-tr-md' : 'sm:tw-rounded-md'"
+          class="tw:px-4 tw:py-5 tw:bg-white tw:shadow tw:sm:p-6"
+          :class="hasActions ? 'tw:sm:rounded-tl-md tw:sm:rounded-tr-md' : 'tw:sm:rounded-md'"
         >
-          <div :class="{ 'tw-grid tw-grid-cols-12 tw-gap-6': formGrid }">
+          <div :class="{ 'tw:grid tw:grid-cols-12 tw:gap-6': formGrid }">
             <slot name="form" />
           </div>
         </div>
 
         <div
           v-if="hasActions"
-          class="tw-flex tw-items-center tw-justify-end tw-px-4 tw-py-3 tw-text-right tw-shadow tw-bg-gray-50 sm:tw-px-6 sm:tw-rounded-bl-md sm:tw-rounded-br-md"
+          class="tw:flex tw:items-center tw:justify-end tw:px-4 tw:py-3 tw:text-right tw:shadow tw:bg-gray-50 tw:sm:px-6 tw:sm:rounded-bl-md tw:sm:rounded-br-md"
         >
           <slot name="actions" />
         </div>

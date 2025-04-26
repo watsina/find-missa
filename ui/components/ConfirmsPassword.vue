@@ -87,17 +87,17 @@
       <template #content>
         {{ content }}
 
-        <div class="tw-mt-4">
+        <div class="tw:mt-4">
           <TextInput
             ref="passwordInput"
             v-model="form.password"
-            class="tw-block tw-w-3/4 tw-mt-1"
+            class="tw:block tw:w-3/4 tw:mt-1"
             placeholder="Password"
             type="password"
             @keyup.enter="confirmPassword"
           />
 
-          <InputError class="tw-mt-2" :message="form.error" />
+          <InputError class="tw:mt-2" :message="form.error" />
         </div>
       </template>
 
@@ -105,8 +105,8 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3"
-          :class="{ 'tw-opacity-25': form.processing }"
+          class="tw:ml-3"
+          :class="{ 'tw:opacity-25': form.processing }"
           :disabled="form.processing"
           @click="confirmPassword"
         >

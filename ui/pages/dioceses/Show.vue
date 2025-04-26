@@ -80,7 +80,7 @@
       <v-card v-else-if="!diocese">
         <v-card-title> No diocese found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-4">
+      <v-row v-else class="tw:py-4">
         <DioceseModal
           v-model:show-modal="showingModal"
           :diocese="dioceseToEdit"
@@ -98,14 +98,14 @@
             <template #action>
               <PrimaryButton
                 v-if="user.is_admin"
-                class="tw-mr-2"
+                class="tw:mr-2"
                 @click="() => importData('parishes')"
               >
                 Upload Parishes
               </PrimaryButton>
               <PrimaryButton
                 v-if="user.is_admin"
-                class="tw-mr-2"
+                class="tw:mr-2"
                 @click="() => importData('activities')"
               >
                 Upload Activities

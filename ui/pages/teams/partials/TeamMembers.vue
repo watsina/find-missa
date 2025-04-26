@@ -54,23 +54,23 @@
     />
 
     <!-- Manage Team Members -->
-    <ActionSection class="tw-mt-10 sm:tw-mt-0">
+    <ActionSection class="tw:mt-10 tw:sm:mt-0">
       <template #title> Team Members </template>
 
       <template #description> All of the people that are part of this team. </template>
 
       <!-- Team Member List -->
       <template #content>
-        <div class="tw-space-y-6">
+        <div class="tw:space-y-6">
           <div
             v-for="member in team.members"
             :key="member.id"
-            class="tw-flex tw-items-center tw-justify-between"
+            class="tw:flex tw:items-center tw:justify-between"
           >
-            <div class="tw-flex tw-items-center">
+            <div class="tw:flex tw:items-center">
               <img
                 :alt="member.name"
-                class="tw-w-8 tw-h-8 tw-rounded-full tw-object-cover"
+                class="tw:w-8 tw:h-8 tw:rounded-full tw:object-cover"
                 :src="member.profile_photo_url"
               />
               <div class="ms-4">
@@ -78,24 +78,24 @@
               </div>
             </div>
 
-            <div class="tw-flex tw-items-center">
+            <div class="tw:flex tw:items-center">
               <!-- Manage Team Member Role -->
               <button
                 v-if="canUpdateTeamMembers && availableRoles.length"
-                class="ms-2 tw-text-sm tw-text-gray-400 tw-underline"
+                class="ms-2 tw:text-sm tw:text-gray-400 tw:underline"
                 @click="manageRole(member)"
               >
                 <!-- {{ displayableRole(member.membership.role) }} -->
               </button>
 
-              <div v-else-if="availableRoles.length" class="ms-2 tw-text-sm tw-text-gray-400">
+              <div v-else-if="availableRoles.length" class="ms-2 tw:text-sm tw:text-gray-400">
                 <!-- {{ displayableRole(member.membership.role) }} -->
               </div>
 
               <!-- Leave Team -->
               <button
                 v-if="authUser?.id === member.id && !authUser?.is_admin"
-                class="tw-cursor-pointer ms-6 tw-text-sm tw-text-red-500"
+                class="tw:cursor-pointer ms-6 tw:text-sm tw:text-red-500"
                 @click="confirmLeavingTeam"
               >
                 Leave

@@ -32,36 +32,36 @@
     <template #content>
       <div v-if="managingRoleFor">
         <div
-          class="tw-relative tw-z-0 tw-mt-1 tw-border tw-border-gray-200 tw-rounded-lg tw-cursor-pointer"
+          class="tw:relative tw:z-0 tw:mt-1 tw:border tw:border-gray-200 tw:rounded-lg tw:cursor-pointer"
         >
           <button
             v-for="(role, i) in availableRoles"
             :key="role.key"
-            class="tw-relative tw-px-4 tw-py-3 tw-inline-flex tw-w-full tw-rounded-lg focus:tw-z-10 focus:tw-outline-none focus:tw-border-indigo-500 focus:tw-ring-2 focus:tw-ring-indigo-500"
+            class="tw:relative tw:px-4 tw:py-3 tw:inline-flex tw:w-full tw:rounded-lg tw:focus:z-10 tw:focus:outline-hidden tw:focus:border-indigo-500 tw:focus:ring-2 tw:focus:ring-indigo-500"
             :class="{
-              'tw-border-t tw-border-gray-200 focus:tw-border-none tw-rounded-t-none': i > 0,
-              'tw-rounded-b-none': i !== Object.keys(availableRoles).length - 1,
+              'tw:border-t tw:border-gray-200 tw:focus:border-none tw:rounded-t-none': i > 0,
+              'tw:rounded-b-none': i !== Object.keys(availableRoles).length - 1,
             }"
             type="button"
             @click="updateRoleForm.role = role.key"
           >
             <div
               :class="{
-                'tw-opacity-50': updateRoleForm.role && updateRoleForm.role !== role.key,
+                'tw:opacity-50': updateRoleForm.role && updateRoleForm.role !== role.key,
               }"
             >
               <!-- Role Name -->
-              <div class="tw-flex tw-items-center">
+              <div class="tw:flex tw:items-center">
                 <div
-                  class="tw-text-sm tw-text-gray-600"
-                  :class="{ 'tw-font-semibold': updateRoleForm.role === role.key }"
+                  class="tw:text-sm tw:text-gray-600"
+                  :class="{ 'tw:font-semibold': updateRoleForm.role === role.key }"
                 >
                   {{ role.name }}
                 </div>
 
                 <svg
                   v-if="updateRoleForm.role == role.key"
-                  class="ms-2 tw-h-5 tw-w-5 tw-text-green-400"
+                  class="ms-2 tw:h-5 tw:w-5 tw:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="1.5"
@@ -77,7 +77,7 @@
               </div>
 
               <!-- Role Description -->
-              <div class="tw-mt-2 tw-text-xs tw-text-gray-600">
+              <div class="tw:mt-2 tw:text-xs tw:text-gray-600">
                 {{ role.description }}
               </div>
             </div>
@@ -91,7 +91,7 @@
 
       <PrimaryButton
         class="ms-3"
-        :class="{ 'tw-opacity-25': updateRoleForm.processing }"
+        :class="{ 'tw:opacity-25': updateRoleForm.processing }"
         :disabled="updateRoleForm.processing"
         @click="updateRole"
       >

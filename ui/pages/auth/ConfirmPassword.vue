@@ -4,7 +4,7 @@
       <AuthenticationCardLogo />
     </template>
 
-    <div class="tw-mb-4 tw-text-sm tw-text-gray-600">
+    <div class="tw:mb-4 tw:text-sm tw:text-gray-600">
       This is a secure area of the application. Please confirm your password before continuing.
     </div>
 
@@ -17,17 +17,17 @@
           v-model="form.password"
           autocomplete="current-password"
           autofocus
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           required
           type="password"
         />
-        <InputError class="tw-mt-2" :message="form.errors.password" />
+        <InputError class="tw:mt-2" :message="form.errors.password" />
       </div>
 
-      <div class="tw-flex tw-justify-end tw-mt-4">
+      <div class="tw:flex tw:justify-end tw:mt-4">
         <PrimaryButton
-          class="tw-ml-4"
-          :class="{ 'tw-opacity-25': form.processing }"
+          class="tw:ml-4"
+          :class="{ 'tw:opacity-25': form.processing }"
           :disabled="form.processing"
         >
           Confirm

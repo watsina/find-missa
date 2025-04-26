@@ -37,7 +37,7 @@
         <v-col cols="12">
           <TextInput
             v-model="form.name"
-            class="tw-mt-1 tw-block tw-w-full"
+            class="tw:mt-1 tw:block tw:w-full"
             :disabled="!canUpdateTeam"
             :error="form.errors.name"
             label="Team Name"
@@ -49,7 +49,7 @@
     </template>
 
     <template v-if="canUpdateTeam" #actions>
-      <ActionMessage class="tw-me-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
+      <ActionMessage class="tw:me-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
 
       <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
         Save

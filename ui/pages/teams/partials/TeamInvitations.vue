@@ -39,7 +39,7 @@
     <SectionBorder />
 
     <!-- Team Member Invitations -->
-    <ActionSection class="tw-mt-10 sm:tw-mt-0">
+    <ActionSection class="tw:mt-10 tw:sm:mt-0">
       <template #title> Pending Team Invitations </template>
 
       <template #description>
@@ -51,17 +51,17 @@
       <template #content>
         <v-list lines="two">
           <v-list-item v-for="invitation in team.invitations" :key="invitation.id">
-            <v-list-item-title class="tw-text-sm !tw-capitalize">
+            <v-list-item-title class="tw:text-sm tw:capitalize!">
               {{ invitation.name }} [{{ invitation?.role?.name?.replace(/-/g, ' ') }}]
             </v-list-item-title>
-            <v-list-item-subtitle class="tw-text-xs !tw-lowercase">
+            <v-list-item-subtitle class="tw:text-xs tw:lowercase!">
               {{ invitation.email }}
             </v-list-item-subtitle>
             <template #append>
               <!-- Cancel Team Invitation -->
               <v-btn
                 v-if="canRemoveTeamMembers"
-                class="tw-text-red-500"
+                class="tw:text-red-500"
                 color="error"
                 :disabled="removingInvite"
                 :loading="removingInvite"

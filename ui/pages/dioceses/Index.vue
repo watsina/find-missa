@@ -39,7 +39,7 @@
 <template>
   <app-layout>
     <template #head>
-      <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Dioceses</h2>
+      <h2 class="tw:text-xl tw:font-semibold tw:leading-tight tw:text-gray-800">Dioceses</h2>
     </template>
     <diocese-modal
       v-model:show-modal="showingModal"
@@ -48,9 +48,9 @@
       @updated="updateDioceses"
     />
     <v-container>
-      <v-row class="tw-py-12">
-        <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the dioceses.</p>
+      <v-row class="tw:py-12">
+        <v-col class="tw:flex tw:justify-between" cols="12">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of all the dioceses.</p>
           <PrimaryButton @click="showModal"> Add a diocese </PrimaryButton>
         </v-col>
         <v-col cols="12">
@@ -61,13 +61,13 @@
             url="/api/v1/dioceses"
           >
             <template #item.name="{ item }">
-              <span class="tw-capitalize">
+              <span class="tw:capitalize">
                 {{ item.name }}
               </span>
             </template>
             <template #item.actions="{ item }">
               <v-icon
-                class="tw-cursor-pointer tw-mr-2"
+                class="tw:cursor-pointer tw:mr-2"
                 color="primary"
                 :icon="mdiPencilOutline"
                 title="Edit Diocese"

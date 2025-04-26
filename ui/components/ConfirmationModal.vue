@@ -33,11 +33,11 @@
 <template>
   <v-dialog v-model="dialog" v-bind="$attrs" :max-width="maxWidth" persistent @close="close">
     <v-card rounded>
-      <v-card-text class="tw-px-4 tw-pt-5 tw-pb-4 tw-bg-white sm:tw-p-6 sm:tw-pb-4">
-        <div class="sm:tw-flex sm:tw-items-start">
+      <v-card-text class="tw:px-4 tw:pt-5 tw:pb-4 tw:bg-white tw:sm:p-6 tw:sm:pb-4">
+        <div class="tw:sm:flex tw:sm:items-start">
           <v-avatar color="red-lighten-5">
             <svg
-              class="tw-w-6 tw-h-6 tw-text-red-600"
+              class="tw:w-6 tw:h-6 tw:text-red-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -51,12 +51,12 @@
             </svg>
           </v-avatar>
 
-          <div class="tw-mt-3 tw-text-center sm:tw-mt-0 sm:tw-ml-4 sm:tw-text-left">
-            <h3 class="tw-font-semibold tw-text-lg">
+          <div class="tw:mt-3 tw:text-center tw:sm:mt-0 tw:sm:ml-4 tw:sm:text-left">
+            <h3 class="tw:font-semibold tw:text-lg">
               <slot name="title" />
             </h3>
 
-            <div class="tw-mt-2">
+            <div class="tw:mt-2">
               <slot name="content" />
             </div>
           </div>
@@ -64,7 +64,7 @@
       </v-card-text>
 
       <v-card-actions
-        class="tw-flex tw-flex-row tw-justify-end tw-px-6 tw-py-2 tw-text-right tw-bg-gray-100"
+        class="tw:flex tw:flex-row tw:justify-end tw:px-6 tw:py-2 tw:text-right tw:bg-gray-100"
       >
         <slot name="footer" />
       </v-card-actions>

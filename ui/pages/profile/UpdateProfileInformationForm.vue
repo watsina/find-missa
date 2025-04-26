@@ -11,29 +11,29 @@
           <v-col cols="12" md="12" sm="6">
             <InputLabel for="photo" value="Photo" />
             <!-- Current Profile Photo -->
-            <div v-show="!photoPreview" class="tw-mt-2">
+            <div v-show="!photoPreview" class="tw:mt-2">
               <img
                 :alt="user.name"
-                class="tw-object-cover tw-w-40 tw-h-40 tw-rounded-full"
+                class="tw:object-cover tw:w-40 tw:h-40 tw:rounded-full"
                 :src="user.profile_photo_url"
               />
             </div>
 
             <!-- New Profile Photo Preview -->
-            <div v-show="photoPreview" class="tw-mt-2">
+            <div v-show="photoPreview" class="tw:mt-2">
               <span
-                class="tw-block tw-w-40 tw-h-40 tw-bg-center tw-bg-no-repeat tw-bg-cover tw-rounded-full"
+                class="tw:block tw:w-40 tw:h-40 tw:bg-center tw:bg-no-repeat tw:bg-cover tw:rounded-full"
                 :style="'background-image: url(\'' + photoPreview + '\');'"
               />
             </div>
 
             <!-- Profile Photo File Input -->
-            <div class="tw-flex tw-justify-between">
+            <div class="tw:flex tw:justify-between">
               <FileInput
                 v-model="form.photo"
                 accept="image/png,image/jpeg,image/jpg, image/webp"
                 autofocus
-                class="tw-mt-2 tw-w-1/2 tw-mr-2"
+                class="tw:mt-2 tw:w-1/2 tw:mr-2"
                 density="compact"
                 :error="form.errors.photo"
                 label="Upload Profile Photo (jpg, jpeg, png, webp)"
@@ -44,7 +44,7 @@
 
               <SecondaryButton
                 v-if="user.profile_photo_path"
-                class="tw-mt-2"
+                class="tw:mt-2"
                 type="button"
                 @click="deletePhoto"
               >
@@ -57,7 +57,7 @@
             <TextInput
               v-model="form.name"
               autocomplete="name"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="Name"
               type="text"
@@ -67,7 +67,7 @@
           <v-col cols="12" md="12" sm="6">
             <TextInput
               v-model="form.email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               disabled
               :error="form.errors.email"
               label="Email"
@@ -75,12 +75,12 @@
             />
 
             <div v-if="user.email_verified_at === null">
-              <p class="tw-mt-2 tw-text-sm">
+              <p class="tw:mt-2 tw:text-sm">
                 Your email address is unverified.
 
                 <a
                   as="button"
-                  class="tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+                  class="tw:text-gray-600 tw:underline tw:hover:text-gray-900"
                   :href="route('verification.send')"
                   method="post"
                   @click.prevent="sendEmailVerification"
@@ -91,7 +91,7 @@
 
               <div
                 v-show="verificationLinkSent"
-                class="tw-mt-2 tw-text-sm tw-font-medium tw-text-green-600"
+                class="tw:mt-2 tw:text-sm tw:font-medium tw:text-green-600"
               >
                 A new verification link has been sent to your email address.
               </div>
@@ -102,10 +102,10 @@
     </template>
 
     <template #actions>
-      <ActionMessage class="tw-mr-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
+      <ActionMessage class="tw:mr-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
 
       <PrimaryButton
-        :class="{ 'tw-opacity-25': form.processing }"
+        :class="{ 'tw:opacity-25': form.processing }"
         :disabled="form.processing"
         type="submit"
       >

@@ -54,7 +54,7 @@
         type="list-item-three-line@3"
       ></v-skeleton-loader>
       <v-card v-else-if="!canUpdateRoles"> Sorry you don't have permission to update roles</v-card>
-      <v-row v-else class="tw-max-w-7xl tw-mx-auto tw-py-10 sm:tw-px-6 lg:tw-px-8">
+      <v-row v-else class="tw:max-w-7xl tw:mx-auto tw:py-10 tw:sm:px-6 tw:lg:px-8">
         <v-expansion-panels variant="default">
           <role-expansion-panel
             v-for="role in roles"
