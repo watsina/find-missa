@@ -59,18 +59,18 @@
 <template>
   <app-layout>
     <template #head>
-      <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Activities</h2>
+      <h2 class="tw:text-xl tw:font-semibold tw:leading-tight tw:text-gray-800">Activities</h2>
     </template>
     <v-container>
-      <v-row class="tw-py-12">
-        <v-col class="tw-flex" cols="12">
+      <v-row class="tw:py-12">
+        <v-col class="tw:flex" cols="12">
           <global-exception-modal
             v-model="showingModal"
             :exception="exceptionToEdit"
             @created="exceptions.push($event)"
             @updated="updateExceptions"
           />
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">
             A list of all the global activity time exceptions.
           </p>
           <v-spacer></v-spacer>

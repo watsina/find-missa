@@ -8,10 +8,10 @@
       </v-btn>
     </template>
     <v-sheet rounded="md" width="150">
-      <div class="tw-block tw-px-4 tw-py-2 tw-text-xs tw-text-gray-400">Manage Account</div>
+      <div class="tw:block tw:px-4 tw:py-2 tw:text-xs tw:text-gray-400">Manage Account</div>
 
       <ResponsiveNavLink href="/auth/profile"> Profile </ResponsiveNavLink>
-      <div class="tw-border-t tw-border-gray-200" />
+      <div class="tw:border-t tw:border-gray-200" />
       <form method="POST" @submit.prevent="logout">
         <ResponsiveNavLink as="button"> Log Out </ResponsiveNavLink>
       </form>

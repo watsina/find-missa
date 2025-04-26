@@ -70,11 +70,11 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.name"
               autofocus
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="User Name*"
               placeholder="Fr User"
@@ -83,10 +83,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.email"
               label="Email"
               placeholder="user@email.com"
@@ -100,7 +100,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

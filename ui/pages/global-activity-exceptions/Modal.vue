@@ -91,10 +91,10 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.reason"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.reason"
               label="Reason*"
               placeholder="Easter Period"
@@ -102,10 +102,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextareaInput
               v-model="form.message"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.message"
               label="Reason*"
               placeholder="Easter period has a specific mass schedule"
@@ -113,20 +113,20 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <DateInput
               v-model="start_date"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.start_date"
               label="Start Date"
               required
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <DateInput
               v-model="end_date"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.end_date"
               label="End Date"
               landscape
@@ -140,7 +140,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

@@ -29,7 +29,7 @@
 
       <DangerButton
         class="ms-3"
-        :class="{ 'tw-opacity-25': leaveTeamForm.processing }"
+        :class="{ 'tw:opacity-25': leaveTeamForm.processing }"
         :disabled="leaveTeamForm.processing"
         @click="leaveTeam"
       >

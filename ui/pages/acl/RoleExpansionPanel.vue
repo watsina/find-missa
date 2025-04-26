@@ -44,15 +44,15 @@
       {{ role.name }}
     </v-expansion-panel-title>
     <v-expansion-panel-text>
-      <div class="tw-border-t tw-border-gray-200"></div>
+      <div class="tw:border-t tw:border-gray-200"></div>
       <data-table :headers="headers" :items="permissions">
         <template #item.actions="{ item }">
           <v-checkbox-btn v-model="form.permission_ids" :value="item.id"></v-checkbox-btn>
         </template>
       </data-table>
-      <div class="tw-flex tw-justify-self-end">
+      <div class="tw:flex tw:justify-self-end">
         <v-btn
-          class="tw-flex tw-justify-self-end"
+          class="tw:flex tw:justify-self-end"
           color="primary"
           :disabled="form.processing"
           :loading="form.processing"

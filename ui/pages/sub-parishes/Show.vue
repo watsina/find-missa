@@ -70,7 +70,7 @@
       <v-card v-else-if="!subParish">
         <v-card-title> No parish found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-4">
+      <v-row v-else class="tw:py-4">
         <SubParishModal
           v-if="subParish?.parish"
           v-model:show-modal="showingModal"

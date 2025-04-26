@@ -7,22 +7,22 @@
     </template>
 
     <template #content>
-      <h3 v-if="twoFactorEnabled && !confirming" class="tw-text-lg tw-font-medium tw-text-gray-900">
+      <h3 v-if="twoFactorEnabled && !confirming" class="tw:text-lg tw:font-medium tw:text-gray-900">
         You have enabled two factor authentication.
       </h3>
 
       <h3
         v-else-if="twoFactorEnabled && confirming"
-        class="tw-text-lg tw-font-medium tw-text-gray-900"
+        class="tw:text-lg tw:font-medium tw:text-gray-900"
       >
         Finish enabling two factor authentication.
       </h3>
 
-      <h3 v-else class="tw-text-lg tw-font-medium tw-text-gray-900">
+      <h3 v-else class="tw:text-lg tw:font-medium tw:text-gray-900">
         You have not enabled two factor authentication.
       </h3>
 
-      <div class="tw-max-w-xl tw-mt-3 tw-text-sm tw-text-gray-600">
+      <div class="tw:max-w-xl tw:mt-3 tw:text-sm tw:text-gray-600">
         <p>
           When two factor authentication is enabled, you will be prompted for a secure, random token
           during authentication. You may retrieve this token from your phone's Google Authenticator
@@ -32,8 +32,8 @@
 
       <div v-if="twoFactorEnabled">
         <div v-if="qrCode">
-          <div class="tw-max-w-xl tw-mt-4 tw-text-sm tw-text-gray-600">
-            <p v-if="confirming" class="tw-font-semibold">
+          <div class="tw:max-w-xl tw:mt-4 tw:text-sm tw:text-gray-600">
+            <p v-if="confirming" class="tw:font-semibold">
               To finish enabling two factor authentication, scan the following QR code using your
               phone's authenticator application or enter the setup key and provide the generated OTP
               code.
@@ -45,13 +45,13 @@
             </p>
           </div>
 
-          <div class="tw-mt-4" v-html="qrCode" />
+          <div class="tw:mt-4" v-html="qrCode" />
 
-          <div v-if="setupKey" class="tw-max-w-xl tw-mt-4 tw-text-sm tw-text-gray-600">
-            <p class="tw-font-semibold">Setup Key: <span v-html="setupKey" /></p>
+          <div v-if="setupKey" class="tw:max-w-xl tw:mt-4 tw:text-sm tw:text-gray-600">
+            <p class="tw:font-semibold">Setup Key: <span v-html="setupKey" /></p>
           </div>
 
-          <div v-if="confirming" class="tw-mt-4">
+          <div v-if="confirming" class="tw:mt-4">
             <InputLabel for="code" value="Code" />
 
             <TextInput
@@ -59,27 +59,27 @@
               v-model="confirmationForm.code"
               autocomplete="one-time-code"
               autofocus
-              class="tw-block tw-w-1/2 tw-mt-1"
+              class="tw:block tw:w-1/2 tw:mt-1"
               inputmode="numeric"
               name="code"
               type="text"
               @keyup.enter="confirmTwoFactorAuthentication"
             />
 
-            <InputError class="tw-mt-2" :message="confirmationForm.errors.code" />
+            <InputError class="tw:mt-2" :message="confirmationForm.errors.code" />
           </div>
         </div>
 
         <div v-if="recoveryCodes.length > 0 && !confirming">
-          <div class="tw-max-w-xl tw-mt-4 tw-text-sm tw-text-gray-600">
-            <p class="tw-font-semibold">
+          <div class="tw:max-w-xl tw:mt-4 tw:text-sm tw:text-gray-600">
+            <p class="tw:font-semibold">
               Store these recovery codes in a secure password manager. They can be used to recover
               access to your account if your two factor authentication device is lost.
             </p>
           </div>
 
           <div
-            class="tw-grid tw-max-w-xl tw-gap-1 tw-px-4 tw-py-4 tw-mt-4 tw-font-mono tw-text-sm tw-bg-gray-100 tw-rounded-lg"
+            class="tw:grid tw:max-w-xl tw:gap-1 tw:px-4 tw:py-4 tw:mt-4 tw:font-mono tw:text-sm tw:bg-gray-100 tw:rounded-lg"
           >
             <div v-for="code in recoveryCodes" :key="code">
               {{ code }}
@@ -88,11 +88,11 @@
         </div>
       </div>
 
-      <div class="tw-mt-5">
+      <div class="tw:mt-5">
         <div v-if="!twoFactorEnabled">
           <ConfirmsPassword @confirmed="enableTwoFactorAuthentication">
             <PrimaryButton
-              :class="{ 'tw-opacity-25': enabling }"
+              :class="{ 'tw:opacity-25': enabling }"
               :disabled="enabling"
               type="button"
             >
@@ -105,8 +105,8 @@
           <ConfirmsPassword @confirmed="confirmTwoFactorAuthentication">
             <PrimaryButton
               v-if="confirming"
-              class="tw-mr-3"
-              :class="{ 'tw-opacity-25': enabling }"
+              class="tw:mr-3"
+              :class="{ 'tw:opacity-25': enabling }"
               :disabled="enabling"
               type="button"
             >
@@ -115,13 +115,13 @@
           </ConfirmsPassword>
 
           <ConfirmsPassword @confirmed="regenerateRecoveryCodes">
-            <SecondaryButton v-if="recoveryCodes.length > 0 && !confirming" class="tw-mr-3">
+            <SecondaryButton v-if="recoveryCodes.length > 0 && !confirming" class="tw:mr-3">
               Regenerate Recovery Codes
             </SecondaryButton>
           </ConfirmsPassword>
 
           <ConfirmsPassword @confirmed="showRecoveryCodes">
-            <SecondaryButton v-if="recoveryCodes.length === 0 && !confirming" class="tw-mr-3">
+            <SecondaryButton v-if="recoveryCodes.length === 0 && !confirming" class="tw:mr-3">
               Show Recovery Codes
             </SecondaryButton>
           </ConfirmsPassword>
@@ -129,7 +129,7 @@
           <ConfirmsPassword @confirmed="disableTwoFactorAuthentication">
             <SecondaryButton
               v-if="confirming"
-              :class="{ 'tw-opacity-25': disabling }"
+              :class="{ 'tw:opacity-25': disabling }"
               :disabled="disabling"
             >
               Cancel
@@ -139,7 +139,7 @@
           <ConfirmsPassword @confirmed="disableTwoFactorAuthentication">
             <DangerButton
               v-if="!confirming"
-              :class="{ 'tw-opacity-25': disabling }"
+              :class="{ 'tw:opacity-25': disabling }"
               :disabled="disabling"
             >
               Disable

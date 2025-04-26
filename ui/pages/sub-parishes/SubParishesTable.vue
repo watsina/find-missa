@@ -50,8 +50,8 @@
       @updated="updateSubParish"
     />
 
-    <v-col class="tw-flex tw-justify-between" cols="12">
-      <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the sub-parishes.</p>
+    <v-col class="tw:flex tw:justify-between" cols="12">
+      <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of all the sub-parishes.</p>
       <PrimaryButton v-if="parish?.id" @click="showModal"> Add SubParish</PrimaryButton>
     </v-col>
     <v-col cols="12">
@@ -61,7 +61,7 @@
             id="search"
             v-model="search"
             autofocus
-            class="tw-block tw-mb-2 tw-mx-2"
+            class="tw:block tw:mb-2 tw:mx-2"
             error=""
             label="Search"
             placeholder="Search subParishes..."
@@ -80,7 +80,7 @@
             @click="showModal(item)"
           ></v-icon>
           <v-btn
-            class="tw-mr-2"
+            class="tw:mr-2"
             color="primary"
             :icon="mdiEyeOutline"
             title="View SubParish Details"

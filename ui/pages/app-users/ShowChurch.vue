@@ -91,14 +91,14 @@
       <v-card v-else-if="!church">
         <v-card-title> No church found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-4">
+      <v-row v-else class="tw:py-4">
         <!-- show church details -->
         <v-col cols="12">
           <EntityDetails :fields="fields" :title="`${church?.name} - ${church?.city}`">
             <template #subtitle>
               <v-btn
                 v-if="church?.google_maps_link"
-                class="tw-text-sm"
+                class="tw:text-sm"
                 color="primary"
                 :href="church?.google_maps_link"
                 :ripple="false"
@@ -113,16 +113,16 @@
             </template>
           </EntityDetails>
         </v-col>
-        <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of church activities.</p>
+        <v-col class="tw:flex tw:justify-between" cols="12">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of church activities.</p>
         </v-col>
         <v-col cols="12">
           <v-expansion-panels v-model="panel">
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw-text-md tw-uppercase tw-font-semibold': true,
-                  'tw-bg-gray-100': panel === 0,
+                  'tw:text-md tw:uppercase tw:font-semibold': true,
+                  'tw:bg-gray-100': panel === 0,
                 }"
               >
                 Mass
@@ -131,8 +131,8 @@
                 <v-table>
                   <thead>
                     <tr>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Mass Schedule</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Day of Week</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Mass Schedule</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -140,7 +140,7 @@
                       <td>{{ day }}</td>
                       <td>
                         <ul>
-                          <li v-for="dayMass in mass[day]" :key="dayMass.id" class="tw-mr-2">
+                          <li v-for="dayMass in mass[day]" :key="dayMass.id" class="tw:mr-2">
                             {{ dayMass?.start_time }} ({{ dayMass?.language }})
                           </li>
                         </ul>
@@ -153,8 +153,8 @@
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw-text-md tw-uppercase tw-font-semibold': true,
-                  'tw-bg-gray-100': panel === 1,
+                  'tw:text-md tw:uppercase tw:font-semibold': true,
+                  'tw:bg-gray-100': panel === 1,
                 }"
               >
                 Confession
@@ -164,8 +164,8 @@
                 <v-table v-else>
                   <thead>
                     <tr>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Confession Schedule</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Day of Week</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Confession Schedule</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -174,7 +174,7 @@
                         <td>{{ day }}</td>
                         <td>
                           <ul>
-                            <li v-for="conf in confession[day]" :key="conf.id" class="tw-mr-2">
+                            <li v-for="conf in confession[day]" :key="conf.id" class="tw:mr-2">
                               {{ conf?.start_time }} ({{ conf?.language }})
                             </li>
                           </ul>
@@ -188,8 +188,8 @@
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw-text-md tw-uppercase tw-font-semibold': true,
-                  'tw-bg-gray-100': panel === 2,
+                  'tw:text-md tw:uppercase tw:font-semibold': true,
+                  'tw:bg-gray-100': panel === 2,
                 }"
               >
                 Adoration
@@ -199,8 +199,8 @@
                 <v-table v-else>
                   <thead>
                     <tr>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Day of Week</th>
-                      <th class="tw-uppercase tw-text-left tw-font-bold">Adoration Schedule</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Day of Week</th>
+                      <th class="tw:uppercase tw:text-left tw:font-bold">Adoration Schedule</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -209,7 +209,7 @@
                         <td>{{ day }}</td>
                         <td>
                           <ul>
-                            <li v-for="ador in adoration[day]" :key="ador.id" class="tw-mr-2">
+                            <li v-for="ador in adoration[day]" :key="ador.id" class="tw:mr-2">
                               {{ ador?.start_time }} ({{ ador?.language }})
                             </li>
                           </ul>

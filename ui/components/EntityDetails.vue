@@ -7,9 +7,9 @@
 
 <template>
   <div>
-    <v-card-title class="!tw-flex tw-justify-between lg:tw-flex-row tw-flex-col !tw-p-0 !tw-py-2">
+    <v-card-title class="tw:flex! tw:justify-between tw:lg:flex-row tw:flex-col tw:p-0! tw:py-2!">
       <div>
-        <h5 class="tw-text-font-bold tw-text-lg tw-capitalize">
+        <h5 class="tw:text-font-bold tw:text-lg tw:capitalize">
           {{ title }}
         </h5>
         <slot name="subtitle" />
@@ -18,10 +18,10 @@
         <slot name="action" />
       </div>
     </v-card-title>
-    <v-card class="tw-mt-2">
+    <v-card class="tw:mt-2">
       <v-card-text>
         <v-row dense no-gutters>
-          <v-col v-for="field in fields" :key="field.text" class="tw-m-0 tw-p-0" cols="12" md="4">
+          <v-col v-for="field in fields" :key="field.text" class="tw:m-0 tw:p-0" cols="12" md="4">
             <v-list>
               <v-list-item density="compact">
                 <template #prepend>
@@ -32,7 +32,7 @@
                 </v-list-item-title>
                 <v-list-item-subtitle
                   v-if="field?.is_link && field?.value"
-                  class="tw-text-indigo-700"
+                  class="tw:text-indigo-700"
                   :href="field?.value"
                   tag="a"
                   target="_blank"

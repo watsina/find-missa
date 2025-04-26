@@ -15,7 +15,7 @@
         <template #prepend>
           <v-icon :icon="item.icon" :title="item.name"></v-icon>
         </template>
-        <v-list-item-title class="!tw-capitalize">
+        <v-list-item-title class="tw:capitalize!">
           {{ item.name }}
         </v-list-item-title>
       </v-list-item>

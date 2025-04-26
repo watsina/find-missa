@@ -10,7 +10,7 @@
       <v-chip
         v-for="(time, index) in model"
         :key="time"
-        class="tw-mx-1"
+        class="tw:mx-1"
         closable
         color="primary"
         rounded="xl"

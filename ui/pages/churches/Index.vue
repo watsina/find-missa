@@ -17,12 +17,12 @@
 <template>
   <app-layout>
     <template #head>
-      <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Churches</h2>
+      <h2 class="tw:text-xl tw:font-semibold tw:leading-tight tw:text-gray-800">Churches</h2>
     </template>
     <v-container>
-      <v-row class="tw-py-12">
-        <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the churches.</p>
+      <v-row class="tw:py-12">
+        <v-col class="tw:flex tw:justify-between" cols="12">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of all the churches.</p>
         </v-col>
         <v-col cols="12">
           <DataTableServer :headers="headers" item-value="id" url="/api/v1/churches">

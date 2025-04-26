@@ -5,13 +5,13 @@
     <template #description> Permanently delete your account. </template>
 
     <template #content>
-      <div class="tw-max-w-xl tw-text-sm tw-text-gray-600">
+      <div class="tw:max-w-xl tw:text-sm tw:text-gray-600">
         Once your account is deleted, all of its resources and data will be permanently deleted.
         Before deleting your account, please download any data or information that you wish to
         retain.
       </div>
 
-      <div class="tw-mt-5">
+      <div class="tw:mt-5">
         <DangerButton @click="confirmUserDeletion"> Delete Account </DangerButton>
       </div>
 
@@ -24,17 +24,17 @@
           resources and data will be permanently deleted. Please enter your password to confirm you
           would like to permanently delete your account.
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               ref="passwordInput"
               v-model="form.password"
-              class="tw-block tw-w-3/4 tw-mt-1"
+              class="tw:block tw:w-3/4 tw:mt-1"
               placeholder="Password"
               type="password"
               @keyup.enter="deleteUser"
             />
 
-            <InputError class="tw-mt-2" :message="form.errors.password" />
+            <InputError class="tw:mt-2" :message="form.errors.password" />
           </div>
         </template>
 
@@ -42,8 +42,8 @@
           <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
           <DangerButton
-            class="tw-ml-3"
-            :class="{ 'tw-opacity-25': form.processing }"
+            class="tw:ml-3"
+            :class="{ 'tw:opacity-25': form.processing }"
             :disabled="form.processing"
             @click="deleteUser"
           >

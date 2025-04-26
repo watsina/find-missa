@@ -160,9 +160,9 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <v-text-field
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.church_id"
               label="Church*"
               :model-value="`${church?.name} - ${church?.city}`"
@@ -171,10 +171,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <SelectInput
               v-model="form.type"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.type"
               :items="activityTypes"
               label="Activity Type*"
@@ -182,10 +182,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <SelectInput
               v-model="form.activity_type_description"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.activity_type_description"
               :items="activityTypeDescriptions"
               label="Activity Type Description*"
@@ -193,10 +193,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <SelectInput
               v-model="form.occurrence"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.occurrence"
               :items="occurrences"
               label="occurrence*"
@@ -204,10 +204,10 @@
             />
           </div>
 
-          <div v-if="form.occurrence === 'one-time'" class="tw-mt-4">
+          <div v-if="form.occurrence === 'one-time'" class="tw:mt-4">
             <DateInput
               v-model="date"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.date"
               label="Date"
               landscape
@@ -215,11 +215,11 @@
             />
           </div>
 
-          <div v-if="form.occurrence === 'weekly'" class="tw-mt-4">
+          <div v-if="form.occurrence === 'weekly'" class="tw:mt-4">
             <SelectInput
               v-if="isEditing"
               v-model="form.day_of_week"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.day_of_week"
               :items="daysOfWeek"
               label="Day of Week"
@@ -231,7 +231,7 @@
               v-else
               v-model="form.days_of_week"
               chips
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.days_of_week"
               :items="daysOfWeek"
               label="Days of Week"
@@ -241,7 +241,7 @@
             />
           </div>
 
-          <div v-if="isAddingBulk" class="tw-mt-4">
+          <div v-if="isAddingBulk" class="tw:mt-4">
             <MultiTimeInput
               v-model="form.starting_times"
               :error="form.errors.starting_times"
@@ -250,7 +250,7 @@
             />
           </div>
 
-          <div v-if="!isAddingBulk" class="tw-mt-4">
+          <div v-if="!isAddingBulk" class="tw:mt-4">
             <TimeInput
               v-model="form.start_time"
               :error="form.errors.start_time"
@@ -259,7 +259,7 @@
             />
           </div>
 
-          <div v-if="!isAddingBulk" class="tw-mt-4">
+          <div v-if="!isAddingBulk" class="tw:mt-4">
             <TimeInput
               v-model="form.end_time"
               :error="form.errors.end_time"
@@ -268,11 +268,11 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.language"
               autofocus
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               density="default"
               :error="form.errors.language"
               label="Language"
@@ -281,7 +281,7 @@
             />
           </div>
 
-          <div v-if="!isEditing" class="tw-mt-4">
+          <div v-if="!isEditing" class="tw:mt-4">
             <v-checkbox
               v-model="isAddingBulk"
               color="primary"
@@ -296,7 +296,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

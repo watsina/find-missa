@@ -1,31 +1,31 @@
 <template>
   <AppLayout title="Profile">
     <template #header>
-      <h2 class="tw-text-xl tw-font-semibold tw-leading-tight tw-text-gray-800">Profile</h2>
+      <h2 class="tw:text-xl tw:font-semibold tw:leading-tight tw:text-gray-800">Profile</h2>
     </template>
-    <div class="tw-py-12">
-      <div class="tw-mx-auto tw-max-w-7xl sm:tw-px-6 lg:tw-px-8">
-        <div class="sm:tw-rounded-lg">
+    <div class="tw:py-12">
+      <div class="tw:mx-auto tw:max-w-7xl tw:sm:px-6 tw:lg:px-8">
+        <div class="tw:sm:rounded-lg">
           <!-- start -->
-          <div class="tw-pb-10 tw-max-w-7xl sm:tw-px-6 lg:tw-px-8">
+          <div class="tw:pb-10 tw:max-w-7xl tw:sm:px-6 tw:lg:px-8">
             <UpdateProfileInformationForm />
 
             <SectionBorder />
 
-            <UpdatePasswordForm class="tw-mt-10 sm:tw-mt-0" />
+            <UpdatePasswordForm class="tw:mt-10 tw:sm:mt-0" />
 
             <SectionBorder />
 
-            <TwoFactorAuthenticationForm class="tw-mt-10 sm:tw-mt-0" />
+            <TwoFactorAuthenticationForm class="tw:mt-10 tw:sm:mt-0" />
 
             <SectionBorder />
 
-            <LogoutOtherBrowserSessionsForm class="tw-mt-10 sm:tw-mt-0" :sessions="sessions" />
+            <LogoutOtherBrowserSessionsForm class="tw:mt-10 tw:sm:mt-0" :sessions="sessions" />
 
             <template v-if="false">
               <SectionBorder />
 
-              <DeleteUserForm class="tw-mt-10 sm:tw-mt-0" />
+              <DeleteUserForm class="tw:mt-10 tw:sm:mt-0" />
             </template>
           </div>
           <!-- end -->

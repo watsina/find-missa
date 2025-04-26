@@ -89,11 +89,11 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.name"
               autofocus
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="Parish Name*"
               placeholder="Christ The King - Kampala"
@@ -102,9 +102,9 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.diocese_id"
               label="Diocese*"
               :model-value="diocese?.name"
@@ -115,10 +115,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.city"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.city"
               label="City/Town*"
               placeholder="Kampala"
@@ -126,10 +126,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.district"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.district"
               label="District/State*"
               placeholder="Kampala"
@@ -137,10 +137,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.office_address"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.office_address"
               label="Office Address"
               placeholder="Office Address"
@@ -148,10 +148,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.contact_email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.contact_email"
               label="Contact Email"
               placeholder="parish@email.com"
@@ -160,10 +160,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.website_url"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.website_url"
               label="Website Url"
               placeholder="www.parish.com"
@@ -178,7 +178,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

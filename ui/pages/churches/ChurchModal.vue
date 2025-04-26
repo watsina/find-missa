@@ -122,11 +122,11 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.name"
               autofocus
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="Church Name*"
               placeholder="Kanja Church"
@@ -135,10 +135,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <SelectInput
               v-model="form.type"
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.type"
               :items="churchTypes"
               label="Type*"
@@ -147,9 +147,9 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.parishable_id"
               hint="Name of parish/subParish that the church belongs to."
               :label="parishType === 'sub-parish' ? 'SubParish*' : 'Parish*'"
@@ -160,10 +160,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.city"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.city"
               label="City/Town*"
               placeholder="Kampala"
@@ -171,10 +171,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.district"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.district"
               label="District/State*"
               placeholder="Kampala"
@@ -182,10 +182,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.google_maps_link"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.google_maps_link"
               label="Google Maps Link*"
               required
@@ -193,10 +193,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.website_url"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.website_url"
               label="Website Url"
               placeholder="www.church.com"
@@ -205,10 +205,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.latitude"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.latitude"
               label="Latitude"
               placeholder="43.88"
@@ -216,10 +216,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.longitude"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.longitude"
               label="Longitude"
               placeholder="93.78"
@@ -227,10 +227,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.contact_email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.contact_email"
               label="Contact Email"
               placeholder="church@email.com"
@@ -239,10 +239,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.contact_phone"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.contact_phone"
               label="Contact Phone"
               placeholder="+256 700 000000"
@@ -250,10 +250,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.street_address"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.street_address"
               label="Street Address"
               placeholder="Plot 2, Kyadondo Road"
@@ -261,10 +261,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.postal_address"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.postal_address"
               label="Postal Address"
               placeholder="PO BOX 123 Kampala"
@@ -278,7 +278,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

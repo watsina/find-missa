@@ -4,7 +4,7 @@
       <AuthenticationCardLogo />
     </template>
 
-    <div class="tw-mb-4 tw-text-sm tw-text-gray-600">
+    <div class="tw:mb-4 tw:text-sm tw:text-gray-600">
       {{
         email
           ? `An account has been created for you. Please request a password reset to create a
@@ -20,7 +20,7 @@
           id="email"
           v-model="form.email"
           autofocus
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           :error="form.errors.email"
           label="Email"
           required
@@ -28,7 +28,7 @@
         />
       </div>
 
-      <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
+      <div class="tw:flex tw:items-center tw:justify-end tw:mt-4">
         <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
           Email Password Reset Link
         </PrimaryButton>
