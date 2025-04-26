@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "21"
+          node-version: "23"
 
       - name: Setup PHP with xdebug extension and composer v2
         uses: shivammathur/setup-php@v2

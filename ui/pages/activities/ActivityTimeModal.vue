@@ -96,7 +96,6 @@
 
   watch(showModal, (newValue) => {
     if (!newValue) {
-      // form.reset();
       form.clearErrors();
     }
   });
@@ -144,12 +143,12 @@
 
   const closeModal = (data = null) => {
     form.reset();
-    if (isAddingBulk.value) {
-      return;
-    }
     if ((data?.id || data?.length) && !isEditing.value) emit('created', data);
     if (data?.id && isEditing.value) emit('updated', data);
 
+    if (isAddingBulk.value) {
+      return;
+    }
     showModal.value = false;
   };
 </script>
@@ -274,6 +273,7 @@
               v-model="form.language"
               autofocus
               class="tw-block tw-w-full tw-mt-1"
+              density="default"
               :error="form.errors.language"
               label="Language"
               placeholder="Ruhororo"
@@ -281,7 +281,7 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div v-if="!isEditing" class="tw-mt-4">
             <v-checkbox
               v-model="isAddingBulk"
               color="primary"
