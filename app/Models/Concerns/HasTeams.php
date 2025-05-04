@@ -124,7 +124,7 @@ trait HasTeams
             return false;
         }
 
-        return $this->teams->contains(function ($team) {
+        return $this->allTeams()->contains(function ($team) {
             return $team->id === session()->get('current_team_id');
         });
     }

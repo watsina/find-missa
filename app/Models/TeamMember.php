@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\TeamScope;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +16,8 @@ class TeamMember extends Pivot
 
     protected static function booted()
     {
+        static::addGlobalScope(new TeamScope);
+
         static::deleting(function ($model) {
             // remove the assigned roles on that team
             setPermissionsTeamId($model->team->id);
