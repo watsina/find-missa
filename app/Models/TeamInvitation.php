@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\TeamScope;
 use App\Mail\TeamInvitationEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,8 @@ class TeamInvitation extends Model
 
     public static function booted()
     {
+        static::addGlobalScope(new TeamScope);
+
         static::created(fn ($invitation) => Mail::to($invitation->email)->send(new TeamInvitationEmail($invitation)));
     }
 
