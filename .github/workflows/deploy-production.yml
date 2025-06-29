@@ -32,6 +32,7 @@ jobs:
             php artisan migrate --force
             php artisan optimize
             php artisan pulse:restart
+            php artisan nightwatch:agent
             sudo service php8.3-fpm reload
             source /usr/local/nvm/nvm.sh
             node -v
