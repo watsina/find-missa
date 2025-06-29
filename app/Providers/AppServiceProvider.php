@@ -78,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
     protected function defineMacros()
     {
         Collection::macro('toLower', function () {
+            /** @var \Illuminate\Support\Collection $this */
             return $this->map(function (string $value) {
                 return Str::lower($value);
             });
@@ -85,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
 
         Builder::macro('getMorphAttributes', function (string $name): array {
             /** @var \Illuminate\Database\Eloquent\Builder $this */
+            /** @var \Illuminate\Database\Eloquent\Model $model */
             $model = $this->getModel();
 
             return [
@@ -95,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
 
         Builder::macro('getCacheKey', function (string $prefix = 'model') {
             /** @var \Illuminate\Database\Eloquent\Builder $this */
+            /** @var \Illuminate\Database\Eloquent\Model $model */
             $model = $this->getModel();
 
             return vsprintf('%s-%s:%s:%s:%s', [
