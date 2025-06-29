@@ -10,7 +10,7 @@
     </template>
     <template v-if="$slots.header" #extension>
       <header class="tw:font-semibold tw:text-xl tw:text-gray-800 tw:leading-tight">
-        <div class="tw:px-4 tw:mx-auto tw:md:px-6 tw:lg:px-8">
+        <div class="tw:px-4! tw:mx-auto tw:md:px-6 tw:lg:px-8">
           <slot name="header" />
         </div>
       </header>
