@@ -49,7 +49,7 @@
     </template>
 
     <template v-if="canUpdateTeam" #actions>
-      <ActionMessage class="tw:me-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
+      <ActionMessage class="tw:me-3!" :on="form.recentlySuccessful"> Saved. </ActionMessage>
 
       <PrimaryButton :disabled="form.processing" :loading="form.processing" type="submit">
         Save

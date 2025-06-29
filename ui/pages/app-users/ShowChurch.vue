@@ -54,7 +54,6 @@
       { icon: mdiHomeCity, text: 'Parish', value: data?.parish?.name },
       { icon: mdiCity, text: 'City/Town', value: data?.city },
       { icon: mdiTownHall, text: 'District/State', value: data?.district },
-      // { icon: mdiMapMarker, text: 'Coordinates', value: data?.coordinates },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },
       { icon: mdiWeb, text: 'Website', value: data?.website_url, is_link: true },
       { icon: mdiPhoneClassic, text: 'Contact Phone', value: data?.contact_phone },
@@ -121,8 +120,8 @@
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw:text-md tw:uppercase tw:font-semibold': true,
-                  'tw:bg-gray-100': panel === 0,
+                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
+                  'tw:bg-gray-100!': panel === 0,
                 }"
               >
                 Mass
@@ -153,8 +152,8 @@
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw:text-md tw:uppercase tw:font-semibold': true,
-                  'tw:bg-gray-100': panel === 1,
+                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
+                  'tw:bg-gray-100!': panel === 1,
                 }"
               >
                 Confession
@@ -188,8 +187,8 @@
             <v-expansion-panel>
               <v-expansion-panel-title
                 :class="{
-                  'tw:text-md tw:uppercase tw:font-semibold': true,
-                  'tw:bg-gray-100': panel === 2,
+                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
+                  'tw:bg-gray-100!': panel === 2,
                 }"
               >
                 Adoration

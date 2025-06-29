@@ -2,7 +2,7 @@
   <v-app-bar elevation="1" flat scroll-behavior="elevate">
     <template #prepend>
       <NavLink class="tw:border-none" :href="{ name: 'home' }">
-        <div class="tw:flex tw:items-center shrink-0 tw:mx-4">
+        <div class="tw:flex tw:items-center shrink-0 tw:mx-4!">
           <ApplicationMark class="tw:block tw:w-auto tw:h-9" />
         </div>
         <v-app-bar-title>Find Missa</v-app-bar-title>

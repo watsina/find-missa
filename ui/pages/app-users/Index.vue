@@ -246,7 +246,7 @@
                 size="small"
               >
                 <div class="tw:flex">
-                  <strong class="tw:me-4">
+                  <strong class="tw:me-4!">
                     {{ `${activity?.start_time}` }}
                   </strong>
                   <div>
