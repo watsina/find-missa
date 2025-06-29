@@ -12,88 +12,88 @@
           v-model="form.name"
           autocomplete="name"
           autofocus
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           required
           type="text"
         />
-        <InputError class="tw-mt-2" :message="form.errors.name" />
+        <InputError class="tw:mt-2" :message="form.errors.name" />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <InputLabel for="email" value="Email" />
         <TextInput
           id="email"
           v-model="form.email"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           required
           type="email"
         />
-        <InputError class="tw-mt-2" :message="form.errors.email" />
+        <InputError class="tw:mt-2" :message="form.errors.email" />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <InputLabel for="password" value="Password" />
         <TextInput
           id="password"
           v-model="form.password"
           autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           required
           type="password"
         />
-        <InputError class="tw-mt-2" :message="form.errors.password" />
+        <InputError class="tw:mt-2" :message="form.errors.password" />
       </div>
 
-      <div class="tw-mt-4">
+      <div class="tw:mt-4">
         <InputLabel for="password_confirmation" value="Confirm Password" />
         <TextInput
           id="password_confirmation"
           v-model="form.password_confirmation"
           autocomplete="new-password"
-          class="tw-block tw-w-full tw-mt-1"
+          class="tw:block tw:w-full tw:mt-1"
           required
           type="password"
         />
-        <InputError class="tw-mt-2" :message="form.errors.password_confirmation" />
+        <InputError class="tw:mt-2" :message="form.errors.password_confirmation" />
       </div>
 
-      <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="tw-mt-4">
+      <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="tw:mt-4">
         <InputLabel for="terms">
-          <div class="tw-flex tw-items-center">
+          <div class="tw:flex tw:items-center">
             <Checkbox id="terms" v-model:checked="form.terms" name="terms" required />
 
-            <div class="tw-ml-2">
+            <div class="tw:ml-2">
               I agree to the
               <a
-                class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+                class="tw:text-sm tw:text-gray-600 tw:underline tw:hover:text-gray-900"
                 :href="route('terms.show')"
                 target="_blank"
                 >Terms of Service</a
               >
               and
               <a
-                class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+                class="tw:text-sm tw:text-gray-600 tw:underline tw:hover:text-gray-900"
                 :href="route('policy.show')"
                 target="_blank"
                 >Privacy Policy</a
               >
             </div>
           </div>
-          <InputError class="tw-mt-2" :message="form.errors.terms" />
+          <InputError class="tw:mt-2" :message="form.errors.terms" />
         </InputLabel>
       </div>
 
-      <div class="tw-flex tw-items-center tw-justify-end tw-mt-4">
+      <div class="tw:flex tw:items-center tw:justify-end tw:mt-4">
         <a
-          class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+          class="tw:text-sm tw:text-gray-600 tw:underline tw:hover:text-gray-900"
           :href="route('login')"
         >
           Already registered?
         </a>
 
         <PrimaryButton
-          class="tw-ml-4"
-          :class="{ 'tw-opacity-25': form.processing }"
+          class="tw:ml-4"
+          :class="{ 'tw:opacity-25': form.processing }"
           :disabled="form.processing"
         >
           Register

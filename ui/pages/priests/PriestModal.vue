@@ -77,11 +77,11 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.name"
               autofocus
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="Priest Name*"
               placeholder="Fr Priest"
@@ -90,9 +90,9 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
-              class="tw-block tw-w-full tw-mt-1 tw-capitalize"
+              class="tw:block tw:w-full tw:mt-1 tw:capitalize"
               :error="form.errors.parishable_id"
               label="Parish"
               :model-value="`${parish?.name} - ${parish?.city || ''}`"
@@ -102,10 +102,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.email"
               label="Email"
               placeholder="priest@email.com"
@@ -113,10 +113,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.phone"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.phone"
               label="Phone Number"
               placeholder="+256 777 777777"
@@ -130,7 +130,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

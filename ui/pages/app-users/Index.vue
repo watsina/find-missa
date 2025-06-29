@@ -151,14 +151,14 @@
     <v-container>
       <v-row class="py-4">
         <v-col cols="12">
-          <v-alert class="tw-font-semibold tw-text-md" prominent type="info" variant="tonal">
+          <v-alert class="tw:font-semibold tw:text-md" prominent type="info" variant="tonal">
             We are still gathering information from various Catholic parishes in Uganda. If you
             notice any inaccuracies or missing details, please share updates with us using this
             Google Form
             <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
           </v-alert>
         </v-col>
-        <v-col class="tw-flex tw-justify-around" cols="12">
+        <v-col class="tw:flex tw:justify-around" cols="12">
           <v-btn-toggle v-model="form.type" color="primary" group mandatory rounded>
             <v-btn rounded="0" value="mass">Mass</v-btn>
             <v-btn rounded="0" value="confession">Confession</v-btn>
@@ -193,10 +193,10 @@
             variant="underlined"
           ></v-text-field>
         </v-col>
-        <v-col class="tw-flex tw-items-end tw-justify-between" cols="12" md="4">
+        <v-col class="tw:flex tw:items-end tw:justify-between" cols="12" md="4">
           <v-text-field
             v-model="form.church_name"
-            class="tw-mr-3"
+            class="tw:mr-3"
             clearable
             density="default"
             label="Parish/Church Name"
@@ -215,11 +215,11 @@
         <v-col v-else cols="12">
           <v-sheet>
             <v-divider opacity="10"></v-divider>
-            <v-card-title class="!tw-flex tw-justify-between">
-              <span :class="{ 'tw-text-base': smAndDown, 'tw-text-md': !smAndDown }">
+            <v-card-title class="tw:flex! tw:justify-between">
+              <span :class="{ 'tw:text-base': smAndDown, 'tw:text-md': !smAndDown }">
                 {{ showDate }}
               </span>
-              <span class="tw-text-base">
+              <span class="tw:text-base">
                 {{
                   `${!smAndDown ? 'Showing:' : ''} ${results?.data?.length} of ${results?.meta?.total} results`
                 }}
@@ -228,34 +228,34 @@
             <v-divider opacity="10"></v-divider>
             <v-card
               v-if="!results?.data || !results?.data?.length"
-              class="tw-flex tw-justify-around"
+              class="tw:flex tw:justify-around"
               height="150"
             >
-              <v-card-title class="tw-mx-auto tw-p-12 tw-my-auto">
+              <v-card-title class="tw:mx-auto tw:p-12 tw:my-auto">
                 No {{ form.type || 'activities' }} found for the
                 {{
                   form.district || form.church_name ? ' selected search query.' : ' selected time. '
                 }}
               </v-card-title>
             </v-card>
-            <v-timeline v-else class="md:tw-ml-4" density="comfortable" side="end">
+            <v-timeline v-else class="tw:md:ml-4" density="comfortable" side="end">
               <v-timeline-item
                 v-for="activity in results?.data"
                 :key="activity?.id"
                 dot-color="primary"
                 size="small"
               >
-                <div class="tw-flex">
-                  <strong class="tw-me-4">
+                <div class="tw:flex">
+                  <strong class="tw:me-4!">
                     {{ `${activity?.start_time}` }}
                   </strong>
                   <div>
-                    <strong class="tw-capitalize">
+                    <strong class="tw:capitalize">
                       {{ `${activity?.activity_type_description} (${activity?.language})` }}
                     </strong>
                     <div>
                       <NavLink
-                        class="tw-text-indigo-600"
+                        class="tw:text-indigo-600"
                         :href="{
                           name: 'church.details',
                           params: { churchId: activity?.church?.code_name },

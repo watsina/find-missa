@@ -63,7 +63,7 @@
           <v-col cols="12">
             <TextInput
               v-model="form.name"
-              class="tw-mt-1 tw-block tw-w-full"
+              class="tw:mt-1 tw:block tw:w-full"
               :error="form.errors.name"
               hint="Please provide the name of the person you would like to add to this team."
               label="Name"
@@ -75,7 +75,7 @@
           <v-col cols="12">
             <TextInput
               v-model="form.email"
-              class="tw-mt-1 tw-block tw-w-full"
+              class="tw:mt-1 tw:block tw:w-full"
               :error="form.errors.email"
               hint="Please provide the email address of the person you would like to add to this team."
               label="Email"
@@ -85,10 +85,10 @@
             />
           </v-col>
           <!-- Role -->
-          <v-col v-if="availableRoles?.length > 0" class="tw-col-span-6 lg:tw-col-span-4" cols="12">
+          <v-col v-if="availableRoles?.length > 0" class="tw:col-span-6 tw:lg:col-span-4" cols="12">
             <SelectInput
               v-model="form.role_id"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.role_id"
               hint="Please provide the role you would like to assign to the team member."
               :item-props="itemProps"

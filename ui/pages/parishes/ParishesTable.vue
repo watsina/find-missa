@@ -49,8 +49,8 @@
       @updated="updateParish"
     ></parish-modal>
 
-    <v-col class="tw-flex tw-justify-between" cols="12">
-      <p class="tw-mt-2 tw-text-base tw-text-gray-700">A list of all the parishes.</p>
+    <v-col class="tw:flex tw:justify-between" cols="12">
+      <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of all the parishes.</p>
       <PrimaryButton v-if="diocese?.id" @click="showModal"> Add Parish</PrimaryButton>
     </v-col>
     <v-col cols="12">
@@ -66,7 +66,7 @@
             @click="showModal(item)"
           ></v-icon>
           <v-btn
-            class="tw-mr-2"
+            class="tw:mr-2"
             color="primary"
             :icon="mdiEyeOutline"
             title="View Parish Details"

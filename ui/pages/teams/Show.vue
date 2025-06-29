@@ -59,11 +59,11 @@
 <template>
   <AppLayout title="Team Settings">
     <template #head>
-      <h2 class="tw-font-semibold tw-text-xl tw-text-gray-800 tw-leading-tight">Team Settings</h2>
+      <h2 class="tw:font-semibold tw:text-xl tw:text-gray-800 tw:leading-tight">Team Settings</h2>
     </template>
 
     <v-container>
-      <v-row class="tw-max-w-7xl tw-mx-auto tw-py-10 sm:tw-px-6 lg:tw-px-8">
+      <v-row class="tw:max-w-7xl tw:mx-auto tw:py-10 tw:sm:px-6 tw:lg:px-8">
         <v-col v-if="fetchingRoles || fetchingTeam" cols="12">
           <v-skeleton-loader type="card-avatar"></v-skeleton-loader>
         </v-col>
@@ -76,11 +76,11 @@
         <v-col v-else cols="12">
           <UpdateTeamNameForm :can-update-team="canUpdateTeam" :team="team" />
 
-          <AddTeamMember v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
+          <AddTeamMember v-model:team="team" :available-roles="availableRoles" class="tw:mt-10" />
 
-          <TeamInvitations v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
+          <TeamInvitations v-model:team="team" :available-roles="availableRoles" class="tw:mt-10" />
 
-          <TeamMembers v-model:team="team" :available-roles="availableRoles" class="tw-mt-10" />
+          <TeamMembers v-model:team="team" :available-roles="availableRoles" class="tw:mt-10" />
         </v-col>
       </v-row>
     </v-container>

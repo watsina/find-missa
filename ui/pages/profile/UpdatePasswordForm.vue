@@ -56,7 +56,7 @@
               ref="currentPasswordInput"
               v-model="form.current_password"
               autocomplete="current-password"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.current_password"
               label="Current Password"
               type="password"
@@ -67,7 +67,7 @@
               ref="passwordInput"
               v-model="form.password"
               autocomplete="new-password"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.password"
               label="New Password"
               type="password"
@@ -77,7 +77,7 @@
             <TextInput
               v-model="form.password_confirmation"
               autocomplete="new-password"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.password_confirmation"
               label="Confirm Password"
               type="password"
@@ -88,10 +88,10 @@
     </template>
 
     <template #actions>
-      <ActionMessage class="tw-mr-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
+      <ActionMessage class="tw:mr-3" :on="form.recentlySuccessful"> Saved. </ActionMessage>
 
       <PrimaryButton
-        :class="{ 'tw-opacity-25': form.processing }"
+        :class="{ 'tw:opacity-25': form.processing }"
         :disabled="form.processing"
         type="submit"
       >

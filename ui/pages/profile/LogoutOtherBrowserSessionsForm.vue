@@ -7,7 +7,7 @@
     </template>
 
     <template #content>
-      <div class="tw-max-w-xl tw-text-sm tw-text-gray-600">
+      <div class="tw:max-w-xl tw:text-sm tw:text-gray-600">
         If necessary, you may log out of all of your other browser sessions across all of your
         devices. Some of your recent sessions are listed below; however, this list may not be
         exhaustive. If you feel your account has been compromised, you should also update your
@@ -15,12 +15,12 @@
       </div>
 
       <!-- Other Browser Sessions -->
-      <div v-if="sessions.length > 0" class="tw-mt-5 tw-space-y-6">
-        <div v-for="(session, i) in sessions" :key="i" class="tw-flex tw-items-center">
+      <div v-if="sessions.length > 0" class="tw:mt-5 tw:space-y-6">
+        <div v-for="(session, i) in sessions" :key="i" class="tw:flex tw:items-center">
           <div>
             <svg
               v-if="session.agent.is_desktop"
-              class="tw-w-8 tw-h-8 tw-text-gray-500"
+              class="tw:w-8 tw:h-8 tw:text-gray-500"
               fill="none"
               stroke="currentColor"
               stroke-linecap="round"
@@ -35,7 +35,7 @@
 
             <svg
               v-else
-              class="tw-w-8 tw-h-8 tw-text-gray-500"
+              class="tw:w-8 tw:h-8 tw:text-gray-500"
               fill="none"
               stroke="currentColor"
               stroke-linecap="round"
@@ -50,17 +50,17 @@
             </svg>
           </div>
 
-          <div class="tw-ml-3">
-            <div class="tw-text-sm tw-text-gray-600">
+          <div class="tw:ml-3">
+            <div class="tw:text-sm tw:text-gray-600">
               {{ session.agent.platform ? session.agent.platform : 'Unknown' }} -
               {{ session.agent.browser ? session.agent.browser : 'Unknown' }}
             </div>
 
             <div>
-              <div class="tw-text-xs tw-text-gray-500">
+              <div class="tw:text-xs tw:text-gray-500">
                 {{ session.ip_address }},
 
-                <span v-if="session.is_current_device" class="tw-font-semibold tw-text-green-500"
+                <span v-if="session.is_current_device" class="tw:font-semibold tw:text-green-500"
                   >This device</span
                 >
                 <span v-else>Last active {{ session.last_active }}</span>
@@ -70,10 +70,10 @@
         </div>
       </div>
 
-      <div class="tw-flex tw-items-center tw-mt-5">
+      <div class="tw:flex tw:items-center tw:mt-5">
         <PrimaryButton @click="confirmLogout"> Log Out Other Browser Sessions </PrimaryButton>
 
-        <ActionMessage class="tw-ml-3" :on="form.recentlySuccessful"> Done. </ActionMessage>
+        <ActionMessage class="tw:ml-3" :on="form.recentlySuccessful"> Done. </ActionMessage>
       </div>
 
       <!-- Log Out Other Devices Confirmation Modal -->
@@ -84,17 +84,17 @@
           Please enter your password to confirm you would like to log out of your other browser
           sessions across all of your devices.
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               ref="passwordInput"
               v-model="form.password"
-              class="tw-block tw-w-3/4 tw-mt-1"
+              class="tw:block tw:w-3/4 tw:mt-1"
               placeholder="Password"
               type="password"
               @keyup.enter="logoutOtherBrowserSessions"
             />
 
-            <InputError class="tw-mt-2" :message="form.errors.password" />
+            <InputError class="tw:mt-2" :message="form.errors.password" />
           </div>
         </template>
 
@@ -102,8 +102,8 @@
           <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
           <PrimaryButton
-            class="tw-ml-3"
-            :class="{ 'tw-opacity-25': form.processing }"
+            class="tw:ml-3"
+            :class="{ 'tw:opacity-25': form.processing }"
             :disabled="form.processing"
             @click="logoutOtherBrowserSessions"
           >

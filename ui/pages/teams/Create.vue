@@ -34,12 +34,12 @@
 <template>
   <AppLayout title="Create Team">
     <template #head>
-      <h2 class="tw-font-semibold tw-text-xl tw-text-gray-800 tw-leading-tight">Create Team</h2>
+      <h2 class="tw:font-semibold tw:text-xl tw:text-gray-800 tw:leading-tight">Create Team</h2>
     </template>
 
     <v-container>
       <v-card v-if="!canCreateTeam"> Sorry you don't have permission to create a team </v-card>
-      <v-row v-else class="tw-max-w-7xl tw-mx-auto tw-py-10 sm:tw-px-6 lg:tw-px-8">
+      <v-row v-else class="tw:max-w-7xl tw:mx-auto tw:py-10 tw:sm:px-6 tw:lg:px-8">
         <FormSection @submitted="createTeam">
           <template #title> Team Details </template>
 
@@ -51,16 +51,16 @@
             <v-col cols="12">
               <InputLabel value="Team Owner" />
 
-              <div class="tw-flex tw-items-center tw-mt-2">
+              <div class="tw:flex tw:items-center tw:mt-2">
                 <img
                   :alt="authUser?.name"
-                  class="tw-object-cover tw-w-12 tw-h-12 tw-rounded-full"
+                  class="tw:object-cover tw:w-12 tw:h-12 tw:rounded-full"
                   :src="authUser?.profile_photo_url"
                 />
 
-                <div class="ms-4 tw-leading-tight">
-                  <div class="tw-text-gray-900">{{ authUser?.name }}</div>
-                  <div class="tw-text-sm tw-text-gray-700">
+                <div class="ms-4 tw:leading-tight">
+                  <div class="tw:text-gray-900">{{ authUser?.name }}</div>
+                  <div class="tw:text-sm tw:text-gray-700">
                     {{ authUser?.email }}
                   </div>
                 </div>
@@ -70,7 +70,7 @@
               <TextInput
                 v-model="form.name"
                 autofocus
-                class="tw-block tw-w-full tw-mt-1"
+                class="tw:block tw:w-full tw:mt-1"
                 :error="form.errors.name"
                 label="Team Name"
                 type="text"
@@ -79,7 +79,7 @@
             <v-col cols="12">
               <TextInput
                 v-model="form.country"
-                class="tw-block tw-w-full tw-mt-1"
+                class="tw:block tw:w-full tw:mt-1"
                 :error="form.errors.country"
                 label="Team Country"
                 type="text"

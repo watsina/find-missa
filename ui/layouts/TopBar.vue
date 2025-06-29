@@ -18,24 +18,24 @@
         variant="text"
         @click.stop="!$vuetify.display.mobile ? (rail = !rail) : (drawer = !drawer)"
       ></v-app-bar-nav-icon>
-      <div class="tw-flex tw-items-center shrink-0 md:tw-mr-4">
+      <div class="tw:flex tw:items-center shrink-0 tw:md:mr-4">
         <NavLink :href="{ name: 'dashboard.index' }">
-          <ApplicationMark class="tw-block tw-w-auto tw-h-9" />
+          <ApplicationMark class="tw:block tw:w-auto tw:h-9" />
         </NavLink>
       </div>
       <v-app-bar-title v-if="!smAndDown">Find Missa</v-app-bar-title>
     </template>
     <template v-if="$slots.header" #extension>
-      <header class="tw-font-semibold tw-text-xl tw-text-gray-800 tw-leading-tight">
-        <div class="tw-px-4 tw-mx-auto md:tw-px-6 lg:tw-px-8">
+      <header class="tw:font-semibold tw:text-xl tw:text-gray-800 tw:leading-tight">
+        <div class="tw:px-4 tw:mx-auto tw:md:px-6 tw:lg:px-8">
           <slot name="header" />
         </div>
       </header>
     </template>
     <v-spacer v-if="!smAndDown"></v-spacer>
     <teams-menu />
-    <div class="md:tw-mr-4 tw-mr-2"></div>
+    <div class="tw:md:mr-4 tw:mr-2"></div>
     <user-avatar></user-avatar>
-    <div class="md:tw-ml-4 tw-ml-2"></div>
+    <div class="tw:md:ml-4 tw:ml-2"></div>
   </v-app-bar>
 </template>

@@ -120,17 +120,17 @@
 
     <v-dialog v-model="dialog" closable width="auto">
       <v-card rounded="lg">
-        <v-card-title class="!tw-capitalize !tw-flex">
+        <v-card-title class="tw:capitalize! tw:flex!">
           <span>
             {{ title }}
           </span>
-          <v-icon class="tw-ms-auto" :icon="mdiClose" size="x-small" @click="closeShareModal" />
+          <v-icon class="tw:ms-auto" :icon="mdiClose" size="x-small" @click="closeShareModal" />
         </v-card-title>
         <v-divider></v-divider>
-        <v-card-text class="tw-flex tw-justify-around !tw-pt-0 !tw-px-2">
-          <v-slide-group class="!tw-px-0" show-arrows>
+        <v-card-text class="tw:flex tw:justify-around tw:pt-0! tw:px-2!">
+          <v-slide-group class="tw:px-0!" show-arrows>
             <v-slide-group-item v-for="media in shareOptions" :key="media.name">
-              <div class="tw-flex tw-px-4 tw-flex-col tw-items-center">
+              <div class="tw:flex tw:px-4 tw:flex-col tw:items-center">
                 <v-btn
                   :color="media.color"
                   :icon="media.icon"
@@ -139,7 +139,7 @@
                   @click="media.function"
                 >
                 </v-btn>
-                <span class="tw-text-sm"> {{ media.name }}</span>
+                <span class="tw:text-sm"> {{ media.name }}</span>
               </div>
             </v-slide-group-item>
           </v-slide-group>

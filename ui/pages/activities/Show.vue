@@ -98,7 +98,7 @@
       <v-card v-else-if="!activity">
         <v-card-title> No activity found</v-card-title>
       </v-card>
-      <v-row v-else class="tw-py-4">
+      <v-row v-else class="tw:py-4">
         <ActivityTimeModal
           v-model:show-modal="showingActivityModal"
           :activity="activityToEdit"
@@ -117,8 +117,8 @@
             </template>
           </EntityDetails>
         </v-col>
-        <v-col class="tw-flex tw-justify-between" cols="12">
-          <p class="tw-mt-2 tw-text-base tw-text-gray-700">
+        <v-col class="tw:flex tw:justify-between" cols="12">
+          <p class="tw:mt-2 tw:text-base tw:text-gray-700">
             A list of all exceptions (Days when the activity will not take place).
           </p>
           <PrimaryButton @click="showExceptionModal"> Add Activity Exceptions</PrimaryButton>
@@ -132,7 +132,7 @@
             @updated="updateActivityException"
           />
           <data-table
-            class="tw-capitalize"
+            class="tw:capitalize"
             has-search
             :headers="headers"
             :items="activity?.exceptions || []"

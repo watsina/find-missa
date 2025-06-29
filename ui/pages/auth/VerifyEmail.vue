@@ -4,25 +4,25 @@
       <AuthenticationCardLogo />
     </template>
 
-    <div class="tw-mb-4 tw-text-sm tw-text-gray-600">
+    <div class="tw:mb-4 tw:text-sm tw:text-gray-600">
       Before continuing, could you verify your email address by clicking on the link we just emailed
       to you? If you didn't receive the email, we will gladly send you another.
     </div>
 
-    <div v-if="verificationLinkSent" class="tw-mb-4 tw-text-sm tw-font-medium tw-text-green-600">
+    <div v-if="verificationLinkSent" class="tw:mb-4 tw:text-sm tw:font-medium tw:text-green-600">
       A new verification link has been sent to the email address you provided in your profile
       settings.
     </div>
 
     <form @submit.prevent="submit">
-      <div class="tw-flex tw-items-center tw-justify-between tw-mt-4">
-        <PrimaryButton :class="{ 'tw-opacity-25': form.processing }" :disabled="form.processing">
+      <div class="tw:flex tw:items-center tw:justify-between tw:mt-4">
+        <PrimaryButton :class="{ 'tw:opacity-25': form.processing }" :disabled="form.processing">
           Resend Verification Email
         </PrimaryButton>
 
         <div>
           <a
-            class="tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+            class="tw:text-sm tw:text-gray-600 tw:underline tw:hover:text-gray-900"
             :href="route('profile.show')"
           >
             Edit Profile
@@ -30,7 +30,7 @@
 
           <a
             as="button"
-            class="tw-ml-2 tw-text-sm tw-text-gray-600 tw-underline hover:tw-text-gray-900"
+            class="tw:ml-2 tw:text-sm tw:text-gray-600 tw:underline tw:hover:text-gray-900"
             :href="route('logout')"
             method="post"
           >

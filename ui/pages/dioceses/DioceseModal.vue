@@ -93,10 +93,10 @@
 
       <template #content>
         <form>
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.name"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.name"
               label="Diocese Name*"
               placeholder="Kabale Diocese"
@@ -105,10 +105,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <SelectInput
               v-model="form.type"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.type"
               :items="dioceseTypes"
               label="Type*"
@@ -117,10 +117,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.contact_email"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.contact_email"
               label="Contact Email"
               placeholder="diocese@email.com"
@@ -129,10 +129,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.website_url"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.website_url"
               label="Website Url"
               placeholder="www.diocese.com"
@@ -141,10 +141,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.office_address"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.office_address"
               label="Office Address"
               placeholder="Office Address"
@@ -152,10 +152,10 @@
             />
           </div>
 
-          <div class="tw-mt-4">
+          <div class="tw:mt-4">
             <TextInput
               v-model="form.postal_address"
-              class="tw-block tw-w-full tw-mt-1"
+              class="tw:block tw:w-full tw:mt-1"
               :error="form.errors.postal_address"
               label="Postal Address"
               placeholder="Postal Address"
@@ -169,7 +169,7 @@
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
         <PrimaryButton
-          class="tw-ml-3 tw-capitalize"
+          class="tw:ml-3 tw:capitalize"
           :disabled="form.processing"
           :loading="form.processing"
           @click="submit"

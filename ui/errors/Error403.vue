@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <svg-403 class="tw-w-full tw-h-fit" height="400px" />
+    <svg-403 class="tw:w-full tw:h-fit" height="400px" />
   </AppLayout>
 </template>
 
