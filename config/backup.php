@@ -77,7 +77,7 @@ return [
              * For a complete list of available customization options, see https://github.com/spatie/db-dumper
              */
             'databases' => [
-                'mysql', 'sqlite',
+                env('DB_CONNECTION', 'sqlite'),
             ],
         ],
 
@@ -211,7 +211,7 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_MAIL_TO', 'you@exmalple.com'),
+            'to' => env('BACKUP_MAIL_TO', 'you@example.com'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
@@ -220,7 +220,7 @@ return [
         ],
 
         'slack' => [
-            'webhook_url' => env('BACKUP_SLACK_URL'),
+            'webhook_url' => env('BACKUP_SLACK_URL', ''),
 
             /*
              * If this is set to null the default channel of the webhook will be used.
