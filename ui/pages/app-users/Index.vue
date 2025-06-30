@@ -168,6 +168,7 @@
         <v-col cols="12" md="3">
           <DateInput
             v-model="date"
+            density="comfortable"
             :hide-actions="false"
             label="Date"
             :min="currentDate"
@@ -177,6 +178,7 @@
         <v-col cols="12" md="2">
           <TimeInput
             v-model="form.start_time"
+            density="comfortable"
             :error="form.errors.start_time"
             label="From Time (24h)"
             required
@@ -188,7 +190,7 @@
           <v-text-field
             v-model="form.district"
             clearable
-            density="default"
+            density="comfortable"
             label="District/Town"
             variant="underlined"
           ></v-text-field>
@@ -198,7 +200,7 @@
             v-model="form.church_name"
             class="tw:mr-3"
             clearable
-            density="default"
+            density="comfortable"
             label="Parish/Church Name"
             variant="underlined"
           ></v-text-field>
