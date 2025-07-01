@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_and_test:
-    uses: watsina/find-mass/.github/workflows/build-and-test.yml@main
+    uses: geneowak/common-workflows/.github/workflows/laravel-build-and-test.yml@main
 
   deploy_production:
     name: Deploy to production site
