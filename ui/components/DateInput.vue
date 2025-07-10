@@ -3,7 +3,6 @@
     v-bind="$attrs"
     v-model="model"
     color="primary"
-    density="compact"
     :error-messages="error"
     :hide-actions="true"
     hide-details="auto"

@@ -1,8 +1,6 @@
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import colors from '@/utils/colors';
 import { md3 } from 'vuetify/blueprints';
-// import { VTimePicker } from 'vuetify/labs/VTimePicker';
-// import { VDateInput } from 'vuetify/labs/VDateInput';
 
 // Composables
 import { createVuetify } from 'vuetify';
@@ -33,10 +31,6 @@ export default createVuetify({
       theme,
     },
   },
-  components: {
-    // VTimePicker,
-    // VDateInput,
-  },
   defaults: {
     VCol: {
       cols: 12,
@@ -44,27 +38,27 @@ export default createVuetify({
     VAlert: {},
     VTextField: {
       variant: 'outlined',
-      density: 'compact',
+      density: 'comfortable',
       color: 'primary',
       hideDetails: 'auto',
     },
 
     VTextarea: {
       variant: 'outlined',
-      density: 'compact',
+      density: 'comfortable',
       color: 'primary',
       autoGrow: true,
       rows: 2,
     },
     VAutocomplete: {
       variant: 'outlined',
-      density: 'compact',
+      density: 'comfortable',
       color: 'primary',
       itemValue: 'id',
     },
     VCombobox: {
       variant: 'outlined',
-      density: 'compact',
+      density: 'comfortable',
       color: 'primary',
     },
     VBtn: {
@@ -75,7 +69,10 @@ export default createVuetify({
       rounded: 'md',
     },
     VBtnToggle: {
-      density: 'compact',
+      density: 'comfortable',
+    },
+    VDateInput: {
+      density: 'comfortable',
     },
 
     VDataTable: dataTableOptions,

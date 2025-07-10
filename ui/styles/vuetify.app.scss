@@ -1,3 +1,5 @@
-@use './settings.scss';
-
-@use 'vuetify';
+@use 'vuetify' with (
+  $reset: false
+);
+// $utilities: true
+// $color-pack: false,
