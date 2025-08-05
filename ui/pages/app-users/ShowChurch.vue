@@ -117,13 +117,8 @@
         </v-col>
         <v-col cols="12">
           <v-expansion-panels v-model="panel">
-            <v-expansion-panel>
-              <v-expansion-panel-title
-                :class="{
-                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
-                  'tw:bg-gray-100!': panel === 0,
-                }"
-              >
+            <v-expansion-panel :color="panel === 0 ? 'grey-lighten-2' : 'default'">
+              <v-expansion-panel-title class="tw:text-md! tw:uppercase! tw:font-semibold!">
                 Mass
               </v-expansion-panel-title>
               <v-expansion-panel-text>
@@ -149,13 +144,8 @@
                 </v-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-title
-                :class="{
-                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
-                  'tw:bg-gray-100!': panel === 1,
-                }"
-              >
+            <v-expansion-panel :color="panel === 1 ? 'grey-lighten-2' : 'default'">
+              <v-expansion-panel-title class="tw:text-md! tw:uppercase! tw:font-semibold!">
                 Confession
               </v-expansion-panel-title>
               <v-expansion-panel-text>
@@ -184,13 +174,8 @@
                 </v-table>
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-title
-                :class="{
-                  'tw:text-md! tw:uppercase! tw:font-semibold!': true,
-                  'tw:bg-gray-100!': panel === 2,
-                }"
-              >
+            <v-expansion-panel :color="panel === 2 ? 'grey-lighten-2' : 'default'">
+              <v-expansion-panel-title class="tw:text-md! tw:uppercase! tw:font-semibold!">
                 Adoration
               </v-expansion-panel-title>
               <v-expansion-panel-text>
