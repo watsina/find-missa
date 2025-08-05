@@ -21,12 +21,10 @@
   ];
 
   function updateDioceses(updated) {
-    dioceses.value = dioceses.value?.map((diocese) => {
-      if (diocese?.id === updated?.id) {
-        return updated;
-      }
-      return diocese;
-    });
+    const index = dioceses.value?.findIndex((diocese) => diocese?.id === updated?.id);
+    if (index === -1) {
+      dioceses.value.push(updated);
+    }
   }
 
   const showModal = (diocese = null) => {
