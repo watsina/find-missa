@@ -16,6 +16,8 @@
       </header>
     </template>
     <v-spacer></v-spacer>
+    <v-btn color="primary" :to="{ name: 'faqs' }">FAQs</v-btn>
+    <span class="tw:mr-4"></span>
   </v-app-bar>
 </template>
 

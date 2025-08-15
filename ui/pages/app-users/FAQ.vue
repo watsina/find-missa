@@ -22,7 +22,7 @@
             services.
           </p>
         </v-col>
-        <v-col class="tw:mt-4" cols="8" offset="2">
+        <v-col class="tw:mt-4" cols="12" md="8" offset-md="2">
           <v-expansion-panels v-model="panel">
             <v-expansion-panel
               v-for="(faq, index) in faqs"
