@@ -13,19 +13,19 @@ export const useFaqs = () => {
       id: 2,
       question: 'How do I find Mass times near me?',
       answer:
-        'Enter your city, district, or address in the search bar on the homepage. You can also enable location services to find nearby parishes automatically. Results include Mass times, parish names, and addresses.',
+        "The website enables you to find mass by date, time, city/town name and parish/church name. Enter the name of the city/town you are in with the corresponding date and time and press the search button to get results for the masses in that area. We are working to make this even better and in a later update, we'll add functionality so that you just enable location services to find nearby parishes automatically.",
     },
     {
       id: 3,
       question: 'Are the Mass times up-to-date?',
       answer:
-        'We strive to keep Mass times accurate by regularly updating our database with information from parishes. However, schedules may change, especially during holidays. Always confirm with the parish directly for the latest details.',
+        'We strive to keep Mass times accurate by regularly updating our database with information from parishes. However, schedules may change, especially during holidays. You can check the parish’s profile for their contact details and contact them directly to confirm Mass times. If you notice any discrepancies in the details of a parish you know, please contact us via email "info@findmissa.org" and we will update it as soon as possible.',
     },
     {
       id: 4,
       question: 'Can I find Masses in different languages?',
       answer:
-        'Yes! Use the filter option to search for Masses in specific languages (e.g., English, Luganda, Swahili, etc). Some parishes also offer the Mass in two languages (a local language and English).',
+        "Some parishes also offer the Mass in two languages (a local language and English) and this is indicated in the list of the masses. A later update, we'll enable you to use the filter option to search for Masses in specific languages (e.g., English, Luganda, Swahili, etc). ",
     },
     {
       id: 5,
