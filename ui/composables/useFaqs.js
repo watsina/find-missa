@@ -25,13 +25,13 @@ export const useFaqs = () => {
       id: 4,
       question: 'Can I find Masses in different languages?',
       answer:
-        "Some parishes also offer the Mass in two languages (a local language and English) and this is indicated in the list of the masses. A later update, we'll enable you to use the filter option to search for Masses in specific languages (e.g., English, Luganda, Swahili, etc). ",
+        "Some parishes offer the Mass in two languages (a local language and English) and this is indicated in the list of the masses. A later update, we'll enable you to use the filter option to search for Masses in specific languages (e.g., English, Luganda, Swahili, etc). ",
     },
     {
       id: 5,
       question: 'What if I can’t find my parish?',
       answer:
-        'If your parish isn’t listed, try searching with a nearby city or postal code. You can also contact us via the “Report a Missing Parish” form, and we’ll work to add it.',
+        'If your parish isn’t listed, you can add its details via our google form (https://forms.gle/kGiX1A36dW3is1BJA), and we’ll work to add it as soon as possible. Make sure to add a phone contact of the parish priest or catechist so that we can verify the details before adding it to the site.',
     },
     {
       id: 6,
