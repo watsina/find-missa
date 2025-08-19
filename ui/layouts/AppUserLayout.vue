@@ -12,10 +12,12 @@
       <slot />
     </v-main>
   </v-layout>
+  <Footer class="tw:mt-4" />
 </template>
 
 <script setup>
   import GuestTopBar from './GuestTopBar';
   import GlobalNotifications from '@/components/GlobalNotifications';
   import GlobalConfirmationDialog from '@/components/GlobalConfirmationDialog';
+  import Footer from './Footer.vue';
 </script>
