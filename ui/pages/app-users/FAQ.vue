@@ -23,7 +23,7 @@
           </p>
         </v-col>
         <v-col class="tw:mt-4" cols="12" md="8" offset-md="2">
-          <v-expansion-panels v-model="panel">
+          <v-expansion-panels v-model="panel" variant="popout">
             <v-expansion-panel
               v-for="(faq, index) in faqs"
               :key="index"
@@ -34,7 +34,9 @@
               <v-expansion-panel-title class="tw:font-bold">
                 {{ faq.question }}
               </v-expansion-panel-title>
-              <v-expansion-panel-text>{{ faq.answer }}</v-expansion-panel-text>
+              <v-expansion-panel-text>
+                <p v-html="faq.answer"></p>
+              </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
         </v-col>
