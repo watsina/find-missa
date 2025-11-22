@@ -171,7 +171,7 @@
             :hide-actions="false"
             label="Date"
             :min="currentDate"
-            variant="underlined"
+            variant="outlined"
           ></DateInput>
         </v-col>
         <v-col cols="12" md="2">
@@ -181,7 +181,7 @@
             label="From Time (24h)"
             required
             title="Select Mass Time"
-            variant="underlined"
+            variant="outlined"
           />
         </v-col>
         <v-col class="tw:flex tw:items-end" cols="12" md="3">
@@ -189,7 +189,7 @@
             v-model="form.district"
             clearable
             label="District/Town"
-            variant="underlined"
+            variant="outlined"
           ></v-text-field>
         </v-col>
         <v-col class="tw:flex tw:items-end tw:justify-between" cols="12" md="4">
@@ -198,7 +198,7 @@
             class="tw:mr-3"
             clearable
             label="Parish/Church Name"
-            variant="underlined"
+            variant="outlined"
           ></v-text-field>
           <v-btn color="primary" :prepend-icon="mdiMagnify" variant="elevated" @click="getResults">
             Search
