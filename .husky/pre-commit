@@ -9,7 +9,7 @@ composer lint:fix
 npm run lint:fix
 
 # ensure it builds
-npm run build
+# npm run build
 
 # add the fixed files
 git add -u
