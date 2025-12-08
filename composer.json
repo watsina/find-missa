@@ -34,6 +34,7 @@
     "fakerphp/faker": "^1.24.1",
     "jasonmccreary/laravel-test-assertions": "^2.8",
     "laravel-shift/blueprint": "^2.13.0",
+    "laravel/boost": "^1.8",
     "laravel/pint": "^1.25.1",
     "laravel/sail": "^1.48.1",
     "mockery/mockery": "^1.6.12",

@@ -56,7 +56,7 @@
 
   const searchedQuery = ref({});
 
-  const shareTitle = computed(() => `Share ${searchedQuery.value?.type || 'mass'} times`);
+  const shareTitle = computed(() => `Share ${searchedQuery.value?.type || 'Mass'} Times`);
 
   const shareDescription = computed(() => {
     const query = searchedQuery.value;
