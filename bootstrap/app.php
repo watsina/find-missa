@@ -36,8 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('backup:clean')->daily();
-        $schedule->command('backup:run')->daily();
+        $schedule->command('backup:clean')->daily()->at('01:00');
+        $schedule->command('backup:run')->daily()->at('01:30');
+        $schedule->command('backup:monitor')->daily()->at('03:00');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->dontFlash(['current_password', 'password', 'password_confirmation']);
