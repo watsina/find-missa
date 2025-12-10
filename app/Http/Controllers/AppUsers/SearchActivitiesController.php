@@ -53,6 +53,7 @@ class SearchActivitiesController extends Controller
 
         $activities = ActivityTime::ofType($types)
             ->with('church')
+            ->effectiveOn($date)
             ->whereDoesntHave('exceptions', function (Builder $query) use ($data) {
                 $query->whereDate('start_date', '<=', $data['date'])
                     ->whereDate('end_date', '>=', $data['date']);

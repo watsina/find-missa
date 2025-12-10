@@ -7,6 +7,7 @@ use App\Models\ActivityTime;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\ActivityTimeRequest;
 use App\Http\Resources\ActivityTimeResource;
 use App\Http\Resources\ActivityTimeCollection;
@@ -21,7 +22,38 @@ class ActivityTimeController extends Controller
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $activityTimes = ActivityTime::search($request->search)
-            ->query(fn ($q) => $q->with('church:id,name'))
+            ->query(function (Builder $query) use ($request) {
+                $query->with('church:id,name');
+
+                // Filter by schedule period
+                if ($request->has('schedule_period_id')) {
+                    if ($request->input('schedule_period_id') === 'null' || $request->input('schedule_period_id') === '') {
+                        $query->withoutSchedulePeriod();
+                    } else {
+                        $query->forSchedulePeriod((int) $request->input('schedule_period_id'));
+                    }
+                }
+
+                // Filter by effective date
+                if ($request->has('effective_on')) {
+                    $query->effectiveOn($request->input('effective_on'));
+                }
+
+                // Filter by type
+                if ($request->has('type')) {
+                    $query->where('type', $request->input('type'));
+                }
+
+                // Filter by church
+                if ($request->has('church_id')) {
+                    $query->where('church_id', (int) $request->input('church_id'));
+                }
+
+                // Filter by occurrence
+                if ($request->has('occurrence')) {
+                    $query->where('occurrence', $request->input('occurrence'));
+                }
+            })
             ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return new ActivityTimeCollection($activityTimes);
@@ -71,7 +103,7 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('view', $activityTime);
 
-        $activityTime->loadMissing('church', 'exceptions');
+        $activityTime->loadMissing('church', 'exceptions', 'schedulePeriod');
 
         return new ActivityTimeResource($activityTime);
     }

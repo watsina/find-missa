@@ -14,6 +14,7 @@ use App\Models\Permission;
 use App\Models\TeamMember;
 use App\Models\ActivityTag;
 use App\Models\ActivityTime;
+use App\Models\SchedulePeriod;
 use App\Models\TeamInvitation;
 use App\Models\HolidayInstance;
 use App\Models\ActivityTimeException;
@@ -38,4 +39,5 @@ return [
     'global-activity-time-exception' => GlobalActivityTimeException::class,
     'holiday' => Holiday::class,
     'holiday-instance' => HolidayInstance::class,
+    'schedule-period' => SchedulePeriod::class,
 ];

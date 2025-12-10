@@ -54,4 +54,10 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::get('holidays/in-range', [Controllers\HolidayController::class, 'inRange'])->name('holidays.in-range');
     Route::get('holidays/check-date', [Controllers\HolidayController::class, 'checkDate'])->name('holidays.check-date');
     Route::apiResource('holidays', Controllers\HolidayController::class);
+
+    // Schedule Periods - custom routes must come before apiResource to avoid route conflicts
+    Route::get('schedule-periods/current', [Controllers\SchedulePeriodController::class, 'current'])->name('schedule-periods.current');
+    Route::get('schedule-periods/upcoming', [Controllers\SchedulePeriodController::class, 'upcoming'])->name('schedule-periods.upcoming');
+    Route::get('schedule-periods/check-overlap', [Controllers\SchedulePeriodController::class, 'checkOverlap'])->name('schedule-periods.check-overlap');
+    Route::apiResource('schedule-periods', Controllers\SchedulePeriodController::class);
 });

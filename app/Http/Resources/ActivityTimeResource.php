@@ -25,6 +25,10 @@ class ActivityTimeResource extends JsonResource
             'occurrence' => $this->occurrence,
             'date' => $this->date,
             'day_of_week' => $this->day_of_week,
+            'schedule_period_id' => $this->schedule_period_id,
+            'schedule_period' => new SchedulePeriodResource($this->whenLoaded('schedulePeriod')),
+            'effective_from' => $this->effective_from?->toDateString(),
+            'effective_until' => $this->effective_until?->toDateString(),
         ];
     }
 }

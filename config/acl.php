@@ -34,6 +34,10 @@ return [
             ['name' => 'holiday.write', 'description' => 'Create and update holiday(s)'],
             ['name' => 'holiday.read', 'description' => 'View holiday(s)'],
         ],
+        'schedulePeriod' => [
+            ['name' => 'schedule-period.write', 'description' => 'Create and update schedule period(s)'],
+            ['name' => 'schedule-period.read', 'description' => 'View schedule period(s)'],
+        ],
     ],
     'roles' => [
         'diocese' => [
