@@ -48,4 +48,10 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('activity-time-exceptions', Controllers\ActivityTimeExceptionController::class);
     Route::apiResource('activity-tags', Controllers\ActivityTagController::class);
     Route::apiResource('global-activity-time-exceptions', Controllers\GlobalActivityTimeExceptionController::class);
+
+    // Holidays - custom routes must come before apiResource to avoid route conflicts
+    Route::get('holidays/instances/{year}', [Controllers\HolidayController::class, 'instances'])->name('holidays.instances');
+    Route::get('holidays/in-range', [Controllers\HolidayController::class, 'inRange'])->name('holidays.in-range');
+    Route::get('holidays/check-date', [Controllers\HolidayController::class, 'checkDate'])->name('holidays.check-date');
+    Route::apiResource('holidays', Controllers\HolidayController::class);
 });

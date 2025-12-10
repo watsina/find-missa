@@ -8,12 +8,14 @@ use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Priest;
 use App\Models\Diocese;
+use App\Models\Holiday;
 use App\Models\SubParish;
 use App\Models\Permission;
 use App\Models\TeamMember;
 use App\Models\ActivityTag;
 use App\Models\ActivityTime;
 use App\Models\TeamInvitation;
+use App\Models\HolidayInstance;
 use App\Models\ActivityTimeException;
 use App\Models\GlobalActivityTimeException;
 
@@ -34,4 +36,6 @@ return [
     'activity-tag' => ActivityTag::class,
     'priest' => Priest::class,
     'global-activity-time-exception' => GlobalActivityTimeException::class,
+    'holiday' => Holiday::class,
+    'holiday-instance' => HolidayInstance::class,
 ];

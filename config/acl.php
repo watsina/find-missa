@@ -30,6 +30,10 @@ return [
             ['name' => 'priest.write', 'description' => 'Create and update and update priest(s)'],
             ['name' => 'priest.read', 'description' => 'View priest(s)'],
         ],
+        'holiday' => [
+            ['name' => 'holiday.write', 'description' => 'Create and update holiday(s)'],
+            ['name' => 'holiday.read', 'description' => 'View holiday(s)'],
+        ],
     ],
     'roles' => [
         'diocese' => [
