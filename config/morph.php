@@ -11,6 +11,7 @@ use App\Models\Diocese;
 use App\Models\SubParish;
 use App\Models\Permission;
 use App\Models\TeamMember;
+use App\Models\ActivityTag;
 use App\Models\ActivityTime;
 use App\Models\TeamInvitation;
 use App\Models\ActivityTimeException;
@@ -30,6 +31,7 @@ return [
     'church' => Church::class,
     'activity-time' => ActivityTime::class,
     'activity-time-exception' => ActivityTimeException::class,
+    'activity-tag' => ActivityTag::class,
     'priest' => Priest::class,
     'global-activity-time-exception' => GlobalActivityTimeException::class,
 ];

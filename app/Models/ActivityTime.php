@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Timecast;
 use Laravel\Scout\Searchable;
+use App\Models\Concerns\HasActivityTags;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ActivityTime extends BaseModel
 {
+    use HasActivityTags;
     use HasFactory;
     use Searchable;
 
