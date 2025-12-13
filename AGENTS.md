@@ -96,6 +96,40 @@ ui/
 - **Props validation** with proper types
 - **Emit definitions** for component events
 
+### Vue HTTP Requests
+- **Always use the http plugin** (`ui/plugins/http.js`) for all API calls
+- **Never import axios directly** - always use `import { http } from '@/plugins'`
+- The http plugin is a pre-configured axios instance with:
+  - Proper headers (`Accept: application/json`, `X-Requested-With: XMLHttpRequest`)
+  - Credentials and XSRF token handling enabled
+  - Helper method `http.getErrorMessageFromResponse(error)` for error handling
+- Use `http.get()`, `http.post()`, `http.put()`, `http.delete()` for API requests
+
+**HTTP Plugin Example:**
+```vue
+<script setup>
+  import { http } from '@/plugins';
+  import { ref } from 'vue';
+
+  const items = ref([]);
+  const loading = ref(false);
+
+  async function fetchItems() {
+    loading.value = true;
+    try {
+      const response = await http.get('/api/v1/items', {
+        params: { per_page: 100 },
+      });
+      items.value = response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch items:', http.getErrorMessageFromResponse(error));
+    } finally {
+      loading.value = false;
+    }
+  }
+</script>
+```
+
 ### Vue Form Handling
 - **Always use the form plugin** (`ui/plugins/form.js`) for all form-related functionality
 - Import as `useForm` from `@/plugins/form`

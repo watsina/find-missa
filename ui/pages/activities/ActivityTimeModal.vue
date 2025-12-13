@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import DialogModal from '@/components/DialogModal.vue';
@@ -11,6 +11,7 @@
   import MultiTimeInput from '@/components/MultiTimeInput.vue';
   import DateInput from '@/components/DateInput.vue';
   import { useDate } from 'vuetify/lib/framework.mjs';
+  import { http } from '@/plugins';
 
   const props = defineProps({
     activity: { type: Object, default: null },
@@ -23,6 +24,12 @@
   const currentDate = new Date().toLocaleDateString('en-US');
   const date = ref(parser.date(currentDate));
   const isAddingBulk = ref(false);
+
+  // Schedule periods
+  const schedulePeriods = ref([]);
+  const loadingSchedulePeriods = ref(false);
+  const effectiveFromDate = ref(null);
+  const effectiveUntilDate = ref(null);
 
   const activityTypes = [
     { title: 'Mass', value: 'mass' },
@@ -72,6 +79,37 @@
     day_of_week: props.activity?.day_of_week || '',
     days_of_week: [],
     church_id: props.church?.id || '',
+    schedule_period_id: props.activity?.schedule_period_id || null,
+    effective_from: props.activity?.effective_from || null,
+    effective_until: props.activity?.effective_until || null,
+  });
+
+  const schedulePeriodItems = computed(() => {
+    return [
+      { title: 'No Schedule Period (Always Active)', value: null },
+      ...schedulePeriods.value.map((period) => ({
+        title: `${period.name} (${period.formatted_date_range})`,
+        value: period.id,
+      })),
+    ];
+  });
+
+  async function fetchSchedulePeriods() {
+    loadingSchedulePeriods.value = true;
+    try {
+      const response = await http.get('/api/v1/schedule-periods', {
+        params: { per_page: 100, is_active: true },
+      });
+      schedulePeriods.value = response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch schedule periods:', error);
+    } finally {
+      loadingSchedulePeriods.value = false;
+    }
+  }
+
+  onMounted(() => {
+    fetchSchedulePeriods();
   });
 
   watch(
@@ -87,8 +125,17 @@
         form.date = newValue?.date || null;
         form.day_of_week = newValue?.day_of_week || '';
         form.church_id = newValue?.church_id || '';
+        form.schedule_period_id = newValue?.schedule_period_id || null;
+        form.effective_from = newValue?.effective_from || null;
+        form.effective_until = newValue?.effective_until || null;
 
         date.value = parser.date(newValue?.date || currentDate);
+        effectiveFromDate.value = newValue?.effective_from
+          ? parser.date(newValue.effective_from)
+          : null;
+        effectiveUntilDate.value = newValue?.effective_until
+          ? parser.date(newValue.effective_until)
+          : null;
       }
     },
     { deep: true },
@@ -127,6 +174,14 @@
       form.date = useDayjs(date.value).format('YYYY-MM-DD');
     }
 
+    // Handle effective date formatting
+    form.effective_from = effectiveFromDate.value
+      ? useDayjs(effectiveFromDate.value).format('YYYY-MM-DD')
+      : null;
+    form.effective_until = effectiveUntilDate.value
+      ? useDayjs(effectiveUntilDate.value).format('YYYY-MM-DD')
+      : null;
+
     form.church_id = props.church.id;
 
     return form[method](url, {
@@ -143,6 +198,8 @@
 
   const closeModal = (data = null) => {
     form.reset();
+    effectiveFromDate.value = null;
+    effectiveUntilDate.value = null;
     if ((data?.id || data?.length) && !isEditing.value) emit('created', data);
     if (data?.id && isEditing.value) emit('updated', data);
 
@@ -280,6 +337,46 @@
               required
             />
           </div>
+
+          <!-- Schedule Period Section -->
+          <v-divider class="tw:my-6" />
+          <div class="tw:text-sm tw:text-gray-600 tw:mb-2">Schedule Period (Optional)</div>
+
+          <div class="tw:mt-4">
+            <SelectInput
+              v-model="form.schedule_period_id"
+              class="tw:block tw:w-full tw:mt-1"
+              clearable
+              :error="form.errors.schedule_period_id"
+              :items="schedulePeriodItems"
+              label="Schedule Period"
+              :loading="loadingSchedulePeriods"
+            />
+          </div>
+
+          <div class="tw:grid tw:grid-cols-2 tw:gap-4 tw:mt-4">
+            <DateInput
+              v-model="effectiveFromDate"
+              class="tw:block tw:w-full"
+              clearable
+              :error="form.errors.effective_from"
+              label="Effective From"
+            />
+            <DateInput
+              v-model="effectiveUntilDate"
+              class="tw:block tw:w-full"
+              clearable
+              :error="form.errors.effective_until"
+              label="Effective Until"
+            />
+          </div>
+
+          <div class="tw:text-xs tw:text-gray-500 tw:mt-2">
+            Leave dates empty for the activity to always be active. Use dates to specify a custom
+            validity period.
+          </div>
+
+          <v-divider class="tw:my-6" />
 
           <div v-if="!isEditing" class="tw:mt-4">
             <v-checkbox
