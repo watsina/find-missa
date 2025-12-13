@@ -19,38 +19,41 @@ class SchedulePeriodController extends Controller
     {
         $this->authorize('viewAny', SchedulePeriod::class);
 
+        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $itemsPerPage = $items > 100 ? 100 : $items;
         $teamId = $request->user()->currentTeam?->id;
 
-        $query = SchedulePeriod::query()
-            ->availableForTeam($teamId)
-            ->orderBy('start_date', 'desc');
+        $periods = SchedulePeriod::search($request->search)
+            ->query(function ($query) use ($request, $teamId) {
+                $query->availableForTeam($teamId)
+                    ->orderBy('start_date', 'desc');
 
-        // Filter by active status
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
-        }
+                // Filter by active status
+                if ($request->has('is_active')) {
+                    $query->where('is_active', $request->boolean('is_active'));
+                }
 
-        // Filter by current (in effect now)
-        if ($request->boolean('current')) {
-            $query->current();
-        }
+                // Filter by current (in effect now)
+                if ($request->boolean('current')) {
+                    $query->current();
+                }
 
-        // Filter by upcoming
-        if ($request->boolean('upcoming')) {
-            $query->upcoming();
-        }
+                // Filter by upcoming
+                if ($request->boolean('upcoming')) {
+                    $query->upcoming();
+                }
 
-        // Filter by recurring
-        if ($request->has('is_recurring')) {
-            $query->where('is_recurring', $request->boolean('is_recurring'));
-        }
+                // Filter by recurring
+                if ($request->has('is_recurring')) {
+                    $query->where('is_recurring', $request->boolean('is_recurring'));
+                }
 
-        // Filter by date range overlap
-        if ($request->has('overlaps_start') && $request->has('overlaps_end')) {
-            $query->overlapping($request->input('overlaps_start'), $request->input('overlaps_end'));
-        }
-
-        $periods = $query->get();
+                // Filter by date range overlap
+                if ($request->has('overlaps_start') && $request->has('overlaps_end')) {
+                    $query->overlapping($request->input('overlaps_start'), $request->input('overlaps_end'));
+                }
+            })
+            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return SchedulePeriodResource::collection($periods);
     }

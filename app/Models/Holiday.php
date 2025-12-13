@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\HolidayType;
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Concerns\RecordsUserActions;
@@ -19,6 +20,7 @@ class Holiday extends Model
 {
     use HasFactory;
     use RecordsUserActions;
+    use Searchable;
 
     /**
      * The attributes that aren't mass assignable.
@@ -26,6 +28,21 @@ class Holiday extends Model
      * @var array<int, string>
      */
     protected $guarded = [];
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'liturgical_color' => $this->liturgical_color,
+        ];
+    }
 
     /**
      * Get the attributes that should be cast.

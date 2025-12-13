@@ -27,39 +27,46 @@ class HolidayController extends Controller
     {
         Gate::authorize('viewAny', Holiday::class);
 
-        $query = Holiday::query()
-            ->availableForTeam($request->user()->currentTeam?->id);
+        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $itemsPerPage = $items > 100 ? 100 : $items;
+        $teamId = $request->user()->currentTeam?->id;
 
-        // Filter by type
-        if ($request->has('type')) {
-            $type = HolidayType::tryFrom($request->type);
-            if ($type) {
-                $query->ofType($type);
-            }
-        }
+        $holidays = Holiday::search($request->search)
+            ->query(function ($query) use ($request, $teamId) {
+                $query->availableForTeam($teamId);
 
-        // Filter by holy days of obligation
-        if ($request->has('is_holy_day_of_obligation')) {
-            if ($request->boolean('is_holy_day_of_obligation')) {
-                $query->holyDaysOfObligation();
-            }
-        }
+                // Filter by type
+                if ($request->has('type')) {
+                    $type = HolidayType::tryFrom($request->type);
+                    if ($type) {
+                        $query->ofType($type);
+                    }
+                }
 
-        // Filter by universal/team-specific
-        if ($request->has('is_universal')) {
-            $request->boolean('is_universal')
-                ? $query->universal()
-                : $query->teamSpecific();
-        }
+                // Filter by holy days of obligation
+                if ($request->has('is_holy_day_of_obligation')) {
+                    if ($request->boolean('is_holy_day_of_obligation')) {
+                        $query->holyDaysOfObligation();
+                    }
+                }
 
-        // Filter by moveable feasts
-        if ($request->has('is_moveable')) {
-            if ($request->boolean('is_moveable')) {
-                $query->moveable();
-            }
-        }
+                // Filter by universal/team-specific
+                if ($request->has('is_universal')) {
+                    $request->boolean('is_universal')
+                        ? $query->universal()
+                        : $query->teamSpecific();
+                }
 
-        $holidays = $query->orderBy('name')->get();
+                // Filter by moveable feasts
+                if ($request->has('is_moveable')) {
+                    if ($request->boolean('is_moveable')) {
+                        $query->moveable();
+                    }
+                }
+
+                $query->orderBy('name');
+            })
+            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
 
         return HolidayResource::collection($holidays);
     }
