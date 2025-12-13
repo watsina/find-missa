@@ -4,13 +4,13 @@
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
   import TimeInput from '@/components/TimeInput.vue';
   import ShareButton from '@/components/ShareButton.vue';
-  import { useForm } from '@/plugins';
+  import { http, useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import { ref, onMounted, computed, watch } from 'vue';
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
   import { useSeoMeta } from '@unhead/vue';
-  import { mdiMagnify, mdiShareAllOutline } from '@mdi/js';
+  import { mdiMagnify, mdiShareAllOutline, mdiChurch, mdiCalendarStar } from '@mdi/js';
   import { useRoute, useRouter } from 'vue-router';
 
   const title = 'Find Catholic Mass - Uganda';
@@ -29,6 +29,7 @@
 
   const results = ref(null);
   const dateUsed = ref(null);
+  const holidayInfo = ref(null);
   const parser = useDate();
   const currentDate = new Date().toLocaleDateString('en-US');
   const date = ref(parser.date(currentDate));
@@ -111,6 +112,35 @@
     return useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day') ? 'Today' : date;
   });
 
+  // Liturgical color mapping for Vuetify alert colors
+  const liturgicalColorMap = {
+    white: 'grey-lighten-1',
+    red: 'red',
+    green: 'green',
+    violet: 'purple',
+    purple: 'purple',
+    rose: 'pink',
+    gold: 'amber',
+    black: 'grey-darken-3',
+  };
+
+  function getLiturgicalColor(color) {
+    const normalizedColor = color?.toLowerCase() || 'white';
+    return liturgicalColorMap[normalizedColor] || liturgicalColorMap.white;
+  }
+
+  async function fetchHolidayInfo(dateString) {
+    try {
+      const response = await http.get('/api/v1/holiday-info', {
+        params: { date: dateString },
+      });
+      holidayInfo.value = response.data;
+    } catch {
+      // Silently fail - holiday info is optional enhancement
+      holidayInfo.value = null;
+    }
+  }
+
   watch(
     () => form.type,
     debounce(() => {
@@ -136,6 +166,9 @@
         router.push({
           query: searchedQuery.value,
         });
+
+        // Fetch holiday info for the searched date
+        fetchHolidayInfo(form.date);
       },
       onError: () => notify.error('Something went wrong...'),
     });
@@ -158,6 +191,46 @@
             <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
           </v-alert>
         </v-col>
+
+        <!-- Holiday Banner -->
+        <v-col v-if="holidayInfo?.is_holiday && holidayInfo?.holidays?.length" cols="12">
+          <v-alert
+            v-for="holidayInstance in holidayInfo.holidays"
+            :key="holidayInstance.id"
+            class="tw:mb-2"
+            :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+            :icon="mdiCalendarStar"
+            prominent
+            :title="holidayInstance.holiday?.name"
+            variant="tonal"
+          >
+            <template #text>
+              <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <v-chip
+                  v-if="holidayInstance.holiday?.is_holy_day_of_obligation"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  :prepend-icon="mdiChurch"
+                  size="small"
+                  variant="elevated"
+                >
+                  Holy Day of Obligation
+                </v-chip>
+                <v-chip
+                  v-if="holidayInstance.holiday?.liturgical_color"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ holidayInstance.holiday?.liturgical_color }}
+                </v-chip>
+              </div>
+              <p v-if="holidayInstance.holiday?.description" class="tw:mt-2 tw:mb-0">
+                {{ holidayInstance.holiday?.description }}
+              </p>
+            </template>
+          </v-alert>
+        </v-col>
+
         <v-col class="tw:flex tw:justify-around" cols="12">
           <v-btn-toggle v-model="form.type" color="primary" group mandatory rounded>
             <v-btn rounded="0" value="mass">Mass</v-btn>

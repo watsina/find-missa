@@ -28,6 +28,7 @@
 
   const headers = [
     { title: 'Name', value: 'name' },
+    { title: 'Slug', value: 'slug' },
     { title: 'Type', value: 'type' },
     { title: 'Holy Day', value: 'is_holy_day_of_obligation' },
     { title: 'Universal', value: 'is_universal' },
@@ -50,7 +51,7 @@
     }
 
     // Check permissions - only super admin can delete universal holidays
-    if (holiday.is_universal && !authUser.value?.is_super_admin) {
+    if (holiday.is_universal && !authUser.value?.is_admin) {
       notify.error('Only super admins can delete universal holidays.');
       return;
     }
@@ -163,7 +164,7 @@
               ></v-btn>
               <v-btn
                 color="error"
-                :disabled="isDeleting || (item?.is_universal && !authUser?.is_super_admin)"
+                :disabled="isDeleting || (item?.is_universal && !authUser?.is_admin)"
                 :icon="mdiDeleteCircleOutline"
                 title="Delete Holiday"
                 variant="text"

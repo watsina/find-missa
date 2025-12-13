@@ -9,6 +9,7 @@ require __DIR__.'/auth.php';
 
 Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
 Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
+Route::get('/holiday-info', AppUsers\HolidayInfoController::class)->name('holiday-info');
 
 Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();
