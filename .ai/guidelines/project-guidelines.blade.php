@@ -93,6 +93,28 @@ ui/
 - **Props validation** with proper types
 - **Emit definitions** for component events
 
+### Vue Icons (MDI)
+- **Always import icons from `@mdi/js`** - never use text-based icon names like `mdi-check-circle`
+- Use the `:icon` binding prop to pass imported icons to Vuetify components
+- Import only the icons you need to keep bundle size small
+
+**Icon Usage Example:**
+```vue
+<script setup>
+  import { mdiCheckCircle, mdiClose, mdiPencilOutline } from '@mdi/js';
+</script>
+
+<template>
+  <!-- Correct: Using imported icon with :icon binding -->
+  <v-icon :icon="mdiCheckCircle" color="success" />
+  <v-btn :icon="mdiPencilOutline" variant="text" />
+  <v-btn :prepend-icon="mdiClose">Cancel</v-btn>
+
+  <!-- WRONG: Text-based icons don't work in this setup -->
+  <v-icon>mdi-check-circle</v-icon>
+</template>
+```
+
 ### Vue HTTP Requests
 - **Always use the http plugin** (`ui/plugins/http.js`) for all API calls
 - **Never import axios directly** - always use `import { http } from '@/plugins'`

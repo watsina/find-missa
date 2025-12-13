@@ -1,5 +1,11 @@
 <script setup>
-  import { mdiDeleteCircleOutline, mdiPencilOutline, mdiCalendarStar } from '@mdi/js';
+  import {
+    mdiDeleteCircleOutline,
+    mdiPencilOutline,
+    mdiCalendarStar,
+    mdiCheckCircle,
+    mdiMinusCircleOutline,
+  } from '@mdi/js';
   import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
   import HolidayModal from './Modal.vue';
@@ -126,10 +132,12 @@
               </v-chip>
             </template>
             <template #item.is_holy_day_of_obligation="{ item }">
-              <v-icon v-if="item?.is_holy_day_of_obligation" color="success"
-                >mdi-check-circle</v-icon
-              >
-              <v-icon v-else color="grey">mdi-minus-circle-outline</v-icon>
+              <v-icon
+                v-if="item?.is_holy_day_of_obligation"
+                color="success"
+                :icon="mdiCheckCircle"
+              />
+              <v-icon v-else color="grey" :icon="mdiMinusCircleOutline" />
             </template>
             <template #item.is_universal="{ item }">
               <v-chip v-if="item?.is_universal" color="primary" size="small">Universal</v-chip>
