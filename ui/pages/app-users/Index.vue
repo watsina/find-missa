@@ -9,20 +9,80 @@
   import { ref, onMounted, computed, watch } from 'vue';
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
-  import { useSeoMeta } from '@unhead/vue';
-  import { mdiMagnify, mdiShareAllOutline, mdiChurch, mdiCalendarStar } from '@mdi/js';
+  import { useSeoMeta, useHead } from '@unhead/vue';
+  import {
+    mdiMagnify,
+    mdiShareAllOutline,
+    mdiChurch,
+    mdiCalendarStar,
+    mdiHandHeart,
+    mdiArrowRight,
+  } from '@mdi/js';
   import { useRoute, useRouter } from 'vue-router';
 
-  const title = 'Find Catholic Mass - Uganda';
+  const title = 'Find Catholic Mass Times in Uganda | Mass, Confession & Adoration';
   const description =
-    'A web app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district...';
+    'Find Catholic Mass times, Confession schedules, and Adoration hours at parishes across Uganda. Search by location, time, or church name. Updated daily with accurate schedules from dioceses nationwide.';
+  const keywords =
+    'Catholic Mass Uganda, Mass times Kampala, find Mass near me Uganda, Catholic church Uganda, Confession times Uganda, Adoration Uganda, Sunday Mass Uganda, daily Mass Uganda, Catholic parishes Uganda, Holy Mass schedule, Kampala diocese, Jinja diocese, Gulu archdiocese, Mbarara archdiocese, Catholic sacraments Uganda';
 
   useSeoMeta({
     title: title,
     description: description,
+    keywords: keywords,
+    ogType: 'website',
     ogTitle: title,
     ogDescription: description,
     ogUrl: 'https://findmissa.com',
+    ogSiteName: 'Find Missa',
+    ogLocale: 'en_UG',
+    twitterCard: 'summary_large_image',
+    twitterTitle: title,
+    twitterDescription: description,
+    robots: 'index, follow',
+    author: 'Watsina Technologies',
+  });
+
+  useHead({
+    link: [{ rel: 'canonical', href: 'https://findmissa.com' }],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: 'Find Missa',
+          description: description,
+          url: 'https://findmissa.com',
+          applicationCategory: 'ReligiousOrganization',
+          operatingSystem: 'Any',
+          browserRequirements: 'Requires JavaScript',
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+          creator: {
+            '@type': 'Organization',
+            name: 'Watsina Technologies',
+            url: 'https://watsina.io',
+          },
+          provider: {
+            '@type': 'Organization',
+            name: 'Find Missa',
+            url: 'https://findmissa.com',
+          },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: 'https://findmissa.com?location={location}&type={type}',
+            },
+            'query-input': 'required name=location',
+          },
+        }),
+      },
+    ],
   });
 
   const { smAndDown } = useDisplay();
@@ -184,11 +244,30 @@
     <v-container>
       <v-row class="py-4">
         <v-col cols="12">
-          <v-alert class="tw:font-semibold tw:text-md" prominent type="info" variant="tonal">
-            We are still gathering information from various Catholic parishes in Uganda. If you
-            notice any inaccuracies or missing details, please share updates with us using this
-            Google Form
-            <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
+          <v-alert
+            class="contribution-alert"
+            :icon="mdiHandHeart"
+            prominent
+            type="warning"
+            variant="tonal"
+          >
+            <template #title>
+              <span class="tw:font-bold">Help Us Grow This Directory!</span>
+            </template>
+            <p class="tw:mb-3">
+              Know a parish schedule that's missing or outdated? Your contribution helps thousands
+              of Catholics find Mass across Uganda.
+            </p>
+            <v-btn
+              :append-icon="mdiArrowRight"
+              color="warning"
+              href="https://forms.gle/kGiX1A36dW3is1BJA"
+              rel="noopener"
+              target="_blank"
+              variant="elevated"
+            >
+              Submit Church Schedule
+            </v-btn>
           </v-alert>
         </v-col>
 
