@@ -1,5 +1,5 @@
 <template>
-  <v-layout class="rounded rounded-md">
+  <v-layout class="tw:min-h-screen tw:flex tw:flex-col rounded rounded-md">
     <global-notifications />
     <global-confirmation-dialog />
     <guest-top-bar>
@@ -8,11 +8,12 @@
       </template>
     </guest-top-bar>
 
-    <v-main class="tw:flex tw:items-center tw:justify-center" style="min-height: 300px">
+    <v-main class="tw:flex tw:flex-1 tw:items-center tw:justify-center" style="min-height: 300px">
       <slot />
     </v-main>
+
+    <Footer class="tw:mt-4" />
   </v-layout>
-  <Footer class="tw:mt-4" />
 </template>
 
 <script setup>
