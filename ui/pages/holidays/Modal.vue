@@ -119,7 +119,7 @@
   });
 
   const isEditing = computed(() => !!props.holiday?.id);
-  const canEditUniversal = computed(() => authUser.value?.is_super_admin);
+  const canEditUniversal = computed(() => authUser.value?.is_admin);
 
   // Auto-generate slug from name
   watch(

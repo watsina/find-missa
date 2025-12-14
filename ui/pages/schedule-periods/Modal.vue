@@ -64,7 +64,7 @@
   });
 
   const isEditing = computed(() => !!props.period?.id);
-  const canEditUniversal = computed(() => authUser.value?.is_super_admin);
+  const canEditUniversal = computed(() => authUser.value?.is_admin);
   const isUniversalPeriod = computed(() => !props.period?.team_id);
 
   // Auto-generate slug from name

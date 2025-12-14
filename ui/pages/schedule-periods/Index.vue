@@ -44,7 +44,7 @@
     }
 
     // Check permissions - only super admin can delete universal periods
-    if (!period.team_id && !authUser.value?.is_super_admin) {
+    if (!period.team_id && !authUser.value?.is_admin) {
       notify.error('Only super admins can delete universal schedule periods.');
       return;
     }
@@ -166,7 +166,7 @@
               ></v-btn>
               <v-btn
                 color="error"
-                :disabled="isDeleting || (!item?.team_id && !authUser?.is_super_admin)"
+                :disabled="isDeleting || (!item?.team_id && !authUser?.is_admin)"
                 :icon="mdiDeleteCircleOutline"
                 title="Delete Schedule Period"
                 variant="text"
