@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\Timecast;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
+use App\Enums\ActivityOccurrence;
 use App\Models\Concerns\HasActivityTags;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,6 +17,35 @@ class ActivityTime extends BaseModel
     use HasActivityTags;
     use HasFactory;
     use Searchable;
+
+    /**
+     * Week of month constants.
+     */
+    public const WEEK_FIRST = 1;
+
+    public const WEEK_SECOND = 2;
+
+    public const WEEK_THIRD = 3;
+
+    public const WEEK_FOURTH = 4;
+
+    public const WEEK_LAST = 5;
+
+    /**
+     * Get the week of month options for UI.
+     *
+     * @return array<int, string>
+     */
+    public static function weekOfMonthOptions(): array
+    {
+        return [
+            self::WEEK_FIRST => 'First',
+            self::WEEK_SECOND => 'Second',
+            self::WEEK_THIRD => 'Third',
+            self::WEEK_FOURTH => 'Fourth',
+            self::WEEK_LAST => 'Last',
+        ];
+    }
 
     protected static function booted()
     {
@@ -40,8 +70,11 @@ class ActivityTime extends BaseModel
             'date' => 'date:Y-m-d',
             'effective_from' => 'date:Y-m-d',
             'effective_until' => 'date:Y-m-d',
+            'bi_weekly_start_date' => 'date:Y-m-d',
             'start_time' => Timecast::class,
             'end_time' => Timecast::class,
+            'week_of_month' => 'integer',
+            'occurrence' => ActivityOccurrence::class,
         ];
     }
 
@@ -139,6 +172,73 @@ class ActivityTime extends BaseModel
         }
 
         return true;
+    }
+
+    /**
+     * Check if this activity occurs on a given date based on its occurrence pattern.
+     */
+    public function occursOn(Carbon $date): bool
+    {
+        $occurrence = $this->occurrence instanceof ActivityOccurrence
+            ? $this->occurrence
+            : ActivityOccurrence::tryFrom($this->occurrence);
+
+        return match ($occurrence) {
+            ActivityOccurrence::Daily => true,
+            ActivityOccurrence::OneTime => $this->date?->isSameDay($date) ?? false,
+            ActivityOccurrence::Weekly => $this->occursOnWeekly($date),
+            ActivityOccurrence::MonthlyNthWeekday => $this->occursOnMonthlyNthWeekday($date),
+            default => false,
+        };
+    }
+
+    /**
+     * Check if this activity occurs on a given date for weekly occurrence.
+     */
+    protected function occursOnWeekly(Carbon $date): bool
+    {
+        return strtolower($date->format('l')) === strtolower($this->day_of_week);
+    }
+
+    /**
+     * Check if this activity occurs on a given date for monthly nth weekday occurrence.
+     */
+    protected function occursOnMonthlyNthWeekday(Carbon $date): bool
+    {
+        if (! $this->week_of_month || ! $this->day_of_week) {
+            return false;
+        }
+
+        // Check if the day of week matches
+        if (strtolower($date->format('l')) !== strtolower($this->day_of_week)) {
+            return false;
+        }
+
+        // Calculate which occurrence of the weekday this is in the month
+        $dayOfMonth = $date->day;
+        $weekNumber = (int) ceil($dayOfMonth / 7);
+
+        // Handle "last" week (value 5)
+        if ($this->week_of_month === self::WEEK_LAST) {
+            // Check if this is the last occurrence of this weekday in the month
+            $nextWeek = $date->copy()->addWeek();
+
+            return $nextWeek->month !== $date->month;
+        }
+
+        return $weekNumber === $this->week_of_month;
+    }
+
+    /**
+     * Get the human-readable label for the week of month.
+     */
+    public function getWeekOfMonthLabelAttribute(): ?string
+    {
+        if (! $this->week_of_month) {
+            return null;
+        }
+
+        return self::weekOfMonthOptions()[$this->week_of_month] ?? null;
     }
 
     public function church(): BelongsTo

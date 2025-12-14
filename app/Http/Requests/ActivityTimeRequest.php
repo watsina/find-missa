@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\DayOfWeek;
 use App\Enums\ActivityType;
+use App\Models\ActivityTime;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityOccurrence;
 use App\Enums\ActivityTypeDescription;
@@ -40,6 +41,13 @@ class ActivityTimeRequest extends FormRequest
             'schedule_period_id' => ['nullable', 'integer', 'exists:schedule_periods,id'],
             'effective_from' => ['nullable', 'date'],
             'effective_until' => ['nullable', 'date', 'after_or_equal:effective_from'],
+            'week_of_month' => [
+                'required_if:occurrence,monthly-nth-weekday',
+                'exclude_unless:occurrence,monthly-nth-weekday',
+                'nullable',
+                'integer',
+                Rule::in(array_keys(ActivityTime::weekOfMonthOptions())),
+            ],
         ];
     }
 
@@ -50,35 +58,51 @@ class ActivityTimeRequest extends FormRequest
             'starting_times.*' => ['required', 'date_format:H:i'],
             'day_of_week' => [
                 Rule::requiredIf(function () {
-                    return $this->occurrence === 'weekly' && ! $this->days_of_week;
+                    return $this->requiresDayOfWeek() && ! $this->days_of_week;
                 }),
-                'exclude_unless:occurrence,weekly',
+                Rule::excludeIf(fn () => ! $this->requiresDayOfWeek()),
                 'nullable',
                 new DayOfWeek,
             ],
             'days_of_week' => [
                 Rule::requiredIf(function () {
+                    // Only for weekly occurrence - monthly-nth-weekday doesn't support bulk day creation
                     return $this->occurrence === 'weekly' && ! $this->day_of_week;
                 }),
                 'exclude_unless:occurrence,weekly',
                 'nullable',
                 'array',
             ],
-            'days_of_week.*' => ['required', 'string',  new DayOfWeek],
+            'days_of_week.*' => ['required', 'string', new DayOfWeek],
         ]);
     }
 
     protected function updateRules(): array
     {
         return array_merge($this->commonRules(), [
-            'day_of_week' => ['required_if:occurrence,weekly', 'exclude_unless:occurrence,weekly',  new DayOfWeek],
+            'day_of_week' => [
+                Rule::requiredIf(fn () => $this->requiresDayOfWeek()),
+                Rule::excludeIf(fn () => ! $this->requiresDayOfWeek()),
+                new DayOfWeek,
+            ],
         ]);
+    }
+
+    /**
+     * Check if the current occurrence type requires a day of week.
+     */
+    protected function requiresDayOfWeek(): bool
+    {
+        return in_array($this->occurrence, ['weekly', 'monthly-nth-weekday']);
     }
 
     public function messages()
     {
         return [
             'end_time.after' => 'The end time should be a time after the start time',
+            'week_of_month.required_if' => 'Please select which week of the month',
+            'week_of_month.in' => 'Invalid week of month selection',
+            'day_of_week.required' => 'Please select a day of the week',
         ];
     }
 }

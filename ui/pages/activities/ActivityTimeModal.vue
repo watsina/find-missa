@@ -54,6 +54,15 @@
     { title: 'Weekly', value: 'weekly' },
     { title: 'Daily', value: 'daily' },
     { title: 'One Time', value: 'one-time' },
+    { title: 'Monthly (Specific Week)', value: 'monthly-nth-weekday' },
+  ];
+
+  const weekOfMonthOptions = [
+    { title: 'First', value: 1 },
+    { title: 'Second', value: 2 },
+    { title: 'Third', value: 3 },
+    { title: 'Fourth', value: 4 },
+    { title: 'Last', value: 5 },
   ];
 
   const daysOfWeek = [
@@ -82,6 +91,33 @@
     schedule_period_id: props.activity?.schedule_period_id || null,
     effective_from: props.activity?.effective_from || null,
     effective_until: props.activity?.effective_until || null,
+    week_of_month: props.activity?.week_of_month || null,
+  });
+
+  // Computed properties for conditional display
+  const requiresDayOfWeek = computed(() => {
+    return ['weekly', 'monthly-nth-weekday'].includes(form.occurrence);
+  });
+
+  const requiresWeekOfMonth = computed(() => {
+    return form.occurrence === 'monthly-nth-weekday';
+  });
+
+  const isOneTime = computed(() => {
+    return form.occurrence === 'one-time';
+  });
+
+  const isWeekly = computed(() => {
+    return form.occurrence === 'weekly';
+  });
+
+  // Generate helpful label for the occurrence pattern
+  const occurrencePatternLabel = computed(() => {
+    if (form.occurrence === 'monthly-nth-weekday' && form.week_of_month && form.day_of_week) {
+      const weekLabel = weekOfMonthOptions.find((w) => w.value === form.week_of_month)?.title;
+      return `${weekLabel} ${form.day_of_week} of every month`;
+    }
+    return null;
   });
 
   const schedulePeriodItems = computed(() => {
@@ -128,6 +164,7 @@
         form.schedule_period_id = newValue?.schedule_period_id || null;
         form.effective_from = newValue?.effective_from || null;
         form.effective_until = newValue?.effective_until || null;
+        form.week_of_month = newValue?.week_of_month || null;
 
         date.value = parser.date(newValue?.date || currentDate);
         effectiveFromDate.value = newValue?.effective_from
@@ -147,6 +184,24 @@
     }
   });
 
+  // Reset related fields when occurrence changes
+  watch(
+    () => form.occurrence,
+    (newOccurrence) => {
+      // Clear fields that don't apply to the new occurrence
+      if (!['weekly', 'monthly-nth-weekday'].includes(newOccurrence)) {
+        form.day_of_week = '';
+        form.days_of_week = [];
+      }
+      if (newOccurrence !== 'monthly-nth-weekday') {
+        form.week_of_month = null;
+      }
+      if (newOccurrence !== 'one-time') {
+        form.date = null;
+      }
+    },
+  );
+
   const isEditing = computed(() => !!props.activity?.id);
 
   const submit = () => {
@@ -160,18 +215,26 @@
 
     const method = isEditing.value ? 'put' : 'post';
 
-    // some clean up to ensure that the data matches what we expect
+    // Clean up based on occurrence type
     if (form.occurrence === 'weekly') {
       form.date = null;
+      form.week_of_month = null;
       if (!isEditing.value) {
         form.day_of_week = null;
       }
     } else if (form.occurrence === 'daily') {
       form.day_of_week = '';
+      form.days_of_week = [];
       form.date = null;
+      form.week_of_month = null;
     } else if (form.occurrence === 'one-time') {
       form.day_of_week = '';
+      form.days_of_week = [];
       form.date = useDayjs(date.value).format('YYYY-MM-DD');
+      form.week_of_month = null;
+    } else if (form.occurrence === 'monthly-nth-weekday') {
+      form.date = null;
+      form.days_of_week = [];
     }
 
     // Handle effective date formatting
@@ -261,7 +324,7 @@
             />
           </div>
 
-          <div v-if="form.occurrence === 'one-time'" class="tw:mt-4">
+          <div v-if="isOneTime" class="tw:mt-4">
             <DateInput
               v-model="date"
               class="tw:block tw:w-full tw:mt-1"
@@ -272,7 +335,8 @@
             />
           </div>
 
-          <div v-if="form.occurrence === 'weekly'" class="tw:mt-4">
+          <!-- Day of Week for Weekly occurrence -->
+          <div v-if="isWeekly" class="tw:mt-4">
             <SelectInput
               v-if="isEditing"
               v-model="form.day_of_week"
@@ -296,6 +360,39 @@
               placeholder="Sunday"
               required
             />
+          </div>
+
+          <!-- Day of Week for Monthly occurrences (single select only) -->
+          <div v-if="requiresDayOfWeek && !isWeekly" class="tw:mt-4">
+            <SelectInput
+              v-model="form.day_of_week"
+              class="tw:block tw:w-full tw:mt-1"
+              :error="form.errors.day_of_week"
+              :items="daysOfWeek"
+              label="Day of Week"
+              placeholder="Sunday"
+              required
+            />
+          </div>
+
+          <!-- Week of Month for Monthly (Specific Week) -->
+          <div v-if="requiresWeekOfMonth" class="tw:mt-4">
+            <SelectInput
+              v-model="form.week_of_month"
+              class="tw:block tw:w-full tw:mt-1"
+              :error="form.errors.week_of_month"
+              :items="weekOfMonthOptions"
+              label="Week of Month"
+              placeholder="First"
+              required
+            />
+          </div>
+
+          <!-- Occurrence Pattern Preview -->
+          <div v-if="occurrencePatternLabel" class="tw:mt-4">
+            <v-alert color="info" density="compact" variant="tonal">
+              <span class="tw:text-sm">{{ occurrencePatternLabel }}</span>
+            </v-alert>
           </div>
 
           <div v-if="isAddingBulk" class="tw:mt-4">

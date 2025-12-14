@@ -138,7 +138,7 @@ test('update behaves as expected', function (): void {
     expect($data['start_time'])->toEqual($activityTime->start_time);
     expect($data['end_time'])->toEqual($activityTime->end_time);
     expect($data['language'])->toEqual($activityTime->language);
-    expect($data['occurrence'])->toEqual($activityTime->occurrence);
+    expect($data['occurrence'])->toEqual($activityTime->occurrence->value);
 });
 
 test('admin can delete an activity time.', function (): void {
@@ -343,4 +343,111 @@ test('index can filter by occurrence', function (): void {
     $response->assertOk();
     $response->assertJsonCount(1, 'data');
     $response->assertJsonPath('data.0.id', $weeklyActivity->id);
+});
+
+// Custom Occurrence Tests
+
+test('store can create monthly-nth-weekday activity time', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $data = ActivityTime::factory()->monthlyNthWeekday('Friday', ActivityTime::WEEK_FIRST)->raw();
+
+    $response = post(route('activity-times.store'), $data);
+
+    $response->assertCreated();
+
+    $activityTime = ActivityTime::latest('id')->first();
+    expect($activityTime->occurrence->value)->toBe('monthly-nth-weekday');
+    expect($activityTime->day_of_week)->toBe('Friday');
+    expect($activityTime->week_of_month)->toBe(1);
+    expect($activityTime->bi_weekly_start_date)->toBeNull();
+});
+
+test('store can create last weekday of month activity', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $data = ActivityTime::factory()->monthlyNthWeekday('Friday', ActivityTime::WEEK_LAST)->raw();
+
+    $response = post(route('activity-times.store'), $data);
+
+    $response->assertCreated();
+
+    $activityTime = ActivityTime::latest('id')->first();
+    expect($activityTime->occurrence->value)->toBe('monthly-nth-weekday');
+    expect($activityTime->week_of_month)->toBe(5);
+});
+
+test('store validates monthly-nth-weekday requires week_of_month', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $data = ActivityTime::factory()->monthlyNthWeekday()->raw([
+        'week_of_month' => null,
+    ]);
+
+    $response = post(route('activity-times.store'), $data);
+
+    $response->assertUnprocessable();
+    $response->assertJsonValidationErrors(['week_of_month']);
+});
+
+test('store validates week_of_month must be valid value', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $data = ActivityTime::factory()->monthlyNthWeekday()->raw([
+        'week_of_month' => 10, // Invalid - only 1-5 allowed
+    ]);
+
+    $response = post(route('activity-times.store'), $data);
+
+    $response->assertUnprocessable();
+    $response->assertJsonValidationErrors(['week_of_month']);
+});
+
+test('update can change to monthly-nth-weekday occurrence', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $activityTime = ActivityTime::factory()->weekly()->create();
+
+    $response = put(route('activity-times.update', $activityTime), [
+        'type' => 'mass',
+        'activity_type_description' => 'mass',
+        'start_time' => '18:00',
+        'end_time' => '19:00',
+        'language' => 'English',
+        'occurrence' => 'monthly-nth-weekday',
+        'day_of_week' => 'Friday',
+        'week_of_month' => 1,
+    ]);
+
+    $response->assertOk();
+
+    $activityTime->refresh();
+    expect($activityTime->occurrence->value)->toBe('monthly-nth-weekday');
+    expect($activityTime->week_of_month)->toBe(1);
+});
+
+test('show includes custom occurrence fields', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $activityTime = ActivityTime::factory()->monthlyNthWeekday('Friday', ActivityTime::WEEK_FIRST)->create();
+
+    $response = get(route('activity-times.show', $activityTime));
+
+    $response->assertOk();
+    $response->assertJsonPath('data.occurrence', 'monthly-nth-weekday');
+    $response->assertJsonPath('data.week_of_month', 1);
+    $response->assertJsonPath('data.week_of_month_label', 'First');
+});
+
+test('index can filter by monthly-nth-weekday occurrence', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $monthlyActivity = ActivityTime::factory()->monthlyNthWeekday()->create();
+    $weeklyActivity = ActivityTime::factory()->weekly()->create();
+
+    $response = get(route('activity-times.index', ['occurrence' => 'monthly-nth-weekday']));
+
+    $response->assertOk();
+    $response->assertJsonCount(1, 'data');
+    $response->assertJsonPath('data.0.id', $monthlyActivity->id);
 });

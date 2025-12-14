@@ -22,9 +22,14 @@ class ActivityTimeResource extends JsonResource
             'church_id' => $this->church_id,
             'church' => new ChurchResource($this->whenLoaded('church')),
             'exceptions' => ActivityTimeExceptionResource::collection($this->whenLoaded('exceptions')),
-            'occurrence' => $this->occurrence,
+            'occurrence' => $this->occurrence instanceof \App\Enums\ActivityOccurrence
+                ? $this->occurrence->value
+                : $this->occurrence,
             'date' => $this->date,
             'day_of_week' => $this->day_of_week,
+            'week_of_month' => $this->week_of_month,
+            'week_of_month_label' => $this->week_of_month_label,
+            'bi_weekly_start_date' => $this->bi_weekly_start_date?->toDateString(),
             'schedule_period_id' => $this->schedule_period_id,
             'schedule_period' => new SchedulePeriodResource($this->whenLoaded('schedulePeriod')),
             'effective_from' => $this->effective_from?->toDateString(),

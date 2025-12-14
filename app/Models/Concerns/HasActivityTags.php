@@ -87,9 +87,13 @@ trait HasActivityTags
         }
 
         // Day type tag based on occurrence and day_of_week
-        if ($this->occurrence === 'daily') {
+        $occurrence = $this->occurrence instanceof \App\Enums\ActivityOccurrence
+            ? $this->occurrence->value
+            : $this->occurrence;
+
+        if ($occurrence === 'daily') {
             $slugs[] = 'daily';
-        } elseif ($this->occurrence === 'weekly' && $this->day_of_week) {
+        } elseif (in_array($occurrence, ['weekly', 'monthly-nth-weekday']) && $this->day_of_week) {
             $daySlug = $this->getDayTypeSlug($this->day_of_week);
             if ($daySlug) {
                 $slugs[] = $daySlug;
