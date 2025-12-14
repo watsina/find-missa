@@ -5,6 +5,7 @@
     mdiCalendarStar,
     mdiCheckCircle,
     mdiMinusCircleOutline,
+    mdiCalendarMonth,
   } from '@mdi/js';
   import DataTableServer from '@/components/DataTableServer';
   import AppLayout from '@/layouts/AppLayout';
@@ -116,6 +117,15 @@
             Manage liturgical holidays and holy days of obligation.
           </p>
           <v-spacer></v-spacer>
+          <v-btn
+            class="tw:mr-2"
+            :disabled="isDeleting"
+            :prepend-icon="mdiCalendarMonth"
+            :to="{ name: 'holidays.instances' }"
+            variant="outlined"
+          >
+            View Calendar
+          </v-btn>
           <v-btn
             color="primary"
             :disabled="isDeleting"

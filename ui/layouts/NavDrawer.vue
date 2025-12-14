@@ -1,6 +1,7 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
+    expand-on-hover
     :permanent="!$vuetify.display.mobile"
     :rail="!$vuetify.display.mobile ? rail : false"
   >
