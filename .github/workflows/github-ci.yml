@@ -73,7 +73,7 @@ jobs:
             php artisan migrate --force
             php artisan optimize
             php artisan pulse:restart
-            sudo service php8.3-fpm reload
+            sudo service php8.4-fpm reload
             source /usr/local/nvm/nvm.sh
             node -v
             npm -v
