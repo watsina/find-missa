@@ -1,1 +1,2 @@
-export { default as useActionLogs } from './useActivityLogs';
+export { useActivityLogs } from './useActivityLogs';
+export { default as useActivitySchedule } from './useActivitySchedule';

@@ -1,9 +1,6 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue';
-  import { http } from '@/plugins';
-  import AppUserLayout from '@/layouts/AppUserLayout';
-  import { notify } from '@/utils';
-  import EntityDetails from '@/components/EntityDetails.vue';
+  import { computed, onMounted, ref } from 'vue';
+  import { useHead, useSeoMeta } from '@unhead/vue';
   import {
     mdiCalendarClock,
     mdiCalendarMonth,
@@ -15,20 +12,32 @@
     mdiEmailFast,
     mdiHandsPray,
     mdiHomeCity,
-    mdiInformationOutline,
     mdiPhoneClassic,
     mdiTownHall,
     mdiWeb,
   } from '@mdi/js';
-  import { useSeoMeta, useHead } from '@unhead/vue';
+  import { http } from '@/plugins';
+  import { notify } from '@/utils';
+  import { useActivitySchedule } from '@/composables';
+  import AppUserLayout from '@/layouts/AppUserLayout';
+  import EntityDetails from '@/components/EntityDetails.vue';
+  import ActivityScheduleSection from '@/components/ActivityScheduleSection.vue';
+  import SchedulePeriodActivities from '@/components/SchedulePeriodActivities.vue';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
   });
 
+  const { hasActivities } = useActivitySchedule();
+
   const church = ref(null);
   const regularSchedule = ref(null);
   const schedulePeriods = ref([]);
+  const isFetching = ref(false);
+  const activeTab = ref('regular');
+
+  // Google Form URL for submitting schedule updates
+  const googleFormUrl = 'https://forms.gle/kGiX1A36dW3is1BJA';
 
   // SEO: Dynamic page title
   const pageTitle = computed(() => {
@@ -81,14 +90,8 @@
     link: [{ rel: 'canonical', href: `https://findmissa.com/church-details/${props.churchId}` }],
   });
 
-  const isFetching = ref(false);
-  const activeTab = ref('regular');
-
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
   const fields = computed(() => {
     const data = church.value;
-
     return [
       { icon: mdiHomeCity, text: 'Parish', value: data?.parish?.name },
       { icon: mdiCity, text: 'City/Town', value: data?.city },
@@ -107,87 +110,10 @@
   // Computed: Get current schedule periods
   const currentSchedulePeriods = computed(() => schedulePeriods.value.filter((p) => p.is_current));
 
-  // Computed: Check if a schedule has any activities
-  const hasActivities = (schedule) => {
-    if (!schedule) return false;
-    return (
-      hasActivityType(schedule.mass) ||
-      hasActivityType(schedule.confession) ||
-      hasActivityType(schedule.adoration)
-    );
-  };
-
-  // Check if an activity type has any activities
-  const hasActivityType = (activityType) => {
-    if (!activityType) return false;
-    return (
-      Object.keys(activityType.weekly || {}).length > 0 ||
-      (activityType.daily || []).length > 0 ||
-      (activityType.monthly || []).length > 0 ||
-      (activityType.one_time || []).length > 0
-    );
-  };
-
-  // Format time display
-  const formatTime = (activity) => {
-    let time = activity.start_time;
-    // if (activity.end_time) {
-    //   time += ` - ${activity.end_time}`;
-    // }
-    return time;
-  };
-
-  // Format activity description
-  const formatActivityDescription = (activity) => {
-    const parts = [];
-    parts.push(formatTime(activity));
-    if (activity.language) {
-      parts.push(`(${activity.language})`);
-    }
-    if (
-      activity.activity_type_description &&
-      activity.activity_type_description !== activity.type
-    ) {
-      parts.push(`- ${formatTypeDescription(activity.activity_type_description)}`);
-    }
-    return parts.join(' ');
-  };
-
-  // Format type description to human readable
-  const formatTypeDescription = (type) => {
-    const typeMap = {
-      mass: 'Mass',
-      'anticipation-mass': 'Anticipation Mass',
-      'traditional-latin-mass': 'Traditional Latin Mass',
-      confession: 'Confession',
-      adoration: 'Adoration',
-      benediction: 'Benediction',
-      'mass-of-the-lords-supper': "Mass of the Lord's Supper",
-      'good-friday-service': 'Good Friday Service',
-      'easter-vigil-mass': 'Easter Vigil Mass',
-      'easter-mass': 'Easter Mass',
-      'easter-monday-mass': 'Easter Monday Mass',
-      'christmas-mass': 'Christmas Mass',
-      'christmas-vigil-mass': 'Christmas Vigil Mass',
-    };
-    return typeMap[type] || type;
-  };
-
-  // Format date for one-time events
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  onMounted(() => {
-    fetchChurchDetails();
-  });
+  // Computed: Filter periods with activities
+  const periodsWithActivities = computed(() =>
+    schedulePeriods.value.filter((p) => hasActivities(p.activities)),
+  );
 
   const fetchChurchDetails = () => {
     if (!props.churchId) return;
@@ -203,8 +129,9 @@
       .finally(() => (isFetching.value = false));
   };
 
-  // Google Form URL for submitting schedule updates
-  const googleFormUrl = 'https://forms.gle/kGiX1A36dW3is1BJA';
+  onMounted(() => {
+    fetchChurchDetails();
+  });
 </script>
 
 <template>
@@ -308,405 +235,42 @@
               <!-- Regular Schedule Tab -->
               <v-tabs-window-item value="regular">
                 <v-card-text>
-                  <!-- Mass Schedule Section -->
-                  <section aria-label="Mass Schedule" class="tw:mb-6">
-                    <h2
-                      class="tw:text-lg tw:font-semibold tw:mb-3 tw:flex tw:items-center tw:gap-2"
-                    >
-                      <v-icon color="primary" :icon="mdiCross" size="small" />
-                      Mass Schedule
-                    </h2>
-
-                    <div v-if="!hasActivityType(regularSchedule?.mass)">
-                      <v-alert
-                        class="tw:mb-0"
-                        color="info"
-                        :icon="mdiInformationOutline"
-                        variant="tonal"
-                      >
-                        <p class="tw:mb-2">
-                          No Mass schedule has been recorded for this church yet.
-                        </p>
-                        <p class="tw:mb-0 tw:text-sm">
-                          If you know the Mass times for this church, please help us by submitting
-                          the schedule through our
-                          <a
-                            class="tw:text-primary tw:font-semibold tw:underline"
-                            :href="googleFormUrl"
-                            rel="noopener"
-                            target="_blank"
-                          >
-                            Google Form </a
-                          >.
-                        </p>
-                      </v-alert>
-                    </div>
-
-                    <div v-else>
-                      <!-- Weekly Mass -->
-                      <div v-if="Object.keys(regularSchedule?.mass?.weekly || {}).length > 0">
-                        <v-table density="comfortable">
-                          <thead>
-                            <tr>
-                              <th class="tw:font-bold tw:w-32">Day</th>
-                              <th class="tw:font-bold">Times</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-for="day in daysOfWeek" :key="day">
-                              <td class="tw:font-medium">{{ day }}</td>
-                              <td>
-                                <div
-                                  v-if="regularSchedule?.mass?.weekly?.[day]"
-                                  class="tw:flex tw:flex-wrap tw:gap-2"
-                                >
-                                  <v-chip
-                                    v-for="activity in regularSchedule.mass.weekly[day]"
-                                    :key="activity.id"
-                                    color="primary"
-                                    size="small"
-                                    variant="tonal"
-                                  >
-                                    {{ formatActivityDescription(activity) }}
-                                  </v-chip>
-                                </div>
-                                <span v-else class="tw:text-gray-400">-</span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </v-table>
-                      </div>
-
-                      <!-- Daily Mass -->
-                      <div v-if="regularSchedule?.mass?.daily?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Daily Mass</h3>
-                        <div class="tw:flex tw:flex-wrap tw:gap-2">
-                          <v-chip
-                            v-for="activity in regularSchedule.mass.daily"
-                            :key="activity.id"
-                            color="success"
-                            size="small"
-                            variant="tonal"
-                          >
-                            {{ formatActivityDescription(activity) }}
-                          </v-chip>
-                        </div>
-                      </div>
-
-                      <!-- Monthly Mass -->
-                      <div v-if="regularSchedule?.mass?.monthly?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Monthly Mass</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="monthlyGroup in regularSchedule.mass.monthly"
-                            :key="monthlyGroup.label"
-                          >
-                            <v-list-item-title class="tw:font-medium">
-                              {{ monthlyGroup.label }} of the Month
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mt-1">
-                                <v-chip
-                                  v-for="activity in monthlyGroup.activities"
-                                  :key="activity.id"
-                                  class="tw:!font-bold"
-                                  color="warning"
-                                  size="small"
-                                  variant="outlined"
-                                >
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </div>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-
-                      <!-- One-time Mass -->
-                      <div v-if="regularSchedule?.mass?.one_time?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Special/One-time Mass</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="activity in regularSchedule.mass.one_time"
-                            :key="activity.id"
-                          >
-                            <v-list-item-title>
-                              {{ formatDate(activity.date) }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              {{ formatActivityDescription(activity) }}
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-                    </div>
-                  </section>
+                  <!-- Mass Schedule -->
+                  <ActivityScheduleSection
+                    activity-name="Mass"
+                    color="primary"
+                    :google-form-url="googleFormUrl"
+                    :icon="mdiCross"
+                    :schedule="regularSchedule?.mass"
+                    :show-all-days="true"
+                    title="Mass Schedule"
+                  />
 
                   <v-divider class="tw:my-4" />
 
-                  <!-- Confession Schedule Section -->
-                  <section aria-label="Confession Schedule" class="tw:mb-6">
-                    <h2
-                      class="tw:text-lg tw:font-semibold tw:mb-3 tw:flex tw:items-center tw:gap-2"
-                    >
-                      <v-icon color="secondary" :icon="mdiClock" size="small" />
-                      Confession Schedule
-                    </h2>
-
-                    <div v-if="!hasActivityType(regularSchedule?.confession)">
-                      <v-alert
-                        class="tw:mb-0"
-                        color="info"
-                        :icon="mdiInformationOutline"
-                        variant="tonal"
-                      >
-                        <p class="tw:mb-2">
-                          No Confession schedule has been recorded for this church yet.
-                        </p>
-                        <p class="tw:mb-0 tw:text-sm">
-                          If you know the Confession times for this church, please help us by
-                          submitting the schedule through our
-                          <a
-                            class="tw:text-primary tw:font-semibold tw:underline"
-                            :href="googleFormUrl"
-                            rel="noopener"
-                            target="_blank"
-                          >
-                            Google Form </a
-                          >.
-                        </p>
-                      </v-alert>
-                    </div>
-
-                    <div v-else>
-                      <!-- Weekly Confession -->
-                      <div v-if="Object.keys(regularSchedule?.confession?.weekly || {}).length > 0">
-                        <v-table density="comfortable">
-                          <thead>
-                            <tr>
-                              <th class="tw:font-bold tw:w-32">Day</th>
-                              <th class="tw:font-bold">Times</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <template v-for="day in daysOfWeek" :key="day">
-                              <tr v-if="regularSchedule?.confession?.weekly?.[day]">
-                                <td class="tw:font-medium">{{ day }}</td>
-                                <td>
-                                  <div class="tw:flex tw:flex-wrap tw:gap-2">
-                                    <v-chip
-                                      v-for="activity in regularSchedule.confession.weekly[day]"
-                                      :key="activity.id"
-                                      color="secondary"
-                                      size="small"
-                                      variant="tonal"
-                                    >
-                                      {{ formatActivityDescription(activity) }}
-                                    </v-chip>
-                                  </div>
-                                </td>
-                              </tr>
-                            </template>
-                          </tbody>
-                        </v-table>
-                      </div>
-
-                      <!-- Daily Confession -->
-                      <div v-if="regularSchedule?.confession?.daily?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Daily Confession</h3>
-                        <div class="tw:flex tw:flex-wrap tw:gap-2">
-                          <v-chip
-                            v-for="activity in regularSchedule.confession.daily"
-                            :key="activity.id"
-                            color="success"
-                            size="small"
-                            variant="tonal"
-                          >
-                            {{ formatActivityDescription(activity) }}
-                          </v-chip>
-                        </div>
-                      </div>
-
-                      <!-- Monthly Confession -->
-                      <div v-if="regularSchedule?.confession?.monthly?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Monthly Confession</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="monthlyGroup in regularSchedule.confession.monthly"
-                            :key="monthlyGroup.label"
-                          >
-                            <v-list-item-title class="tw:font-medium">
-                              {{ monthlyGroup.label }} of the Month
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mt-1">
-                                <v-chip
-                                  v-for="activity in monthlyGroup.activities"
-                                  :key="activity.id"
-                                  color="warning"
-                                  size="small"
-                                  variant="tonal"
-                                >
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </div>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-
-                      <!-- One-time Confession -->
-                      <div v-if="regularSchedule?.confession?.one_time?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Special/One-time Confession</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="activity in regularSchedule.confession.one_time"
-                            :key="activity.id"
-                          >
-                            <v-list-item-title>
-                              {{ formatDate(activity.date) }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              {{ formatActivityDescription(activity) }}
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-                    </div>
-                  </section>
+                  <!-- Confession Schedule -->
+                  <ActivityScheduleSection
+                    activity-name="Confession"
+                    color="secondary"
+                    :google-form-url="googleFormUrl"
+                    :icon="mdiClock"
+                    :schedule="regularSchedule?.confession"
+                    :show-all-days="false"
+                    title="Confession Schedule"
+                  />
 
                   <v-divider class="tw:my-4" />
 
-                  <!-- Adoration Schedule Section -->
-                  <section aria-label="Adoration Schedule">
-                    <h2
-                      class="tw:text-lg tw:font-semibold tw:mb-3 tw:flex tw:items-center tw:gap-2"
-                    >
-                      <v-icon color="info" :icon="mdiHandsPray" size="small" />
-                      Adoration Schedule
-                    </h2>
-
-                    <div v-if="!hasActivityType(regularSchedule?.adoration)">
-                      <v-alert
-                        class="tw:mb-0"
-                        color="info"
-                        :icon="mdiInformationOutline"
-                        variant="tonal"
-                      >
-                        <p class="tw:mb-2">
-                          No Adoration schedule has been recorded for this church yet.
-                        </p>
-                        <p class="tw:mb-0 tw:text-sm">
-                          If you know the Adoration times for this church, please help us by
-                          submitting the schedule through our
-                          <a
-                            class="tw:text-primary tw:font-semibold tw:underline"
-                            :href="googleFormUrl"
-                            rel="noopener"
-                            target="_blank"
-                          >
-                            Google Form </a
-                          >.
-                        </p>
-                      </v-alert>
-                    </div>
-
-                    <div v-else>
-                      <!-- Weekly Adoration -->
-                      <div v-if="Object.keys(regularSchedule?.adoration?.weekly || {}).length > 0">
-                        <v-table density="comfortable">
-                          <thead>
-                            <tr>
-                              <th class="tw:font-bold tw:w-32">Day</th>
-                              <th class="tw:font-bold">Times</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <template v-for="day in daysOfWeek" :key="day">
-                              <tr v-if="regularSchedule?.adoration?.weekly?.[day]">
-                                <td class="tw:font-medium">{{ day }}</td>
-                                <td>
-                                  <div class="tw:flex tw:flex-wrap tw:gap-2">
-                                    <v-chip
-                                      v-for="activity in regularSchedule.adoration.weekly[day]"
-                                      :key="activity.id"
-                                      color="info"
-                                      size="small"
-                                      variant="tonal"
-                                    >
-                                      {{ formatActivityDescription(activity) }}
-                                    </v-chip>
-                                  </div>
-                                </td>
-                              </tr>
-                            </template>
-                          </tbody>
-                        </v-table>
-                      </div>
-
-                      <!-- Daily Adoration -->
-                      <div v-if="regularSchedule?.adoration?.daily?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Daily Adoration</h3>
-                        <div class="tw:flex tw:flex-wrap tw:gap-2">
-                          <v-chip
-                            v-for="activity in regularSchedule.adoration.daily"
-                            :key="activity.id"
-                            color="success"
-                            size="small"
-                            variant="tonal"
-                          >
-                            {{ formatActivityDescription(activity) }}
-                          </v-chip>
-                        </div>
-                      </div>
-
-                      <!-- Monthly Adoration -->
-                      <div v-if="regularSchedule?.adoration?.monthly?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Monthly Adoration</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="monthlyGroup in regularSchedule.adoration.monthly"
-                            :key="monthlyGroup.label"
-                          >
-                            <v-list-item-title class="tw:font-medium">
-                              {{ monthlyGroup.label }} of the Month
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mt-1">
-                                <v-chip
-                                  v-for="activity in monthlyGroup.activities"
-                                  :key="activity.id"
-                                  color="warning"
-                                  size="small"
-                                  variant="tonal"
-                                >
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </div>
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-
-                      <!-- One-time Adoration -->
-                      <div v-if="regularSchedule?.adoration?.one_time?.length > 0" class="tw:mt-4">
-                        <h3 class="tw:font-medium tw:mb-2">Special/One-time Adoration</h3>
-                        <v-list density="compact">
-                          <v-list-item
-                            v-for="activity in regularSchedule.adoration.one_time"
-                            :key="activity.id"
-                          >
-                            <v-list-item-title>
-                              {{ formatDate(activity.date) }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              {{ formatActivityDescription(activity) }}
-                            </v-list-item-subtitle>
-                          </v-list-item>
-                        </v-list>
-                      </div>
-                    </div>
-                  </section>
+                  <!-- Adoration Schedule -->
+                  <ActivityScheduleSection
+                    activity-name="Adoration"
+                    color="info"
+                    :google-form-url="googleFormUrl"
+                    :icon="mdiHandsPray"
+                    :schedule="regularSchedule?.adoration"
+                    :show-all-days="false"
+                    title="Adoration Schedule"
+                  />
                 </v-card-text>
               </v-tabs-window-item>
 
@@ -714,10 +278,7 @@
               <v-tabs-window-item v-if="hasSchedulePeriods" value="special">
                 <v-card-text>
                   <v-expansion-panels>
-                    <v-expansion-panel
-                      v-for="period in schedulePeriods.filter((p) => hasActivities(p.activities))"
-                      :key="period.id"
-                    >
+                    <v-expansion-panel v-for="period in periodsWithActivities" :key="period.id">
                       <v-expansion-panel-title>
                         <div class="tw:flex tw:items-center tw:gap-2">
                           <v-chip
@@ -740,218 +301,28 @@
                         </p>
 
                         <!-- Period Mass Schedule -->
-                        <div v-if="hasActivityType(period.activities?.mass)" class="tw:mb-4">
-                          <h3 class="tw:font-medium tw:mb-2">Mass Schedule</h3>
-                          <div v-if="Object.keys(period.activities?.mass?.weekly || {}).length > 0">
-                            <div
-                              v-for="(activities, day) in period.activities.mass.weekly"
-                              :key="day"
-                              class="tw:mb-2"
-                            >
-                              <span class="tw:font-medium">{{ day }}:</span>
-                              <span
-                                v-for="activity in activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                              >
-                                <v-chip color="primary" size="small" variant="tonal">
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </span>
-                            </div>
-                          </div>
-                          <div v-if="period.activities?.mass?.daily?.length > 0" class="tw:mt-2">
-                            <span class="tw:font-medium">Daily:</span>
-                            <v-chip
-                              v-for="activity in period.activities.mass.daily"
-                              :key="activity.id"
-                              class="tw:ml-2"
-                              color="success"
-                              size="small"
-                              variant="tonal"
-                            >
-                              {{ formatActivityDescription(activity) }}
-                            </v-chip>
-                          </div>
-                          <div v-if="period.activities?.mass?.monthly?.length > 0" class="tw:mt-2">
-                            <div
-                              v-for="monthlyGroup in period.activities.mass.monthly"
-                              :key="monthlyGroup.label"
-                            >
-                              <span class="tw:font-medium">{{ monthlyGroup.label }} of Month:</span>
-                              <v-chip
-                                v-for="activity in monthlyGroup.activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                                color="warning"
-                                size="small"
-                                variant="tonal"
-                              >
-                                {{ formatActivityDescription(activity) }}
-                              </v-chip>
-                            </div>
-                          </div>
-                        </div>
+                        <SchedulePeriodActivities
+                          activity-name="Mass"
+                          color="primary"
+                          :schedule="period.activities?.mass"
+                          title="Mass Schedule"
+                        />
 
                         <!-- Period Confession Schedule -->
-                        <div v-if="hasActivityType(period.activities?.confession)" class="tw:mb-4">
-                          <h3 class="tw:font-medium tw:mb-2">Confession Schedule</h3>
-                          <div
-                            v-if="
-                              Object.keys(period.activities?.confession?.weekly || {}).length > 0
-                            "
-                          >
-                            <div
-                              v-for="(activities, day) in period.activities.confession.weekly"
-                              :key="day"
-                              class="tw:mb-2"
-                            >
-                              <span class="tw:font-medium">{{ day }}:</span>
-                              <span
-                                v-for="activity in activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                              >
-                                <v-chip color="secondary" size="small" variant="tonal">
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </span>
-                            </div>
-                          </div>
-                          <div
-                            v-if="period.activities?.confession?.daily?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <span class="tw:font-medium">Daily:</span>
-                            <v-chip
-                              v-for="activity in period.activities.confession.daily"
-                              :key="activity.id"
-                              class="tw:ml-2"
-                              color="success"
-                              size="small"
-                              variant="tonal"
-                            >
-                              {{ formatActivityDescription(activity) }}
-                            </v-chip>
-                          </div>
-                          <div
-                            v-if="period.activities?.confession?.monthly?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <div
-                              v-for="monthlyGroup in period.activities.confession.monthly"
-                              :key="monthlyGroup.label"
-                            >
-                              <span class="tw:font-medium">{{ monthlyGroup.label }} of Month:</span>
-                              <v-chip
-                                v-for="activity in monthlyGroup.activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                                color="warning"
-                                size="small"
-                                variant="tonal"
-                              >
-                                {{ formatActivityDescription(activity) }}
-                              </v-chip>
-                            </div>
-                          </div>
-                          <div
-                            v-if="period.activities?.confession?.one_time?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <div class="tw:font-medium tw:mb-1">Special/One-time:</div>
-                            <div
-                              v-for="activity in period.activities.confession.one_time"
-                              :key="activity.id"
-                              class="tw:mb-1"
-                            >
-                              <v-chip color="secondary" size="small" variant="outlined">
-                                {{ formatDate(activity.date) }} -
-                                {{ formatActivityDescription(activity) }}
-                              </v-chip>
-                            </div>
-                          </div>
-                        </div>
+                        <SchedulePeriodActivities
+                          activity-name="Confession"
+                          color="secondary"
+                          :schedule="period.activities?.confession"
+                          title="Confession Schedule"
+                        />
 
                         <!-- Period Adoration Schedule -->
-                        <div v-if="hasActivityType(period.activities?.adoration)">
-                          <h3 class="tw:font-medium tw:mb-2">Adoration Schedule</h3>
-                          <div
-                            v-if="
-                              Object.keys(period.activities?.adoration?.weekly || {}).length > 0
-                            "
-                          >
-                            <div
-                              v-for="(activities, day) in period.activities.adoration.weekly"
-                              :key="day"
-                              class="tw:mb-2"
-                            >
-                              <span class="tw:font-medium">{{ day }}:</span>
-                              <span
-                                v-for="activity in activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                              >
-                                <v-chip color="info" size="small" variant="tonal">
-                                  {{ formatActivityDescription(activity) }}
-                                </v-chip>
-                              </span>
-                            </div>
-                          </div>
-                          <div
-                            v-if="period.activities?.adoration?.daily?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <span class="tw:font-medium">Daily:</span>
-                            <v-chip
-                              v-for="activity in period.activities.adoration.daily"
-                              :key="activity.id"
-                              class="tw:ml-2"
-                              color="success"
-                              size="small"
-                              variant="tonal"
-                            >
-                              {{ formatActivityDescription(activity) }}
-                            </v-chip>
-                          </div>
-                          <div
-                            v-if="period.activities?.adoration?.monthly?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <div
-                              v-for="monthlyGroup in period.activities.adoration.monthly"
-                              :key="monthlyGroup.label"
-                            >
-                              <span class="tw:font-medium">{{ monthlyGroup.label }} of Month:</span>
-                              <v-chip
-                                v-for="activity in monthlyGroup.activities"
-                                :key="activity.id"
-                                class="tw:ml-2"
-                                color="warning"
-                                size="small"
-                                variant="tonal"
-                              >
-                                {{ formatActivityDescription(activity) }}
-                              </v-chip>
-                            </div>
-                          </div>
-                          <div
-                            v-if="period.activities?.adoration?.one_time?.length > 0"
-                            class="tw:mt-2"
-                          >
-                            <div class="tw:font-medium tw:mb-1">Special/One-time:</div>
-                            <div
-                              v-for="activity in period.activities.adoration.one_time"
-                              :key="activity.id"
-                              class="tw:mb-1"
-                            >
-                              <v-chip color="info" size="small" variant="outlined">
-                                {{ formatDate(activity.date) }} -
-                                {{ formatActivityDescription(activity) }}
-                              </v-chip>
-                            </div>
-                          </div>
-                        </div>
+                        <SchedulePeriodActivities
+                          activity-name="Adoration"
+                          color="info"
+                          :schedule="period.activities?.adoration"
+                          title="Adoration Schedule"
+                        />
                       </v-expansion-panel-text>
                     </v-expansion-panel>
                   </v-expansion-panels>
