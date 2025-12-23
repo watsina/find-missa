@@ -271,45 +271,6 @@
           </v-alert>
         </v-col>
 
-        <!-- Holiday Banner -->
-        <v-col v-if="holidayInfo?.is_holiday && holidayInfo?.holidays?.length" cols="12">
-          <v-alert
-            v-for="holidayInstance in holidayInfo.holidays"
-            :key="holidayInstance.id"
-            class="tw:mb-2"
-            :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
-            :icon="mdiCalendarStar"
-            prominent
-            :title="holidayInstance.holiday?.name"
-            variant="tonal"
-          >
-            <template #text>
-              <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                <v-chip
-                  v-if="holidayInstance.holiday?.is_holy_day_of_obligation"
-                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
-                  :prepend-icon="mdiChurch"
-                  size="small"
-                  variant="elevated"
-                >
-                  Holy Day of Obligation
-                </v-chip>
-                <v-chip
-                  v-if="holidayInstance.holiday?.liturgical_color"
-                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ holidayInstance.holiday?.liturgical_color }}
-                </v-chip>
-              </div>
-              <p v-if="holidayInstance.holiday?.description" class="tw:mt-2 tw:mb-0">
-                {{ holidayInstance.holiday?.description }}
-              </p>
-            </template>
-          </v-alert>
-        </v-col>
-
         <v-col class="tw:flex tw:justify-around" cols="12">
           <v-btn-toggle v-model="form.type" color="primary" group mandatory rounded>
             <v-btn rounded="0" value="mass">Mass</v-btn>
@@ -369,6 +330,44 @@
           >
             Search
           </v-btn>
+        </v-col>
+        <!-- Holiday Banner -->
+        <v-col v-if="holidayInfo?.is_holiday && holidayInfo?.holidays?.length" cols="12">
+          <v-alert
+            v-for="holidayInstance in holidayInfo.holidays"
+            :key="holidayInstance.id"
+            class="tw:mb-2"
+            :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+            :icon="mdiCalendarStar"
+            prominent
+            :title="holidayInstance.holiday?.name"
+            variant="tonal"
+          >
+            <template #text>
+              <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <v-chip
+                  v-if="holidayInstance.holiday?.is_holy_day_of_obligation"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  :prepend-icon="mdiChurch"
+                  size="small"
+                  variant="elevated"
+                >
+                  Holy Day of Obligation
+                </v-chip>
+                <v-chip
+                  v-if="holidayInstance.holiday?.liturgical_color"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ holidayInstance.holiday?.liturgical_color }}
+                </v-chip>
+              </div>
+              <p v-if="holidayInstance.holiday?.description" class="tw:mt-2 tw:mb-0">
+                {{ holidayInstance.holiday?.description }}
+              </p>
+            </template>
+          </v-alert>
         </v-col>
         <share-button :description="shareDescription" :title="shareTitle" />
         <template v-if="form.processing">

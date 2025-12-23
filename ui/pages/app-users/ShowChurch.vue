@@ -131,9 +131,9 @@
   // Format time display
   const formatTime = (activity) => {
     let time = activity.start_time;
-    if (activity.end_time) {
-      time += ` - ${activity.end_time}`;
-    }
+    // if (activity.end_time) {
+    //   time += ` - ${activity.end_time}`;
+    // }
     return time;
   };
 
@@ -161,6 +161,14 @@
       'traditional-latin-mass': 'Traditional Latin Mass',
       confession: 'Confession',
       adoration: 'Adoration',
+      benediction: 'Benediction',
+      'mass-of-the-lords-supper': "Mass of the Lord's Supper",
+      'good-friday-service': 'Good Friday Service',
+      'easter-vigil-mass': 'Easter Vigil Mass',
+      'easter-mass': 'Easter Mass',
+      'easter-monday-mass': 'Easter Monday Mass',
+      'christmas-mass': 'Christmas Mass',
+      'christmas-vigil-mass': 'Christmas Vigil Mass',
     };
     return typeMap[type] || type;
   };
