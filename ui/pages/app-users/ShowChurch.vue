@@ -554,6 +554,24 @@
                           </v-list-item>
                         </v-list>
                       </div>
+
+                      <!-- One-time Confession -->
+                      <div v-if="regularSchedule?.confession?.one_time?.length > 0" class="tw:mt-4">
+                        <h3 class="tw:font-medium tw:mb-2">Special/One-time Confession</h3>
+                        <v-list density="compact">
+                          <v-list-item
+                            v-for="activity in regularSchedule.confession.one_time"
+                            :key="activity.id"
+                          >
+                            <v-list-item-title>
+                              {{ formatDate(activity.date) }}
+                            </v-list-item-title>
+                            <v-list-item-subtitle>
+                              {{ formatActivityDescription(activity) }}
+                            </v-list-item-subtitle>
+                          </v-list-item>
+                        </v-list>
+                      </div>
                     </div>
                   </section>
 
@@ -665,6 +683,24 @@
                                   {{ formatActivityDescription(activity) }}
                                 </v-chip>
                               </div>
+                            </v-list-item-subtitle>
+                          </v-list-item>
+                        </v-list>
+                      </div>
+
+                      <!-- One-time Adoration -->
+                      <div v-if="regularSchedule?.adoration?.one_time?.length > 0" class="tw:mt-4">
+                        <h3 class="tw:font-medium tw:mb-2">Special/One-time Adoration</h3>
+                        <v-list density="compact">
+                          <v-list-item
+                            v-for="activity in regularSchedule.adoration.one_time"
+                            :key="activity.id"
+                          >
+                            <v-list-item-title>
+                              {{ formatDate(activity.date) }}
+                            </v-list-item-title>
+                            <v-list-item-subtitle>
+                              {{ formatActivityDescription(activity) }}
                             </v-list-item-subtitle>
                           </v-list-item>
                         </v-list>
@@ -782,6 +818,59 @@
                               </span>
                             </div>
                           </div>
+                          <div
+                            v-if="period.activities?.confession?.daily?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <span class="tw:font-medium">Daily:</span>
+                            <v-chip
+                              v-for="activity in period.activities.confession.daily"
+                              :key="activity.id"
+                              class="tw:ml-2"
+                              color="success"
+                              size="small"
+                              variant="tonal"
+                            >
+                              {{ formatActivityDescription(activity) }}
+                            </v-chip>
+                          </div>
+                          <div
+                            v-if="period.activities?.confession?.monthly?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <div
+                              v-for="monthlyGroup in period.activities.confession.monthly"
+                              :key="monthlyGroup.label"
+                            >
+                              <span class="tw:font-medium">{{ monthlyGroup.label }} of Month:</span>
+                              <v-chip
+                                v-for="activity in monthlyGroup.activities"
+                                :key="activity.id"
+                                class="tw:ml-2"
+                                color="warning"
+                                size="small"
+                                variant="tonal"
+                              >
+                                {{ formatActivityDescription(activity) }}
+                              </v-chip>
+                            </div>
+                          </div>
+                          <div
+                            v-if="period.activities?.confession?.one_time?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <div class="tw:font-medium tw:mb-1">Special/One-time:</div>
+                            <div
+                              v-for="activity in period.activities.confession.one_time"
+                              :key="activity.id"
+                              class="tw:mb-1"
+                            >
+                              <v-chip color="secondary" size="small" variant="outlined">
+                                {{ formatDate(activity.date) }} -
+                                {{ formatActivityDescription(activity) }}
+                              </v-chip>
+                            </div>
+                          </div>
                         </div>
 
                         <!-- Period Adoration Schedule -->
@@ -807,6 +896,59 @@
                                   {{ formatActivityDescription(activity) }}
                                 </v-chip>
                               </span>
+                            </div>
+                          </div>
+                          <div
+                            v-if="period.activities?.adoration?.daily?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <span class="tw:font-medium">Daily:</span>
+                            <v-chip
+                              v-for="activity in period.activities.adoration.daily"
+                              :key="activity.id"
+                              class="tw:ml-2"
+                              color="success"
+                              size="small"
+                              variant="tonal"
+                            >
+                              {{ formatActivityDescription(activity) }}
+                            </v-chip>
+                          </div>
+                          <div
+                            v-if="period.activities?.adoration?.monthly?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <div
+                              v-for="monthlyGroup in period.activities.adoration.monthly"
+                              :key="monthlyGroup.label"
+                            >
+                              <span class="tw:font-medium">{{ monthlyGroup.label }} of Month:</span>
+                              <v-chip
+                                v-for="activity in monthlyGroup.activities"
+                                :key="activity.id"
+                                class="tw:ml-2"
+                                color="warning"
+                                size="small"
+                                variant="tonal"
+                              >
+                                {{ formatActivityDescription(activity) }}
+                              </v-chip>
+                            </div>
+                          </div>
+                          <div
+                            v-if="period.activities?.adoration?.one_time?.length > 0"
+                            class="tw:mt-2"
+                          >
+                            <div class="tw:font-medium tw:mb-1">Special/One-time:</div>
+                            <div
+                              v-for="activity in period.activities.adoration.one_time"
+                              :key="activity.id"
+                              class="tw:mb-1"
+                            >
+                              <v-chip color="info" size="small" variant="outlined">
+                                {{ formatDate(activity.date) }} -
+                                {{ formatActivityDescription(activity) }}
+                              </v-chip>
                             </div>
                           </div>
                         </div>
