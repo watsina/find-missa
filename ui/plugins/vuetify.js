@@ -49,17 +49,19 @@ export default createVuetify({
       color: 'primary',
       autoGrow: true,
       rows: 2,
+      hideDetails: 'auto',
     },
     VAutocomplete: {
       variant: 'outlined',
       density: 'comfortable',
       color: 'primary',
-      itemValue: 'id',
+      hideDetails: 'auto',
     },
     VCombobox: {
       variant: 'outlined',
       density: 'comfortable',
       color: 'primary',
+      hideDetails: 'auto',
     },
     VBtn: {
       rounded: 'lg',
@@ -73,6 +75,7 @@ export default createVuetify({
     },
     VDateInput: {
       density: 'comfortable',
+      hideDetails: 'auto',
     },
 
     VDataTable: dataTableOptions,

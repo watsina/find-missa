@@ -93,6 +93,62 @@ ui/
 - **Props validation** with proper types
 - **Emit definitions** for component events
 
+### Vue Icons (MDI)
+- **Always import icons from `@mdi/js`** - never use text-based icon names like `mdi-check-circle`
+- Use the `:icon` binding prop to pass imported icons to Vuetify components
+- Import only the icons you need to keep bundle size small
+
+**Icon Usage Example:**
+```vue
+<script setup>
+  import { mdiCheckCircle, mdiClose, mdiPencilOutline } from '@mdi/js';
+</script>
+
+<template>
+  <!-- Correct: Using imported icon with :icon binding -->
+  <v-icon :icon="mdiCheckCircle" color="success" />
+  <v-btn :icon="mdiPencilOutline" variant="text" />
+  <v-btn :prepend-icon="mdiClose">Cancel</v-btn>
+
+  <!-- WRONG: Text-based icons don't work in this setup -->
+  <v-icon>mdi-check-circle</v-icon>
+</template>
+```
+
+### Vue HTTP Requests
+- **Always use the http plugin** (`ui/plugins/http.js`) for all API calls
+- **Never import axios directly** - always use `import { http } from '@/plugins'`
+- The http plugin is a pre-configured axios instance with:
+  - Proper headers (`Accept: application/json`, `X-Requested-With: XMLHttpRequest`)
+  - Credentials and XSRF token handling enabled
+  - Helper method `http.getErrorMessageFromResponse(error)` for error handling
+- Use `http.get()`, `http.post()`, `http.put()`, `http.delete()` for API requests
+
+**HTTP Plugin Example:**
+```vue
+<script setup>
+  import { http } from '@/plugins';
+  import { ref } from 'vue';
+
+  const items = ref([]);
+  const loading = ref(false);
+
+  async function fetchItems() {
+    loading.value = true;
+    try {
+      const response = await http.get('/api/v1/items', {
+        params: { per_page: 100 },
+      });
+      items.value = response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch items:', http.getErrorMessageFromResponse(error));
+    } finally {
+      loading.value = false;
+    }
+  }
+</script>
+```
+
 ### Vue Form Handling
 - **Always use the form plugin** (`ui/plugins/form.js`) for all form-related functionality
 - Import as `useForm` from `@/plugins/form`

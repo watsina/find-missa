@@ -53,6 +53,7 @@ class SearchActivitiesController extends Controller
 
         $activities = ActivityTime::ofType($types)
             ->with('church')
+            ->effectiveOn($date)
             ->whereDoesntHave('exceptions', function (Builder $query) use ($data) {
                 $query->whereDate('start_date', '<=', $data['date'])
                     ->whereDate('end_date', '>=', $data['date']);
@@ -83,10 +84,32 @@ class SearchActivitiesController extends Controller
                         ->whereDate('date', $date)
                 )->when(
                     ! $dayHasGlobalException,
-                    fn (Builder $query) => $query->orWhere('day_of_week', $date->dayName)
+                    fn (Builder $query) => $query
+                        // Weekly activities - match by day of week
+                        ->orWhere(function (Builder $q) use ($date) {
+                            $q->where('occurrence', 'weekly')
+                                ->where('day_of_week', $date->dayName);
+                        })
+                        // Daily activities
                         ->orWhere('occurrence', 'daily')
-                )
+                        // Monthly nth weekday - match day of week and week of month
+                        ->orWhere(function (Builder $q) use ($date) {
+                            $q->where('occurrence', 'monthly-nth-weekday')
+                                ->where('day_of_week', $date->dayName)
+                                ->where(function (Builder $inner) use ($date) {
+                                    $weekNumber = (int) ceil($date->day / 7);
+                                    // Check if this is the last occurrence of weekday in month
+                                    $isLastOccurrence = $date->copy()->addWeek()->month !== $date->month;
 
+                                    $inner->where('week_of_month', $weekNumber);
+
+                                    if ($isLastOccurrence) {
+                                        // Also match "last" (week_of_month = 5)
+                                        $inner->orWhere('week_of_month', ActivityTime::WEEK_LAST);
+                                    }
+                                });
+                        })
+                )
             )
             ->orderBy('start_time', 'asc')
             ->paginate(50)

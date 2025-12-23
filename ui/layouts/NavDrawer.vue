@@ -1,6 +1,7 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
+    expand-on-hover
     :permanent="!$vuetify.display.mobile"
     :rail="!$vuetify.display.mobile ? rail : false"
   >
@@ -35,6 +36,8 @@
     mdiAccountDetailsOutline,
     mdiAccountGroup,
     mdiTimerStopOutline,
+    mdiCalendarStar,
+    mdiCalendarClock,
   } from '@mdi/js';
   import useAuthStore from '@/stores/useAuthStore';
 
@@ -93,6 +96,20 @@
       icon: mdiTimerStopOutline,
       current: true,
       show: authUser.value.is_admin,
+    },
+    {
+      name: 'holidays',
+      routeName: 'holidays.index',
+      icon: mdiCalendarStar,
+      current: true,
+      show: true,
+    },
+    {
+      name: 'schedule periods',
+      routeName: 'schedule-periods.index',
+      icon: mdiCalendarClock,
+      current: true,
+      show: true,
     },
     {
       name: 'priests',

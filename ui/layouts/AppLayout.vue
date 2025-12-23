@@ -34,7 +34,7 @@
   const authUser = computed(() => authStore?.user);
 
   const drawer = ref(true);
-  const rail = ref(true);
+  const rail = ref(false);
   const showSessionExpiredModal = ref(false);
 
   onMounted(async () => {

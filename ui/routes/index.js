@@ -8,6 +8,8 @@ import parishes from './parishes';
 import churches from './churches';
 import activities from './activities';
 import globalExceptions from './global-activity-exceptions';
+import holidays from './holidays';
+import schedulePeriods from './schedule-periods';
 import subParishes from './sub-parishes';
 import dioceses from './dioceses';
 import priests from './priests';
@@ -28,6 +30,8 @@ export default [
       ...dioceses,
       ...activities,
       ...globalExceptions,
+      ...holidays,
+      ...schedulePeriods,
       ...parishes,
       ...churches,
       ...priests,

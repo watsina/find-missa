@@ -4,31 +4,92 @@
   import AppUserLayout from '@/layouts/AppUserLayout.vue';
   import TimeInput from '@/components/TimeInput.vue';
   import ShareButton from '@/components/ShareButton.vue';
-  import { useForm } from '@/plugins';
+  import { http, useForm } from '@/plugins';
   import { notify, useDayjs } from '@/utils';
   import { ref, onMounted, computed, watch } from 'vue';
   import { useDate, useDisplay } from 'vuetify';
   import { debounce } from 'lodash';
-  import { useSeoMeta } from '@unhead/vue';
-  import { mdiMagnify, mdiShareAllOutline } from '@mdi/js';
+  import { useSeoMeta, useHead } from '@unhead/vue';
+  import {
+    mdiMagnify,
+    mdiShareAllOutline,
+    mdiChurch,
+    mdiCalendarStar,
+    mdiHandHeart,
+    mdiArrowRight,
+  } from '@mdi/js';
   import { useRoute, useRouter } from 'vue-router';
 
-  const title = 'Find Catholic Mass - Uganda';
+  const title = 'Find Catholic Mass Times in Uganda | Mass, Confession & Adoration';
   const description =
-    'A web app that helps you find mass, confession and adoration in a parish or subparish near you. Search for mass, adoration and confession by time, church/parish name and town/district...';
+    'Find Catholic Mass times, Confession schedules, and Adoration hours at parishes across Uganda. Search by location, time, or church name. Updated daily with accurate schedules from dioceses nationwide.';
+  const keywords =
+    'Catholic Mass Uganda, Mass times Kampala, find Mass near me Uganda, Catholic church Uganda, Confession times Uganda, Adoration Uganda, Sunday Mass Uganda, daily Mass Uganda, Catholic parishes Uganda, Holy Mass schedule, Kampala diocese, Jinja diocese, Gulu archdiocese, Mbarara archdiocese, Catholic sacraments Uganda';
 
   useSeoMeta({
     title: title,
     description: description,
+    keywords: keywords,
+    ogType: 'website',
     ogTitle: title,
     ogDescription: description,
     ogUrl: 'https://findmissa.com',
+    ogSiteName: 'Find Missa',
+    ogLocale: 'en_UG',
+    twitterCard: 'summary_large_image',
+    twitterTitle: title,
+    twitterDescription: description,
+    robots: 'index, follow',
+    author: 'Watsina Technologies',
+  });
+
+  useHead({
+    link: [{ rel: 'canonical', href: 'https://findmissa.com' }],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: 'Find Missa',
+          description: description,
+          url: 'https://findmissa.com',
+          applicationCategory: 'ReligiousOrganization',
+          operatingSystem: 'Any',
+          browserRequirements: 'Requires JavaScript',
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+          creator: {
+            '@type': 'Organization',
+            name: 'Watsina Technologies',
+            url: 'https://watsina.io',
+          },
+          provider: {
+            '@type': 'Organization',
+            name: 'Find Missa',
+            url: 'https://findmissa.com',
+          },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: 'https://findmissa.com?location={location}&type={type}',
+            },
+            'query-input': 'required name=location',
+          },
+        }),
+      },
+    ],
   });
 
   const { smAndDown } = useDisplay();
 
   const results = ref(null);
   const dateUsed = ref(null);
+  const holidayInfo = ref(null);
   const parser = useDate();
   const currentDate = new Date().toLocaleDateString('en-US');
   const date = ref(parser.date(currentDate));
@@ -111,6 +172,35 @@
     return useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day') ? 'Today' : date;
   });
 
+  // Liturgical color mapping for Vuetify alert colors
+  const liturgicalColorMap = {
+    white: 'grey-lighten-1',
+    red: 'red',
+    green: 'green',
+    violet: 'purple',
+    purple: 'purple',
+    rose: 'pink',
+    gold: 'amber',
+    black: 'grey-darken-3',
+  };
+
+  function getLiturgicalColor(color) {
+    const normalizedColor = color?.toLowerCase() || 'white';
+    return liturgicalColorMap[normalizedColor] || liturgicalColorMap.white;
+  }
+
+  async function fetchHolidayInfo(dateString) {
+    try {
+      const response = await http.get('/api/v1/holiday-info', {
+        params: { date: dateString },
+      });
+      holidayInfo.value = response.data;
+    } catch {
+      // Silently fail - holiday info is optional enhancement
+      holidayInfo.value = null;
+    }
+  }
+
   watch(
     () => form.type,
     debounce(() => {
@@ -136,6 +226,9 @@
         router.push({
           query: searchedQuery.value,
         });
+
+        // Fetch holiday info for the searched date
+        fetchHolidayInfo(form.date);
       },
       onError: () => notify.error('Something went wrong...'),
     });
@@ -151,13 +244,33 @@
     <v-container>
       <v-row class="py-4">
         <v-col cols="12">
-          <v-alert class="tw:font-semibold tw:text-md" prominent type="info" variant="tonal">
-            We are still gathering information from various Catholic parishes in Uganda. If you
-            notice any inaccuracies or missing details, please share updates with us using this
-            Google Form
-            <a href="https://forms.gle/kGiX1A36dW3is1BJA" target="_blank">(click here)</a> .
+          <v-alert
+            class="contribution-alert"
+            :icon="mdiHandHeart"
+            prominent
+            type="warning"
+            variant="tonal"
+          >
+            <template #title>
+              <span class="tw:font-bold">Help Us Grow This Directory!</span>
+            </template>
+            <p class="tw:mb-3">
+              Know a parish schedule that's missing or outdated? Your contribution helps thousands
+              of Catholics find Mass across Uganda.
+            </p>
+            <v-btn
+              :append-icon="mdiArrowRight"
+              color="warning"
+              href="https://forms.gle/kGiX1A36dW3is1BJA"
+              rel="noopener"
+              target="_blank"
+              variant="elevated"
+            >
+              Submit Church Schedule
+            </v-btn>
           </v-alert>
         </v-col>
+
         <v-col class="tw:flex tw:justify-around" cols="12">
           <v-btn-toggle v-model="form.type" color="primary" group mandatory rounded>
             <v-btn rounded="0" value="mass">Mass</v-btn>
@@ -217,6 +330,44 @@
           >
             Search
           </v-btn>
+        </v-col>
+        <!-- Holiday Banner -->
+        <v-col v-if="holidayInfo?.is_holiday && holidayInfo?.holidays?.length" cols="12">
+          <v-alert
+            v-for="holidayInstance in holidayInfo.holidays"
+            :key="holidayInstance.id"
+            class="tw:mb-2"
+            :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+            :icon="mdiCalendarStar"
+            prominent
+            :title="holidayInstance.holiday?.name"
+            variant="tonal"
+          >
+            <template #text>
+              <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <v-chip
+                  v-if="holidayInstance.holiday?.is_holy_day_of_obligation"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  :prepend-icon="mdiChurch"
+                  size="small"
+                  variant="elevated"
+                >
+                  Holy Day of Obligation
+                </v-chip>
+                <v-chip
+                  v-if="holidayInstance.holiday?.liturgical_color"
+                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ holidayInstance.holiday?.liturgical_color }}
+                </v-chip>
+              </div>
+              <p v-if="holidayInstance.holiday?.description" class="tw:mt-2 tw:mb-0">
+                {{ holidayInstance.holiday?.description }}
+              </p>
+            </template>
+          </v-alert>
         </v-col>
         <share-button :description="shareDescription" :title="shareTitle" />
         <template v-if="form.processing">

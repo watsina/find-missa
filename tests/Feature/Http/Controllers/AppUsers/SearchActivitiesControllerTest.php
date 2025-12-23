@@ -226,3 +226,166 @@ test('users can search by district.', function () {
         ->assertJsonMissing(['id' => $adorationInDistrict->id])
         ->assertJsonMissing(['id' => $massInOtherDistrict->id]);
 });
+
+// Effective Date Filtering Tests
+
+test('search only returns activities that are effective on the search date', function () {
+    // Mass that is always effective (no dates set)
+    $alwaysEffectiveMass = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => null,
+        'effective_until' => null,
+    ]);
+
+    // Mass that is effective during summer (includes search date)
+    $summerMass = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-06-01',
+        'effective_until' => '2024-08-31',
+    ]);
+
+    // Mass that is only effective in winter (excludes search date)
+    $winterMass = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-12-01',
+        'effective_until' => '2025-02-28',
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => '2024-07-15', // Summer date
+    ]))
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonFragment(['id' => $alwaysEffectiveMass->id])
+        ->assertJsonFragment(['id' => $summerMass->id])
+        ->assertJsonMissing(['id' => $winterMass->id]);
+});
+
+test('search returns activities with only effective_from set when search date is after', function () {
+    // Mass effective from June onwards (no end date)
+    $massFromJune = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-06-01',
+        'effective_until' => null,
+    ]);
+
+    // Mass effective from December onwards (search date is before)
+    $massFromDecember = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-12-01',
+        'effective_until' => null,
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => '2024-07-15',
+    ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['id' => $massFromJune->id])
+        ->assertJsonMissing(['id' => $massFromDecember->id]);
+});
+
+test('search returns activities with only effective_until set when search date is before', function () {
+    // Mass effective until August
+    $massUntilAugust = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => null,
+        'effective_until' => '2024-08-31',
+    ]);
+
+    // Mass effective until May (search date is after)
+    $massUntilMay = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => null,
+        'effective_until' => '2024-05-31',
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => '2024-07-15',
+    ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['id' => $massUntilAugust->id])
+        ->assertJsonMissing(['id' => $massUntilMay->id]);
+});
+
+test('search respects effective dates for weekly activities', function () {
+    $searchDate = '2024-07-15'; // A Monday in summer
+    $dayName = \Carbon\Carbon::parse($searchDate)->dayName;
+
+    // Weekly mass effective during the search period
+    $effectiveWeeklyMass = ActivityTime::factory()->weekly($dayName, 'mass')->create([
+        'effective_from' => '2024-06-01',
+        'effective_until' => '2024-08-31',
+    ]);
+
+    // Weekly mass on the same day but not effective (future schedule)
+    $futureWeeklyMass = ActivityTime::factory()->weekly($dayName, 'mass')->create([
+        'effective_from' => '2024-10-01',
+        'effective_until' => '2024-12-31',
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => $searchDate,
+    ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['id' => $effectiveWeeklyMass->id])
+        ->assertJsonMissing(['id' => $futureWeeklyMass->id]);
+});
+
+test('search respects effective dates on exact boundary dates', function () {
+    // Mass effective exactly on the search date boundaries
+    $massStartingToday = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-07-15',
+        'effective_until' => '2024-08-15',
+    ]);
+
+    $massEndingToday = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-06-15',
+        'effective_until' => '2024-07-15',
+    ]);
+
+    // Mass that ended yesterday
+    $massEndedYesterday = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-06-01',
+        'effective_until' => '2024-07-14',
+    ]);
+
+    // Mass that starts tomorrow
+    $massStartsTomorrow = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-07-16',
+        'effective_until' => '2024-08-31',
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => '2024-07-15',
+    ]))
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonFragment(['id' => $massStartingToday->id])
+        ->assertJsonFragment(['id' => $massEndingToday->id])
+        ->assertJsonMissing(['id' => $massEndedYesterday->id])
+        ->assertJsonMissing(['id' => $massStartsTomorrow->id]);
+});
+
+test('search returns activities without effective dates (permanent schedule)', function () {
+    // Permanent mass (no effective dates)
+    $permanentMass = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => null,
+        'effective_until' => null,
+    ]);
+
+    // Seasonal mass that's not currently effective
+    $seasonalMass = ActivityTime::factory()->daily('mass')->create([
+        'effective_from' => '2024-12-01',
+        'effective_until' => '2024-12-31',
+    ]);
+
+    get(route('search', [
+        'type' => 'mass',
+        'date' => '2024-07-15',
+    ]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['id' => $permanentMass->id])
+        ->assertJsonMissing(['id' => $seasonalMass->id]);
+});

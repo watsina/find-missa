@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Team;
 use App\Models\Church;
 use App\Models\ActivityTime;
-use App\Enums\ActivityOccurrence;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ActivityTimeFactory extends Factory
@@ -22,37 +21,44 @@ class ActivityTimeFactory extends Factory
      */
     public function definition(): array
     {
+        // Default to weekly occurrence to avoid requiring extra fields
         return [
             'type' => 'mass',
             'activity_type_description' => 'mass',
             'start_time' => '10:00',
             'end_time' => '11:00',
-            'language' => $this->faker->languageCode,
+            'language' => 'English',
             'church_id' => Church::factory(),
-            'occurrence' => $this->faker->randomElement(ActivityOccurrence::values()),
-            'date' => $this->faker->date,
-            'day_of_week' => $this->faker->dayOfWeek(),
+            'occurrence' => 'weekly',
+            'date' => null,
+            'day_of_week' => 'Sunday',
             'team_id' => Team::factory(),
+            'week_of_month' => null,
+            'bi_weekly_start_date' => null,
         ];
     }
 
-    public function daily($type)
+    public function daily($type = 'mass')
     {
         return $this->state(fn (array $attributes) => [
             'type' => $type,
             'day_of_week' => null,
             'occurrence' => 'daily',
             'date' => null,
+            'week_of_month' => null,
+            'bi_weekly_start_date' => null,
         ]);
     }
 
-    public function oneTime($date, $type)
+    public function oneTime($date, $type = 'mass')
     {
         return $this->state(fn (array $attributes) => [
             'type' => $type,
             'day_of_week' => null,
             'occurrence' => 'one-time',
             'date' => $date,
+            'week_of_month' => null,
+            'bi_weekly_start_date' => null,
         ]);
     }
 
@@ -63,6 +69,38 @@ class ActivityTimeFactory extends Factory
             'day_of_week' => $dayOfWeek,
             'occurrence' => 'weekly',
             'date' => null,
+            'week_of_month' => null,
+            'bi_weekly_start_date' => null,
+        ]);
+    }
+
+    /**
+     * Create a bi-weekly activity (every other week).
+     */
+    public function biWeekly($dayOfWeek = 'Wednesday', $startDate = null, $type = 'mass')
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'day_of_week' => $dayOfWeek,
+            'occurrence' => 'bi-weekly',
+            'date' => null,
+            'week_of_month' => null,
+            'bi_weekly_start_date' => $startDate ?? now()->toDateString(),
+        ]);
+    }
+
+    /**
+     * Create a monthly nth weekday activity (e.g., first Friday of the month).
+     */
+    public function monthlyNthWeekday($dayOfWeek = 'Friday', $weekOfMonth = ActivityTime::WEEK_FIRST, $type = 'mass')
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'day_of_week' => $dayOfWeek,
+            'occurrence' => 'monthly-nth-weekday',
+            'date' => null,
+            'week_of_month' => $weekOfMonth,
+            'bi_weekly_start_date' => null,
         ]);
     }
 }

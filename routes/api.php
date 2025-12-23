@@ -9,6 +9,7 @@ require __DIR__.'/auth.php';
 
 Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
 Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
+Route::get('/holiday-info', AppUsers\HolidayInfoController::class)->name('holiday-info');
 
 Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $request) {
     return $request->user();
@@ -46,5 +47,18 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('sub-parishes', Controllers\SubParishController::class)->except('destroy');
     Route::apiResource('activity-times', Controllers\ActivityTimeController::class);
     Route::apiResource('activity-time-exceptions', Controllers\ActivityTimeExceptionController::class);
+    Route::apiResource('activity-tags', Controllers\ActivityTagController::class);
     Route::apiResource('global-activity-time-exceptions', Controllers\GlobalActivityTimeExceptionController::class);
+
+    // Holidays - custom routes must come before apiResource to avoid route conflicts
+    Route::get('holidays/instances/{year}', [Controllers\HolidayController::class, 'instances'])->name('holidays.instances');
+    Route::get('holidays/in-range', [Controllers\HolidayController::class, 'inRange'])->name('holidays.in-range');
+    Route::get('holidays/check-date', [Controllers\HolidayController::class, 'checkDate'])->name('holidays.check-date');
+    Route::apiResource('holidays', Controllers\HolidayController::class);
+
+    // Schedule Periods - custom routes must come before apiResource to avoid route conflicts
+    Route::get('schedule-periods/current', [Controllers\SchedulePeriodController::class, 'current'])->name('schedule-periods.current');
+    Route::get('schedule-periods/upcoming', [Controllers\SchedulePeriodController::class, 'upcoming'])->name('schedule-periods.upcoming');
+    Route::get('schedule-periods/check-overlap', [Controllers\SchedulePeriodController::class, 'checkOverlap'])->name('schedule-periods.check-overlap');
+    Route::apiResource('schedule-periods', Controllers\SchedulePeriodController::class);
 });

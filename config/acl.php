@@ -22,9 +22,21 @@ return [
             ['name' => 'activiy-time.write', 'description' => 'Create and update activiy time(s)'],
             ['name' => 'activiy-time.read', 'description' => 'View activiy time(s)'],
         ],
+        'activityTag' => [
+            ['name' => 'activity-tag.write', 'description' => 'Create and update activity tag(s)'],
+            ['name' => 'activity-tag.read', 'description' => 'View activity tag(s)'],
+        ],
         'priest' => [
             ['name' => 'priest.write', 'description' => 'Create and update and update priest(s)'],
             ['name' => 'priest.read', 'description' => 'View priest(s)'],
+        ],
+        'holiday' => [
+            ['name' => 'holiday.write', 'description' => 'Create and update holiday(s)'],
+            ['name' => 'holiday.read', 'description' => 'View holiday(s)'],
+        ],
+        'schedulePeriod' => [
+            ['name' => 'schedule-period.write', 'description' => 'Create and update schedule period(s)'],
+            ['name' => 'schedule-period.read', 'description' => 'View schedule period(s)'],
         ],
     ],
     'roles' => [
