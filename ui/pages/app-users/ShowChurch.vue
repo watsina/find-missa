@@ -202,7 +202,7 @@
         <!-- Current Schedule Period Alert -->
         <v-alert
           v-if="currentSchedulePeriods.length > 0"
-          class="tw:mb-4 tw:mt-2"
+          class="tw:mb-2 tw:mt-2"
           color="info"
           :icon="mdiCalendarMonth"
           variant="tonal"
@@ -219,7 +219,7 @@
 
         <!-- Schedule Content -->
         <section aria-label="Church Schedule">
-          <v-card>
+          <v-card class="tw:mt-2">
             <v-tabs v-model="activeTab" color="primary" grow>
               <v-tab value="regular">
                 <v-icon :icon="mdiCalendarClock" start />
