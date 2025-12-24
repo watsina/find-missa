@@ -19,6 +19,6 @@ enum ActivityTypeDescription: string
     case EasterVigilMass = 'easter-vigil-mass';
     case EasterMass = 'easter-mass';
     case EasterMondayMass = 'easter-monday-mass';
-    case ChristmasVigilMass = 'christmass-vigil-mass';
+    case ChristmasVigilMass = 'christmas-vigil-mass';
     case ChristmasMass = 'christmas-mass';
 }
