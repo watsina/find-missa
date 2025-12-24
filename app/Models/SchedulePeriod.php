@@ -104,7 +104,7 @@ class SchedulePeriod extends Model
      */
     public function scopeCurrent(Builder $query, ?string $date = null): Builder
     {
-        $date = $date ? Carbon::parse($date) : now();
+        $date = $date ? Carbon::parse($date) : now()->toDateString();
 
         return $query->where('start_date', '<=', $date)
             ->where('end_date', '>=', $date);
@@ -130,7 +130,7 @@ class SchedulePeriod extends Model
      */
     public function scopeUpcoming(Builder $query, ?string $afterDate = null): Builder
     {
-        $date = $afterDate ? Carbon::parse($afterDate) : now();
+        $date = $afterDate ? Carbon::parse($afterDate) : now()->toDateString();
 
         return $query->where('start_date', '>', $date);
     }
@@ -140,7 +140,7 @@ class SchedulePeriod extends Model
      */
     public function isCurrent(?string $date = null): bool
     {
-        $checkDate = $date ? Carbon::parse($date) : now();
+        $checkDate = $date ? Carbon::parse($date) : now()->toDateString();
 
         return $this->is_active
             && $this->start_date->lte($checkDate)
