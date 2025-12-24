@@ -111,6 +111,10 @@ class ChurchDetailsResource extends JsonResource
         $monthlyNthWeekday = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'monthly-nth-weekday');
         $oneTime = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'one-time');
 
+        // Filter one-time events to only include current or future dates
+        $today = now()->toDateString();
+        $oneTime = $oneTime->filter(fn ($a) => $a->date && $a->date->gte($today));
+
         return [
             'weekly' => $this->formatWeeklyActivities($weekly),
             'daily' => $daily->map(fn ($a) => $this->formatActivity($a))->values()->all(),

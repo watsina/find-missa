@@ -199,6 +199,44 @@ test('it includes one-time activities with their specific dates', function () {
     expect($oneTime[0]['date'])->toBe($eventDate->toDateString());
 });
 
+test('it excludes past one-time activities and includes current or future ones', function () {
+    $church = Church::factory()->create();
+
+    // Past one-time event (should be excluded)
+    ActivityTime::factory()->recycle($church)->create([
+        'type' => 'mass',
+        'occurrence' => ActivityOccurrence::OneTime,
+        'date' => Carbon::yesterday(),
+        'start_time' => '10:00',
+    ]);
+
+    // Today's one-time event (should be included)
+    $todayActivity = ActivityTime::factory()->recycle($church)->create([
+        'type' => 'mass',
+        'occurrence' => ActivityOccurrence::OneTime,
+        'date' => Carbon::today(),
+        'start_time' => '11:00',
+    ]);
+
+    // Future one-time event (should be included)
+    $futureActivity = ActivityTime::factory()->recycle($church)->create([
+        'type' => 'mass',
+        'occurrence' => ActivityOccurrence::OneTime,
+        'date' => Carbon::today()->addDays(7),
+        'start_time' => '12:00',
+    ]);
+
+    $response = getJson(route('church-details', ['church' => $church->id]))
+        ->assertOk();
+
+    $oneTime = $response->json('data.regular_schedule.mass.one_time');
+    expect($oneTime)->toHaveCount(2);
+
+    $returnedIds = collect($oneTime)->pluck('id')->all();
+    expect($returnedIds)->toContain($todayActivity->id);
+    expect($returnedIds)->toContain($futureActivity->id);
+});
+
 test('it maintains backward compatibility with legacy mass/confession/adoration keys', function () {
     $church = Church::factory()->create();
     ActivityTime::factory()->recycle($church)->create(['type' => 'mass']);
