@@ -269,6 +269,7 @@
                     :icon="mdiHandsPray"
                     :schedule="regularSchedule?.adoration"
                     :show-all-days="false"
+                    :show-end-time="true"
                     title="Adoration Schedule"
                   />
                 </v-card-text>
@@ -321,6 +322,7 @@
                           activity-name="Adoration"
                           color="info"
                           :schedule="period.activities?.adoration"
+                          :show-end-time="true"
                           title="Adoration Schedule"
                         />
                       </v-expansion-panel-text>

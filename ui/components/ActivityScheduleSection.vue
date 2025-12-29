@@ -18,6 +18,8 @@
     googleFormUrl: { type: String, default: null },
     /** Whether to show all days in weekly table (true) or only days with activities (false) */
     showAllDays: { type: Boolean, default: true },
+    /** Whether to show end time in activity descriptions */
+    showEndTime: { type: Boolean, default: false },
   });
 
   const { daysOfWeek, formatActivityDescription, formatDate, hasActivityType } =
@@ -83,7 +85,7 @@
                       size="small"
                       variant="tonal"
                     >
-                      {{ formatActivityDescription(activity) }}
+                      {{ formatActivityDescription(activity, showEndTime) }}
                     </v-chip>
                   </div>
                   <span v-else class="tw:text-gray-400">-</span>
@@ -105,7 +107,7 @@
             size="small"
             variant="tonal"
           >
-            {{ formatActivityDescription(activity) }}
+            {{ formatActivityDescription(activity, showEndTime) }}
           </v-chip>
         </div>
       </div>
@@ -127,7 +129,7 @@
                   size="small"
                   variant="tonal"
                 >
-                  {{ formatActivityDescription(activity) }}
+                  {{ formatActivityDescription(activity, showEndTime) }}
                 </v-chip>
               </div>
             </v-list-item-subtitle>
@@ -144,7 +146,7 @@
               {{ formatDate(activity.date) }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{ formatActivityDescription(activity) }}
+              {{ formatActivityDescription(activity, showEndTime) }}
             </v-list-item-subtitle>
           </v-list-item>
         </v-list>

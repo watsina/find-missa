@@ -11,6 +11,8 @@
     color: { type: String, default: 'primary' },
     /** Activity type name (e.g., "Mass", "Confession") */
     activityName: { type: String, required: true },
+    /** Whether to show end time in activity descriptions */
+    showEndTime: { type: Boolean, default: false },
   });
 
   const { formatActivityDescription, formatDate, hasActivityType } = useActivitySchedule();
@@ -36,7 +38,7 @@
         <span class="tw:font-medium">{{ day }}:</span>
         <span v-for="activity in activities" :key="activity.id" class="tw:ml-2">
           <v-chip :color="color" size="small" variant="tonal">
-            {{ formatActivityDescription(activity) }}
+            {{ formatActivityDescription(activity, showEndTime) }}
           </v-chip>
         </span>
       </div>
@@ -53,7 +55,7 @@
         size="small"
         variant="tonal"
       >
-        {{ formatActivityDescription(activity) }}
+        {{ formatActivityDescription(activity, showEndTime) }}
       </v-chip>
     </div>
 
@@ -69,7 +71,7 @@
           size="small"
           variant="tonal"
         >
-          {{ formatActivityDescription(activity) }}
+          {{ formatActivityDescription(activity, showEndTime) }}
         </v-chip>
       </div>
     </div>
@@ -79,7 +81,7 @@
       <div class="tw:font-medium tw:mb-1">Special/One-time:</div>
       <div v-for="activity in schedule.one_time" :key="activity.id" class="tw:mb-1">
         <v-chip :color="color" size="small" variant="outlined">
-          {{ formatDate(activity.date) }} - {{ formatActivityDescription(activity) }}
+          {{ formatDate(activity.date) }} - {{ formatActivityDescription(activity, showEndTime) }}
         </v-chip>
       </div>
     </div>

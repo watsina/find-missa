@@ -22,8 +22,13 @@ export default function useActivitySchedule() {
 
   /**
    * Format time display from activity
+   * @param {Object} activity - The activity object
+   * @param {boolean} showEndTime - Whether to include end time (default: false)
    */
-  const formatTime = (activity) => {
+  const formatTime = (activity, showEndTime = false) => {
+    if (showEndTime && activity.end_time) {
+      return `${activity.start_time} - ${activity.end_time}`;
+    }
     return activity.start_time;
   };
 
@@ -36,10 +41,12 @@ export default function useActivitySchedule() {
 
   /**
    * Format activity description including time, language, and type
+   * @param {Object} activity - The activity object
+   * @param {boolean} showEndTime - Whether to include end time (default: false)
    */
-  const formatActivityDescription = (activity) => {
+  const formatActivityDescription = (activity, showEndTime = false) => {
     const parts = [];
-    parts.push(formatTime(activity));
+    parts.push(formatTime(activity, showEndTime));
     if (activity.language) {
       parts.push(`(${activity.language})`);
     }
