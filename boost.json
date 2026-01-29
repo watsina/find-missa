@@ -1,13 +1,18 @@
 {
-    "agents": [
-        "copilot",
-        "opencode"
-    ],
-    "editors": [
-        "opencode",
-        "vscode"
-    ],
-    "guidelines": [
-        "laravel/fortify"
-    ]
+  "agents": [
+    "copilot",
+    "opencode"
+  ],
+  "guidelines": true,
+  "herd_mcp": false,
+  "mcp": true,
+  "packages": [
+    "laravel/fortify"
+  ],
+  "sail": false,
+  "skills": [
+    "pest-testing",
+    "tailwindcss-development",
+    "developing-with-fortify"
+  ]
 }
