@@ -27,19 +27,41 @@ class ActivityTimeMigrationService
 
     protected int $countOverrides = 0;
 
+    protected int $countTagSyncs = 0;
+
+    protected int $countDeletedSchedules = 0;
+
+    protected int $countDeletedOneTime = 0;
+
+    protected int $countDeletedOverrides = 0;
+
+    /**
+     * @var array<int, array<string, int>>
+     */
+    protected array $countsByChurch = [];
+
+    /**
+     * @var array<string, array<string, int>>
+     */
+    protected array $countsByType = [
+        'schedules' => [],
+        'one_time' => [],
+        'overrides' => [],
+    ];
+
     /**
      * Migrate all churches.
      *
      * @param  bool  $force  If true, deletes existing data in new tables for the processed churches (optional/dangerous).
      */
-    public function migrateAll(bool $force = false): array
+    public function migrateAll(bool $force = false, bool $dryRun = false): array
     {
         $this->resetCounters();
 
         // Process churches in chunks to avoid memory issues
-        Church::chunk(100, function ($churches) use ($force) {
+        Church::chunk(100, function ($churches) use ($force, $dryRun) {
             foreach ($churches as $church) {
-                $this->migrateChurch($church, $force);
+                $this->migrateChurch($church, $force, $dryRun);
             }
         });
 
@@ -49,8 +71,16 @@ class ActivityTimeMigrationService
     /**
      * Migrate a specific church's activity times.
      */
-    public function migrateChurch(Church $church, bool $force = false): array
+    public function migrateChurch(Church $church, bool $force = false, bool $dryRun = false): array
     {
+        if ($dryRun) {
+            if ($force) {
+                $this->countExistingData($church);
+            }
+
+            return $this->previewChurch($church);
+        }
+
         return DB::transaction(function () use ($church, $force) {
             if ($force) {
                 $this->clearExistingData($church);
@@ -104,6 +134,16 @@ class ActivityTimeMigrationService
         $this->countSchedules = 0;
         $this->countOneTime = 0;
         $this->countOverrides = 0;
+        $this->countTagSyncs = 0;
+        $this->countDeletedSchedules = 0;
+        $this->countDeletedOneTime = 0;
+        $this->countDeletedOverrides = 0;
+        $this->countsByChurch = [];
+        $this->countsByType = [
+            'schedules' => [],
+            'one_time' => [],
+            'overrides' => [],
+        ];
     }
 
     /**
@@ -115,6 +155,12 @@ class ActivityTimeMigrationService
             'schedules_created' => $this->countSchedules,
             'one_time_created' => $this->countOneTime,
             'overrides_created' => $this->countOverrides,
+            'tag_syncs' => $this->countTagSyncs,
+            'deleted_schedules' => $this->countDeletedSchedules,
+            'deleted_one_time' => $this->countDeletedOneTime,
+            'deleted_overrides' => $this->countDeletedOverrides,
+            'by_church' => $this->countsByChurch,
+            'type_counts' => $this->countsByType,
         ];
     }
 
@@ -123,11 +169,61 @@ class ActivityTimeMigrationService
      */
     protected function clearExistingData(Church $church): void
     {
+        $this->countExistingData($church);
+
         OneTimeActivity::where('church_id', $church->id)->delete();
         ActivitySchedule::where('church_id', $church->id)->delete();
         ScheduleOverride::where('scope_type', ScheduleScope::Church->value)
             ->where('scope_id', $church->id)
             ->delete();
+    }
+
+    protected function countExistingData(Church $church): void
+    {
+        $oneTime = OneTimeActivity::where('church_id', $church->id)->count();
+        $schedules = ActivitySchedule::where('church_id', $church->id)->count();
+        $overrides = ScheduleOverride::where('scope_type', ScheduleScope::Church->value)
+            ->where('scope_id', $church->id)
+            ->count();
+
+        $this->countDeletedOneTime += $oneTime;
+        $this->countDeletedSchedules += $schedules;
+        $this->countDeletedOverrides += $overrides;
+
+        $this->recordChurchDeletions($church->id, $schedules, $oneTime, $overrides);
+    }
+
+    protected function previewChurch(Church $church): array
+    {
+        $activityTimes = ActivityTime::where('church_id', $church->id)
+            ->with(['tags', 'exceptions'])
+            ->get();
+
+        if ($activityTimes->isEmpty()) {
+            return $this->getStats();
+        }
+
+        $oneTimeActivities = $activityTimes->where('occurrence', ActivityOccurrence::OneTime);
+        $dailyActivities = $activityTimes->where('occurrence', ActivityOccurrence::Daily);
+        $monthlyActivities = $activityTimes->where('occurrence', ActivityOccurrence::MonthlyNthWeekday);
+        $weeklyActivities = $activityTimes->where('occurrence', ActivityOccurrence::Weekly);
+
+        foreach ($oneTimeActivities as $activity) {
+            $this->previewOneTimeActivity($activity);
+        }
+
+        foreach ($dailyActivities as $activity) {
+            $this->previewDailyActivity($activity);
+        }
+
+        foreach ($monthlyActivities as $activity) {
+            $this->previewMonthlyNthActivity($activity);
+        }
+
+        $this->previewWeeklyActivities($weeklyActivities);
+        $this->previewExceptions($activityTimes);
+
+        return $this->getStats();
     }
 
     /**
@@ -141,6 +237,10 @@ class ActivityTimeMigrationService
             return;
         }
 
+        $this->countOneTime++;
+        $this->recordCreated($source->church_id, 'one_time', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+
         $new = new OneTimeActivity;
         $new->church_id = $source->church_id;
         $new->team_id = $source->team_id; // Assuming column exists or is nullable
@@ -152,8 +252,7 @@ class ActivityTimeMigrationService
         $new->date = $source->date;
         $new->save();
 
-        $this->copyTags($source, $new);
-        $this->countOneTime++;
+        $this->syncTags($new, $source->tags->pluck('id')->all());
     }
 
     /**
@@ -161,6 +260,10 @@ class ActivityTimeMigrationService
      */
     protected function migrateDailyActivity(ActivityTime $source): void
     {
+        $this->countSchedules++;
+        $this->recordCreated($source->church_id, 'schedules', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+
         $new = new ActivitySchedule;
         $new->church_id = $source->church_id;
         $new->team_id = $source->team_id;
@@ -175,8 +278,7 @@ class ActivityTimeMigrationService
         $new->effective_until = $source->effective_until;
         $new->save();
 
-        $this->copyTags($source, $new);
-        $this->countSchedules++;
+        $this->syncTags($new, $source->tags->pluck('id')->all());
     }
 
     /**
@@ -184,6 +286,10 @@ class ActivityTimeMigrationService
      */
     protected function migrateMonthlyNthActivity(ActivityTime $source): void
     {
+        $this->countSchedules++;
+        $this->recordCreated($source->church_id, 'schedules', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+
         $new = new ActivitySchedule;
         $new->church_id = $source->church_id;
         $new->team_id = $source->team_id;
@@ -202,8 +308,7 @@ class ActivityTimeMigrationService
         $new->effective_until = $source->effective_until;
         $new->save();
 
-        $this->copyTags($source, $new);
-        $this->countSchedules++;
+        $this->syncTags($new, $source->tags->pluck('id')->all());
     }
 
     /**
@@ -246,6 +351,9 @@ class ActivityTimeMigrationService
                 continue;
             }
 
+            $this->countSchedules++;
+            $this->recordCreated($church->id, 'schedules', $first->type);
+
             $new = new ActivitySchedule;
             $new->church_id = $church->id;
             $new->team_id = $first->team_id;
@@ -268,11 +376,8 @@ class ActivityTimeMigrationService
 
             // Merge tags from all items in the group
             $allTagIds = $group->flatMap(fn ($item) => $item->tags->pluck('id'))->unique()->toArray();
-            if (! empty($allTagIds)) {
-                $new->tags()->sync($allTagIds);
-            }
-
-            $this->countSchedules++;
+            $this->recordTagSyncs($allTagIds, $church->id);
+            $this->syncTags($new, $allTagIds);
         }
     }
 
@@ -300,6 +405,9 @@ class ActivityTimeMigrationService
             /** @var ActivityTime $parent */
             $parent = $item['parent'];
 
+            $this->countOverrides++;
+            $this->recordCreated($church->id, 'overrides', $parent->type);
+
             $override = new ScheduleOverride;
             // Provide default name as it is required in DB schema
             $override->name = 'Migrated Exception: '.($ex->reason ?? 'Untitled');
@@ -318,19 +426,146 @@ class ActivityTimeMigrationService
             $override->reason = $ex->reason;
             $override->is_active = true;
             $override->save();
-
-            $this->countOverrides++;
         }
     }
 
     /**
      * Copy tags from source to destination.
      */
-    protected function copyTags(ActivityTime $source, $destination): void
+    protected function syncTags($destination, array $tagIds): void
     {
-        if ($source->tags->isNotEmpty()) {
-            // attach() works if destination model has BelongsToMany 'tags'
-            $destination->tags()->sync($source->tags->pluck('id'));
+        if (! empty($tagIds)) {
+            $destination->tags()->sync($tagIds);
         }
+    }
+
+    protected function recordTagSyncs(array $tagIds, ?int $churchId = null): void
+    {
+        if (! empty($tagIds)) {
+            $this->countTagSyncs += count($tagIds);
+
+            if ($churchId !== null) {
+                $this->countsByChurch[$churchId]['tag_syncs'] = ($this->countsByChurch[$churchId]['tag_syncs'] ?? 0) + count($tagIds);
+            }
+        }
+    }
+
+    protected function previewOneTimeActivity(ActivityTime $source): void
+    {
+        if (! $source->date) {
+            Log::warning("Skipping OneTimeActivity ID {$source->id}: No date provided.");
+
+            return;
+        }
+
+        $this->countOneTime++;
+        $this->recordCreated($source->church_id, 'one_time', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+    }
+
+    protected function previewDailyActivity(ActivityTime $source): void
+    {
+        $this->countSchedules++;
+        $this->recordCreated($source->church_id, 'schedules', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+    }
+
+    protected function previewMonthlyNthActivity(ActivityTime $source): void
+    {
+        $this->countSchedules++;
+        $this->recordCreated($source->church_id, 'schedules', $source->type);
+        $this->recordTagSyncs($source->tags->pluck('id')->all(), $source->church_id);
+    }
+
+    protected function previewWeeklyActivities(Collection $weeklyActivities): void
+    {
+        $grouped = $weeklyActivities->groupBy(function ($item) {
+            $startTime = $item->start_time ? substr($item->start_time, 0, 5) : 'null';
+            $endTime = $item->end_time ? substr($item->end_time, 0, 5) : 'null';
+
+            return implode('|', [
+                $item->schedule_period_id ?? 'null',
+                $item->type,
+                $item->language,
+                $startTime,
+                $endTime,
+                $item->effective_from?->toDateString() ?? 'null',
+                $item->effective_until?->toDateString() ?? 'null',
+                $item->activity_type_description ?? 'null',
+                $item->team_id ?? 'null',
+            ]);
+        });
+
+        foreach ($grouped as $group) {
+            $days = $group->pluck('day_of_week')
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+
+            if (empty($days)) {
+                continue;
+            }
+
+            $this->countSchedules++;
+
+            $churchId = $group->first()?->church_id;
+            if ($churchId !== null) {
+                $this->recordCreated($churchId, 'schedules', $group->first()?->type);
+            }
+
+            $allTagIds = $group->flatMap(fn ($item) => $item->tags->pluck('id'))
+                ->unique()
+                ->toArray();
+
+            $this->recordTagSyncs($allTagIds, $churchId);
+        }
+    }
+
+    protected function previewExceptions(Collection $activityTimes): void
+    {
+        foreach ($activityTimes as $activity) {
+            if ($activity->exceptions->isNotEmpty()) {
+                $this->countOverrides += $activity->exceptions->count();
+                $this->recordCreated($activity->church_id, 'overrides', $activity->type, $activity->exceptions->count());
+            }
+        }
+    }
+
+    protected function recordCreated(int $churchId, string $modelKey, ?string $type, int $increment = 1): void
+    {
+        $this->countsByChurch[$churchId]['schedules_created'] = $this->countsByChurch[$churchId]['schedules_created'] ?? 0;
+        $this->countsByChurch[$churchId]['one_time_created'] = $this->countsByChurch[$churchId]['one_time_created'] ?? 0;
+        $this->countsByChurch[$churchId]['overrides_created'] = $this->countsByChurch[$churchId]['overrides_created'] ?? 0;
+        $this->countsByChurch[$churchId]['deleted_schedules'] = $this->countsByChurch[$churchId]['deleted_schedules'] ?? 0;
+        $this->countsByChurch[$churchId]['deleted_one_time'] = $this->countsByChurch[$churchId]['deleted_one_time'] ?? 0;
+        $this->countsByChurch[$churchId]['deleted_overrides'] = $this->countsByChurch[$churchId]['deleted_overrides'] ?? 0;
+        $this->countsByChurch[$churchId]['tag_syncs'] = $this->countsByChurch[$churchId]['tag_syncs'] ?? 0;
+
+        $key = match ($modelKey) {
+            'schedules' => 'schedules_created',
+            'one_time' => 'one_time_created',
+            'overrides' => 'overrides_created',
+            default => null,
+        };
+
+        if ($key !== null) {
+            $this->countsByChurch[$churchId][$key] += $increment;
+        }
+
+        $typeKey = $type ?: 'unknown';
+        $this->countsByType[$modelKey][$typeKey] = ($this->countsByType[$modelKey][$typeKey] ?? 0) + $increment;
+    }
+
+    protected function recordChurchDeletions(int $churchId, int $schedules, int $oneTime, int $overrides): void
+    {
+        $this->countsByChurch[$churchId]['schedules_created'] = $this->countsByChurch[$churchId]['schedules_created'] ?? 0;
+        $this->countsByChurch[$churchId]['one_time_created'] = $this->countsByChurch[$churchId]['one_time_created'] ?? 0;
+        $this->countsByChurch[$churchId]['overrides_created'] = $this->countsByChurch[$churchId]['overrides_created'] ?? 0;
+        $this->countsByChurch[$churchId]['tag_syncs'] = $this->countsByChurch[$churchId]['tag_syncs'] ?? 0;
+
+        $this->countsByChurch[$churchId]['deleted_schedules'] = ($this->countsByChurch[$churchId]['deleted_schedules'] ?? 0) + $schedules;
+        $this->countsByChurch[$churchId]['deleted_one_time'] = ($this->countsByChurch[$churchId]['deleted_one_time'] ?? 0) + $oneTime;
+        $this->countsByChurch[$churchId]['deleted_overrides'] = ($this->countsByChurch[$churchId]['deleted_overrides'] ?? 0) + $overrides;
     }
 }
