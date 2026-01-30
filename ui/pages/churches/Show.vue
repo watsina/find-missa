@@ -8,6 +8,7 @@
     mdiCalendarAlert,
     mdiAlertCircleOutline,
     mdiCalendarMonth,
+    mdiCalendarStar,
   } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -17,8 +18,8 @@
   import OneTimeActivityModal from '@/pages/activities/OneTimeActivityModal.vue';
   import ScheduleOverrideModal from '@/pages/activities/ScheduleOverrideModal.vue';
   import ScheduleRuleModal from '@/pages/activities/ScheduleRuleModal.vue';
+  import LiturgicalScheduleModal from '@/pages/activities/LiturgicalScheduleModal.vue';
   import { notify } from '@/utils';
-  import { isArray } from 'lodash';
   import useAuthStore from '@/stores/useAuthStore';
 
   const props = defineProps({
@@ -35,12 +36,14 @@
   const showOneTimeModal = ref(false);
   const showOverrideModal = ref(false);
   const showRuleModal = ref(false);
+  const showLiturgicalModal = ref(false);
 
   // Edit states
   const scheduleToEdit = ref(null);
   const activityToEdit = ref(null);
   const overrideToEdit = ref(null);
   const ruleToEdit = ref(null);
+  const liturgicalScheduleToEdit = ref(null);
 
   const deletingItem = ref(false);
   const activeTab = ref('schedules');
@@ -50,6 +53,7 @@
   const oneTimeActivities = ref([]);
   const overrides = ref([]);
   const rules = ref([]);
+  const liturgicalSchedules = ref([]);
 
   const scheduleHeaders = [
     { title: 'Type', value: 'type' },
@@ -86,12 +90,21 @@
     { title: '', value: 'actions' },
   ];
 
+  const liturgicalHeaders = [
+    { title: 'Holiday', value: 'holiday_name' },
+    { title: 'Year', value: 'year_display' },
+    { title: 'Times', value: 'times_count' },
+    { title: 'Replaces Regular', value: 'replaces_regular_schedule' },
+    { title: '', value: 'actions' },
+  ];
+
   onMounted(() => {
     fetchChurchDetails();
     fetchSchedules();
     fetchOneTimeActivities();
     fetchOverrides();
     fetchRules();
+    fetchLiturgicalSchedules();
   });
 
   const fetchChurchDetails = () => {
@@ -137,6 +150,19 @@
       .get('/api/v1/schedule-rules', { params: { scope_type: 'church', scope_id: props.churchId } })
       .then(({ data }) => {
         rules.value = data.data;
+      });
+  };
+
+  const fetchLiturgicalSchedules = () => {
+    http
+      .get('/api/v1/liturgical-schedules', { params: { church_id: props.churchId } })
+      .then(({ data }) => {
+        liturgicalSchedules.value = data.data.map((item) => ({
+          ...item,
+          holiday_name: item.holiday?.name || 'Unknown Holiday',
+          year_display: item.year || 'Every Year',
+          times_count: item.times?.length || 0,
+        }));
       });
   };
 
@@ -193,6 +219,19 @@
       .finally(() => (deletingItem.value = false));
   };
 
+  const deleteLiturgicalSchedule = async (id) => {
+    if (!(await notify.confirm('Delete this liturgical schedule?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/liturgical-schedules/${id}`)
+      .then(() => {
+        liturgicalSchedules.value = liturgicalSchedules.value.filter((i) => i.id !== id);
+        notify.success('Liturgical schedule deleted');
+      })
+      .catch(() => notify.error('Failed to delete liturgical schedule'))
+      .finally(() => (deletingItem.value = false));
+  };
+
   // Update handlers
   const onScheduleUpdated = (item) => {
     const index = schedules.value.findIndex((s) => s.id === item.id);
@@ -216,6 +255,18 @@
     const index = rules.value.findIndex((s) => s.id === item.id);
     if (index !== -1) rules.value[index] = item;
     else rules.value.push(item);
+  };
+
+  const onLiturgicalScheduleUpdated = (item) => {
+    const transformedItem = {
+      ...item,
+      holiday_name: item.holiday?.name || 'Unknown Holiday',
+      year_display: item.year || 'Every Year',
+      times_count: item.times?.length || 0,
+    };
+    const index = liturgicalSchedules.value.findIndex((s) => s.id === item.id);
+    if (index !== -1) liturgicalSchedules.value[index] = transformedItem;
+    else liturgicalSchedules.value.push(transformedItem);
   };
 </script>
 
@@ -244,6 +295,9 @@
               </v-tab>
               <v-tab value="one-time">
                 <v-icon class="tw:mr-2" :icon="mdiCalendarMonth" /> One-Time Activities
+              </v-tab>
+              <v-tab value="liturgical">
+                <v-icon class="tw:mr-2" :icon="mdiCalendarStar" /> Liturgical
               </v-tab>
               <v-tab value="overrides">
                 <v-icon class="tw:mr-2" :icon="mdiCalendarAlert" /> Exceptions
@@ -309,6 +363,50 @@
                       :disabled="deletingItem"
                       :icon="mdiDeleteOutline"
                       @click="deleteOneTimeActivity(item.id)"
+                    />
+                  </template>
+                </data-table>
+              </v-window-item>
+
+              <!-- Liturgical Schedules Tab -->
+              <v-window-item value="liturgical">
+                <div class="tw:flex tw:justify-between tw:mb-4">
+                  <p class="tw:text-base tw:text-gray-700">
+                    Manage special mass times for holidays (e.g., Christmas, Easter).
+                  </p>
+                  <PrimaryButton
+                    @click="((liturgicalScheduleToEdit = null), (showLiturgicalModal = true))"
+                  >
+                    Add Liturgical Schedule
+                  </PrimaryButton>
+                </div>
+                <data-table
+                  class="tw:capitalize"
+                  :headers="liturgicalHeaders"
+                  :items="liturgicalSchedules"
+                >
+                  <template #item.replaces_regular_schedule="{ item }">
+                    <v-chip
+                      :color="item.replaces_regular_schedule ? 'warning' : 'grey'"
+                      size="small"
+                      variant="tonal"
+                    >
+                      {{ item.replaces_regular_schedule ? 'Yes' : 'No' }}
+                    </v-chip>
+                  </template>
+                  <template #item.actions="{ item }">
+                    <v-icon
+                      class="tw:mr-2"
+                      color="primary"
+                      :icon="mdiPencilOutline"
+                      @click="((liturgicalScheduleToEdit = item), (showLiturgicalModal = true))"
+                    />
+                    <v-icon
+                      v-if="store.user.is_admin"
+                      color="error"
+                      :disabled="deletingItem"
+                      :icon="mdiDeleteOutline"
+                      @click="deleteLiturgicalSchedule(item.id)"
                     />
                   </template>
                 </data-table>
@@ -433,6 +531,14 @@
           :rule="ruleToEdit"
           @created="onRuleUpdated"
           @updated="onRuleUpdated"
+        />
+
+        <LiturgicalScheduleModal
+          v-model:show-modal="showLiturgicalModal"
+          :church="church"
+          :liturgical-schedule="liturgicalScheduleToEdit"
+          @created="onLiturgicalScheduleUpdated"
+          @updated="onLiturgicalScheduleUpdated"
         />
       </v-row>
     </v-container>
