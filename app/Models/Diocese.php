@@ -36,4 +36,14 @@ class Diocese extends BaseModel
     {
         return $this->hasMany(Parish::class);
     }
+
+    public function scheduleRules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleRule::class, 'scope');
+    }
+
+    public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleOverride::class, 'scope');
+    }
 }

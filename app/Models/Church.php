@@ -55,4 +55,29 @@ class Church extends BaseModel
     {
         return $this->hasMany(ActivityTime::class);
     }
+
+    public function activitySchedules(): HasMany
+    {
+        return $this->hasMany(ActivitySchedule::class);
+    }
+
+    public function liturgicalSchedules(): HasMany
+    {
+        return $this->hasMany(LiturgicalSchedule::class);
+    }
+
+    public function oneTimeActivities(): HasMany
+    {
+        return $this->hasMany(OneTimeActivity::class);
+    }
+
+    public function scheduleRules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleRule::class, 'scope');
+    }
+
+    public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleOverride::class, 'scope');
+    }
 }
