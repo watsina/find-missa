@@ -150,8 +150,6 @@ class ActivityTimeMigrationService
         $new->start_time = $source->start_time;
         $new->end_time = $source->end_time;
         $new->date = $source->date;
-        $new->details = $source->details;
-        $new->url = $source->url;
         $new->save();
 
         $this->copyTags($source, $new);
@@ -175,8 +173,6 @@ class ActivityTimeMigrationService
         $new->day_pattern = DayPattern::Daily;
         $new->effective_from = $source->effective_from;
         $new->effective_until = $source->effective_until;
-        $new->details = $source->details;
-        $new->url = $source->url;
         $new->save();
 
         $this->copyTags($source, $new);
@@ -204,8 +200,6 @@ class ActivityTimeMigrationService
 
         $new->effective_from = $source->effective_from;
         $new->effective_until = $source->effective_until;
-        $new->details = $source->details;
-        $new->url = $source->url;
         $new->save();
 
         $this->copyTags($source, $new);
@@ -270,8 +264,6 @@ class ActivityTimeMigrationService
 
             $new->effective_from = $first->effective_from;
             $new->effective_until = $first->effective_until;
-            $new->details = $first->details; // Using first one's details
-            $new->url = $first->url;
             $new->save();
 
             // Merge tags from all items in the group

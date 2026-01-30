@@ -69,7 +69,6 @@
     { title: 'Date', value: 'date' },
     { title: 'Start Time', value: 'start_time' },
     { title: 'Language', value: 'language' },
-    { title: 'Details', value: 'details' },
     { title: '', value: 'actions' },
   ];
 

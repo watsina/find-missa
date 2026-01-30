@@ -52,7 +52,6 @@
     language: props.activity?.language || '',
     date: props.activity?.date || null,
     church_id: props.church?.id || '',
-    details: props.activity?.details || '',
     tags: props.activity?.tags || [],
   });
 
@@ -67,7 +66,6 @@
         form.language = newValue?.language || '';
         form.date = newValue?.date || null;
         form.church_id = newValue?.church_id || '';
-        form.details = newValue?.details || '';
         form.tags = newValue?.tags || [];
 
         date.value = parser.date(newValue?.date || currentDate);
@@ -200,17 +198,6 @@
               label="Language"
               placeholder="English"
               required
-            />
-          </div>
-
-          <div class="tw:mt-4">
-            <TextInput
-              v-model="form.details"
-              class="tw:block tw:w-full tw:mt-1"
-              density="default"
-              :error="form.errors.details"
-              label="Additional Details (Optional)"
-              placeholder="e.g. Special celebration"
             />
           </div>
         </form>
