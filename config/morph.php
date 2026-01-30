@@ -22,4 +22,11 @@ return [
     'holiday' => Models\Holiday::class,
     'holiday-instance' => Models\HolidayInstance::class,
     'schedule-period' => Models\SchedulePeriod::class,
+    'activity-schedule' => Models\ActivitySchedule::class,
+    'schedule-day-detail' => Models\ScheduleDayDetail::class,
+    'schedule-rule' => Models\ScheduleRule::class,
+    'schedule-override' => Models\ScheduleOverride::class,
+    'liturgical-schedule' => Models\LiturgicalSchedule::class,
+    'liturgical-schedule-time' => Models\LiturgicalScheduleTime::class,
+    'one-time-activity' => Models\OneTimeActivity::class,
 ];
