@@ -195,4 +195,22 @@ class HolidayFactory extends Factory
             'liturgical_color' => 'red',
         ]);
     }
+
+    /**
+     * Create Good Friday holiday.
+     */
+    public function goodFriday(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Good Friday',
+            'slug' => 'good-friday',
+            'type' => HolidayType::EasterRelative,
+            'fixed_month' => null,
+            'fixed_day' => null,
+            'easter_offset_days' => -2,
+            'is_holy_day_of_obligation' => false,
+            'is_moveable' => true,
+            'liturgical_color' => 'red',
+        ]);
+    }
 }

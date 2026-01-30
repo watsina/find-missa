@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,6 +36,26 @@ class Church extends BaseModel
     public function toSearchableArray()
     {
         return $this->only('name', 'city', 'district');
+    }
+
+    /**
+     * Get the diocese_id through the parishable relationship.
+     */
+    protected function dioceseId(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->parishable instanceof Parish) {
+                    return $this->parishable->diocese_id;
+                }
+
+                if ($this->parishable instanceof SubParish) {
+                    return $this->parishable->parish?->diocese_id;
+                }
+
+                return null;
+            }
+        );
     }
 
     /**

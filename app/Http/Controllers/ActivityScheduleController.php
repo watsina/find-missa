@@ -55,7 +55,7 @@ class ActivityScheduleController extends Controller
                     $query->where('day_pattern', $request->input('day_pattern'));
                 }
             })
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
 
         return ActivityScheduleResource::collection($activitySchedules);
     }

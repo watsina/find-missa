@@ -41,7 +41,7 @@ class OneTimeActivityController extends Controller
             })
             ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
 
         return OneTimeActivityResource::collection($oneTimeActivities);
     }

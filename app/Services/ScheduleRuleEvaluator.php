@@ -244,6 +244,11 @@ class ScheduleRuleEvaluator
      */
     public function getRulesForChurch(Church $church, ?array $activityTypes = null): Collection
     {
+        // Ensure parishable is loaded for diocese_id accessor
+        if (! $church->relationLoaded('parishable')) {
+            $church->load('parishable');
+        }
+
         $query = ScheduleRule::query()
             ->active()
             ->applicableToChurch($church, $church->diocese_id)
@@ -266,6 +271,11 @@ class ScheduleRuleEvaluator
      */
     public function getOverridesForChurch(Church $church, Carbon $date, ?array $activityTypes = null): Collection
     {
+        // Ensure parishable is loaded for diocese_id accessor
+        if (! $church->relationLoaded('parishable')) {
+            $church->load('parishable');
+        }
+
         $query = ScheduleOverride::query()
             ->active()
             ->applicableToChurch($church, $church->diocese_id)

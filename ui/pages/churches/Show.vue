@@ -1,12 +1,22 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { http } from '@/plugins';
-  import { mdiPencilOutline, mdiEyeOutline, mdiDeleteOutline } from '@mdi/js';
+  import {
+    mdiPencilOutline,
+    mdiDeleteOutline,
+    mdiCalendarClock,
+    mdiCalendarAlert,
+    mdiAlertCircleOutline,
+    mdiCalendarMonth,
+  } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
   import AppLayout from '@/layouts/AppLayout';
   import ChurchDetails from './ChurchDetails.vue';
-  import ActivityTimeModal from '@/pages/activities/ActivityTimeModal.vue';
+  import ActivityScheduleModal from '@/pages/activities/ActivityScheduleModal.vue';
+  import OneTimeActivityModal from '@/pages/activities/OneTimeActivityModal.vue';
+  import ScheduleOverrideModal from '@/pages/activities/ScheduleOverrideModal.vue';
+  import ScheduleRuleModal from '@/pages/activities/ScheduleRuleModal.vue';
   import { notify } from '@/utils';
   import { isArray } from 'lodash';
   import useAuthStore from '@/stores/useAuthStore';
@@ -19,25 +29,69 @@
 
   const church = ref(null);
   const isFetching = ref(false);
-  const showingModal = ref(false);
-  const deletingActivity = ref(false);
-  const activityToEdit = ref(null);
 
-  const headers = [
-    { title: 'Activity Type', value: 'type' },
-    { title: 'Activity Description', value: 'activity_type_description' },
-    { title: 'Church', value: 'church.name' },
+  // Modal states
+  const showScheduleModal = ref(false);
+  const showOneTimeModal = ref(false);
+  const showOverrideModal = ref(false);
+  const showRuleModal = ref(false);
+
+  // Edit states
+  const scheduleToEdit = ref(null);
+  const activityToEdit = ref(null);
+  const overrideToEdit = ref(null);
+  const ruleToEdit = ref(null);
+
+  const deletingItem = ref(false);
+  const activeTab = ref('schedules');
+
+  // Schedules (V2) data
+  const schedules = ref([]);
+  const oneTimeActivities = ref([]);
+  const overrides = ref([]);
+  const rules = ref([]);
+
+  const scheduleHeaders = [
+    { title: 'Type', value: 'type' },
+    { title: 'Description', value: 'activity_type_description' },
+    { title: 'Pattern', value: 'day_pattern_label' },
     { title: 'Start Time', value: 'start_time' },
-    { title: 'End Time', value: 'end_time' },
     { title: 'Language', value: 'language' },
-    { title: 'Occurrence', value: 'occurrence' },
+    { title: '', value: 'actions' },
+  ];
+
+  const oneTimeHeaders = [
+    { title: 'Type', value: 'type' },
     { title: 'Date', value: 'date' },
-    { title: 'Day of Week', value: 'day_of_week' },
+    { title: 'Start Time', value: 'start_time' },
+    { title: 'Language', value: 'language' },
+    { title: 'Details', value: 'details' },
+    { title: '', value: 'actions' },
+  ];
+
+  const overrideHeaders = [
+    { title: 'Name', value: 'name' },
+    { title: 'Dates', value: 'date_range' },
+    { title: 'Action', value: 'action' },
+    { title: 'Target', value: 'target_summary' },
+    { title: 'Active', value: 'is_active' },
+    { title: '', value: 'actions' },
+  ];
+
+  const ruleHeaders = [
+    { title: 'Name', value: 'name' },
+    { title: 'Condition', value: 'condition_summary' },
+    { title: 'Action', value: 'action' },
+    { title: 'Active', value: 'is_active' },
     { title: '', value: 'actions' },
   ];
 
   onMounted(() => {
     fetchChurchDetails();
+    fetchSchedules();
+    fetchOneTimeActivities();
+    fetchOverrides();
+    fetchRules();
   });
 
   const fetchChurchDetails = () => {
@@ -52,42 +106,117 @@
       .finally(() => (isFetching.value = false));
   };
 
-  const deleteActivity = async (activityId) => {
-    if (
-      !(await notify.confirm('You are about to delete this activity, this action is irreversible.'))
-    ) {
-      return;
-    }
-
-    deletingActivity.value = true;
+  const fetchSchedules = () => {
     http
-      .delete(`/api/v1/activity-times/${activityId}`)
-      .then(() => {
-        const items = church.value.activities;
-        church.value.activities = items.filter((activity) => activity.id !== activityId);
-        notify.success('Activity removed successfully');
-      })
-      .catch(() => notify.error('Failed to remove the activity.'))
-      .finally(() => (deletingActivity.value = false));
+      .get('/api/v1/activity-schedules', { params: { church_id: props.churchId } })
+      .then(({ data }) => {
+        schedules.value = data.data;
+      });
   };
 
-  function showModal(data = null) {
-    activityToEdit.value = data;
-    showingModal.value = true;
-  }
+  const fetchOneTimeActivities = () => {
+    http
+      .get('/api/v1/one-time-activities', { params: { church_id: props.churchId } })
+      .then(({ data }) => {
+        oneTimeActivities.value = data.data;
+      });
+  };
 
-  function updateActivity(updates) {
-    church.value.activities = church.value?.activities?.map((activity) => {
-      if (activity?.id === updates?.id) return updates;
-      return activity;
-    });
-  }
-  function createdActivities(activities) {
-    if (isArray(activities)) {
-      return church.value.activities.push(...activities);
-    }
-    church.value.activities.push(activities);
-  }
+  const fetchOverrides = () => {
+    http
+      .get('/api/v1/schedule-overrides', {
+        params: { scope_type: 'church', scope_id: props.churchId },
+      })
+      .then(({ data }) => {
+        overrides.value = data.data;
+      });
+  };
+
+  const fetchRules = () => {
+    http
+      .get('/api/v1/schedule-rules', { params: { scope_type: 'church', scope_id: props.churchId } })
+      .then(({ data }) => {
+        rules.value = data.data;
+      });
+  };
+
+  // Delete handlers
+  const deleteSchedule = async (id) => {
+    if (!(await notify.confirm('Delete this schedule template?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/activity-schedules/${id}`)
+      .then(() => {
+        schedules.value = schedules.value.filter((i) => i.id !== id);
+        notify.success('Schedule deleted');
+      })
+      .catch(() => notify.error('Failed to delete schedule'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  const deleteOneTimeActivity = async (id) => {
+    if (!(await notify.confirm('Delete this one-time activity?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/one-time-activities/${id}`)
+      .then(() => {
+        oneTimeActivities.value = oneTimeActivities.value.filter((i) => i.id !== id);
+        notify.success('Activity deleted');
+      })
+      .catch(() => notify.error('Failed to delete activity'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  const deleteOverride = async (id) => {
+    if (!(await notify.confirm('Delete this schedule exception?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/schedule-overrides/${id}`)
+      .then(() => {
+        overrides.value = overrides.value.filter((i) => i.id !== id);
+        notify.success('Exception deleted');
+      })
+      .catch(() => notify.error('Failed to delete exception'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  const deleteRule = async (id) => {
+    if (!(await notify.confirm('Delete this schedule rule?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/schedule-rules/${id}`)
+      .then(() => {
+        rules.value = rules.value.filter((i) => i.id !== id);
+        notify.success('Rule deleted');
+      })
+      .catch(() => notify.error('Failed to delete rule'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  // Update handlers
+  const onScheduleUpdated = (item) => {
+    const index = schedules.value.findIndex((s) => s.id === item.id);
+    if (index !== -1) schedules.value[index] = item;
+    else schedules.value.push(item);
+  };
+
+  const onOneTimeActivityUpdated = (item) => {
+    const index = oneTimeActivities.value.findIndex((s) => s.id === item.id);
+    if (index !== -1) oneTimeActivities.value[index] = item;
+    else oneTimeActivities.value.push(item);
+  };
+
+  const onOverrideUpdated = (item) => {
+    const index = overrides.value.findIndex((s) => s.id === item.id);
+    if (index !== -1) overrides.value[index] = item;
+    else overrides.value.push(item);
+  };
+
+  const onRuleUpdated = (item) => {
+    const index = rules.value.findIndex((s) => s.id === item.id);
+    if (index !== -1) rules.value[index] = item;
+    else rules.value.push(item);
+  };
 </script>
 
 <template>
@@ -105,51 +234,206 @@
         <v-col cols="12">
           <ChurchDetails v-model:church="church" />
         </v-col>
-        <activity-time-modal
-          v-model:show-modal="showingModal"
+
+        <!-- Tabs for Schedule Management -->
+        <v-col cols="12">
+          <v-card variant="flat">
+            <v-tabs v-model="activeTab" bg-color="transparent" color="primary">
+              <v-tab value="schedules">
+                <v-icon class="tw:mr-2" :icon="mdiCalendarClock" /> Regular Schedules
+              </v-tab>
+              <v-tab value="one-time">
+                <v-icon class="tw:mr-2" :icon="mdiCalendarMonth" /> One-Time Activities
+              </v-tab>
+              <v-tab value="overrides">
+                <v-icon class="tw:mr-2" :icon="mdiCalendarAlert" /> Exceptions
+              </v-tab>
+              <v-tab value="rules">
+                <v-icon class="tw:mr-2" :icon="mdiAlertCircleOutline" /> Rules
+              </v-tab>
+            </v-tabs>
+
+            <v-window v-model="activeTab" class="tw:mt-4">
+              <!-- Regular Schedules Tab -->
+              <v-window-item value="schedules">
+                <div class="tw:flex tw:justify-between tw:mb-4">
+                  <p class="tw:text-base tw:text-gray-700">Manage recurring activity schedules.</p>
+                  <PrimaryButton @click="((scheduleToEdit = null), (showScheduleModal = true))">
+                    Add Schedule
+                  </PrimaryButton>
+                </div>
+                <data-table class="tw:capitalize" :headers="scheduleHeaders" :items="schedules">
+                  <template #item.actions="{ item }">
+                    <v-icon
+                      class="tw:mr-2"
+                      color="primary"
+                      :icon="mdiPencilOutline"
+                      @click="((scheduleToEdit = item), (showScheduleModal = true))"
+                    />
+                    <v-icon
+                      v-if="store.user.is_admin"
+                      color="error"
+                      :disabled="deletingItem"
+                      :icon="mdiDeleteOutline"
+                      @click="deleteSchedule(item.id)"
+                    />
+                  </template>
+                </data-table>
+              </v-window-item>
+
+              <!-- One-Time Activities Tab -->
+              <v-window-item value="one-time">
+                <div class="tw:flex tw:justify-between tw:mb-4">
+                  <p class="tw:text-base tw:text-gray-700">
+                    Manage single-occurrence events (e.g., weddings, funerals).
+                  </p>
+                  <PrimaryButton @click="((activityToEdit = null), (showOneTimeModal = true))">
+                    Add One-Time Activity
+                  </PrimaryButton>
+                </div>
+                <data-table
+                  class="tw:capitalize"
+                  :headers="oneTimeHeaders"
+                  :items="oneTimeActivities"
+                >
+                  <template #item.actions="{ item }">
+                    <v-icon
+                      class="tw:mr-2"
+                      color="primary"
+                      :icon="mdiPencilOutline"
+                      @click="((activityToEdit = item), (showOneTimeModal = true))"
+                    />
+                    <v-icon
+                      v-if="store.user.is_admin"
+                      color="error"
+                      :disabled="deletingItem"
+                      :icon="mdiDeleteOutline"
+                      @click="deleteOneTimeActivity(item.id)"
+                    />
+                  </template>
+                </data-table>
+              </v-window-item>
+
+              <!-- Exceptions Tab -->
+              <v-window-item value="overrides">
+                <div class="tw:flex tw:justify-between tw:mb-4">
+                  <p class="tw:text-base tw:text-gray-700">
+                    Manage schedule exceptions (e.g., cancelled mass due to construction).
+                  </p>
+                  <PrimaryButton @click="((overrideToEdit = null), (showOverrideModal = true))">
+                    Add Exception
+                  </PrimaryButton>
+                </div>
+                <data-table class="tw:capitalize" :headers="overrideHeaders" :items="overrides">
+                  <template #item.target_summary="{ item }">
+                    {{ item.target_summary || 'All Activities' }}
+                  </template>
+                  <template #item.date_range="{ item }">
+                    {{ item.start_date }} - {{ item.end_date }}
+                  </template>
+                  <template #item.is_active="{ item }">
+                    <v-chip
+                      :color="item.is_active ? 'success' : 'grey'"
+                      size="small"
+                      variant="tonal"
+                    >
+                      {{ item.is_active ? 'Active' : 'Inactive' }}
+                    </v-chip>
+                  </template>
+                  <template #item.actions="{ item }">
+                    <v-icon
+                      class="tw:mr-2"
+                      color="primary"
+                      :icon="mdiPencilOutline"
+                      @click="((overrideToEdit = item), (showOverrideModal = true))"
+                    />
+                    <v-icon
+                      v-if="store.user.is_admin"
+                      color="error"
+                      :disabled="deletingItem"
+                      :icon="mdiDeleteOutline"
+                      @click="deleteOverride(item.id)"
+                    />
+                  </template>
+                </data-table>
+              </v-window-item>
+
+              <!-- Rules Tab -->
+              <v-window-item value="rules">
+                <div class="tw:flex tw:justify-between tw:mb-4">
+                  <p class="tw:text-base tw:text-gray-700">
+                    Manage conditional rules (e.g., no regular mass on Good Friday).
+                  </p>
+                  <PrimaryButton @click="((ruleToEdit = null), (showRuleModal = true))">
+                    Add Rule
+                  </PrimaryButton>
+                </div>
+                <data-table class="tw:capitalize" :headers="ruleHeaders" :items="rules">
+                  <template #item.condition_summary="{ item }">
+                    {{ item.condition_summary }}
+                  </template>
+                  <template #item.is_active="{ item }">
+                    <v-chip
+                      :color="item.is_active ? 'success' : 'grey'"
+                      size="small"
+                      variant="tonal"
+                    >
+                      {{ item.is_active ? 'Active' : 'Inactive' }}
+                    </v-chip>
+                  </template>
+                  <template #item.actions="{ item }">
+                    <v-icon
+                      class="tw:mr-2"
+                      color="primary"
+                      :icon="mdiPencilOutline"
+                      @click="((ruleToEdit = item), (showRuleModal = true))"
+                    />
+                    <v-icon
+                      v-if="store.user.is_admin"
+                      color="error"
+                      :disabled="deletingItem"
+                      :icon="mdiDeleteOutline"
+                      @click="deleteRule(item.id)"
+                    />
+                  </template>
+                </data-table>
+              </v-window-item>
+            </v-window>
+          </v-card>
+        </v-col>
+
+        <!-- Modals -->
+        <ActivityScheduleModal
+          v-model:show-modal="showScheduleModal"
+          :church="church"
+          :schedule="scheduleToEdit"
+          @created="onScheduleUpdated"
+          @updated="onScheduleUpdated"
+        />
+
+        <OneTimeActivityModal
+          v-model:show-modal="showOneTimeModal"
           :activity="activityToEdit"
           :church="church"
-          @created="createdActivities"
-          @updated="updateActivity"
+          @created="onOneTimeActivityUpdated"
+          @updated="onOneTimeActivityUpdated"
         />
-        <v-col class="tw:flex tw:justify-between" cols="12">
-          <p class="tw:mt-2 tw:text-base tw:text-gray-700">A list of church activities.</p>
-          <PrimaryButton @click="showModal"> Add Activity</PrimaryButton>
-        </v-col>
-        <v-col cols="12">
-          <!-- church activities -->
-          <data-table
-            class="tw:capitalize"
-            has-search
-            :headers="headers"
-            :items="church?.activities || []"
-          >
-            <template #item.actions="{ item }">
-              <v-icon
-                v-if="item?.id"
-                class="tw:mr-2"
-                color="primary"
-                :icon="mdiPencilOutline"
-                @click="showModal(item)"
-              />
-              <v-icon
-                v-if="item?.id"
-                color="primary"
-                :icon="mdiEyeOutline"
-                title="View Activity Details"
-                variant="text"
-                @click="$router.push({ name: 'activities.show', params: { activityId: item.id } })"
-              />
-              <v-icon
-                v-if="store.user.is_admin"
-                color="error"
-                :disabled="deletingActivity"
-                :icon="mdiDeleteOutline"
-                @click="deleteActivity(item.id)"
-              />
-            </template>
-          </data-table>
-        </v-col>
+
+        <ScheduleOverrideModal
+          v-model:show-modal="showOverrideModal"
+          :church-id="churchId"
+          :override="overrideToEdit"
+          @created="onOverrideUpdated"
+          @updated="onOverrideUpdated"
+        />
+
+        <ScheduleRuleModal
+          v-model:show-modal="showRuleModal"
+          :church-id="churchId"
+          :rule="ruleToEdit"
+          @created="onRuleUpdated"
+          @updated="onRuleUpdated"
+        />
       </v-row>
     </v-container>
   </app-layout>

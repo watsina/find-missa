@@ -406,3 +406,348 @@ it('includes one time activities', function () {
     expect($activities->first()->activityTypeDescription)->toBe('Wedding Mass');
     expect($activities->first()->source)->toBe('one_time');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Activity Type Filtering Tests
+|--------------------------------------------------------------------------
+*/
+
+it('filters activities by type', function () {
+    // Mass schedule
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Confession schedule
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '16:00',
+        'type' => 'confession',
+    ]);
+
+    // Adoration schedule
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '08:00',
+        'type' => 'adoration',
+    ]);
+
+    // Filter for mass only
+    $massOnly = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-01-06'),
+        activityTypes: ['mass']
+    );
+
+    expect($massOnly)->toHaveCount(1);
+    expect($massOnly->first()->type)->toBe('mass');
+
+    // Filter for mass and confession
+    $massAndConfession = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-01-06'),
+        activityTypes: ['mass', 'confession']
+    );
+
+    expect($massAndConfession)->toHaveCount(2);
+    $types = $massAndConfession->pluck('type')->sort()->values();
+    expect($types[0])->toBe('confession');
+    expect($types[1])->toBe('mass');
+
+    // No filter returns all
+    $all = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-01-06')
+    );
+
+    expect($all)->toHaveCount(3);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Multiple Churches Tests
+|--------------------------------------------------------------------------
+*/
+
+it('retrieves activities for multiple churches on a date', function () {
+    $church2 = Church::factory()->create(['team_id' => $this->team->id]);
+
+    // Church 1 mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Church 2 mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $church2->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '09:00',
+        'type' => 'mass',
+    ]);
+
+    $activities = $this->service->getActivitiesForChurchesOnDate(
+        collect([$this->church, $church2]),
+        Carbon::parse('2025-01-06')
+    );
+
+    expect($activities)->toHaveCount(2);
+    $times = $activities->pluck('startTime')->sort()->values();
+    expect($times[0])->toBe('07:00');
+    expect($times[1])->toBe('09:00');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Date Range Tests
+|--------------------------------------------------------------------------
+*/
+
+it('retrieves activities for a date range', function () {
+    // Daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // One-time activity on Jan 7
+    OneTimeActivity::factory()->create([
+        'church_id' => $this->church->id,
+        'date' => '2025-01-07',
+        'start_time' => '14:00',
+        'type' => 'mass',
+    ]);
+
+    $activities = $this->service->getActivitiesForChurchInRange(
+        $this->church,
+        Carbon::parse('2025-01-06'),
+        Carbon::parse('2025-01-08')
+    );
+
+    // Returns collection keyed by date
+    expect($activities)->toHaveCount(3);
+    expect($activities->keys()->all())->toBe(['2025-01-06', '2025-01-07', '2025-01-08']);
+
+    // Jan 6: 1 mass
+    expect($activities['2025-01-06'])->toHaveCount(1);
+
+    // Jan 7: 1 regular mass + 1 one-time
+    expect($activities['2025-01-07'])->toHaveCount(2);
+
+    // Jan 8: 1 mass
+    expect($activities['2025-01-08'])->toHaveCount(1);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Helper Method Tests
+|--------------------------------------------------------------------------
+*/
+
+it('checks if church has activities on a date', function () {
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Sunday,
+        'start_time' => '10:00',
+        'type' => 'mass',
+    ]);
+
+    // Sunday has activities
+    $hasSunday = $this->service->churchHasActivitiesOnDate(
+        $this->church,
+        Carbon::parse('2025-01-05') // Sunday
+    );
+    expect($hasSunday)->toBeTrue();
+
+    // Monday has no activities
+    $hasMonday = $this->service->churchHasActivitiesOnDate(
+        $this->church,
+        Carbon::parse('2025-01-06') // Monday
+    );
+    expect($hasMonday)->toBeFalse();
+});
+
+it('finds next date with activities', function () {
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Sunday,
+        'start_time' => '10:00',
+        'type' => 'mass',
+    ]);
+
+    // Starting from Monday Jan 6, next Sunday is Jan 12
+    $nextDate = $this->service->getNextDateWithActivities(
+        $this->church,
+        Carbon::parse('2025-01-06')
+    );
+
+    expect($nextDate)->not->toBeNull();
+    expect($nextDate->toDateString())->toBe('2025-01-12');
+});
+
+it('returns null when no activities within max days', function () {
+    // No schedules created
+
+    $nextDate = $this->service->getNextDateWithActivities(
+        $this->church,
+        Carbon::parse('2025-01-06'),
+        maxDaysToSearch: 7
+    );
+
+    expect($nextDate)->toBeNull();
+});
+
+/*
+|--------------------------------------------------------------------------
+| Search Activities Tests
+|--------------------------------------------------------------------------
+*/
+
+it('searches activities across churches', function () {
+    $church2 = Church::factory()->create([
+        'team_id' => $this->team->id,
+        'name' => 'St. Mary Cathedral',
+        'district' => 'Downtown',
+    ]);
+
+    // Church 1 in different district
+    $this->church->update(['district' => 'Suburbs', 'name' => 'Holy Family']);
+
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    ActivitySchedule::factory()->create([
+        'church_id' => $church2->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '09:00',
+        'type' => 'mass',
+    ]);
+
+    // Search all masses
+    $allMasses = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['mass']
+    );
+    expect($allMasses)->toHaveCount(2);
+
+    // Search by district
+    $downtownMasses = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['mass'],
+        district: 'Downtown'
+    );
+    expect($downtownMasses)->toHaveCount(1);
+    expect($downtownMasses->first()->startTime)->toBe('09:00');
+
+    // Search by church name
+    $maryMasses = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['mass'],
+        churchName: 'Mary'
+    );
+    expect($maryMasses)->toHaveCount(1);
+
+    // Filter by start time
+    $laterMasses = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['mass'],
+        startTime: '08:00'
+    );
+    expect($laterMasses)->toHaveCount(1);
+    expect($laterMasses->first()->startTime)->toBe('09:00');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Diocese-Level Rule Tests
+|--------------------------------------------------------------------------
+*/
+
+it('applies diocese-level rules to all churches in diocese', function () {
+    $diocese = \App\Models\Diocese::factory()->create(['team_id' => $this->team->id]);
+    $parish = \App\Models\Parish::factory()->create([
+        'diocese_id' => $diocese->id,
+        'team_id' => $this->team->id,
+    ]);
+
+    // Update church to belong to parish (and thus diocese)
+    $this->church->update([
+        'parishable_type' => \App\Models\Parish::class,
+        'parishable_id' => $parish->id,
+    ]);
+
+    // Daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Diocese-level rule to exclude on public holidays
+    ScheduleRule::factory()->create([
+        'scope_type' => 'diocese',
+        'scope_id' => $diocese->id,
+        'condition_type' => ScheduleRuleCondition::PublicHoliday,
+        'action' => ScheduleAction::Exclude,
+    ]);
+
+    // Create holiday
+    Holiday::factory()->fixed(1, 1)->create(['name' => 'New Year']);
+
+    // On holiday: diocese rule should exclude
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-01-01')
+    );
+
+    expect($activities)->toHaveCount(0);
+
+    // On normal day: should have mass
+    $normalActivities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-01-02')
+    );
+
+    expect($normalActivities)->toHaveCount(1);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Holiday Info Tests
+|--------------------------------------------------------------------------
+*/
+
+it('returns holiday info for a date', function () {
+    $holiday = Holiday::factory()->fixed(12, 25)->create(['name' => 'Christmas Day']);
+    HolidayInstance::factory()->create([
+        'holiday_id' => $holiday->id,
+        'year' => 2025,
+        'date' => '2025-12-25',
+    ]);
+
+    $info = $this->service->getHolidayInfoForDate(Carbon::parse('2025-12-25'));
+
+    expect($info['is_public_holiday'])->toBeTrue();
+    expect($info['holidays'])->toHaveCount(1);
+    expect($info['holidays'][0]['name'])->toBe('Christmas Day');
+
+    // Normal day
+    $normalInfo = $this->service->getHolidayInfoForDate(Carbon::parse('2025-12-26'));
+    expect($normalInfo['is_public_holiday'])->toBeFalse();
+    expect($normalInfo['holidays'])->toBeEmpty();
+});

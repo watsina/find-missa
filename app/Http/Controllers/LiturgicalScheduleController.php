@@ -34,7 +34,7 @@ class LiturgicalScheduleController extends Controller
                 $query->forYear((int) $request->input('year'));
             })
             ->orderBy('year', 'desc')
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
 
         return LiturgicalScheduleResource::collection($liturgicalSchedules);
     }

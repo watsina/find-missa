@@ -41,7 +41,7 @@ class ScheduleRuleController extends Controller
                 $query->where('is_active', filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN));
             })
             ->orderedByPriority()
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
 
         return ScheduleRuleResource::collection($scheduleRules);
     }
