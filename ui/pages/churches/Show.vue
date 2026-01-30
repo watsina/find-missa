@@ -19,7 +19,7 @@
   import ScheduleOverrideModal from '@/pages/activities/ScheduleOverrideModal.vue';
   import ScheduleRuleModal from '@/pages/activities/ScheduleRuleModal.vue';
   import LiturgicalScheduleModal from '@/pages/activities/LiturgicalScheduleModal.vue';
-  import { notify } from '@/utils';
+  import { notify, useDayjs } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
 
   const props = defineProps({
@@ -54,11 +54,12 @@
   const overrides = ref([]);
   const rules = ref([]);
   const liturgicalSchedules = ref([]);
+  const schedulePeriodsById = ref({});
 
   const scheduleHeaders = [
     { title: 'Type', value: 'type' },
     { title: 'Description', value: 'activity_type_description' },
-    { title: 'Pattern', value: 'day_pattern_label' },
+    { title: 'Days & Period', value: 'pattern_summary' },
     { title: 'Start Time', value: 'start_time' },
     { title: 'Language', value: 'language' },
     { title: '', value: 'actions' },
@@ -104,6 +105,7 @@
     fetchOverrides();
     fetchRules();
     fetchLiturgicalSchedules();
+    fetchSchedulePeriods();
   });
 
   const fetchChurchDetails = () => {
@@ -123,6 +125,17 @@
       .get('/api/v1/activity-schedules', { params: { church_id: props.churchId } })
       .then(({ data }) => {
         schedules.value = data.data;
+      });
+  };
+
+  const fetchSchedulePeriods = () => {
+    http
+      .get('/api/v1/schedule-periods', { params: { per_page: 100, is_active: true } })
+      .then(({ data }) => {
+        schedulePeriodsById.value = data.data.reduce((map, period) => {
+          map[period.id] = period.name;
+          return map;
+        }, {});
       });
   };
 
@@ -163,6 +176,92 @@
           times_count: item.times?.length || 0,
         }));
       });
+  };
+
+  const weekOfMonthLabels = {
+    1: 'First',
+    2: 'Second',
+    3: 'Third',
+    4: 'Fourth',
+    5: 'Last',
+  };
+
+  const formatPatternLabel = (schedule) => {
+    if (schedule?.day_pattern === 'monthly-nth' && schedule?.day_of_week) {
+      const weekLabel = schedule.week_of_month_label || weekOfMonthLabels[schedule.week_of_month];
+      if (weekLabel) {
+        return `${weekLabel} ${schedule.day_of_week} of every month`;
+      }
+    }
+
+    if (schedule?.day_pattern === 'specific' && schedule?.days_of_week?.length > 0) {
+      return `Every ${schedule.days_of_week.join(', ')}`;
+    }
+
+    if (schedule?.day_pattern === 'weekdays') {
+      return 'Every Monday–Friday';
+    }
+
+    if (schedule?.day_pattern === 'daily') {
+      return 'Every day';
+    }
+
+    if (schedule?.day_pattern === 'saturday') {
+      return 'Every Saturday';
+    }
+
+    if (schedule?.day_pattern === 'sunday') {
+      return 'Every Sunday';
+    }
+
+    return schedule?.day_pattern || 'Schedule';
+  };
+
+  const formatEffectiveRange = (schedule) => {
+    const start = schedule?.effective_from
+      ? useDayjs(schedule.effective_from).format('MMM D, YYYY')
+      : null;
+    const end = schedule?.effective_until
+      ? useDayjs(schedule.effective_until).format('MMM D, YYYY')
+      : null;
+
+    if (start && end) {
+      return `Effective ${start}–${end}`;
+    }
+
+    if (start) {
+      return `Effective from ${start}`;
+    }
+
+    if (end) {
+      return `Effective until ${end}`;
+    }
+
+    return null;
+  };
+
+  const formatSchedulePeriod = (schedule) => {
+    if (schedule?.schedule_period?.name) {
+      return schedule.schedule_period.name;
+    }
+
+    if (schedule?.schedule_period_id) {
+      return (
+        schedulePeriodsById.value[schedule.schedule_period_id] ||
+        `Schedule period #${schedule.schedule_period_id}`
+      );
+    }
+
+    return null;
+  };
+
+  const formatScheduleSummary = (schedule) => {
+    const parts = [
+      formatPatternLabel(schedule),
+      formatSchedulePeriod(schedule),
+      formatEffectiveRange(schedule),
+    ];
+    return parts.filter(Boolean).join(' • ');
   };
 
   // Delete handlers
@@ -310,12 +409,24 @@
               <!-- Regular Schedules Tab -->
               <v-window-item value="schedules">
                 <div class="tw:flex tw:justify-between tw:mb-4">
-                  <p class="tw:text-base tw:text-gray-700">Manage recurring activity schedules.</p>
+                  <div>
+                    <p class="tw:text-base tw:text-gray-700">
+                      Recurring schedules with days, periods, and effective dates shown.
+                    </p>
+                    <p class="tw:text-sm tw:text-gray-500">
+                      Each entry lists the weekly pattern, schedule period, and date range (if set).
+                    </p>
+                  </div>
                   <PrimaryButton @click="((scheduleToEdit = null), (showScheduleModal = true))">
                     Add Schedule
                   </PrimaryButton>
                 </div>
                 <data-table class="tw:capitalize" :headers="scheduleHeaders" :items="schedules">
+                  <template #item.pattern_summary="{ item }">
+                    <span class="tw:text-sm tw:text-gray-800">
+                      {{ formatScheduleSummary(item) }}
+                    </span>
+                  </template>
                   <template #item.actions="{ item }">
                     <v-icon
                       class="tw:mr-2"
@@ -337,9 +448,14 @@
               <!-- One-Time Activities Tab -->
               <v-window-item value="one-time">
                 <div class="tw:flex tw:justify-between tw:mb-4">
-                  <p class="tw:text-base tw:text-gray-700">
-                    Manage single-occurrence events (e.g., weddings, funerals).
-                  </p>
+                  <div>
+                    <p class="tw:text-base tw:text-gray-700">
+                      Single-occurrence activities with exact dates and times.
+                    </p>
+                    <p class="tw:text-sm tw:text-gray-500">
+                      Use this section for events that do not repeat.
+                    </p>
+                  </div>
                   <PrimaryButton @click="((activityToEdit = null), (showOneTimeModal = true))">
                     Add One-Time Activity
                   </PrimaryButton>
@@ -370,9 +486,14 @@
               <!-- Liturgical Schedules Tab -->
               <v-window-item value="liturgical">
                 <div class="tw:flex tw:justify-between tw:mb-4">
-                  <p class="tw:text-base tw:text-gray-700">
-                    Manage special mass times for holidays (e.g., Christmas, Easter).
-                  </p>
+                  <div>
+                    <p class="tw:text-base tw:text-gray-700">
+                      Holiday-specific schedules tied to liturgical dates.
+                    </p>
+                    <p class="tw:text-sm tw:text-gray-500">
+                      Shows the holiday, year, and number of special times configured.
+                    </p>
+                  </div>
                   <PrimaryButton
                     @click="((liturgicalScheduleToEdit = null), (showLiturgicalModal = true))"
                   >
@@ -414,9 +535,14 @@
               <!-- Exceptions Tab -->
               <v-window-item value="overrides">
                 <div class="tw:flex tw:justify-between tw:mb-4">
-                  <p class="tw:text-base tw:text-gray-700">
-                    Manage schedule exceptions (e.g., cancelled mass due to construction).
-                  </p>
+                  <div>
+                    <p class="tw:text-base tw:text-gray-700">
+                      Exceptions that override regular schedules over date ranges.
+                    </p>
+                    <p class="tw:text-sm tw:text-gray-500">
+                      Each entry lists a target activity and the affected dates.
+                    </p>
+                  </div>
                   <PrimaryButton @click="((overrideToEdit = null), (showOverrideModal = true))">
                     Add Exception
                   </PrimaryButton>
@@ -458,9 +584,14 @@
               <!-- Rules Tab -->
               <v-window-item value="rules">
                 <div class="tw:flex tw:justify-between tw:mb-4">
-                  <p class="tw:text-base tw:text-gray-700">
-                    Manage conditional rules (e.g., no regular mass on Good Friday).
-                  </p>
+                  <div>
+                    <p class="tw:text-base tw:text-gray-700">
+                      Conditional rules that automate changes to regular schedules.
+                    </p>
+                    <p class="tw:text-sm tw:text-gray-500">
+                      Each rule summarizes its condition and action.
+                    </p>
+                  </div>
                   <PrimaryButton @click="((ruleToEdit = null), (showRuleModal = true))">
                     Add Rule
                   </PrimaryButton>
