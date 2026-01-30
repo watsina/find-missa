@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\ActivitySchedule;
 
+use App\Models\Church;
 use App\Enums\DayPattern;
 use App\Enums\ActivityType;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use App\Models\ActivitySchedule;
 use App\Enums\ActivityTypeDescription;
@@ -28,7 +30,7 @@ class StoreActivityScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'church_id' => ['required', 'integer', 'exists:churches,id'],
+            'church_id' => ['required', 'integer', new ExistsInTeam(Church::class)],
             'type' => ['required', Rule::enum(ActivityType::class)],
             'activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'start_time' => ['required', 'date_format:H:i'],

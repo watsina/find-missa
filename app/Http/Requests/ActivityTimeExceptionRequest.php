@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ExistsInTeam;
+use App\Models\ActivityTime;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ActivityTimeExceptionRequest extends FormRequest
@@ -21,7 +23,7 @@ class ActivityTimeExceptionRequest extends FormRequest
     {
         return [
             'reason' => ['required', 'string', 'max:255'],
-            'activity_time_id' => ['required', 'integer', 'exists:activity_times,id'],
+            'activity_time_id' => ['required', 'integer', new ExistsInTeam(ActivityTime::class)],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ];

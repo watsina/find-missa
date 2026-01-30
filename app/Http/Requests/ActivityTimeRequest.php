@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Church;
 use App\Rules\DayOfWeek;
 use App\Enums\ActivityType;
+use App\Rules\ExistsInTeam;
 use App\Models\ActivityTime;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityOccurrence;
@@ -35,7 +37,7 @@ class ActivityTimeRequest extends FormRequest
             'start_time' => ['required_if:starting_times,null', 'nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['required', 'string', 'max:100'],
-            'church_id' => ['nullable', 'integer', 'exists:churches,id'],
+            'church_id' => ['nullable', 'integer', new ExistsInTeam(Church::class)],
             'occurrence' => ['required', Rule::enum(ActivityOccurrence::class)],
             'date' => ['required_if:occurrence,one-time', 'exclude_unless:occurrence,one-time', 'nullable', 'date'],
             'schedule_period_id' => ['nullable', 'integer', 'exists:schedule_periods,id'],

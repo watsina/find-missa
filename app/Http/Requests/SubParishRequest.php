@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Parish;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,7 +23,7 @@ class SubParishRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'parish_id' => ['required', 'integer', 'exists:parishes,id'],
+            'parish_id' => ['required', 'integer', new ExistsInTeam(Parish::class)],
             'name' => [
                 'required',
                 'string',

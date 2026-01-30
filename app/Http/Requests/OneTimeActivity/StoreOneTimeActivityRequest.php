@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\OneTimeActivity;
 
+use App\Models\Church;
 use App\Enums\ActivityType;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityTypeDescription;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +28,7 @@ class StoreOneTimeActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'church_id' => ['required', 'integer', 'exists:churches,id'],
+            'church_id' => ['required', 'integer', new ExistsInTeam(Church::class)],
             'type' => ['required', Rule::enum(ActivityType::class)],
             'activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'date' => ['required', 'date'],

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\LiturgicalSchedule;
 
+use App\Models\Church;
 use App\Enums\ActivityType;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use App\Enums\ActivityTypeDescription;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +28,7 @@ class StoreLiturgicalScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'church_id' => ['required', 'integer', 'exists:churches,id'],
+            'church_id' => ['required', 'integer', new ExistsInTeam(Church::class)],
             'holiday_id' => ['required', 'integer', 'exists:holidays,id'],
             'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
             'replaces_regular_schedule' => ['boolean'],
