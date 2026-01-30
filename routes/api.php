@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 require __DIR__.'/auth.php';
 
 Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
+Route::get('/search-v2', AppUsers\SearchActivitiesV2Controller::class)->name('search.v2');
 Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
 Route::get('/holiday-info', AppUsers\HolidayInfoController::class)->name('holiday-info');
 
@@ -61,4 +62,11 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::get('schedule-periods/upcoming', [Controllers\SchedulePeriodController::class, 'upcoming'])->name('schedule-periods.upcoming');
     Route::get('schedule-periods/check-overlap', [Controllers\SchedulePeriodController::class, 'checkOverlap'])->name('schedule-periods.check-overlap');
     Route::apiResource('schedule-periods', Controllers\SchedulePeriodController::class);
+
+    // Activity Schedules v2
+    Route::apiResource('activity-schedules', Controllers\ActivityScheduleController::class);
+    Route::apiResource('one-time-activities', Controllers\OneTimeActivityController::class);
+    Route::apiResource('schedule-rules', Controllers\ScheduleRuleController::class);
+    Route::apiResource('schedule-overrides', Controllers\ScheduleOverrideController::class);
+    Route::apiResource('liturgical-schedules', Controllers\LiturgicalScheduleController::class);
 });
