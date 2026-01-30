@@ -23,7 +23,7 @@ class LiturgicalScheduleController extends Controller
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $liturgicalSchedules = LiturgicalSchedule::query()
-            ->with('church:id,name', 'holiday:id,name,slug', 'times')
+            ->with('church:id,name', 'holiday:id,name,slug,type', 'times')
             ->when($request->has('church_id'), function (Builder $query) use ($request) {
                 $query->forChurch((int) $request->input('church_id'));
             })
