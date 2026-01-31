@@ -79,6 +79,7 @@ RUN apk add --no-cache --virtual .build-deps \
         bcmath \
         intl \
         mbstring \
+        pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis opcache \
     && apk del .build-deps \
