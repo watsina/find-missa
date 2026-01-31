@@ -25,12 +25,12 @@ class ClearDataController extends Controller
      */
     public function __invoke(Request $request)
     {
-        // Double protection: environment check AND super admin check
-        if (App::environment('production')) {
-            abort(403, 'This action is not allowed in production');
+        // Only allow in local environment
+        if (! App::environment('local')) {
+            abort(403, 'This action is only allowed in local environment');
         }
 
-        // Additional safeguard: only super admins can clear data
+        // Only super admins can clear data
         if (! $request->user()?->is_super_admin) {
             abort(403, 'Only super administrators can clear data');
         }
