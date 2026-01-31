@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Church;
-use App\Models\ActivityTag;
 use App\Models\ActivityTime;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
@@ -17,22 +16,19 @@ uses(RefreshDatabase::class);
 
 it('summarizes actions for dry run without writing data', function () {
     $church = Church::factory()->create();
-    $tag = ActivityTag::factory()->create();
 
-    $oneTime = ActivityTime::factory()->create([
+    ActivityTime::factory()->create([
         'church_id' => $church->id,
         'occurrence' => ActivityOccurrence::OneTime,
         'date' => now()->addDays(2),
         'start_time' => '09:00:00',
     ]);
-    $oneTime->tags()->attach($tag);
 
-    $daily = ActivityTime::factory()->create([
+    ActivityTime::factory()->create([
         'church_id' => $church->id,
         'occurrence' => ActivityOccurrence::Daily,
         'start_time' => '08:00:00',
     ]);
-    $daily->tags()->attach($tag);
 
     $weekly = ActivityTime::factory()->create([
         'church_id' => $church->id,
@@ -40,7 +36,6 @@ it('summarizes actions for dry run without writing data', function () {
         'day_of_week' => 'Monday',
         'start_time' => '07:00:00',
     ]);
-    $weekly->tags()->attach($tag);
 
     ActivityTimeException::factory()->create([
         'activity_time_id' => $weekly->id,
@@ -63,7 +58,6 @@ it('summarizes actions for dry run without writing data', function () {
         ->expectsOutputToContain('ActivitySchedule')
         ->expectsOutputToContain('OneTimeActivity')
         ->expectsOutputToContain('ScheduleOverride')
-        ->expectsOutputToContain('ActivityTag pivot')
         ->expectsOutputToContain('Per-church summary')
         ->expectsOutputToContain('Dry run complete. No changes were written.');
 

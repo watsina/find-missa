@@ -70,10 +70,6 @@ class UpdateActivityScheduleRequest extends FormRequest
             'day_details.*.language' => ['nullable', 'string', 'max:100'],
             'day_details.*.activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class)],
             'day_details.*.is_skipped' => ['boolean'],
-
-            // Tags
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:activity_tags,id'],
         ];
     }
 

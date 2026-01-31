@@ -36,7 +36,6 @@ readonly class ComputedActivity implements Arrayable
         public string $source,
         public ?int $sourceId = null,
         public ?string $holidayName = null,
-        public array $tags = [],
         public ?Church $church = null,
     ) {}
 
@@ -50,7 +49,6 @@ readonly class ComputedActivity implements Arrayable
         $schedule,
         Carbon $date,
         array $resolvedValues,
-        array $tags = [],
     ): self {
         return new self(
             churchId: $schedule->church_id,
@@ -63,7 +61,6 @@ readonly class ComputedActivity implements Arrayable
             source: self::SOURCE_SCHEDULE,
             sourceId: $schedule->id,
             holidayName: null,
-            tags: $tags,
             church: $schedule->relationLoaded('church') ? $schedule->church : null,
         );
     }
@@ -78,7 +75,6 @@ readonly class ComputedActivity implements Arrayable
         $time,
         $schedule,
         Carbon $date,
-        array $tags = [],
     ): self {
         return new self(
             churchId: $schedule->church_id,
@@ -91,7 +87,6 @@ readonly class ComputedActivity implements Arrayable
             source: self::SOURCE_LITURGICAL,
             sourceId: $time->id,
             holidayName: $schedule->holiday?->name,
-            tags: $tags,
             church: $schedule->relationLoaded('church') ? $schedule->church : null,
         );
     }
@@ -103,7 +98,6 @@ readonly class ComputedActivity implements Arrayable
      */
     public static function fromOneTimeActivity(
         $activity,
-        array $tags = [],
     ): self {
         return new self(
             churchId: $activity->church_id,
@@ -116,7 +110,6 @@ readonly class ComputedActivity implements Arrayable
             source: self::SOURCE_ONE_TIME,
             sourceId: $activity->id,
             holidayName: null,
-            tags: $tags,
             church: $activity->relationLoaded('church') ? $activity->church : null,
         );
     }
@@ -137,7 +130,6 @@ readonly class ComputedActivity implements Arrayable
             source: $this->source,
             sourceId: $this->sourceId,
             holidayName: $this->holidayName,
-            tags: $this->tags,
             church: $this->church,
         );
     }
@@ -158,7 +150,6 @@ readonly class ComputedActivity implements Arrayable
             source: $this->source,
             sourceId: $this->sourceId,
             holidayName: $this->holidayName,
-            tags: $this->tags,
             church: $church,
         );
     }
@@ -195,7 +186,6 @@ readonly class ComputedActivity implements Arrayable
             'source' => $this->source,
             'source_id' => $this->sourceId,
             'holiday_name' => $this->holidayName,
-            'tags' => $this->tags,
         ];
     }
 }

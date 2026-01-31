@@ -24,7 +24,7 @@ class ActivityScheduleController extends Controller
 
         $activitySchedules = ActivitySchedule::search($request->search)
             ->query(function (Builder $query) use ($request) {
-                $query->with('church:id,name', 'dayDetails', 'tags');
+                $query->with('church:id,name', 'dayDetails');
 
                 // Filter by schedule period
                 if ($request->has('schedule_period_id')) {
@@ -66,11 +66,10 @@ class ActivityScheduleController extends Controller
 
         $data = $request->validated();
         $dayDetails = $data['day_details'] ?? [];
-        $tags = $data['tags'] ?? [];
 
-        unset($data['day_details'], $data['tags']);
+        unset($data['day_details']);
 
-        $activitySchedule = DB::transaction(function () use ($data, $dayDetails, $tags) {
+        $activitySchedule = DB::transaction(function () use ($data, $dayDetails) {
             $activitySchedule = ActivitySchedule::create($data);
 
             // Create day details
@@ -78,15 +77,10 @@ class ActivityScheduleController extends Controller
                 $activitySchedule->dayDetails()->create($detail);
             }
 
-            // Attach tags
-            if (! empty($tags)) {
-                $activitySchedule->tags()->attach($tags);
-            }
-
             return $activitySchedule;
         });
 
-        $activitySchedule->load('dayDetails', 'tags');
+        $activitySchedule->load('dayDetails');
 
         return new ActivityScheduleResource($activitySchedule);
     }
@@ -95,7 +89,7 @@ class ActivityScheduleController extends Controller
     {
         Gate::authorize('view', $activitySchedule);
 
-        $activitySchedule->loadMissing('church', 'dayDetails', 'schedulePeriod', 'tags');
+        $activitySchedule->loadMissing('church', 'dayDetails', 'schedulePeriod');
 
         return new ActivityScheduleResource($activitySchedule);
     }
@@ -106,11 +100,10 @@ class ActivityScheduleController extends Controller
 
         $data = $request->validated();
         $dayDetails = $data['day_details'] ?? null;
-        $tags = $data['tags'] ?? null;
 
-        unset($data['day_details'], $data['tags']);
+        unset($data['day_details']);
 
-        DB::transaction(function () use ($activitySchedule, $data, $dayDetails, $tags) {
+        DB::transaction(function () use ($activitySchedule, $data, $dayDetails) {
             $activitySchedule->update($data);
 
             // Update day details if provided
@@ -123,14 +116,9 @@ class ActivityScheduleController extends Controller
                     $activitySchedule->dayDetails()->create($detail);
                 }
             }
-
-            // Sync tags if provided
-            if ($tags !== null) {
-                $activitySchedule->tags()->sync($tags);
-            }
         });
 
-        $activitySchedule->load('dayDetails', 'tags');
+        $activitySchedule->load('dayDetails');
 
         return new ActivityScheduleResource($activitySchedule);
     }
@@ -141,7 +129,6 @@ class ActivityScheduleController extends Controller
 
         DB::transaction(function () use ($activitySchedule) {
             $activitySchedule->dayDetails()->delete();
-            $activitySchedule->tags()->detach();
             $activitySchedule->delete();
         });
 

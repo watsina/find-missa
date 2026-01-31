@@ -37,7 +37,6 @@ class ActivityScheduleResource extends JsonResource
             'effective_from' => $this->effective_from?->toDateString(),
             'effective_until' => $this->effective_until?->toDateString(),
             'day_details' => ScheduleDayDetailResource::collection($this->whenLoaded('dayDetails')),
-            'tags' => ActivityTagResource::collection($this->whenLoaded('tags')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

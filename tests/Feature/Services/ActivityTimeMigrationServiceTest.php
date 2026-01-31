@@ -4,7 +4,6 @@ namespace Tests\Feature\Services;
 
 use App\Models\Church;
 use App\Enums\DayPattern;
-use App\Models\ActivityTag;
 use App\Enums\ScheduleScope;
 use App\Models\ActivityTime;
 use App\Enums\ScheduleAction;
@@ -22,7 +21,6 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->service = new ActivityTimeMigrationService;
     $this->church = Church::factory()->create();
-    $this->tag = ActivityTag::factory()->create(['name' => 'English', 'slug' => 'english']);
 });
 
 test('it migrates one-time activities correctly', function () {
@@ -33,7 +31,6 @@ test('it migrates one-time activities correctly', function () {
         'start_time' => '10:00:00',
         'type' => 'mass',
     ]);
-    $source->tags()->attach($this->tag);
 
     $this->service->migrateChurch($this->church);
 
@@ -42,8 +39,7 @@ test('it migrates one-time activities correctly', function () {
 
     expect($migrated->church_id)->toBe($source->church_id)
         ->and($migrated->date->toDateString())->toBe($source->date->toDateString())
-        ->and($migrated->start_time)->toBe('10:00') // Updated to match Timecast format
-        ->and($migrated->tags->contains($this->tag))->toBeTrue();
+        ->and($migrated->start_time)->toBe('10:00'); // Updated to match Timecast format
 });
 
 test('it migrates daily activities correctly', function () {

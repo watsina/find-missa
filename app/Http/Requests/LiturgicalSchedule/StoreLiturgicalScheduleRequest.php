@@ -41,8 +41,6 @@ class StoreLiturgicalScheduleRequest extends FormRequest
             'times.*.start_time' => ['required', 'date_format:H:i'],
             'times.*.end_time' => ['nullable', 'date_format:H:i', 'after:times.*.start_time'],
             'times.*.language' => ['required', 'string', 'max:100'],
-            'times.*.tags' => ['nullable', 'array'],
-            'times.*.tags.*' => ['integer', 'exists:activity_tags,id'],
         ];
     }
 

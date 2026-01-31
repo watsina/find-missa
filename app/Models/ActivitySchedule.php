@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ActivitySchedule extends BaseModel
 {
@@ -295,10 +294,5 @@ class ActivitySchedule extends BaseModel
     public function dayDetails(): HasMany
     {
         return $this->hasMany(ScheduleDayDetail::class);
-    }
-
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(ActivityTag::class, 'activity_schedule_tag');
     }
 }

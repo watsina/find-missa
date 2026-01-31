@@ -33,10 +33,6 @@ class UpdateOneTimeActivityRequest extends FormRequest
             'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['sometimes', 'required', 'string', 'max:100'],
             'reason' => ['nullable', 'string', 'max:255'],
-
-            // Tags
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:activity_tags,id'],
         ];
     }
 

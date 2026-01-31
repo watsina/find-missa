@@ -71,7 +71,6 @@ class MigrateActivityTimesCommand extends Command
                     ['ActivitySchedule', 'create', $stats['schedules_created']],
                     ['OneTimeActivity', 'create', $stats['one_time_created']],
                     ['ScheduleOverride', 'create', $stats['overrides_created']],
-                    ['ActivityTag pivot', 'sync', $stats['tag_syncs']],
                     ['ActivitySchedule', 'delete', $force ? $stats['deleted_schedules'] : 0],
                     ['OneTimeActivity', 'delete', $force ? $stats['deleted_one_time'] : 0],
                     ['ScheduleOverride', 'delete', $force ? $stats['deleted_overrides'] : 0],
@@ -79,14 +78,13 @@ class MigrateActivityTimesCommand extends Command
             );
 
             $this->line(sprintf(
-                'Dry run summary: ActivitySchedule create=%d delete=%d; OneTimeActivity create=%d delete=%d; ScheduleOverride create=%d delete=%d; ActivityTag pivot sync=%d',
+                'Dry run summary: ActivitySchedule create=%d delete=%d; OneTimeActivity create=%d delete=%d; ScheduleOverride create=%d delete=%d',
                 $stats['schedules_created'],
                 $force ? $stats['deleted_schedules'] : 0,
                 $stats['one_time_created'],
                 $force ? $stats['deleted_one_time'] : 0,
                 $stats['overrides_created'],
-                $force ? $stats['deleted_overrides'] : 0,
-                $stats['tag_syncs']
+                $force ? $stats['deleted_overrides'] : 0
             ));
 
             if (! empty($stats['by_church'])) {
@@ -101,7 +99,6 @@ class MigrateActivityTimesCommand extends Command
                         $churchStats['schedules_created'] ?? 0,
                         $churchStats['one_time_created'] ?? 0,
                         $churchStats['overrides_created'] ?? 0,
-                        $churchStats['tag_syncs'] ?? 0,
                         $force ? ($churchStats['deleted_schedules'] ?? 0) : 0,
                         $force ? ($churchStats['deleted_one_time'] ?? 0) : 0,
                         $force ? ($churchStats['deleted_overrides'] ?? 0) : 0,
@@ -114,7 +111,6 @@ class MigrateActivityTimesCommand extends Command
                         'Schedules Create',
                         'One-Time Create',
                         'Overrides Create',
-                        'Tag Syncs',
                         'Schedules Delete',
                         'One-Time Delete',
                         'Overrides Delete',

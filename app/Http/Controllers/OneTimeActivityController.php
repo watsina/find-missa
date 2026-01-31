@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\OneTimeActivity;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Resources\OneTimeActivityResource;
@@ -23,7 +22,7 @@ class OneTimeActivityController extends Controller
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $oneTimeActivities = OneTimeActivity::query()
-            ->with('church:id,name', 'tags')
+            ->with('church:id,name')
             ->when($request->has('church_id'), function (Builder $query) use ($request) {
                 $query->forChurch((int) $request->input('church_id'));
             })
@@ -50,22 +49,7 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('create', OneTimeActivity::class);
 
-        $data = $request->validated();
-        $tags = $data['tags'] ?? [];
-
-        unset($data['tags']);
-
-        $oneTimeActivity = DB::transaction(function () use ($data, $tags) {
-            $oneTimeActivity = OneTimeActivity::create($data);
-
-            if (! empty($tags)) {
-                $oneTimeActivity->tags()->attach($tags);
-            }
-
-            return $oneTimeActivity;
-        });
-
-        $oneTimeActivity->load('tags');
+        $oneTimeActivity = OneTimeActivity::create($request->validated());
 
         return new OneTimeActivityResource($oneTimeActivity);
     }
@@ -74,7 +58,7 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('view', $oneTimeActivity);
 
-        $oneTimeActivity->loadMissing('church', 'tags');
+        $oneTimeActivity->loadMissing('church');
 
         return new OneTimeActivityResource($oneTimeActivity);
     }
@@ -83,20 +67,7 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('update', $oneTimeActivity);
 
-        $data = $request->validated();
-        $tags = $data['tags'] ?? null;
-
-        unset($data['tags']);
-
-        DB::transaction(function () use ($oneTimeActivity, $data, $tags) {
-            $oneTimeActivity->update($data);
-
-            if ($tags !== null) {
-                $oneTimeActivity->tags()->sync($tags);
-            }
-        });
-
-        $oneTimeActivity->load('tags');
+        $oneTimeActivity->update($request->validated());
 
         return new OneTimeActivityResource($oneTimeActivity);
     }
@@ -105,10 +76,7 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('delete', $oneTimeActivity);
 
-        DB::transaction(function () use ($oneTimeActivity) {
-            $oneTimeActivity->tags()->detach();
-            $oneTimeActivity->delete();
-        });
+        $oneTimeActivity->delete();
 
         return response()->noContent();
     }

@@ -25,7 +25,6 @@ class OneTimeActivityResource extends JsonResource
             'end_time' => $this->end_time,
             'language' => $this->language,
             'reason' => $this->reason,
-            'tags' => ActivityTagResource::collection($this->whenLoaded('tags')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

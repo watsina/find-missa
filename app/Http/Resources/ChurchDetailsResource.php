@@ -257,7 +257,6 @@ class ChurchDetailsResource extends JsonResource
             'day_details' => $schedule->has_day_variations
                 ? ScheduleDayDetailResource::collection($schedule->dayDetails)
                 : [],
-            'tags' => ActivityTagResource::collection($schedule->tags ?? collect()),
             'effective_from' => $schedule->effective_from?->toDateString(),
             'effective_until' => $schedule->effective_until?->toDateString(),
         ];
@@ -293,7 +292,6 @@ class ChurchDetailsResource extends JsonResource
             'end_time' => $activity->end_time,
             'language' => $activity->language,
             'reason' => $activity->reason,
-            'tags' => ActivityTagResource::collection($activity->tags ?? collect()),
         ];
     }
 }

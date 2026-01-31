@@ -34,9 +34,6 @@ class ClearDataController extends Controller
 
         try {
             // Truncate pivot tables first
-            DB::table('activity_time_tag')->truncate();
-            DB::table('activity_schedule_tag')->truncate();
-            DB::table('one_time_activity_tag')->truncate();
             DB::table('liturgical_schedule_times')->truncate();
             DB::table('schedule_day_details')->truncate();
 

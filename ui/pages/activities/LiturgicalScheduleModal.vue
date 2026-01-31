@@ -67,7 +67,6 @@
     start_time: '',
     end_time: '',
     language: 'English',
-    tags: [],
   });
 
   const addTimeEntry = () => {
@@ -118,7 +117,6 @@
           start_time: t.start_time || '',
           end_time: t.end_time || '',
           language: t.language || 'English',
-          tags: t.tags || [],
         }));
       } else {
         // Reset form for new schedule

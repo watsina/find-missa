@@ -6,7 +6,6 @@ use App\Casts\Timecast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class LiturgicalScheduleTime extends Model
 {
@@ -49,13 +48,5 @@ class LiturgicalScheduleTime extends Model
     public function liturgicalSchedule(): BelongsTo
     {
         return $this->belongsTo(LiturgicalSchedule::class);
-    }
-
-    /**
-     * Get the tags for this liturgical schedule time.
-     */
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(ActivityTag::class, 'liturgical_schedule_time_tag');
     }
 }

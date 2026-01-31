@@ -79,7 +79,6 @@
     week_of_month: props.schedule?.week_of_month || null,
     has_day_variations: props.schedule?.has_day_variations || false,
     day_details: props.schedule?.day_details || [],
-    tags: props.schedule?.tags || [],
   });
 
   // Computed properties for conditional display
@@ -161,7 +160,6 @@
         form.week_of_month = newValue?.week_of_month || null;
         form.has_day_variations = newValue?.has_day_variations || false;
         form.day_details = newValue?.day_details || [];
-        form.tags = newValue?.tags || [];
 
         effectiveFromDate.value = newValue?.effective_from
           ? parser.date(newValue.effective_from)

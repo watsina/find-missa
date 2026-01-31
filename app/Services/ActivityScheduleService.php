@@ -110,7 +110,7 @@ class ActivityScheduleService
             ->where('church_id', $church->id)
             ->effectiveOn($date)
             ->matchesDayPattern($date)
-            ->with(['dayDetails', 'tags']);
+            ->with(['dayDetails']);
 
         if ($includeChurch) {
             $query->with('church');
@@ -131,9 +131,7 @@ class ActivityScheduleService
                 return null;
             }
 
-            $tags = $schedule->tags->pluck('name')->all();
-
-            $activity = ComputedActivity::fromSchedule($schedule, $date, $resolvedValues, $tags);
+            $activity = ComputedActivity::fromSchedule($schedule, $date, $resolvedValues);
 
             // Attach church if needed and not already loaded
             if ($includeChurch && $activity->church === null) {
@@ -154,7 +152,7 @@ class ActivityScheduleService
         $query = LiturgicalSchedule::query()
             ->forChurch($church)
             ->applicableOnDate($date)
-            ->with(['times.tags', 'holiday']);
+            ->with(['times', 'holiday']);
 
         if ($includeChurch) {
             $query->with('church');
@@ -171,9 +169,7 @@ class ActivityScheduleService
             }
 
             return $times->map(function ($time) use ($schedule, $date, $church, $includeChurch) {
-                $tags = $time->tags->pluck('name')->all();
-
-                $activity = ComputedActivity::fromLiturgicalTime($time, $schedule, $date, $tags);
+                $activity = ComputedActivity::fromLiturgicalTime($time, $schedule, $date);
 
                 // Attach church if needed and not already loaded
                 if ($includeChurch && $activity->church === null) {
@@ -215,8 +211,7 @@ class ActivityScheduleService
     {
         $query = OneTimeActivity::query()
             ->forChurch($church)
-            ->onDate($date)
-            ->with('tags');
+            ->onDate($date);
 
         if ($includeChurch) {
             $query->with('church');
@@ -227,9 +222,7 @@ class ActivityScheduleService
         }
 
         return $query->get()->map(function (OneTimeActivity $activity) use ($church, $includeChurch) {
-            $tags = $activity->tags->pluck('name')->all();
-
-            $computedActivity = ComputedActivity::fromOneTimeActivity($activity, $tags);
+            $computedActivity = ComputedActivity::fromOneTimeActivity($activity);
 
             // Attach church if needed and not already loaded
             if ($includeChurch && $computedActivity->church === null) {

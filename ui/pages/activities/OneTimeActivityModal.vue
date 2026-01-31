@@ -52,7 +52,6 @@
     language: props.activity?.language || '',
     date: props.activity?.date || null,
     church_id: props.church?.id || '',
-    tags: props.activity?.tags || [],
   });
 
   watch(
@@ -66,7 +65,6 @@
         form.language = newValue?.language || '';
         form.date = newValue?.date || null;
         form.church_id = newValue?.church_id || '';
-        form.tags = newValue?.tags || [];
 
         date.value = parser.date(newValue?.date || currentDate);
       }

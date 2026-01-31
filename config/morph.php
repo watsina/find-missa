@@ -16,7 +16,6 @@ return [
     'church' => Models\Church::class,
     'activity-time' => Models\ActivityTime::class,
     'activity-time-exception' => Models\ActivityTimeException::class,
-    'activity-tag' => Models\ActivityTag::class,
     'priest' => Models\Priest::class,
     'global-activity-time-exception' => Models\GlobalActivityTimeException::class,
     'holiday' => Models\Holiday::class,

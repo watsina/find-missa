@@ -31,7 +31,6 @@ class ComputedActivityResource extends JsonResource
             'source' => $this->source,
             'source_id' => $this->sourceId,
             'holiday_name' => $this->holidayName,
-            'tags' => $this->tags,
         ];
     }
 }

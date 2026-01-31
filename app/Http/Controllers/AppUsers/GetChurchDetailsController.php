@@ -19,8 +19,7 @@ class GetChurchDetailsController extends Controller
         $church->loadMissing([
             'activitySchedules.schedulePeriod',
             'activitySchedules.dayDetails',
-            'activitySchedules.tags',
-            'oneTimeActivities.tags',
+            'oneTimeActivities',
             'liturgicalSchedules.holiday',
             'liturgicalSchedules.times',
             'parishable',

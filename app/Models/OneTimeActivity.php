@@ -7,7 +7,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class OneTimeActivity extends BaseModel
 {
@@ -81,14 +80,6 @@ class OneTimeActivity extends BaseModel
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
-    }
-
-    /**
-     * Get the tags for this activity.
-     */
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(ActivityTag::class, 'one_time_activity_tag');
     }
 
     /**
