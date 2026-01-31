@@ -23,6 +23,8 @@
   import EntityDetails from '@/components/EntityDetails.vue';
   import ActivityScheduleSection from '@/components/ActivityScheduleSection.vue';
   import SchedulePeriodActivities from '@/components/SchedulePeriodActivities.vue';
+  import OneTimeActivitySection from '@/components/OneTimeActivitySection.vue';
+  import LiturgicalScheduleSection from '@/components/LiturgicalScheduleSection.vue';
 
   const props = defineProps({
     churchId: { type: [String, Number], required: true },
@@ -33,6 +35,8 @@
   const church = ref(null);
   const regularSchedule = ref(null);
   const schedulePeriods = ref([]);
+  const oneTimeActivities = ref(null);
+  const liturgicalSchedules = ref([]);
   const isFetching = ref(false);
   const activeTab = ref('regular');
 
@@ -115,6 +119,20 @@
     schedulePeriods.value.filter((p) => hasActivities(p.activities)),
   );
 
+  // Computed: Check if there are any one-time activities
+  const hasOneTimeActivities = computed(() => {
+    const a = oneTimeActivities.value;
+    return (a?.mass?.length || 0) + (a?.confession?.length || 0) + (a?.adoration?.length || 0) > 0;
+  });
+
+  // Computed: Check if there are any liturgical schedules
+  const hasLiturgicalSchedules = computed(() => liturgicalSchedules.value.length > 0);
+
+  // Computed: Check if special schedules tab should show
+  const hasSpecialSchedules = computed(
+    () => hasSchedulePeriods.value || hasOneTimeActivities.value || hasLiturgicalSchedules.value,
+  );
+
   const fetchChurchDetails = () => {
     if (!props.churchId) return;
     isFetching.value = true;
@@ -124,6 +142,8 @@
         church.value = data?.data?.details || {};
         regularSchedule.value = data?.data?.regular_schedule || null;
         schedulePeriods.value = data?.data?.schedule_periods || [];
+        oneTimeActivities.value = data?.data?.one_time_activities || null;
+        liturgicalSchedules.value = data?.data?.liturgical_schedules || [];
       })
       .catch(() => notify.error('Something went wrong fetching the church details.'))
       .finally(() => (isFetching.value = false));
@@ -225,7 +245,7 @@
                 <v-icon :icon="mdiCalendarClock" start />
                 Regular Schedule
               </v-tab>
-              <v-tab v-if="hasSchedulePeriods" value="special">
+              <v-tab v-if="hasSpecialSchedules" value="special">
                 <v-icon :icon="mdiCalendarMonth" start />
                 Special Schedules
               </v-tab>
@@ -276,58 +296,81 @@
               </v-tabs-window-item>
 
               <!-- Special Schedules Tab -->
-              <v-tabs-window-item v-if="hasSchedulePeriods" value="special">
+              <v-tabs-window-item v-if="hasSpecialSchedules" value="special">
                 <v-card-text>
-                  <v-expansion-panels>
-                    <v-expansion-panel v-for="period in periodsWithActivities" :key="period.id">
-                      <v-expansion-panel-title>
-                        <div class="tw:flex tw:items-center tw:gap-2">
-                          <v-chip
-                            v-if="period.is_current"
-                            color="success"
-                            size="x-small"
-                            variant="flat"
-                          >
-                            Current
-                          </v-chip>
-                          <span class="tw:font-semibold">{{ period.name }}</span>
-                          <span class="tw:text-sm tw:text-gray-500">
-                            ({{ period.formatted_date_range }})
-                          </span>
-                        </div>
-                      </v-expansion-panel-title>
-                      <v-expansion-panel-text>
-                        <p v-if="period.description" class="tw:mb-4 tw:text-gray-600">
-                          {{ period.description }}
-                        </p>
+                  <!-- Schedule Periods Section -->
+                  <section v-if="hasSchedulePeriods" class="tw:mb-6">
+                    <h2 class="tw:text-lg tw:font-semibold tw:mb-3">Liturgical Seasons</h2>
+                    <v-expansion-panels>
+                      <v-expansion-panel v-for="period in periodsWithActivities" :key="period.id">
+                        <v-expansion-panel-title>
+                          <div class="tw:flex tw:items-center tw:gap-2">
+                            <v-chip
+                              v-if="period.is_current"
+                              color="success"
+                              size="x-small"
+                              variant="flat"
+                            >
+                              Current
+                            </v-chip>
+                            <span class="tw:font-semibold">{{ period.name }}</span>
+                            <span class="tw:text-sm tw:text-gray-500">
+                              ({{ period.formatted_date_range }})
+                            </span>
+                          </div>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <p v-if="period.description" class="tw:mb-4 tw:text-gray-600">
+                            {{ period.description }}
+                          </p>
 
-                        <!-- Period Mass Schedule -->
-                        <SchedulePeriodActivities
-                          activity-name="Mass"
-                          color="primary"
-                          :schedule="period.activities?.mass"
-                          title="Mass Schedule"
-                        />
+                          <!-- Period Mass Schedule -->
+                          <SchedulePeriodActivities
+                            activity-name="Mass"
+                            color="primary"
+                            :schedule="period.activities?.mass"
+                            title="Mass Schedule"
+                          />
 
-                        <!-- Period Confession Schedule -->
-                        <SchedulePeriodActivities
-                          activity-name="Confession"
-                          color="secondary"
-                          :schedule="period.activities?.confession"
-                          title="Confession Schedule"
-                        />
+                          <!-- Period Confession Schedule -->
+                          <SchedulePeriodActivities
+                            activity-name="Confession"
+                            color="secondary"
+                            :schedule="period.activities?.confession"
+                            title="Confession Schedule"
+                          />
 
-                        <!-- Period Adoration Schedule -->
-                        <SchedulePeriodActivities
-                          activity-name="Adoration"
-                          color="info"
-                          :schedule="period.activities?.adoration"
-                          :show-end-time="true"
-                          title="Adoration Schedule"
-                        />
-                      </v-expansion-panel-text>
-                    </v-expansion-panel>
-                  </v-expansion-panels>
+                          <!-- Period Adoration Schedule -->
+                          <SchedulePeriodActivities
+                            activity-name="Adoration"
+                            color="info"
+                            :schedule="period.activities?.adoration"
+                            :show-end-time="true"
+                            title="Adoration Schedule"
+                          />
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </section>
+
+                  <v-divider v-if="hasSchedulePeriods && hasOneTimeActivities" class="tw:my-4" />
+
+                  <!-- One-time Activities Section -->
+                  <OneTimeActivitySection
+                    v-if="hasOneTimeActivities"
+                    :activities="oneTimeActivities"
+                  />
+
+                  <v-divider
+                    v-if="(hasSchedulePeriods || hasOneTimeActivities) && hasLiturgicalSchedules"
+                    class="tw:my-4"
+                  />
+
+                  <!-- Liturgical Schedules Section -->
+                  <LiturgicalScheduleSection
+                    v-if="hasLiturgicalSchedules"
+                    :schedules="liturgicalSchedules"
+                  />
                 </v-card-text>
               </v-tabs-window-item>
             </v-tabs-window>

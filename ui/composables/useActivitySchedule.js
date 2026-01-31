@@ -74,27 +74,31 @@ export default function useActivitySchedule() {
   };
 
   /**
-   * Check if an activity type has any activities
+   * Check if v2 schedule has any data for a single activity type
+   * V2 format uses: weekdays, saturday, sunday, daily, specific, monthly_nth
    */
-  const hasActivityType = (activityType) => {
+  const hasActivityTypeV2 = (activityType) => {
     if (!activityType) return false;
     return (
-      Object.keys(activityType.weekly || {}).length > 0 ||
+      (activityType.weekdays || []).length > 0 ||
+      (activityType.saturday || []).length > 0 ||
+      (activityType.sunday || []).length > 0 ||
       (activityType.daily || []).length > 0 ||
-      (activityType.monthly || []).length > 0 ||
-      (activityType.one_time || []).length > 0
+      (activityType.specific || []).length > 0 ||
+      (activityType.monthly_nth || []).length > 0
     );
   };
 
   /**
    * Check if a schedule has any activities (mass, confession, or adoration)
+   * Updated for v2 format
    */
   const hasActivities = (schedule) => {
     if (!schedule) return false;
     return (
-      hasActivityType(schedule.mass) ||
-      hasActivityType(schedule.confession) ||
-      hasActivityType(schedule.adoration)
+      hasActivityTypeV2(schedule.mass) ||
+      hasActivityTypeV2(schedule.confession) ||
+      hasActivityTypeV2(schedule.adoration)
     );
   };
 
@@ -104,7 +108,7 @@ export default function useActivitySchedule() {
     formatTypeDescription,
     formatActivityDescription,
     formatDate,
-    hasActivityType,
+    hasActivityTypeV2,
     hasActivities,
   };
 }

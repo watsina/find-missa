@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\ActivityTime;
+use App\Enums\DayPattern;
 use Illuminate\Http\Request;
-use App\Enums\ActivityOccurrence;
+use App\Models\OneTimeActivity;
+use App\Models\ActivitySchedule;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,11 +28,16 @@ class ChurchDetailsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $activities = $this->activities;
+        $activitySchedules = $this->activitySchedules ?? collect();
+        $oneTimeActivities = $this->oneTimeActivities ?? collect();
 
-        // Separate activities by their schedule context
-        $regularActivities = $activities->filter(fn ($a) => $a->schedule_period_id === null);
-        $schedulePeriodActivities = $activities->filter(fn ($a) => $a->schedule_period_id !== null);
+        // Separate schedules by their schedule context
+        $regularSchedules = $activitySchedules->filter(fn ($s) => $s->schedule_period_id === null);
+        $schedulePeriodSchedules = $activitySchedules->filter(fn ($s) => $s->schedule_period_id !== null);
+
+        // Filter one-time activities to only include current or future dates
+        $today = now()->toDateString();
+        $futureOneTimeActivities = $oneTimeActivities->filter(fn ($a) => $a->date && $a->date->gte($today));
 
         return [
             'details' => [
@@ -52,22 +58,38 @@ class ChurchDetailsResource extends JsonResource
                 'parish' => $this->whenLoaded('parishable'),
             ],
 
-            // Regular schedule (no schedule period)
+            // Regular schedule (no schedule period) grouped by day pattern
             'regular_schedule' => [
-                'mass' => $this->formatActivitiesByOccurrence(
-                    $regularActivities->filter(fn ($a) => in_array($a->type, ['mass', 'anticipation-mass', 'traditional-latin-mass']))
+                'mass' => $this->formatSchedulesByDayPattern(
+                    $regularSchedules->filter(fn ($s) => in_array($s->type, ['mass', 'anticipation-mass', 'traditional-latin-mass']))
                 ),
-                'confession' => $this->formatActivitiesByOccurrence(
-                    $regularActivities->filter(fn ($a) => $a->type === 'confession')
+                'confession' => $this->formatSchedulesByDayPattern(
+                    $regularSchedules->filter(fn ($s) => $s->type === 'confession')
                 ),
-                'adoration' => $this->formatActivitiesByOccurrence(
-                    $regularActivities->filter(fn ($a) => $a->type === 'adoration')
+                'adoration' => $this->formatSchedulesByDayPattern(
+                    $regularSchedules->filter(fn ($s) => $s->type === 'adoration')
                 ),
             ],
 
+            // One-time activities (future dates only)
+            'one_time_activities' => [
+                'mass' => $this->formatOneTimeActivities(
+                    $futureOneTimeActivities->filter(fn ($a) => in_array($a->type, ['mass', 'anticipation-mass', 'traditional-latin-mass']))
+                ),
+                'confession' => $this->formatOneTimeActivities(
+                    $futureOneTimeActivities->filter(fn ($a) => $a->type === 'confession')
+                ),
+                'adoration' => $this->formatOneTimeActivities(
+                    $futureOneTimeActivities->filter(fn ($a) => $a->type === 'adoration')
+                ),
+            ],
+
+            // Liturgical schedules (holiday schedules)
+            'liturgical_schedules' => LiturgicalScheduleResource::collection($this->whenLoaded('liturgicalSchedules')),
+
             // Schedule period specific activities
-            'schedule_periods' => $this->schedulePeriods?->map(function ($period) use ($schedulePeriodActivities) {
-                $periodActivities = $schedulePeriodActivities->filter(fn ($a) => $a->schedule_period_id === $period->id);
+            'schedule_periods' => $this->schedulePeriods?->map(function ($period) use ($schedulePeriodSchedules) {
+                $periodSchedules = $schedulePeriodSchedules->filter(fn ($s) => $s->schedule_period_id === $period->id);
 
                 return [
                     'id' => $period->id,
@@ -79,94 +101,98 @@ class ChurchDetailsResource extends JsonResource
                     'formatted_date_range' => $period->formatted_date_range,
                     'is_current' => $period->isCurrent(),
                     'activities' => [
-                        'mass' => $this->formatActivitiesByOccurrence(
-                            $periodActivities->filter(fn ($a) => in_array($a->type, ['mass', 'anticipation-mass', 'traditional-latin-mass']))
+                        'mass' => $this->formatSchedulesByDayPattern(
+                            $periodSchedules->filter(fn ($s) => in_array($s->type, ['mass', 'anticipation-mass', 'traditional-latin-mass']))
                         ),
-                        'confession' => $this->formatActivitiesByOccurrence(
-                            $periodActivities->filter(fn ($a) => $a->type === 'confession')
+                        'confession' => $this->formatSchedulesByDayPattern(
+                            $periodSchedules->filter(fn ($s) => $s->type === 'confession')
                         ),
-                        'adoration' => $this->formatActivitiesByOccurrence(
-                            $periodActivities->filter(fn ($a) => $a->type === 'adoration')
+                        'adoration' => $this->formatSchedulesByDayPattern(
+                            $periodSchedules->filter(fn ($s) => $s->type === 'adoration')
                         ),
                     ],
                 ];
             }) ?? [],
-
-            // Legacy format for backward compatibility
-            'mass' => $this->activities()->whereIn('type', ['mass', 'anticipation-mass', 'traditional-latin-mass'])->get(),
-            'confession' => $this->activities()->where('type', 'confession')->get(),
-            'adoration' => $this->activities()->where('type', 'adoration')->get(),
         ];
     }
 
     /**
-     * Format activities grouped by occurrence type.
+     * Format schedules grouped by day pattern.
      *
-     * @return array<string, mixed>
+     * @return array<string, array>
      */
-    protected function formatActivitiesByOccurrence(Collection $activities): array
+    protected function formatSchedulesByDayPattern(Collection $schedules): array
     {
-        $weekly = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'weekly');
-        $daily = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'daily');
-        $monthlyNthWeekday = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'monthly-nth-weekday');
-        $oneTime = $activities->filter(fn ($a) => $this->getOccurrenceValue($a) === 'one-time');
-
-        // Filter one-time events to only include current or future dates
-        $today = now()->toDateString();
-        $oneTime = $oneTime->filter(fn ($a) => $a->date && $a->date->gte($today));
-
         return [
-            'weekly' => $this->formatWeeklyActivities($weekly),
-            'daily' => $daily->map(fn ($a) => $this->formatActivity($a))->values()->all(),
-            'monthly' => $this->formatMonthlyActivities($monthlyNthWeekday),
-            'one_time' => $oneTime->map(fn ($a) => $this->formatActivity($a))->values()->all(),
+            'weekdays' => $this->formatSchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::Weekdays->value)
+            ),
+            'saturday' => $this->formatSchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::Saturday->value)
+            ),
+            'sunday' => $this->formatSchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::Sunday->value)
+            ),
+            'daily' => $this->formatSchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::Daily->value)
+            ),
+            'specific' => $this->formatSpecificSchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::Specific->value)
+            ),
+            'monthly_nth' => $this->formatMonthlySchedules(
+                $schedules->filter(fn ($s) => $this->getDayPatternValue($s) === DayPattern::MonthlyNth->value)
+            ),
         ];
     }
 
     /**
-     * Get the occurrence value as a string.
+     * Get the day pattern value from a schedule.
      */
-    protected function getOccurrenceValue(ActivityTime $activity): string
+    protected function getDayPatternValue(ActivitySchedule $schedule): string
     {
-        $occurrence = $activity->occurrence;
+        $dayPattern = $schedule->day_pattern;
 
-        if ($occurrence instanceof ActivityOccurrence) {
-            return $occurrence->value;
+        if ($dayPattern instanceof DayPattern) {
+            return $dayPattern->value;
         }
 
-        return (string) $occurrence;
+        return (string) $dayPattern;
     }
 
     /**
-     * Format weekly activities grouped by day of week.
+     * Format a collection of schedules.
      *
-     * @return array<string, array>
+     * @return array<int, array>
      */
-    protected function formatWeeklyActivities(Collection $activities): array
+    protected function formatSchedules(Collection $schedules): array
     {
-        $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        $grouped = [];
-
-        foreach ($days as $day) {
-            $dayActivities = $activities->filter(fn ($a) => strcasecmp($a->day_of_week, $day) === 0);
-            if ($dayActivities->isNotEmpty()) {
-                $grouped[$day] = $dayActivities
-                    ->sortBy('start_time')
-                    ->map(fn ($a) => $this->formatActivity($a))
-                    ->values()
-                    ->all();
-            }
-        }
-
-        return $grouped;
+        return $schedules
+            ->sortBy('start_time')
+            ->map(fn ($s) => $this->formatSchedule($s))
+            ->values()
+            ->all();
     }
 
     /**
-     * Format monthly activities grouped by week of month and day.
+     * Format specific day schedules (grouped by days_of_week).
      *
-     * @return array<string, array>
+     * @return array<int, array>
      */
-    protected function formatMonthlyActivities(Collection $activities): array
+    protected function formatSpecificSchedules(Collection $schedules): array
+    {
+        return $schedules
+            ->sortBy('start_time')
+            ->map(fn ($s) => $this->formatSchedule($s))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Format monthly-nth schedules (grouped by week of month and day).
+     *
+     * @return array<int, array>
+     */
+    protected function formatMonthlySchedules(Collection $schedules): array
     {
         $weekLabels = [
             1 => 'First',
@@ -178,20 +204,20 @@ class ChurchDetailsResource extends JsonResource
 
         $grouped = [];
 
-        foreach ($activities as $activity) {
-            $weekLabel = $weekLabels[$activity->week_of_month] ?? 'Unknown';
-            $key = "{$weekLabel} {$activity->day_of_week}";
+        foreach ($schedules as $schedule) {
+            $weekLabel = $weekLabels[$schedule->week_of_month] ?? 'Unknown';
+            $key = "{$weekLabel} {$schedule->day_of_week}";
 
             if (! isset($grouped[$key])) {
                 $grouped[$key] = [
                     'label' => $key,
-                    'week_of_month' => $activity->week_of_month,
-                    'day_of_week' => $activity->day_of_week,
-                    'activities' => [],
+                    'week_of_month' => $schedule->week_of_month,
+                    'day_of_week' => $schedule->day_of_week,
+                    'schedules' => [],
                 ];
             }
 
-            $grouped[$key]['activities'][] = $this->formatActivity($activity);
+            $grouped[$key]['schedules'][] = $this->formatSchedule($schedule);
         }
 
         // Sort by week_of_month, then by day order
@@ -209,27 +235,65 @@ class ChurchDetailsResource extends JsonResource
     }
 
     /**
-     * Format a single activity time.
+     * Format a single activity schedule.
      *
      * @return array<string, mixed>
      */
-    protected function formatActivity(ActivityTime $activity): array
+    protected function formatSchedule(ActivitySchedule $schedule): array
+    {
+        return [
+            'id' => $schedule->id,
+            'type' => $schedule->type,
+            'activity_type_description' => $schedule->activity_type_description,
+            'start_time' => $schedule->start_time,
+            'end_time' => $schedule->end_time,
+            'language' => $schedule->language,
+            'day_pattern' => $this->getDayPatternValue($schedule),
+            'days_of_week' => $schedule->days_of_week,
+            'week_of_month' => $schedule->week_of_month,
+            'week_of_month_label' => $schedule->week_of_month_label,
+            'day_of_week' => $schedule->day_of_week,
+            'has_day_variations' => $schedule->has_day_variations,
+            'day_details' => $schedule->has_day_variations
+                ? ScheduleDayDetailResource::collection($schedule->dayDetails)
+                : [],
+            'tags' => ActivityTagResource::collection($schedule->tags ?? collect()),
+            'effective_from' => $schedule->effective_from?->toDateString(),
+            'effective_until' => $schedule->effective_until?->toDateString(),
+        ];
+    }
+
+    /**
+     * Format one-time activities.
+     *
+     * @return array<int, array>
+     */
+    protected function formatOneTimeActivities(Collection $activities): array
+    {
+        return $activities
+            ->sortBy('date')
+            ->map(fn ($a) => $this->formatOneTimeActivity($a))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Format a single one-time activity.
+     *
+     * @return array<string, mixed>
+     */
+    protected function formatOneTimeActivity(OneTimeActivity $activity): array
     {
         return [
             'id' => $activity->id,
             'type' => $activity->type,
             'activity_type_description' => $activity->activity_type_description,
+            'date' => $activity->date->toDateString(),
             'start_time' => $activity->start_time,
             'end_time' => $activity->end_time,
             'language' => $activity->language,
-            'occurrence' => $this->getOccurrenceValue($activity),
-            'day_of_week' => $activity->day_of_week,
-            'week_of_month' => $activity->week_of_month,
-            'week_of_month_label' => $activity->week_of_month_label,
-            'date' => $activity->date?->toDateString(),
-            'effective_from' => $activity->effective_from?->toDateString(),
-            'effective_until' => $activity->effective_until?->toDateString(),
-            'has_exceptions' => $activity->exceptions->isNotEmpty(),
+            'reason' => $activity->reason,
+            'tags' => ActivityTagResource::collection($activity->tags ?? collect()),
         ];
     }
 }

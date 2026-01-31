@@ -17,8 +17,12 @@ class GetChurchDetailsController extends Controller
     public function __invoke(Request $request, Church $church)
     {
         $church->loadMissing([
-            'activities.schedulePeriod',
-            'activities.exceptions',
+            'activitySchedules.schedulePeriod',
+            'activitySchedules.dayDetails',
+            'activitySchedules.tags',
+            'oneTimeActivities.tags',
+            'liturgicalSchedules.holiday',
+            'liturgicalSchedules.times',
             'parishable',
         ]);
 
