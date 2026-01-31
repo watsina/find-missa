@@ -15,7 +15,7 @@ test('user switches team successfully', function () {
 
     $this->actingAsUser($user)
         ->put('/api/v1/switch-team', ['team_id' => $team->id])
-        ->assertOk();
+        ->assertNoContent();
 
     assertEquals($team->id, $user->fresh()->current_team_id);
 });

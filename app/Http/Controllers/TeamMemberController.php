@@ -47,6 +47,12 @@ class TeamMemberController extends Controller
             'role_ids.*' => 'required|exists:roles,id',
         ]);
 
+        $member->loadMissing('user');
+
+        if (! $member->user) {
+            abort(422, 'Team member has no associated user');
+        }
+
         $member->user->syncRoles($data['role_ids']);
 
         $member->loadMissing('user.roles');

@@ -31,7 +31,7 @@ test("it doesn't run on production.", function () {
     $this->actingAsSuperAdmin();
 
     deleteJson(route('clear-data'))
-        ->assertStatus(500);
+        ->assertForbidden();
 
     stillHasData();
 });

@@ -33,12 +33,7 @@ class ActivitiesImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
 
             $parish = Parish::where('name', trim($row['parish_name']))
                 ->where('diocese_id', $this->diocese->id)
-                // ->firstOrFail();
-                ->first();
-
-            if (! $parish) {
-                dd($row['parish_name']);
-            }
+                ->firstOrFail();
 
             if (isset($row['sub_parish_name'])) {
                 $parishType = 'subParish';
