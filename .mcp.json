@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ]
+    },
+    "vuetify-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@vuetify/mcp"
+      ]
+    }
+  }
