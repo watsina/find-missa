@@ -210,7 +210,7 @@
 
   function getResults() {
     form.date = useDayjs(date.value).format('YYYY-MM-DD');
-    form.get('/api/v1/search', {
+    form.get('/api/v1/search-v2', {
       onSuccess: (data) => {
         results.value = data || [];
         dateUsed.value = form.date;
@@ -383,9 +383,7 @@
                 {{ showDate }}
               </span>
               <span class="tw:text-base">
-                {{
-                  `${!smAndDown ? 'Showing:' : ''} ${results?.data?.length} of ${results?.meta?.total} results`
-                }}
+                {{ `${!smAndDown ? 'Results:' : ''} ${results?.data?.length || 0}` }}
               </span>
             </v-card-title>
             <v-divider opacity="10"></v-divider>
@@ -403,8 +401,8 @@
             </v-card>
             <v-timeline v-else class="tw:md:ml-4" density="comfortable" side="end">
               <v-timeline-item
-                v-for="activity in results?.data"
-                :key="activity?.id"
+                v-for="(activity, index) in results?.data"
+                :key="`${activity?.church_id}-${activity?.start_time}-${index}`"
                 dot-color="primary"
                 size="small"
               >
@@ -416,6 +414,15 @@
                     <strong class="tw:capitalize">
                       {{ `${activity?.activity_type_description} (${activity?.language})` }}
                     </strong>
+                    <v-chip
+                      v-if="activity?.holiday_name"
+                      class="tw:ml-2"
+                      color="purple"
+                      size="x-small"
+                      variant="tonal"
+                    >
+                      {{ activity.holiday_name }}
+                    </v-chip>
                     <div>
                       <NavLink
                         class="tw:text-indigo-600"
