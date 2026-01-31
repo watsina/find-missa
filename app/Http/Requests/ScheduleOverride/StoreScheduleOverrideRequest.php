@@ -30,7 +30,7 @@ class StoreScheduleOverrideRequest extends FormRequest
             'scope_type' => ['required', Rule::enum(ScheduleScope::class)],
             'scope_id' => ['required', 'integer'],
             'name' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
+            'reason' => ['nullable', 'string', 'max:1000'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'action' => ['required', Rule::enum(ScheduleAction::class)],

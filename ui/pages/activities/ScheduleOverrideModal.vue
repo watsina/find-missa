@@ -50,7 +50,7 @@
     scope_type: props.dioceseId ? 'diocese' : 'church',
     scope_id: props.dioceseId || props.churchId || '',
     name: props.override?.name || '',
-    description: props.override?.description || '',
+    reason: props.override?.reason || '',
     start_date: props.override?.start_date || null,
     end_date: props.override?.end_date || null,
     action: props.override?.action || 'exclude',
@@ -74,7 +74,7 @@
         form.scope_type = newValue.scope_type;
         form.scope_id = newValue.scope_id;
         form.name = newValue.name || '';
-        form.description = newValue.description || '';
+        form.reason = newValue.reason || '';
         form.action = newValue.action || 'exclude';
         form.activity_type = newValue.activity_type || null;
         form.target_times = newValue.target_times || [];
@@ -268,12 +268,12 @@
 
           <div class="tw:mt-4">
             <v-textarea
-              v-model="form.description"
+              v-model="form.reason"
               auto-grow
               class="tw:mt-1"
               counter
-              :error-messages="form.errors.description"
-              label="Description (Optional)"
+              :error-messages="form.errors.reason"
+              label="Reason (Optional)"
               rows="2"
               variant="outlined"
             />

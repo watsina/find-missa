@@ -23,7 +23,7 @@ class ScheduleOverrideResource extends JsonResource
                 : $this->scope_type,
             'scope_id' => $this->scope_id,
             'name' => $this->name,
-            'description' => $this->description,
+            'reason' => $this->reason,
             'start_date' => $this->start_date?->toDateString(),
             'end_date' => $this->end_date?->toDateString(),
             'action' => $this->action instanceof ScheduleAction

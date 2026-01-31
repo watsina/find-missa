@@ -30,7 +30,7 @@ class UpdateScheduleOverrideRequest extends FormRequest
             'scope_type' => ['sometimes', 'required', Rule::enum(ScheduleScope::class)],
             'scope_id' => ['sometimes', 'required', 'integer'],
             'name' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
+            'reason' => ['nullable', 'string', 'max:1000'],
             'start_date' => ['sometimes', 'required', 'date'],
             'end_date' => ['sometimes', 'required', 'date', 'after_or_equal:start_date'],
             'action' => ['sometimes', 'required', Rule::enum(ScheduleAction::class)],
