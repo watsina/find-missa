@@ -11,6 +11,7 @@ use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
 use App\Models\ScheduleOverride;
 use App\Enums\ActivityOccurrence;
+use App\Models\ScheduleDayDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ActivityTimeException;
@@ -312,11 +313,149 @@ class ActivityTimeMigrationService
     }
 
     /**
+     * Determine the appropriate DayPattern from an array of day names.
+     *
+     * @param  array<string>  $days
+     * @return array{pattern: DayPattern, days: array<string>|null}
+     */
+    protected function determineDayPattern(array $days): array
+    {
+        $normalizedDays = array_map(fn ($d) => ucfirst(strtolower($d)), $days);
+        sort($normalizedDays);
+
+        $weekdays = ['Friday', 'Monday', 'Thursday', 'Tuesday', 'Wednesday'];
+        $allDays = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday'];
+
+        if ($normalizedDays === $weekdays) {
+            return ['pattern' => DayPattern::Weekdays, 'days' => null];
+        }
+        if ($normalizedDays === ['Saturday']) {
+            return ['pattern' => DayPattern::Saturday, 'days' => null];
+        }
+        if ($normalizedDays === ['Sunday']) {
+            return ['pattern' => DayPattern::Sunday, 'days' => null];
+        }
+        if ($normalizedDays === $allDays) {
+            return ['pattern' => DayPattern::Daily, 'days' => null];
+        }
+
+        return ['pattern' => DayPattern::Specific, 'days' => $days];
+    }
+
+    /**
+     * Split activities by day type (weekdays, saturday, sunday).
+     *
+     * @param  array<string, ActivityTime>  $dayActivities
+     * @return array<string, array<string, ActivityTime>>
+     */
+    protected function splitByDayType(array $dayActivities): array
+    {
+        $weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+        $result = [
+            'weekdays' => [],
+            'saturday' => [],
+            'sunday' => [],
+        ];
+
+        foreach ($dayActivities as $day => $activity) {
+            $normalizedDay = ucfirst(strtolower($day));
+            if (in_array($normalizedDay, $weekdays)) {
+                $result['weekdays'][$day] = $activity;
+            } elseif ($normalizedDay === 'Saturday') {
+                $result['saturday'][$day] = $activity;
+            } elseif ($normalizedDay === 'Sunday') {
+                $result['sunday'][$day] = $activity;
+            }
+        }
+
+        return array_filter($result, fn ($group) => ! empty($group));
+    }
+
+    /**
+     * Determine the default language for a schedule.
+     * Prefers English, otherwise uses the most common language.
+     *
+     * @param  array<string, ActivityTime>  $dayActivities
+     */
+    protected function determineDefaultLanguage(array $dayActivities): string
+    {
+        $languages = collect($dayActivities)->pluck('language')->filter();
+
+        if ($languages->contains('English')) {
+            return 'English';
+        }
+
+        return $languages->countBy()->sortDesc()->keys()->first() ?? 'English';
+    }
+
+    /**
+     * Create an ActivitySchedule for a specific day type group.
+     *
+     * @param  array<string, ActivityTime>  $dayActivities
+     */
+    protected function createScheduleForDayGroup(
+        Church $church,
+        ActivityTime $first,
+        array $dayActivities
+    ): void {
+        $days = array_keys($dayActivities);
+        $patternResult = $this->determineDayPattern($days);
+
+        $defaultLanguage = $this->determineDefaultLanguage($dayActivities);
+
+        $variations = [];
+        foreach ($dayActivities as $day => $activity) {
+            if ($activity->language && $activity->language !== $defaultLanguage) {
+                $variations[$day] = $activity->language;
+            }
+        }
+
+        $hasVariations = ! empty($variations);
+
+        $this->countSchedules++;
+        $this->recordCreated($church->id, 'schedules', $first->type);
+
+        $new = new ActivitySchedule;
+        $new->church_id = $church->id;
+        $new->team_id = $first->team_id;
+        $new->schedule_period_id = $first->schedule_period_id;
+        $new->type = $first->type;
+        $new->activity_type_description = $first->activity_type_description;
+        $new->start_time = $first->start_time;
+        $new->end_time = $first->end_time;
+        $new->day_pattern = $patternResult['pattern'];
+        $new->days_of_week = $patternResult['days'];
+        $new->effective_from = $first->effective_from;
+        $new->effective_until = $first->effective_until;
+        $new->language = $defaultLanguage;
+        $new->has_day_variations = $hasVariations;
+        $new->save();
+
+        if ($hasVariations) {
+            foreach ($variations as $day => $language) {
+                ScheduleDayDetail::create([
+                    'activity_schedule_id' => $new->id,
+                    'day_of_week' => $day,
+                    'language' => $language,
+                ]);
+            }
+        }
+
+        $subGroupTagIds = collect($dayActivities)
+            ->flatMap(fn ($item) => $item->tags->pluck('id'))
+            ->unique()
+            ->toArray();
+        $this->recordTagSyncs($subGroupTagIds, $church->id);
+        $this->syncTags($new, $subGroupTagIds);
+    }
+
+    /**
      * Migrate Weekly Activities with Grouping Logic.
      */
     protected function migrateWeeklyActivities(Collection $weeklyActivities, Church $church): void
     {
-        // Group by key attributes to merge same-time activities into one schedule
+        // Group by key attributes EXCLUDING language to allow day variations
         $grouped = $weeklyActivities->groupBy(function ($item) {
             // Normalize times to H:i format to ensure consistent grouping
             $startTime = $item->start_time ? substr($item->start_time, 0, 5) : 'null';
@@ -325,7 +464,6 @@ class ActivityTimeMigrationService
             return implode('|', [
                 $item->schedule_period_id ?? 'null',
                 $item->type,
-                $item->language,
                 $startTime,
                 $endTime,
                 $item->effective_from?->toDateString() ?? 'null',
@@ -339,45 +477,30 @@ class ActivityTimeMigrationService
             /** @var ActivityTime $first */
             $first = $group->first();
 
-            // Extract distinct days
-            $days = $group->pluck('day_of_week')
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
+            // Build day → activity mapping
+            $dayActivities = [];
+            foreach ($group as $activity) {
+                $day = $activity->day_of_week;
+                if ($day) {
+                    $dayActivities[$day] = $activity;
+                }
+            }
 
-            // If no days found (shouldn't happen for Weekly), skip or handle
-            if (empty($days)) {
+            if (empty($dayActivities)) {
                 continue;
             }
 
-            $this->countSchedules++;
-            $this->recordCreated($church->id, 'schedules', $first->type);
+            // Split by day type (weekdays, saturday, sunday)
+            $dayTypeGroups = $this->splitByDayType($dayActivities);
 
-            $new = new ActivitySchedule;
-            $new->church_id = $church->id;
-            $new->team_id = $first->team_id;
-            $new->schedule_period_id = $first->schedule_period_id;
-            $new->type = $first->type;
-            $new->activity_type_description = $first->activity_type_description;
-            $new->language = $first->language;
-            $new->start_time = $first->start_time;
-            $new->end_time = $first->end_time;
-
-            // Determine Pattern: if all 7 days, convert to Daily? Or keep as Specific?
-            // For now, mapping 'Weekly' -> 'Specific' is safest to preserve intent unless it's genuinely every day.
-            // If the set of days is exactly M-F, we could use Weekdays, but Specific is robust.
-            $new->day_pattern = DayPattern::Specific;
-            $new->days_of_week = $days;
-
-            $new->effective_from = $first->effective_from;
-            $new->effective_until = $first->effective_until;
-            $new->save();
-
-            // Merge tags from all items in the group
-            $allTagIds = $group->flatMap(fn ($item) => $item->tags->pluck('id'))->unique()->toArray();
-            $this->recordTagSyncs($allTagIds, $church->id);
-            $this->syncTags($new, $allTagIds);
+            // Create a schedule for each day type sub-group
+            foreach ($dayTypeGroups as $subGroupActivities) {
+                $this->createScheduleForDayGroup(
+                    $church,
+                    $first,
+                    $subGroupActivities
+                );
+            }
         }
     }
 
@@ -479,6 +602,7 @@ class ActivityTimeMigrationService
 
     protected function previewWeeklyActivities(Collection $weeklyActivities): void
     {
+        // Group by key attributes EXCLUDING language to match actual migration logic
         $grouped = $weeklyActivities->groupBy(function ($item) {
             $startTime = $item->start_time ? substr($item->start_time, 0, 5) : 'null';
             $endTime = $item->end_time ? substr($item->end_time, 0, 5) : 'null';
@@ -486,7 +610,6 @@ class ActivityTimeMigrationService
             return implode('|', [
                 $item->schedule_period_id ?? 'null',
                 $item->type,
-                $item->language,
                 $startTime,
                 $endTime,
                 $item->effective_from?->toDateString() ?? 'null',
@@ -497,28 +620,38 @@ class ActivityTimeMigrationService
         });
 
         foreach ($grouped as $group) {
-            $days = $group->pluck('day_of_week')
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
+            // Build day → activity mapping
+            $dayActivities = [];
+            foreach ($group as $activity) {
+                $day = $activity->day_of_week;
+                if ($day) {
+                    $dayActivities[$day] = $activity;
+                }
+            }
 
-            if (empty($days)) {
+            if (empty($dayActivities)) {
                 continue;
             }
 
-            $this->countSchedules++;
+            // Split by day type (same as migrate)
+            $dayTypeGroups = $this->splitByDayType($dayActivities);
 
             $churchId = $group->first()?->church_id;
-            if ($churchId !== null) {
-                $this->recordCreated($churchId, 'schedules', $group->first()?->type);
+
+            // Count one schedule per day type sub-group
+            foreach ($dayTypeGroups as $subGroupActivities) {
+                $this->countSchedules++;
+
+                if ($churchId !== null) {
+                    $this->recordCreated($churchId, 'schedules', $group->first()?->type);
+                }
+
+                $subGroupTagIds = collect($subGroupActivities)
+                    ->flatMap(fn ($item) => $item->tags->pluck('id'))
+                    ->unique()
+                    ->toArray();
+                $this->recordTagSyncs($subGroupTagIds, $churchId);
             }
-
-            $allTagIds = $group->flatMap(fn ($item) => $item->tags->pluck('id'))
-                ->unique()
-                ->toArray();
-
-            $this->recordTagSyncs($allTagIds, $churchId);
         }
     }
 

@@ -163,3 +163,175 @@ test('it handles force migration by clearing old data', function () {
     // Should still be 1, not 2 (duplicates avoided by clearing)
     expect(ActivitySchedule::count())->toBe(1);
 });
+
+test('it detects weekdays pattern (Mon-Fri)', function () {
+    $team = \App\Models\Team::factory()->create();
+    $commonData = [
+        'church_id' => $this->church->id,
+        'team_id' => $team->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'start_time' => '07:00:00',
+        'type' => 'mass',
+        'language' => 'English',
+    ];
+
+    foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day) {
+        ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => $day]));
+    }
+
+    $this->service->migrateChurch($this->church);
+
+    expect(ActivitySchedule::count())->toBe(1);
+    $schedule = ActivitySchedule::first();
+    expect($schedule->day_pattern)->toBe(DayPattern::Weekdays)
+        ->and($schedule->days_of_week)->toBeNull()
+        ->and($schedule->has_day_variations)->toBeFalse()
+        ->and($schedule->language)->toBe('English');
+});
+
+test('it detects saturday pattern', function () {
+    ActivityTime::factory()->create([
+        'church_id' => $this->church->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'day_of_week' => 'Saturday',
+        'start_time' => '17:00:00',
+        'type' => 'mass',
+    ]);
+
+    $this->service->migrateChurch($this->church);
+
+    $schedule = ActivitySchedule::first();
+    expect($schedule->day_pattern)->toBe(DayPattern::Saturday)
+        ->and($schedule->days_of_week)->toBeNull();
+});
+
+test('it detects sunday pattern', function () {
+    ActivityTime::factory()->create([
+        'church_id' => $this->church->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'day_of_week' => 'Sunday',
+        'start_time' => '10:00:00',
+        'type' => 'mass',
+    ]);
+
+    $this->service->migrateChurch($this->church);
+
+    $schedule = ActivitySchedule::first();
+    expect($schedule->day_pattern)->toBe(DayPattern::Sunday)
+        ->and($schedule->days_of_week)->toBeNull();
+});
+
+test('it creates day variations for weekdays with different languages', function () {
+    $team = \App\Models\Team::factory()->create();
+    $commonData = [
+        'church_id' => $this->church->id,
+        'team_id' => $team->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'start_time' => '07:00:00',
+        'type' => 'mass',
+    ];
+
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Monday', 'language' => 'English']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Tuesday', 'language' => 'Swahili']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Wednesday', 'language' => 'English']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Thursday', 'language' => 'Luganda']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Friday', 'language' => 'English']));
+
+    $this->service->migrateChurch($this->church);
+
+    // Should create 1 schedule with day variations
+    expect(ActivitySchedule::count())->toBe(1);
+
+    $schedule = ActivitySchedule::first();
+    expect($schedule->day_pattern)->toBe(DayPattern::Weekdays)
+        ->and($schedule->has_day_variations)->toBeTrue()
+        ->and($schedule->language)->toBe('English'); // Default language is English
+
+    // Should have only 2 day detail records (variations from default)
+    expect(\App\Models\ScheduleDayDetail::count())->toBe(2);
+
+    expect(\App\Models\ScheduleDayDetail::where('day_of_week', 'Tuesday')->first()->language)->toBe('Swahili');
+    expect(\App\Models\ScheduleDayDetail::where('day_of_week', 'Thursday')->first()->language)->toBe('Luganda');
+});
+
+test('it splits all 7 days into Weekdays, Saturday, and Sunday schedules', function () {
+    $team = \App\Models\Team::factory()->create();
+    $commonData = [
+        'church_id' => $this->church->id,
+        'team_id' => $team->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'start_time' => '06:00:00',
+        'type' => 'mass',
+        'language' => 'English',
+    ];
+
+    foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day) {
+        ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => $day]));
+    }
+
+    $this->service->migrateChurch($this->church);
+
+    // Should create 3 schedules: Weekdays + Saturday + Sunday
+    expect(ActivitySchedule::count())->toBe(3);
+
+    expect(ActivitySchedule::where('day_pattern', DayPattern::Weekdays)->exists())->toBeTrue();
+    expect(ActivitySchedule::where('day_pattern', DayPattern::Saturday)->exists())->toBeTrue();
+    expect(ActivitySchedule::where('day_pattern', DayPattern::Sunday)->exists())->toBeTrue();
+});
+
+test('it splits Mon-Sat into Weekdays and Saturday schedules', function () {
+    $team = \App\Models\Team::factory()->create();
+    $commonData = [
+        'church_id' => $this->church->id,
+        'team_id' => $team->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'start_time' => '07:00:00',
+        'type' => 'mass',
+        'language' => 'English',
+    ];
+
+    foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day) {
+        ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => $day]));
+    }
+
+    $this->service->migrateChurch($this->church);
+
+    // Should create 2 schedules: Weekdays + Saturday
+    expect(ActivitySchedule::count())->toBe(2);
+
+    $weekdaySchedule = ActivitySchedule::where('day_pattern', DayPattern::Weekdays)->first();
+    $saturdaySchedule = ActivitySchedule::where('day_pattern', DayPattern::Saturday)->first();
+
+    expect($weekdaySchedule)->not->toBeNull()
+        ->and($weekdaySchedule->language)->toBe('English');
+
+    expect($saturdaySchedule)->not->toBeNull()
+        ->and($saturdaySchedule->language)->toBe('English');
+});
+
+test('it uses most common language as default when English not present', function () {
+    $team = \App\Models\Team::factory()->create();
+    $commonData = [
+        'church_id' => $this->church->id,
+        'team_id' => $team->id,
+        'occurrence' => ActivityOccurrence::Weekly,
+        'start_time' => '07:00:00',
+        'type' => 'mass',
+    ];
+
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Monday', 'language' => 'Swahili']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Tuesday', 'language' => 'Swahili']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Wednesday', 'language' => 'Swahili']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Thursday', 'language' => 'Luganda']));
+    ActivityTime::factory()->create(array_merge($commonData, ['day_of_week' => 'Friday', 'language' => 'Swahili']));
+
+    $this->service->migrateChurch($this->church);
+
+    $schedule = ActivitySchedule::first();
+    expect($schedule->language)->toBe('Swahili') // Most common
+        ->and($schedule->has_day_variations)->toBeTrue();
+
+    // Only 1 day detail (Thu→Luganda)
+    expect(\App\Models\ScheduleDayDetail::count())->toBe(1);
+    expect(\App\Models\ScheduleDayDetail::first()->language)->toBe('Luganda');
+});
