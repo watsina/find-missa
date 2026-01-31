@@ -271,7 +271,7 @@
                   <!-- Confession Schedule -->
                   <ActivityScheduleSection
                     activity-name="Confession"
-                    color="secondary"
+                    color="purple"
                     :google-form-url="googleFormUrl"
                     :icon="mdiClock"
                     :schedule="regularSchedule?.confession"
@@ -335,7 +335,7 @@
                           <!-- Period Confession Schedule -->
                           <SchedulePeriodActivities
                             activity-name="Confession"
-                            color="secondary"
+                            color="purple"
                             :schedule="period.activities?.confession"
                             title="Confession Schedule"
                           />
