@@ -495,7 +495,7 @@
             <v-window v-model="activeTab" class="tw:mt-4">
               <!-- Regular Schedules Tab -->
               <v-window-item value="schedules">
-                <div class="tw:flex tw:justify-between tw:mb-4">
+                <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
                   <div>
                     <p class="tw:text-base tw:text-gray-700">
                       Recurring schedules with days, periods, and effective dates shown.
@@ -646,7 +646,7 @@
 
               <!-- One-Time Activities Tab -->
               <v-window-item value="one-time">
-                <div class="tw:flex tw:justify-between tw:mb-4">
+                <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
                   <div>
                     <p class="tw:text-base tw:text-gray-700">
                       Single-occurrence activities with exact dates and times.
@@ -684,7 +684,7 @@
 
               <!-- Liturgical Schedules Tab -->
               <v-window-item value="liturgical">
-                <div class="tw:flex tw:justify-between tw:mb-4">
+                <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
                   <div>
                     <p class="tw:text-base tw:text-gray-700">
                       Holiday-specific schedules tied to liturgical dates.
@@ -733,7 +733,7 @@
 
               <!-- Exceptions Tab -->
               <v-window-item value="overrides">
-                <div class="tw:flex tw:justify-between tw:mb-4">
+                <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
                   <div>
                     <p class="tw:text-base tw:text-gray-700">
                       Exceptions that override regular schedules over date ranges.
@@ -782,7 +782,7 @@
 
               <!-- Rules Tab -->
               <v-window-item value="rules">
-                <div class="tw:flex tw:justify-between tw:mb-4">
+                <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
                   <div>
                     <p class="tw:text-base tw:text-gray-700">
                       Conditional rules that automate changes to regular schedules.
