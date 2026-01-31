@@ -9,6 +9,8 @@
     mdiAlertCircleOutline,
     mdiCalendarMonth,
     mdiCalendarStar,
+    mdiPlus,
+    mdiCancel,
   } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -19,6 +21,7 @@
   import ScheduleOverrideModal from '@/pages/activities/ScheduleOverrideModal.vue';
   import ScheduleRuleModal from '@/pages/activities/ScheduleRuleModal.vue';
   import LiturgicalScheduleModal from '@/pages/activities/LiturgicalScheduleModal.vue';
+  import DayVariationModal from '@/pages/activities/DayVariationModal.vue';
   import { notify, useDayjs } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
 
@@ -45,6 +48,12 @@
   const ruleToEdit = ref(null);
   const liturgicalScheduleToEdit = ref(null);
 
+  // Day variation states
+  const showVariationModal = ref(false);
+  const variationSchedule = ref(null);
+  const variationToEdit = ref(null);
+  const savingVariation = ref(false);
+
   const deletingItem = ref(false);
   const activeTab = ref('schedules');
 
@@ -55,15 +64,6 @@
   const rules = ref([]);
   const liturgicalSchedules = ref([]);
   const schedulePeriodsById = ref({});
-
-  const scheduleHeaders = [
-    { title: 'Type', value: 'type' },
-    { title: 'Description', value: 'activity_type_description' },
-    { title: 'Days & Period', value: 'pattern_summary' },
-    { title: 'Start Time', value: 'start_time' },
-    { title: 'Language', value: 'language' },
-    { title: '', value: 'actions' },
-  ];
 
   const oneTimeHeaders = [
     { title: 'Type', value: 'type' },
@@ -264,6 +264,93 @@
     return parts.filter(Boolean).join(' • ');
   };
 
+  const supportsVariations = (pattern) => {
+    return ['daily', 'weekdays', 'specific'].includes(pattern);
+  };
+
+  const getExistingVariationDays = (schedule) => {
+    return (schedule?.day_details || []).map((d) => d.day_of_week);
+  };
+
+  const formatVariationChange = (variation, schedule) => {
+    if (variation.is_skipped) {
+      return 'Skipped';
+    }
+
+    const changes = [];
+    if (variation.start_time) {
+      const baseTime = schedule?.start_time || 'N/A';
+      changes.push(`${variation.start_time} (instead of ${baseTime})`);
+    }
+    if (variation.end_time && variation.end_time !== schedule?.end_time) {
+      changes.push(`ends ${variation.end_time}`);
+    }
+    if (variation.language) {
+      const baseLang = schedule?.language || 'N/A';
+      changes.push(`${variation.language} (instead of ${baseLang})`);
+    }
+
+    return changes.length > 0 ? changes.join(', ') : 'No changes';
+  };
+
+  const openVariationModal = (schedule, variation = null) => {
+    variationSchedule.value = schedule;
+    variationToEdit.value = variation;
+    showVariationModal.value = true;
+  };
+
+  const saveVariation = async (variationData) => {
+    if (!variationSchedule.value) return;
+
+    savingVariation.value = true;
+    const schedule = variationSchedule.value;
+    const existingDetails = [...(schedule.day_details || [])];
+
+    // If editing, replace the existing variation; otherwise add new
+    const existingIndex = existingDetails.findIndex(
+      (d) => d.day_of_week === variationData.day_of_week,
+    );
+
+    if (existingIndex !== -1) {
+      existingDetails[existingIndex] = { ...existingDetails[existingIndex], ...variationData };
+    } else {
+      existingDetails.push(variationData);
+    }
+
+    try {
+      const response = await http.put(`/api/v1/activity-schedules/${schedule.id}`, {
+        day_details: existingDetails,
+        has_day_variations: existingDetails.length > 0,
+      });
+      onScheduleUpdated(response.data.data);
+      notify.success('Day variation saved');
+    } catch {
+      notify.error('Failed to save day variation');
+    } finally {
+      savingVariation.value = false;
+    }
+  };
+
+  const deleteVariation = async (schedule, dayOfWeek) => {
+    if (!(await notify.confirm(`Remove the variation for ${dayOfWeek}?`))) return;
+
+    savingVariation.value = true;
+    const existingDetails = (schedule.day_details || []).filter((d) => d.day_of_week !== dayOfWeek);
+
+    try {
+      const response = await http.put(`/api/v1/activity-schedules/${schedule.id}`, {
+        day_details: existingDetails,
+        has_day_variations: existingDetails.length > 0,
+      });
+      onScheduleUpdated(response.data.data);
+      notify.success('Day variation removed');
+    } catch {
+      notify.error('Failed to remove day variation');
+    } finally {
+      savingVariation.value = false;
+    }
+  };
+
   // Delete handlers
   const deleteSchedule = async (id) => {
     if (!(await notify.confirm('Delete this schedule template?'))) return;
@@ -414,35 +501,147 @@
                       Recurring schedules with days, periods, and effective dates shown.
                     </p>
                     <p class="tw:text-sm tw:text-gray-500">
-                      Each entry lists the weekly pattern, schedule period, and date range (if set).
+                      Expand a schedule to view or add day-specific variations.
                     </p>
                   </div>
                   <PrimaryButton @click="((scheduleToEdit = null), (showScheduleModal = true))">
                     Add Schedule
                   </PrimaryButton>
                 </div>
-                <data-table class="tw:capitalize" :headers="scheduleHeaders" :items="schedules">
-                  <template #item.pattern_summary="{ item }">
-                    <span class="tw:text-sm tw:text-gray-800">
-                      {{ formatScheduleSummary(item) }}
-                    </span>
-                  </template>
-                  <template #item.actions="{ item }">
-                    <v-icon
-                      class="tw:mr-2"
-                      color="primary"
-                      :icon="mdiPencilOutline"
-                      @click="((scheduleToEdit = item), (showScheduleModal = true))"
-                    />
-                    <v-icon
-                      v-if="store.user.is_admin"
-                      color="error"
-                      :disabled="deletingItem"
-                      :icon="mdiDeleteOutline"
-                      @click="deleteSchedule(item.id)"
-                    />
-                  </template>
-                </data-table>
+
+                <v-expansion-panels v-if="schedules.length" variant="accordion">
+                  <v-expansion-panel v-for="schedule in schedules" :key="schedule.id">
+                    <v-expansion-panel-title>
+                      <div class="tw:flex tw:items-center tw:justify-between tw:w-full tw:pr-4">
+                        <div class="tw:flex tw:items-center tw:gap-4 tw:flex-1">
+                          <v-chip color="primary" size="small" variant="tonal">
+                            {{ schedule.type }}
+                          </v-chip>
+                          <span class="tw:text-sm tw:capitalize">
+                            {{ schedule.activity_type_description }}
+                          </span>
+                          <span class="tw:text-sm tw:text-gray-600">
+                            {{ formatScheduleSummary(schedule) }}
+                          </span>
+                          <span class="tw:text-sm tw:font-medium">
+                            {{ schedule.start_time }}
+                          </span>
+                          <span class="tw:text-sm tw:text-gray-500 tw:capitalize">
+                            {{ schedule.language }}
+                          </span>
+                          <v-chip
+                            v-if="schedule.day_details?.length"
+                            color="info"
+                            size="x-small"
+                            variant="tonal"
+                          >
+                            {{ schedule.day_details.length }} variation{{
+                              schedule.day_details.length > 1 ? 's' : ''
+                            }}
+                          </v-chip>
+                        </div>
+                        <div class="tw:flex tw:items-center tw:gap-2" @click.stop>
+                          <v-icon
+                            color="primary"
+                            :icon="mdiPencilOutline"
+                            size="small"
+                            @click="((scheduleToEdit = schedule), (showScheduleModal = true))"
+                          />
+                          <v-icon
+                            v-if="store.user.is_admin"
+                            color="error"
+                            :disabled="deletingItem"
+                            :icon="mdiDeleteOutline"
+                            size="small"
+                            @click="deleteSchedule(schedule.id)"
+                          />
+                        </div>
+                      </div>
+                    </v-expansion-panel-title>
+
+                    <v-expansion-panel-text>
+                      <template v-if="supportsVariations(schedule.day_pattern)">
+                        <div class="tw:mb-4">
+                          <h4 class="tw:text-sm tw:font-medium tw:text-gray-700 tw:mb-2">
+                            Day Variations
+                          </h4>
+                          <p class="tw:text-xs tw:text-gray-500 tw:mb-3">
+                            Override the base schedule for specific days of the week.
+                          </p>
+                        </div>
+
+                        <div v-if="schedule.day_details?.length" class="tw:space-y-2 tw:mb-4">
+                          <div
+                            v-for="variation in schedule.day_details"
+                            :key="variation.day_of_week"
+                            class="tw:flex tw:items-center tw:justify-between tw:p-3 tw:bg-gray-50 tw:rounded-lg"
+                          >
+                            <div class="tw:flex tw:items-center tw:gap-3">
+                              <v-chip
+                                :color="variation.is_skipped ? 'error' : 'success'"
+                                size="small"
+                                variant="tonal"
+                              >
+                                <v-icon
+                                  v-if="variation.is_skipped"
+                                  :icon="mdiCancel"
+                                  size="x-small"
+                                  start
+                                />
+                                {{ variation.day_of_week }}
+                              </v-chip>
+                              <span class="tw:text-sm tw:text-gray-700">
+                                {{ formatVariationChange(variation, schedule) }}
+                              </span>
+                            </div>
+                            <div class="tw:flex tw:items-center tw:gap-2">
+                              <v-icon
+                                color="primary"
+                                :disabled="savingVariation"
+                                :icon="mdiPencilOutline"
+                                size="small"
+                                @click="openVariationModal(schedule, variation)"
+                              />
+                              <v-icon
+                                v-if="store.user.is_admin"
+                                color="error"
+                                :disabled="savingVariation"
+                                :icon="mdiDeleteOutline"
+                                size="small"
+                                @click="deleteVariation(schedule, variation.day_of_week)"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div v-else class="tw:text-sm tw:text-gray-500 tw:mb-4">
+                          No day variations. All days follow the base schedule.
+                        </div>
+
+                        <v-btn
+                          color="primary"
+                          :disabled="savingVariation"
+                          :prepend-icon="mdiPlus"
+                          size="small"
+                          variant="outlined"
+                          @click="openVariationModal(schedule)"
+                        >
+                          Add Variation
+                        </v-btn>
+                      </template>
+
+                      <div v-else class="tw:text-sm tw:text-gray-500">
+                        This schedule type ({{ schedule.day_pattern }}) doesn't support day
+                        variations. Only daily, weekdays, and specific-day patterns can have per-day
+                        overrides.
+                      </div>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+
+                <v-alert v-else color="info" density="compact" variant="tonal">
+                  No regular schedules configured yet. Click "Add Schedule" to create one.
+                </v-alert>
               </v-window-item>
 
               <!-- One-Time Activities Tab -->
@@ -669,6 +868,14 @@
           :liturgical-schedule="liturgicalScheduleToEdit"
           @created="onLiturgicalScheduleUpdated"
           @updated="onLiturgicalScheduleUpdated"
+        />
+
+        <DayVariationModal
+          v-model:show-modal="showVariationModal"
+          :existing-days="getExistingVariationDays(variationSchedule)"
+          :schedule="variationSchedule"
+          :variation="variationToEdit"
+          @saved="saveVariation"
         />
       </v-row>
     </v-container>
