@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "findMissa" ]; then
+    echo "You should set SUPERVISOR_PHP_USER to either 'findMissa' or 'root'."
+    exit 1
+fi
+
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER findMissa
+fi
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+# Run Laravel setup commands BEFORE exec (which replaces the process)
+if [ $# -eq 0 ]; then
+    echo "Running Laravel setup commands..."
+
+    # Ensure storage subdirectories exist (important for fresh volume mounts)
+    echo "Creating storage directories..."
+    mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
+    mkdir -p /var/www/html/storage/logs
+
+    php artisan package:discover --ansi
+
+    # Optimize application (caches config, events, routes, and views)
+    php artisan optimize --ansi
+
+    # Database setup
+    php artisan migrate --force --ansi
+
+    # Queue management
+    php artisan queue:restart --ansi
+fi
+
+# Ensure storage directory has correct permissions
+# This runs AFTER artisan commands to fix any files they created
+echo "Setting storage permissions..."
+chown -R findMissa:findMissa /var/www/html/storage
+chmod -R 775 /var/www/html/storage
+
+if [ $# -gt 0 ]; then
+    if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
+        exec "$@"
+    else
+        exec gosu $WWWUSER "$@"
+    fi
+else
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi
