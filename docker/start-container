@@ -23,6 +23,14 @@ if [ $# -eq 0 ]; then
     echo "Creating storage directories..."
     mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
     mkdir -p /var/www/html/storage/logs
+    mkdir -p /var/www/html/storage/app/public
+
+    # Create storage symlink if it doesn't exist
+    # This links public/storage -> storage/app/public for serving uploaded files
+    if [ ! -L /var/www/html/public/storage ]; then
+        echo "Creating storage symlink..."
+        php artisan storage:link --ansi
+    fi
 
     php artisan package:discover --ansi
 
