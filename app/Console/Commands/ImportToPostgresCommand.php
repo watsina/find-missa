@@ -97,9 +97,10 @@ class ImportToPostgresCommand extends Command
             return Command::FAILURE;
         }
 
-        // Disable foreign key checks
+        // Start transaction and defer constraints to avoid foreign key issues during import
         if (! $dryRun) {
-            DB::connection($connection)->statement("SET session_replication_role = 'replica'");
+            DB::connection($connection)->beginTransaction();
+            DB::connection($connection)->statement('SET CONSTRAINTS ALL DEFERRED');
         }
 
         try {
@@ -115,11 +116,16 @@ class ImportToPostgresCommand extends Command
                 $this->resetSequences($sqlite, $tables, $connection);
             }
 
-        } finally {
-            // Re-enable foreign key checks
+            // Commit transaction
             if (! $dryRun) {
-                DB::connection($connection)->statement("SET session_replication_role = 'origin'");
+                DB::connection($connection)->commit();
             }
+        } catch (\Exception $e) {
+            // Rollback on error
+            if (! $dryRun) {
+                DB::connection($connection)->rollBack();
+            }
+            throw $e;
         }
 
         // Display results

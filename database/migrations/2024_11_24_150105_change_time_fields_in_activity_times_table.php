@@ -31,7 +31,9 @@ return new class extends Migration
     private function changeColumnsForPostgres(): void
     {
         DB::statement('ALTER TABLE activity_times ALTER COLUMN start_time TYPE time USING start_time::time');
+        DB::statement('ALTER TABLE activity_times ALTER COLUMN start_time DROP NOT NULL');
         DB::statement('ALTER TABLE activity_times ALTER COLUMN end_time TYPE time USING end_time::time');
+        DB::statement('ALTER TABLE activity_times ALTER COLUMN end_time DROP NOT NULL');
     }
 
     private function changeColumnsDefault(): void

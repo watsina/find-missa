@@ -3,10 +3,17 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 
 class ExportSqliteCommand extends Command
 {
+    /**
+     * Cache of PostgreSQL column types per table.
+     */
+    protected array $pgColumnTypes = [];
+
     /**
      * Tables to exclude from export by default.
      * These are transient/regenerated tables.
@@ -25,6 +32,7 @@ class ExportSqliteCommand extends Command
 
     protected $signature = 'db:export-sqlite
         {--output=database/exports/sqlite-export.sql : Output file path}
+        {--connection=pgsql : PostgreSQL connection to read schema from}
         {--tables= : Comma-separated list of tables to export (default: all)}
         {--exclude= : Additional comma-separated list of tables to exclude}
         {--include-excluded : Include normally excluded tables (migrations, cache, etc.)}';
@@ -43,9 +51,19 @@ class ExportSqliteCommand extends Command
 
         $outputPath = $this->option('output');
         $outputDir = dirname($outputPath);
+        $pgConnection = $this->option('connection');
 
         if (! File::isDirectory($outputDir)) {
             File::makeDirectory($outputDir, 0755, true);
+        }
+
+        // Validate PostgreSQL connection for schema detection
+        try {
+            DB::connection($pgConnection)->getPdo();
+            $this->info("Using PostgreSQL connection '{$pgConnection}' for schema detection...");
+        } catch (\Exception $e) {
+            $this->warn("Cannot connect to PostgreSQL ({$pgConnection}): ".$e->getMessage());
+            $this->warn('Boolean columns may not be properly converted.');
         }
 
         // Get tables to export
@@ -63,6 +81,9 @@ class ExportSqliteCommand extends Command
         // Connect to SQLite
         $sqlite = new \PDO("sqlite:{$sqlitePath}");
         $sqlite->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        // Pre-load PostgreSQL column types for all tables
+        $this->loadPostgresColumnTypes($tables, $pgConnection);
 
         $sql = $this->generateHeader();
         $totalRows = 0;
@@ -142,6 +163,35 @@ class ExportSqliteCommand extends Command
         return array_values($tables);
     }
 
+    /**
+     * Load PostgreSQL column types for all tables to detect boolean columns.
+     */
+    protected function loadPostgresColumnTypes(array $tables, string $connection): void
+    {
+        try {
+            foreach ($tables as $table) {
+                if (! Schema::connection($connection)->hasTable($table)) {
+                    continue;
+                }
+
+                $columns = DB::connection($connection)
+                    ->select('
+                        SELECT column_name, data_type 
+                        FROM information_schema.columns 
+                        WHERE table_name = ?
+                    ', [$table]);
+
+                $this->pgColumnTypes[$table] = [];
+                foreach ($columns as $column) {
+                    $this->pgColumnTypes[$table][$column->column_name] = $column->data_type;
+                }
+            }
+        } catch (\Exception $e) {
+            // If we can't connect to PostgreSQL, continue without type detection
+            $this->pgColumnTypes = [];
+        }
+    }
+
     protected function generateHeader(): string
     {
         $date = now()->toDateTimeString();
@@ -153,8 +203,10 @@ class ExportSqliteCommand extends Command
 -- Source: database/database.sqlite
 -- =============================================================================
 
--- Disable foreign key checks during import
-SET session_replication_role = 'replica';
+-- Note: Foreign key constraints are deferred during the transaction.
+-- Run this entire file within a single transaction for best results.
+BEGIN;
+SET CONSTRAINTS ALL DEFERRED;
 
 
 SQL;
@@ -176,9 +228,10 @@ SQL;
             return ['sql' => $sql, 'rows' => 0];
         }
 
-        // Get column names
+        // Get column names and PostgreSQL types for this table
         $columns = array_keys($rows[0]);
         $columnList = implode(', ', array_map(fn ($col) => "\"{$col}\"", $columns));
+        $pgTypes = $this->pgColumnTypes[$table] ?? [];
 
         // Generate INSERT statements (batch for efficiency)
         $batchSize = 100;
@@ -188,8 +241,9 @@ SQL;
             $values = [];
             foreach ($batch as $row) {
                 $rowValues = [];
-                foreach ($row as $value) {
-                    $rowValues[] = $this->formatValue($value);
+                foreach ($row as $column => $value) {
+                    $pgType = $pgTypes[$column] ?? null;
+                    $rowValues[] = $this->formatValue($value, $pgType);
                 }
                 $values[] = '('.implode(', ', $rowValues).')';
             }
@@ -201,10 +255,16 @@ SQL;
         return ['sql' => $sql, 'rows' => count($rows)];
     }
 
-    protected function formatValue(mixed $value): string
+    protected function formatValue(mixed $value, ?string $pgType = null): string
     {
         if ($value === null) {
             return 'NULL';
+        }
+
+        // Handle boolean type from PostgreSQL schema
+        if ($pgType === 'boolean') {
+            // SQLite stores booleans as 0/1 integers
+            return $value ? 'TRUE' : 'FALSE';
         }
 
         if (is_bool($value)) {
@@ -214,9 +274,6 @@ SQL;
         if (is_int($value) || is_float($value)) {
             return (string) $value;
         }
-
-        // Handle SQLite boolean integers (0/1 for boolean columns)
-        // We can't reliably detect this, so leave as integers
 
         // Escape string for PostgreSQL
         $escaped = str_replace("'", "''", $value);
@@ -258,8 +315,8 @@ SQL;
             }
         }
 
-        $sql .= "\n-- Re-enable foreign key checks\n";
-        $sql .= "SET session_replication_role = 'origin';\n";
+        $sql .= "\n-- Commit the transaction\n";
+        $sql .= "COMMIT;\n";
 
         return $sql;
     }

@@ -25,3 +25,4 @@ yarn-error.log
 *.testing
 /storage/exports
 *.zip
+/database/exports
