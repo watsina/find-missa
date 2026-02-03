@@ -24,6 +24,10 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::post('import-activities/{diocese}', Controllers\ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
     Route::post('export-data', Controllers\ExportDataController::class)->middleware('userWithTeam')->name('export-data');
 
+    // Full data export/import (JSON format)
+    Route::get('full-export', Controllers\FullDataExportController::class)->middleware('userWithTeam')->name('full-export');
+    Route::post('full-import', Controllers\FullDataImportController::class)->middleware('userWithTeam')->name('full-import');
+
     Route::apiResource('team.invitations', Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', Controllers\UserController::class)->except('destroy');
     Route::apiResource('teams', Controllers\TeamController::class)->except('destroy');
