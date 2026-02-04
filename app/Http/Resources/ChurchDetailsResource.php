@@ -87,6 +87,12 @@ class ChurchDetailsResource extends JsonResource
             // Liturgical schedules (holiday schedules)
             'liturgical_schedules' => LiturgicalScheduleResource::collection($this->whenLoaded('liturgicalSchedules')),
 
+            // Adoration chapel (permanent adoration space with its own hours)
+            'adoration_chapel' => $this->when(
+                $this->relationLoaded('adorationChapel') && $this->adorationChapel !== null,
+                fn () => new AdorationChapelResource($this->adorationChapel)
+            ),
+
             // Schedule period specific activities
             'schedule_periods' => $this->schedulePeriods?->map(function ($period) use ($schedulePeriodSchedules) {
                 $periodSchedules = $schedulePeriodSchedules->filter(fn ($s) => $s->schedule_period_id === $period->id);

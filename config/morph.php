@@ -28,4 +28,8 @@ return [
     'liturgical-schedule' => Models\LiturgicalSchedule::class,
     'liturgical-schedule-time' => Models\LiturgicalScheduleTime::class,
     'one-time-activity' => Models\OneTimeActivity::class,
+    'adoration-chapel' => Models\AdorationChapel::class,
+    'adoration-chapel-schedule' => Models\AdorationChapelSchedule::class,
+    'adoration-chapel-schedule-detail' => Models\AdorationChapelScheduleDetail::class,
+    'adoration-chapel-exception' => Models\AdorationChapelException::class,
 ];

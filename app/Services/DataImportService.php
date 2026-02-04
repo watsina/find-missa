@@ -11,6 +11,7 @@ use App\Models\SubParish;
 use App\Models\ActivityTime;
 use App\Models\ScheduleRule;
 use App\Models\SchedulePeriod;
+use App\Models\AdorationChapel;
 use App\Models\HolidayInstance;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
@@ -19,7 +20,10 @@ use App\Models\LiturgicalSchedule;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityTimeException;
 use App\Models\LiturgicalScheduleTime;
+use App\Models\AdorationChapelSchedule;
+use App\Models\AdorationChapelException;
 use App\Models\GlobalActivityTimeException;
+use App\Models\AdorationChapelScheduleDetail;
 
 class DataImportService
 {
@@ -53,6 +57,10 @@ class DataImportService
         'global_activity_time_exceptions' => GlobalActivityTimeException::class,
         'schedule_rules' => ScheduleRule::class,
         'schedule_overrides' => ScheduleOverride::class,
+        'adoration_chapels' => AdorationChapel::class,
+        'adoration_chapel_schedules' => AdorationChapelSchedule::class,
+        'adoration_chapel_schedule_details' => AdorationChapelScheduleDetail::class,
+        'adoration_chapel_exceptions' => AdorationChapelException::class,
     ];
 
     /**
@@ -70,6 +78,8 @@ class DataImportService
         'activity_time_id' => 'activity_times',
         'holiday_id' => 'holidays',
         'liturgical_schedule_id' => 'liturgical_schedules',
+        'adoration_chapel_id' => 'adoration_chapels',
+        'adoration_chapel_schedule_id' => 'adoration_chapel_schedules',
     ];
 
     /**
@@ -151,6 +161,15 @@ class DataImportService
             LiturgicalScheduleTime::class => LiturgicalScheduleTime::query()
                 ->whereHas('liturgicalSchedule', fn ($q) => $q->where('team_id', $teamId))
                 ->delete(),
+            AdorationChapelSchedule::class => AdorationChapelSchedule::query()
+                ->whereHas('adorationChapel', fn ($q) => $q->where('team_id', $teamId))
+                ->delete(),
+            AdorationChapelScheduleDetail::class => AdorationChapelScheduleDetail::query()
+                ->whereHas('adorationChapelSchedule.adorationChapel', fn ($q) => $q->where('team_id', $teamId))
+                ->delete(),
+            AdorationChapelException::class => AdorationChapelException::query()
+                ->whereHas('adorationChapel', fn ($q) => $q->where('team_id', $teamId))
+                ->delete(),
             default => 0,
         };
     }
@@ -163,6 +182,9 @@ class DataImportService
         return ! in_array($modelClass, [
             HolidayInstance::class,
             LiturgicalScheduleTime::class,
+            AdorationChapelSchedule::class,
+            AdorationChapelScheduleDetail::class,
+            AdorationChapelException::class,
         ]);
     }
 
@@ -243,6 +265,9 @@ class DataImportService
         return ! in_array($tableName, [
             'holiday_instances',
             'liturgical_schedule_times',
+            'adoration_chapel_schedules',
+            'adoration_chapel_schedule_details',
+            'adoration_chapel_exceptions',
         ]);
     }
 

@@ -23,6 +23,8 @@ class GetChurchDetailsController extends Controller
             'liturgicalSchedules.holiday',
             'liturgicalSchedules.times',
             'parishable',
+            'adorationChapel.schedules.dayDetails',
+            'adorationChapel.exceptions',
         ]);
 
         // Get the church's team_id for fetching relevant schedule periods

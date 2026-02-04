@@ -4,6 +4,7 @@ namespace App\DataTransferObjects;
 
 use App\Models\Church;
 use Illuminate\Support\Carbon;
+use App\Models\AdorationChapel;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -24,6 +25,8 @@ readonly class ComputedActivity implements Arrayable
     public const SOURCE_LITURGICAL = 'liturgical';
 
     public const SOURCE_ONE_TIME = 'one_time';
+
+    public const SOURCE_ADORATION_CHAPEL = 'adoration_chapel';
 
     public function __construct(
         public int $churchId,
@@ -111,6 +114,36 @@ readonly class ComputedActivity implements Arrayable
             sourceId: $activity->id,
             holidayName: null,
             church: $activity->relationLoaded('church') ? $activity->church : null,
+        );
+    }
+
+    /**
+     * Create a ComputedActivity from an AdorationChapel.
+     *
+     * @param  array{opens_at: string|null, closes_at: string|null, is_open_24_hours: bool, is_closed: bool}  $hours
+     */
+    public static function fromAdorationChapel(
+        AdorationChapel $chapel,
+        Carbon $date,
+        array $hours,
+        ?Church $church = null,
+    ): self {
+        // For 24-hour chapels, show as "00:00" start time
+        $startTime = $hours['is_open_24_hours'] ? '00:00' : ($hours['opens_at'] ?? '00:00');
+        $endTime = $hours['is_open_24_hours'] ? '23:59' : $hours['closes_at'];
+
+        return new self(
+            churchId: $chapel->church_id,
+            type: 'adoration',
+            startTime: $startTime,
+            endTime: $endTime,
+            language: 'All',
+            activityTypeDescription: $hours['is_open_24_hours'] ? 'Adoration Chapel (24 hours)' : 'Adoration Chapel',
+            date: $date,
+            source: self::SOURCE_ADORATION_CHAPEL,
+            sourceId: $chapel->id,
+            holidayName: null,
+            church: $church ?? ($chapel->relationLoaded('church') ? $chapel->church : null),
         );
     }
 

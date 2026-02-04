@@ -11,6 +11,7 @@ use App\Models\SubParish;
 use App\Models\ActivityTime;
 use App\Models\ScheduleRule;
 use App\Models\SchedulePeriod;
+use App\Models\AdorationChapel;
 use App\Models\HolidayInstance;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
@@ -18,7 +19,10 @@ use App\Models\ScheduleOverride;
 use App\Models\LiturgicalSchedule;
 use App\Models\ActivityTimeException;
 use App\Models\LiturgicalScheduleTime;
+use App\Models\AdorationChapelSchedule;
+use App\Models\AdorationChapelException;
 use App\Models\GlobalActivityTimeException;
+use App\Models\AdorationChapelScheduleDetail;
 
 class DataExportService
 {
@@ -46,6 +50,10 @@ class DataExportService
         'global_activity_time_exceptions' => GlobalActivityTimeException::class,
         'schedule_rules' => ScheduleRule::class,
         'schedule_overrides' => ScheduleOverride::class,
+        'adoration_chapels' => AdorationChapel::class,
+        'adoration_chapel_schedules' => AdorationChapelSchedule::class,
+        'adoration_chapel_schedule_details' => AdorationChapelScheduleDetail::class,
+        'adoration_chapel_exceptions' => AdorationChapelException::class,
     ];
 
     /**
@@ -112,6 +120,7 @@ class DataExportService
             GlobalActivityTimeException::class,
             ScheduleRule::class,
             ScheduleOverride::class,
+            AdorationChapel::class,
         ];
 
         return in_array($modelClass, $modelsWithTeamId);
@@ -129,6 +138,12 @@ class DataExportService
                 ->whereHas('holiday', fn ($q) => $q->where('team_id', $teamId)),
             LiturgicalScheduleTime::class => LiturgicalScheduleTime::query()
                 ->whereHas('liturgicalSchedule', fn ($q) => $q->where('team_id', $teamId)),
+            AdorationChapelSchedule::class => AdorationChapelSchedule::query()
+                ->whereHas('adorationChapel', fn ($q) => $q->where('team_id', $teamId)),
+            AdorationChapelScheduleDetail::class => AdorationChapelScheduleDetail::query()
+                ->whereHas('adorationChapelSchedule.adorationChapel', fn ($q) => $q->where('team_id', $teamId)),
+            AdorationChapelException::class => AdorationChapelException::query()
+                ->whereHas('adorationChapel', fn ($q) => $q->where('team_id', $teamId)),
             default => $modelClass::query(),
         };
     }

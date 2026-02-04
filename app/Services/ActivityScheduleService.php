@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Church;
 use Illuminate\Support\Carbon;
+use App\Models\AdorationChapel;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
 use App\Models\LiturgicalSchedule;
@@ -365,6 +366,17 @@ class ActivityScheduleService
             )
         );
 
+        // If searching for adoration, also include open adoration chapels
+        if (in_array('adoration', $activityTypes, true)) {
+            $chapelActivities = $this->getOpenAdorationChapels(
+                $date,
+                $churchName,
+                $district,
+                $startTime
+            );
+            $allActivities = $allActivities->concat($chapelActivities);
+        }
+
         // Filter by start time if specified
         if ($startTime) {
             $allActivities = $allActivities->filter(
@@ -377,5 +389,72 @@ class ActivityScheduleService
             ->sortBy(fn (ComputedActivity $activity) => $activity->startTime)
             ->values()
             ->take($limit);
+    }
+
+    /**
+     * Get open adoration chapels for a date/time.
+     *
+     * Returns adoration chapels that are open on the given date,
+     * filtered by optional church name and district criteria.
+     *
+     * @return Collection<int, ComputedActivity>
+     */
+    public function getOpenAdorationChapels(
+        Carbon $date,
+        ?string $churchName = null,
+        ?string $district = null,
+        ?string $startTime = null,
+    ): Collection {
+        // Build the query for chapels with their churches
+        $query = AdorationChapel::query()
+            ->with(['church', 'schedules.dayDetails', 'exceptions']);
+
+        // Filter by church criteria
+        $query->whereHas('church', function ($churchQuery) use ($churchName, $district) {
+            if ($churchName) {
+                $churchQuery->where('name', 'like', "%{$churchName}%");
+            }
+            if ($district) {
+                $churchQuery->where(function ($q) use ($district) {
+                    $q->where('district', 'like', "%{$district}%")
+                        ->orWhere('city', 'like', "%{$district}%");
+                });
+            }
+        });
+
+        $chapels = $query->get();
+
+        // Convert each open chapel to a ComputedActivity
+        return $chapels
+            ->map(function (AdorationChapel $chapel) use ($date, $startTime) {
+                // Get hours for this date
+                $hours = $chapel->getHoursForDate($date);
+
+                // Skip if no schedule or closed
+                if (! $hours || $hours['is_closed']) {
+                    return null;
+                }
+
+                // If start_time filter is provided, check if chapel is open at that time
+                if ($startTime && ! $hours['is_open_24_hours']) {
+                    $opensAt = $hours['opens_at'] ?? '00:00';
+                    $closesAt = $hours['closes_at'] ?? '23:59';
+
+                    // Skip if the requested start time is before the chapel opens
+                    // or after it closes
+                    if ($startTime < $opensAt || $startTime >= $closesAt) {
+                        return null;
+                    }
+                }
+
+                return ComputedActivity::fromAdorationChapel(
+                    $chapel,
+                    $date,
+                    $hours,
+                    $chapel->church
+                );
+            })
+            ->filter()
+            ->values();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -99,5 +100,13 @@ class Church extends BaseModel
     public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(ScheduleOverride::class, 'scope');
+    }
+
+    /**
+     * Get the adoration chapel for this church.
+     */
+    public function adorationChapel(): HasOne
+    {
+        return $this->hasOne(AdorationChapel::class);
     }
 }

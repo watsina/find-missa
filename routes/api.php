@@ -72,4 +72,10 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('schedule-rules', Controllers\ScheduleRuleController::class);
     Route::apiResource('schedule-overrides', Controllers\ScheduleOverrideController::class);
     Route::apiResource('liturgical-schedules', Controllers\LiturgicalScheduleController::class);
+
+    // Adoration Chapel (nested under churches - one per church)
+    Route::get('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'show'])->name('churches.adoration-chapel.show');
+    Route::post('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'store'])->name('churches.adoration-chapel.store');
+    Route::put('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'update'])->name('churches.adoration-chapel.update');
+    Route::delete('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'destroy'])->name('churches.adoration-chapel.destroy');
 });
