@@ -38,6 +38,7 @@
     mdiTimerStopOutline,
     mdiCalendarStar,
     mdiCalendarClock,
+    mdiBookOpenPageVariant,
   } from '@mdi/js';
   import useAuthStore from '@/stores/useAuthStore';
 
@@ -124,6 +125,13 @@
       icon: mdiAccountGroup,
       current: true,
       show: authUser.value.is_admin,
+    },
+    {
+      name: 'Documentation',
+      routeName: 'docs.index',
+      icon: mdiBookOpenPageVariant,
+      current: true,
+      show: true,
     },
   ];
 
