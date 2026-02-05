@@ -59,14 +59,4 @@ class TeamController extends Controller
 
         return response()->noContent();
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Team $team)
-    {
-        Gate::authorize('delete', $team);
-
-        //
-    }
 }

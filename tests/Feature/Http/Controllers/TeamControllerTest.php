@@ -26,7 +26,10 @@ test('store works as expected', function () {
 });
 
 test('store uses the create team action...', function () {
+    $team = Team::factory()->create();
+
     $spy = $this->spy(CreateTeam::class);
+    $spy->shouldReceive('handle')->andReturn($team);
 
     $this->actingAsSuperAdmin()
         ->post('/api/v1/teams', [

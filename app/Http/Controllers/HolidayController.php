@@ -138,8 +138,19 @@ class HolidayController extends Controller
         $teamId = $request->user()->currentTeam?->id;
         $instances = $this->holidayService->computeInstancesForYear($year, $teamId);
 
-        // Load the holiday relationship for each instance
-        $instances->each(fn ($instance) => $instance->load('holiday'));
+        // Load the holiday relationship for all instances at once to avoid N+1
+        // Use loadMissing via each since computeInstancesForYear returns a regular Collection
+        $instanceIds = $instances->pluck('id')->filter();
+        if ($instanceIds->isNotEmpty()) {
+            $loadedInstances = \App\Models\HolidayInstance::whereIn('id', $instanceIds)
+                ->with('holiday')
+                ->get()
+                ->keyBy('id');
+
+            $instances = $instances->map(function ($instance) use ($loadedInstances) {
+                return $loadedInstances->get($instance->id) ?? $instance;
+            });
+        }
 
         return HolidayInstanceResource::collection($instances);
     }

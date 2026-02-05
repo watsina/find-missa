@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,26 @@ class Church extends BaseModel
     }
 
     /**
+     * Get the diocese_id through the parishable relationship.
+     */
+    protected function dioceseId(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->parishable instanceof Parish) {
+                    return $this->parishable->diocese_id;
+                }
+
+                if ($this->parishable instanceof SubParish) {
+                    return $this->parishable->parish?->diocese_id;
+                }
+
+                return null;
+            }
+        );
+    }
+
+    /**
      * Get the parent parishable model (parish or sub-parish).
      */
     public function parishable(): MorphTo
@@ -54,5 +75,38 @@ class Church extends BaseModel
     public function activities(): HasMany
     {
         return $this->hasMany(ActivityTime::class);
+    }
+
+    public function activitySchedules(): HasMany
+    {
+        return $this->hasMany(ActivitySchedule::class);
+    }
+
+    public function liturgicalSchedules(): HasMany
+    {
+        return $this->hasMany(LiturgicalSchedule::class);
+    }
+
+    public function oneTimeActivities(): HasMany
+    {
+        return $this->hasMany(OneTimeActivity::class);
+    }
+
+    public function scheduleRules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleRule::class, 'scope');
+    }
+
+    public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ScheduleOverride::class, 'scope');
+    }
+
+    /**
+     * Get the adoration chapel for this church.
+     */
+    public function adorationChapel(): HasOne
+    {
+        return $this->hasOne(AdorationChapel::class);
     }
 }

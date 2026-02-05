@@ -18,6 +18,6 @@ class SwitchTeamController extends Controller
             abort(404);
         }
 
-        return response(200);
+        return response()->noContent();
     }
 }

@@ -43,22 +43,6 @@ class TeamInvitationController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(TeamInvitation $userInvitation)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, TeamInvitation $userInvitation)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Team $team, TeamInvitation $invitation)

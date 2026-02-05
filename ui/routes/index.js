@@ -13,6 +13,7 @@ import schedulePeriods from './schedule-periods';
 import subParishes from './sub-parishes';
 import dioceses from './dioceses';
 import priests from './priests';
+import docs from './docs';
 import errors from './errors';
 
 export default [
@@ -36,6 +37,7 @@ export default [
       ...churches,
       ...priests,
       ...subParishes,
+      ...docs,
     ],
   },
   ...errors,

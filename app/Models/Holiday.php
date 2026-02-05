@@ -80,6 +80,14 @@ class Holiday extends Model
     }
 
     /**
+     * Get liturgical schedules for this holiday.
+     */
+    public function liturgicalSchedules(): HasMany
+    {
+        return $this->hasMany(LiturgicalSchedule::class);
+    }
+
+    /**
      * Scope to get only universal holidays.
      */
     public function scopeUniversal(Builder $query): void

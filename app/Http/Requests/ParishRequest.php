@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Diocese;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,7 +23,7 @@ class ParishRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'diocese_id' => ['required', 'integer', 'exists:dioceses,id'],
+            'diocese_id' => ['required', 'integer', new ExistsInTeam(Diocese::class)],
             'name' => [
                 'required',
                 'string',

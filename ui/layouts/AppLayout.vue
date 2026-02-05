@@ -3,7 +3,12 @@
     <session-expired-modal v-model="showSessionExpiredModal" />
     <global-notifications />
     <global-confirmation-dialog />
-    <top-bar v-if="authUser" v-model:drawer="drawer" v-model:rail="rail">
+    <top-bar
+      v-if="authUser"
+      v-model:drawer="drawer"
+      v-model:help-drawer="helpDrawer"
+      v-model:rail="rail"
+    >
       <template v-if="$slots.head" #header>
         <slot name="head" />
       </template>
@@ -11,6 +16,7 @@
     <guest-top-bar v-else></guest-top-bar>
 
     <nav-drawer v-if="authUser" v-model:drawer="drawer" v-model:rail="rail" />
+    <help-drawer v-if="authUser" v-model="helpDrawer" />
 
     <v-main class="tw:flex tw:items-center tw:justify-center" style="min-height: 300px">
       <slot />
@@ -35,6 +41,7 @@
 
   const drawer = ref(true);
   const rail = ref(false);
+  const helpDrawer = ref(false);
   const showSessionExpiredModal = ref(false);
 
   onMounted(async () => {

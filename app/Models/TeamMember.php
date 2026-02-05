@@ -20,9 +20,11 @@ class TeamMember extends Pivot
 
         static::deleting(function ($model) {
             // remove the assigned roles on that team
-            setPermissionsTeamId($model->team->id);
+            if ($model->team) {
+                setPermissionsTeamId($model->team->id);
+            }
 
-            $model->user->syncRoles([]);
+            $model->user?->syncRoles([]);
         });
     }
 

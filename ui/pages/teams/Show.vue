@@ -5,6 +5,7 @@
   import TeamMembers from './partials/TeamMembers.vue';
   import AddTeamMember from './partials/AddTeamMember.vue';
   import TeamInvitations from './partials/TeamInvitations.vue';
+  import DataManagement from './partials/DataManagement.vue';
   import { http } from '@/plugins';
   import { notify } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
@@ -16,6 +17,7 @@
   const authStore = useAuthStore();
 
   const canUpdateTeam = computed(() => authStore.hasPermission('teams.write'));
+  const isAdmin = computed(() => authStore.user?.is_admin);
 
   const team = ref('');
   const fetchingTeam = ref(false);
@@ -81,6 +83,9 @@
           <TeamInvitations v-model:team="team" :available-roles="availableRoles" class="tw:mt-10" />
 
           <TeamMembers v-model:team="team" :available-roles="availableRoles" class="tw:mt-10" />
+
+          <!-- Data Management (Admin only) -->
+          <DataManagement v-if="isAdmin" class="tw:mt-10" :team="team" />
         </v-col>
       </v-row>
     </v-container>

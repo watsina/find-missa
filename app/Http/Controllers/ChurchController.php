@@ -35,11 +35,9 @@ class ChurchController extends Controller
         $church = Church::create($request->safe()->except('parishable_id'));
         $data = $request->validated();
 
-        if ($data['type'] === 'sub-parish') {
-            $parish = SubParish::find($data['parishable_id']);
-        } else {
-            $parish = Parish::find($data['parishable_id']);
-        }
+        $parish = $data['type'] === 'sub-parish'
+            ? SubParish::findOrFail($data['parishable_id'])
+            : Parish::findOrFail($data['parishable_id']);
 
         $church->parishable()->associate($parish)->save();
 
@@ -65,11 +63,10 @@ class ChurchController extends Controller
         $data = $request->validated();
 
         if (isset($data['parishable_id'])) {
-            if ($data['type'] === 'sub-parish') {
-                $parish = SubParish::find($data['parishable_id']);
-            } else {
-                $parish = Parish::find($data['parishable_id']);
-            }
+            $parish = $data['type'] === 'sub-parish'
+                ? SubParish::findOrFail($data['parishable_id'])
+                : Parish::findOrFail($data['parishable_id']);
+
             $church->parishable()->associate($parish)->save();
         }
 

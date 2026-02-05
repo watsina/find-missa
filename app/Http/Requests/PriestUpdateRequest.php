@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Parish;
+use App\Rules\ExistsInTeam;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PriestUpdateRequest extends FormRequest
@@ -23,7 +25,7 @@ class PriestUpdateRequest extends FormRequest
             'name' => ['required', 'string'],
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string'],
-            'parish_id' => ['nullable', 'integer', 'exists:parishes,id'],
+            'parish_id' => ['nullable', 'integer', new ExistsInTeam(Parish::class)],
         ];
     }
 }

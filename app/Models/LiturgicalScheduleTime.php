@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Models;
+
+use App\Casts\Timecast;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class LiturgicalScheduleTime extends Model
+{
+    use HasFactory;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'liturgical_schedule_id' => 'integer',
+            'start_time' => Timecast::class,
+            'end_time' => Timecast::class,
+        ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (LiturgicalScheduleTime $model) {
+            if (! $model->activity_type_description) {
+                $model->activity_type_description = $model->type;
+            }
+        });
+    }
+
+    /**
+     * Get the liturgical schedule this time belongs to.
+     */
+    public function liturgicalSchedule(): BelongsTo
+    {
+        return $this->belongsTo(LiturgicalSchedule::class);
+    }
+}

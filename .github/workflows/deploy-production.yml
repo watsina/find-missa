@@ -10,32 +10,12 @@ jobs:
     uses: geneowak/common-workflows/.github/workflows/laravel-build-and-test.yml@main
 
   deploy_production:
-    name: Deploy to production site
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: bash
+    name: Deploy to production via Coolify
+    runs-on: ubuntu-latest
     needs: build_and_test
     if: success() && github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{secrets.HOST_IP_PROD}}
-          port: 22
-          username: ${{secrets.HOST_USERNAME_PROD}}
-          key: ${{secrets.PRIVATE_KEY_PROD}}
-          script: |
-            cd ${{secrets.PROD_DIR}}
-            git pull origin main
-            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-            php artisan migrate --force
-            php artisan optimize
-            php artisan pulse:restart
-            php artisan queue:restart
-            sudo service php8.4-fpm reload
-            source /usr/local/nvm/nvm.sh
-            node -v
-            npm -v
-            npm ci
-            npm run build
+      - name: Trigger Coolify Deployment
+        run: |
+          curl --fail --silent --show-error -X GET "${{ secrets.COOLIFY_PRODUCTION_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_PRODUCTION_WEBHOOK_TOKEN }}"

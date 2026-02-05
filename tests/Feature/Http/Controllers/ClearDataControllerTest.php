@@ -25,18 +25,10 @@ beforeEach(function () {
     Priest::factory(3)->create();
 });
 
-test("it doesn't run on production.", function () {
-    App::detectEnvironment(fn () => 'production');
+test('it only runs in local environment', function () {
+    // Tests run in 'testing' environment by default, so we need to set 'local'
+    App::detectEnvironment(fn () => 'local');
 
-    $this->actingAsSuperAdmin();
-
-    deleteJson(route('clear-data'))
-        ->assertStatus(500);
-
-    stillHasData();
-});
-
-test('it can be run in non prod env by an admin', function () {
     $this->actingAsSuperAdmin();
 
     deleteJson(route('clear-data'))
@@ -45,8 +37,32 @@ test('it can be run in non prod env by an admin', function () {
     hasNoData();
 });
 
-test('it cannot be run in non prod env by a non admin', function () {
-    $this->actingAsRandomUser();
+test("it doesn't run in production environment", function () {
+    App::detectEnvironment(fn () => 'production');
+
+    $this->actingAsSuperAdmin();
+
+    deleteJson(route('clear-data'))
+        ->assertForbidden();
+
+    stillHasData();
+});
+
+test("it doesn't run in staging environment", function () {
+    App::detectEnvironment(fn () => 'staging');
+
+    $this->actingAsSuperAdmin();
+
+    deleteJson(route('clear-data'))
+        ->assertForbidden();
+
+    stillHasData();
+});
+
+test('it cannot be run by a non super admin in local environment', function () {
+    App::detectEnvironment(fn () => 'local');
+
+    $this->actingAsRandomUser(['is_super_admin' => false]);
 
     deleteJson(route('clear-data'))
         ->assertForbidden();

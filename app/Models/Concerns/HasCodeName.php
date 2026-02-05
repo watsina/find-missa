@@ -23,6 +23,12 @@ trait HasCodeName
 
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where('id', $value)->orWhere('code_name', $value)->firstOrFail();
+        $query = $this->where('code_name', $value);
+
+        if (is_numeric($value)) {
+            $query->orWhere('id', $value);
+        }
+
+        return $query->firstOrFail();
     }
 }

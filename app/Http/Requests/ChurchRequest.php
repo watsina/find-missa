@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Priest;
 use App\Enums\ChurchType;
+use App\Rules\ExistsInTeam;
 use Illuminate\Validation\Rule;
 use App\Rules\ValidateParishableId;
 use Illuminate\Foundation\Http\FormRequest;
@@ -45,7 +47,7 @@ class ChurchRequest extends FormRequest
             'google_maps_link' => ['nullable', 'url', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'contact_phone' => ['nullable', 'string'],
-            'priest_id' => ['nullable', 'integer', 'exists:priests,id'],
+            'priest_id' => ['nullable', 'integer', new ExistsInTeam(Priest::class)],
         ];
     }
 }

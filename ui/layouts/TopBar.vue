@@ -4,11 +4,13 @@
   import UserAvatar from './UserAvatar';
   import TeamsMenu from './TeamsMenu.vue';
   import { useDisplay } from 'vuetify';
+  import { mdiHelpCircleOutline } from '@mdi/js';
 
   const { smAndDown } = useDisplay();
 
   const rail = defineModel('rail', { type: Boolean });
   const drawer = defineModel('drawer', { type: Boolean });
+  const helpDrawer = defineModel('helpDrawer', { type: Boolean });
 </script>
 
 <template>
@@ -34,7 +36,7 @@
     </template>
     <v-spacer v-if="!smAndDown"></v-spacer>
     <teams-menu />
-    <div class="tw:md:mr-4 tw:mr-2"></div>
+    <v-btn :icon="mdiHelpCircleOutline" title="Help" variant="text" @click="helpDrawer = true" />
     <user-avatar></user-avatar>
     <div class="tw:md:ml-4 tw:ml-2"></div>
   </v-app-bar>

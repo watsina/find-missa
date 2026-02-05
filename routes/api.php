@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 require __DIR__.'/auth.php';
 
 Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
+Route::get('/search-v2', AppUsers\SearchActivitiesV2Controller::class)->name('search.v2');
 Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
 Route::get('/holiday-info', AppUsers\HolidayInfoController::class)->name('holiday-info');
 
@@ -22,6 +23,10 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::post('import-churches/{diocese}', Controllers\ImportDioceseChurchesController::class)->middleware('userWithTeam')->name('import-churches');
     Route::post('import-activities/{diocese}', Controllers\ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
     Route::post('export-data', Controllers\ExportDataController::class)->middleware('userWithTeam')->name('export-data');
+
+    // Full data export/import (JSON format)
+    Route::get('full-export', Controllers\FullDataExportController::class)->middleware('userWithTeam')->name('full-export');
+    Route::post('full-import', Controllers\FullDataImportController::class)->middleware('userWithTeam')->name('full-import');
 
     Route::apiResource('team.invitations', Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', Controllers\UserController::class)->except('destroy');
@@ -47,7 +52,6 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::apiResource('sub-parishes', Controllers\SubParishController::class)->except('destroy');
     Route::apiResource('activity-times', Controllers\ActivityTimeController::class);
     Route::apiResource('activity-time-exceptions', Controllers\ActivityTimeExceptionController::class);
-    Route::apiResource('activity-tags', Controllers\ActivityTagController::class);
     Route::apiResource('global-activity-time-exceptions', Controllers\GlobalActivityTimeExceptionController::class);
 
     // Holidays - custom routes must come before apiResource to avoid route conflicts
@@ -61,4 +65,17 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::get('schedule-periods/upcoming', [Controllers\SchedulePeriodController::class, 'upcoming'])->name('schedule-periods.upcoming');
     Route::get('schedule-periods/check-overlap', [Controllers\SchedulePeriodController::class, 'checkOverlap'])->name('schedule-periods.check-overlap');
     Route::apiResource('schedule-periods', Controllers\SchedulePeriodController::class);
+
+    // Activity Schedules v2
+    Route::apiResource('activity-schedules', Controllers\ActivityScheduleController::class);
+    Route::apiResource('one-time-activities', Controllers\OneTimeActivityController::class);
+    Route::apiResource('schedule-rules', Controllers\ScheduleRuleController::class);
+    Route::apiResource('schedule-overrides', Controllers\ScheduleOverrideController::class);
+    Route::apiResource('liturgical-schedules', Controllers\LiturgicalScheduleController::class);
+
+    // Adoration Chapel (nested under churches - one per church)
+    Route::get('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'show'])->name('churches.adoration-chapel.show');
+    Route::post('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'store'])->name('churches.adoration-chapel.store');
+    Route::put('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'update'])->name('churches.adoration-chapel.update');
+    Route::delete('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'destroy'])->name('churches.adoration-chapel.destroy');
 });

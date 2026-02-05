@@ -32,6 +32,10 @@ class TeamInvitation extends Model
 
     public function convertToMembership()
     {
+        if (! $this->team || ! $this->role) {
+            throw new \RuntimeException('Invalid invitation: missing team or role');
+        }
+
         $user = User::firstOrCreate(
             ['email' => $this->email],
             ['name' => $this->name],

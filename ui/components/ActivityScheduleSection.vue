@@ -4,7 +4,7 @@
   import { useActivitySchedule } from '@/composables';
 
   const props = defineProps({
-    /** Activity schedule data with weekly, daily, monthly, one_time */
+    /** V2 activity schedule data with weekdays, saturday, sunday, daily, specific, monthly_nth */
     schedule: { type: Object, default: null },
     /** Title for the section (e.g., "Mass Schedule") */
     title: { type: String, required: true },
@@ -22,18 +22,95 @@
     showEndTime: { type: Boolean, default: false },
   });
 
-  const { daysOfWeek, formatActivityDescription, formatDate, hasActivityType } =
-    useActivitySchedule();
+  const { daysOfWeek, formatActivityDescription, hasActivityTypeV2 } = useActivitySchedule();
 
-  const hasData = computed(() => hasActivityType(props.schedule));
+  const hasData = computed(() => hasActivityTypeV2(props.schedule));
+  const hasMonthlyNth = computed(() => (props.schedule?.monthly_nth || []).length > 0);
 
-  const hasWeekly = computed(() => Object.keys(props.schedule?.weekly || {}).length > 0);
+  /**
+   * Build weekly object by expanding v2 patterns into individual days.
+   * Handles: weekdays, saturday, sunday, daily, specific, and day_details variations.
+   */
+  const weeklySchedule = computed(() => {
+    const weekly = {
+      Sunday: [],
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+    };
+    const schedule = props.schedule;
+    if (!schedule) return weekly;
 
-  const hasDaily = computed(() => (props.schedule?.daily || []).length > 0);
+    // Add Sunday schedules
+    (schedule.sunday || []).forEach((s) => weekly.Sunday.push(s));
 
-  const hasMonthly = computed(() => (props.schedule?.monthly || []).length > 0);
+    // Add Saturday schedules
+    (schedule.saturday || []).forEach((s) => weekly.Saturday.push(s));
 
-  const hasOneTime = computed(() => (props.schedule?.one_time || []).length > 0);
+    // Add Weekday schedules (Mon-Fri)
+    const weekdayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    (schedule.weekdays || []).forEach((s) => {
+      if (s.has_day_variations && s.day_details?.length) {
+        // Expand day variations - each day gets its specific time/language
+        const detailsByDay = {};
+        s.day_details.forEach((detail) => {
+          if (!detailsByDay[detail.day_of_week]) {
+            detailsByDay[detail.day_of_week] = [];
+          }
+          detailsByDay[detail.day_of_week].push(detail);
+        });
+
+        weekdayNames.forEach((day) => {
+          const dayDetails = detailsByDay[day] || [];
+          if (dayDetails.length > 0) {
+            dayDetails.forEach((detail) => {
+              if (!detail.is_skipped) {
+                weekly[day].push({
+                  ...s,
+                  id: `${s.id}-${day}-${detail.start_time}`,
+                  start_time: detail.start_time || s.start_time,
+                  end_time: detail.end_time || s.end_time,
+                  language: detail.language || s.language,
+                });
+              }
+            });
+          } else {
+            // No specific detail for this day - use base schedule
+            weekly[day].push(s);
+          }
+        });
+      } else {
+        // No variations - add to all weekdays
+        weekdayNames.forEach((day) => weekly[day].push(s));
+      }
+    });
+
+    // Add Daily schedules (all days)
+    (schedule.daily || []).forEach((s) => {
+      Object.keys(weekly).forEach((day) => weekly[day].push(s));
+    });
+
+    // Add Specific day schedules
+    (schedule.specific || []).forEach((s) => {
+      (s.days_of_week || []).forEach((day) => {
+        if (weekly[day]) weekly[day].push(s);
+      });
+    });
+
+    // Sort each day by start_time
+    Object.keys(weekly).forEach((day) => {
+      weekly[day].sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
+    });
+
+    return weekly;
+  });
+
+  const hasWeeklyData = computed(() =>
+    Object.values(weeklySchedule.value).some((day) => day.length > 0),
+  );
 </script>
 
 <template>
@@ -63,8 +140,8 @@
     </div>
 
     <div v-else>
-      <!-- Weekly Schedule -->
-      <div v-if="hasWeekly">
+      <!-- Weekly Schedule Table -->
+      <div v-if="hasWeeklyData">
         <v-table density="comfortable">
           <thead>
             <tr>
@@ -74,12 +151,12 @@
           </thead>
           <tbody>
             <template v-for="day in daysOfWeek" :key="day">
-              <tr v-if="showAllDays || schedule?.weekly?.[day]">
+              <tr v-if="showAllDays || weeklySchedule[day]?.length">
                 <td class="tw:font-medium">{{ day }}</td>
                 <td>
-                  <div v-if="schedule?.weekly?.[day]" class="tw:flex tw:flex-wrap tw:gap-2">
+                  <div v-if="weeklySchedule[day]?.length" class="tw:flex tw:flex-wrap tw:gap-2">
                     <v-chip
-                      v-for="activity in schedule.weekly[day]"
+                      v-for="activity in weeklySchedule[day]"
                       :key="activity.id"
                       :color="color"
                       size="small"
@@ -96,57 +173,26 @@
         </v-table>
       </div>
 
-      <!-- Daily Schedule -->
-      <div v-if="hasDaily" class="tw:mt-4">
-        <h3 class="tw:font-medium tw:mb-2">Daily {{ activityName }}</h3>
-        <div class="tw:flex tw:flex-wrap tw:gap-2">
-          <v-chip
-            v-for="activity in schedule.daily"
-            :key="activity.id"
-            color="success"
-            size="small"
-            variant="tonal"
-          >
-            {{ formatActivityDescription(activity, showEndTime) }}
-          </v-chip>
-        </div>
-      </div>
-
-      <!-- Monthly Schedule -->
-      <div v-if="hasMonthly" class="tw:mt-4">
+      <!-- Monthly Schedule (separate section) -->
+      <div v-if="hasMonthlyNth" class="tw:mt-4">
         <h3 class="tw:font-medium tw:mb-2">Monthly {{ activityName }}</h3>
         <v-list density="compact">
-          <v-list-item v-for="monthlyGroup in schedule.monthly" :key="monthlyGroup.label">
+          <v-list-item v-for="group in schedule.monthly_nth" :key="group.label">
             <v-list-item-title class="tw:font-medium">
-              {{ monthlyGroup.label }} of the Month
+              {{ group.label }}
             </v-list-item-title>
             <v-list-item-subtitle>
               <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mt-1">
                 <v-chip
-                  v-for="activity in monthlyGroup.activities"
-                  :key="activity.id"
+                  v-for="s in group.schedules"
+                  :key="s.id"
                   color="warning"
                   size="small"
                   variant="tonal"
                 >
-                  {{ formatActivityDescription(activity, showEndTime) }}
+                  {{ formatActivityDescription(s, showEndTime) }}
                 </v-chip>
               </div>
-            </v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
-      </div>
-
-      <!-- One-time Schedule -->
-      <div v-if="hasOneTime" class="tw:mt-4">
-        <h3 class="tw:font-medium tw:mb-2">Special/One-time {{ activityName }}</h3>
-        <v-list density="compact">
-          <v-list-item v-for="activity in schedule.one_time" :key="activity.id">
-            <v-list-item-title>
-              {{ formatDate(activity.date) }}
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ formatActivityDescription(activity, showEndTime) }}
             </v-list-item-subtitle>
           </v-list-item>
         </v-list>
