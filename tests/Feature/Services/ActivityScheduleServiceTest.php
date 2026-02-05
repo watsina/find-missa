@@ -671,6 +671,56 @@ it('searches activities across churches', function () {
     expect($laterMasses->first()->startTime)->toBe('09:00');
 });
 
+it('searches activities case-insensitively', function () {
+    $church = Church::factory()->create([
+        'team_id' => $this->team->id,
+        'name' => 'Christ The King',
+        'district' => 'Kampala',
+        'city' => 'Kampala City',
+    ]);
+
+    ActivitySchedule::factory()->create([
+        'church_id' => $church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '08:00',
+        'type' => 'mass',
+    ]);
+
+    $date = Carbon::parse('2025-01-06');
+
+    // Search with lowercase church name
+    $results = $this->service->searchActivities(
+        $date,
+        ['mass'],
+        churchName: 'christ the king',
+    );
+    expect($results)->toHaveCount(1);
+
+    // Search with uppercase church name
+    $results = $this->service->searchActivities(
+        $date,
+        ['mass'],
+        churchName: 'CHRIST THE KING',
+    );
+    expect($results)->toHaveCount(1);
+
+    // Search with lowercase district
+    $results = $this->service->searchActivities(
+        $date,
+        ['mass'],
+        district: 'kampala',
+    );
+    expect($results)->toHaveCount(1);
+
+    // Search with mixed case district
+    $results = $this->service->searchActivities(
+        $date,
+        ['mass'],
+        district: 'KAMPALA CITY',
+    );
+    expect($results)->toHaveCount(1);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Diocese-Level Rule Tests

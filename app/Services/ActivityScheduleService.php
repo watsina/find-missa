@@ -344,13 +344,13 @@ class ActivityScheduleService
         $churchQuery = Church::query();
 
         if ($churchName) {
-            $churchQuery->where('name', 'like', "%{$churchName}%");
+            $churchQuery->whereLikeInsensitive('name', $churchName);
         }
 
         if ($district) {
             $churchQuery->where(function ($q) use ($district) {
-                $q->where('district', 'like', "%{$district}%")
-                    ->orWhere('city', 'like', "%{$district}%");
+                $q->whereLikeInsensitive('district', $district)
+                    ->orWhereLikeInsensitive('city', $district);
             });
         }
 
@@ -412,12 +412,12 @@ class ActivityScheduleService
         // Filter by church criteria
         $query->whereHas('church', function ($churchQuery) use ($churchName, $district) {
             if ($churchName) {
-                $churchQuery->where('name', 'like', "%{$churchName}%");
+                $churchQuery->whereLikeInsensitive('name', $churchName);
             }
             if ($district) {
                 $churchQuery->where(function ($q) use ($district) {
-                    $q->where('district', 'like', "%{$district}%")
-                        ->orWhere('city', 'like', "%{$district}%");
+                    $q->whereLikeInsensitive('district', $district)
+                        ->orWhereLikeInsensitive('city', $district);
                 });
             }
         });
