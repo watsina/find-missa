@@ -358,3 +358,19 @@ test('it does not include legacy mass/confession/adoration keys', function () {
     expect($response->json('data'))->not->toHaveKey('confession');
     expect($response->json('data'))->not->toHaveKey('adoration');
 });
+
+test('it resolves church by code_name slug', function () {
+    $church = Church::factory()->create(['name' => 'Christ the King', 'city' => 'Kampala']);
+
+    getJson(route('church-details', ['church' => $church->code_name]))
+        ->assertOk()
+        ->assertJsonPath('data.details.id', $church->id);
+});
+
+test('it resolves church by numeric id', function () {
+    $church = Church::factory()->create();
+
+    getJson(route('church-details', ['church' => $church->id]))
+        ->assertOk()
+        ->assertJsonPath('data.details.id', $church->id);
+});
