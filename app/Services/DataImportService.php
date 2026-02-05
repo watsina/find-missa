@@ -281,13 +281,16 @@ class DataImportService
 
     /**
      * Remap a polymorphic ID based on the morph type.
+     *
+     * Supports both full class names (App\Models\Parish) and
+     * morph map aliases (parish, subParish) from config/morph.php.
      */
     protected function remapPolymorphicId(string $morphType, int $oldId): ?int
     {
         // Determine the source table based on the morph type
         $sourceTable = match ($morphType) {
-            'App\\Models\\Parish', Parish::class => 'parishes',
-            'App\\Models\\SubParish', SubParish::class => 'sub_parishes',
+            'App\\Models\\Parish', Parish::class, 'parish' => 'parishes',
+            'App\\Models\\SubParish', SubParish::class, 'subParish' => 'sub_parishes',
             default => null,
         };
 

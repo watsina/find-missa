@@ -271,6 +271,169 @@ describe('Data Import Service', function () {
         expect($church->parishable_type)->toBe(SubParish::class);
     });
 
+    it('handles morph alias format for parish polymorphic relationship', function () {
+        $exportData = [
+            'version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'team_id' => 999,
+            'tables' => [
+                'dioceses' => [
+                    ['id' => 100, 'name' => 'Test Diocese', 'type' => 'diocese'],
+                ],
+                'parishes' => [
+                    ['id' => 200, 'name' => 'Test Parish', 'diocese_id' => 100],
+                ],
+                'sub_parishes' => [],
+                'priests' => [],
+                'churches' => [
+                    [
+                        'id' => 300,
+                        'name' => 'Morph Alias Church',
+                        'parishable_type' => 'parish', // Morph alias format (not full class name)
+                        'parishable_id' => 200,
+                    ],
+                ],
+                'schedule_periods' => [],
+                'activity_times' => [],
+                'activity_schedules' => [],
+                'activity_time_exceptions' => [],
+                'holidays' => [],
+                'holiday_instances' => [],
+                'liturgical_schedules' => [],
+                'liturgical_schedule_times' => [],
+                'one_time_activities' => [],
+                'global_activity_time_exceptions' => [],
+                'schedule_rules' => [],
+                'schedule_overrides' => [],
+            ],
+        ];
+
+        $service = new DataImportService;
+        $result = $service->import($exportData, $this->team->id);
+
+        expect($result->isSuccessful())->toBeTrue();
+
+        $parish = Parish::where('team_id', $this->team->id)->first();
+        $church = Church::where('team_id', $this->team->id)->first();
+
+        expect($church)->not->toBeNull();
+        expect($church->parishable_id)->toBe($parish->id);
+        expect($church->parishable_type)->toBe('parish');
+    });
+
+    it('handles morph alias format for subParish polymorphic relationship', function () {
+        $exportData = [
+            'version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'team_id' => 999,
+            'tables' => [
+                'dioceses' => [
+                    ['id' => 100, 'name' => 'Test Diocese', 'type' => 'diocese'],
+                ],
+                'parishes' => [
+                    ['id' => 200, 'name' => 'Test Parish', 'diocese_id' => 100],
+                ],
+                'sub_parishes' => [
+                    ['id' => 250, 'name' => 'Test SubParish', 'parish_id' => 200],
+                ],
+                'priests' => [],
+                'churches' => [
+                    [
+                        'id' => 300,
+                        'name' => 'SubParish Morph Alias Church',
+                        'parishable_type' => 'subParish', // Morph alias format (not full class name)
+                        'parishable_id' => 250,
+                    ],
+                ],
+                'schedule_periods' => [],
+                'activity_times' => [],
+                'activity_schedules' => [],
+                'activity_time_exceptions' => [],
+                'holidays' => [],
+                'holiday_instances' => [],
+                'liturgical_schedules' => [],
+                'liturgical_schedule_times' => [],
+                'one_time_activities' => [],
+                'global_activity_time_exceptions' => [],
+                'schedule_rules' => [],
+                'schedule_overrides' => [],
+            ],
+        ];
+
+        $service = new DataImportService;
+        $result = $service->import($exportData, $this->team->id);
+
+        expect($result->isSuccessful())->toBeTrue();
+
+        $subParish = SubParish::where('team_id', $this->team->id)->first();
+        $church = Church::where('team_id', $this->team->id)->first();
+
+        expect($church)->not->toBeNull();
+        expect($church->parishable_id)->toBe($subParish->id);
+        expect($church->parishable_type)->toBe('subParish');
+    });
+
+    it('preserves polymorphic relationships through full export/import cycle with morph aliases', function () {
+        // Create original data - Laravel will store using morph aliases
+        $diocese = Diocese::factory()->create(['team_id' => $this->team->id]);
+        $parish = Parish::factory()->create([
+            'team_id' => $this->team->id,
+            'diocese_id' => $diocese->id,
+        ]);
+        $subParish = SubParish::factory()->create([
+            'team_id' => $this->team->id,
+            'parish_id' => $parish->id,
+        ]);
+
+        // Create churches with both parish and sub-parish relationships
+        $churchWithParish = Church::factory()->create([
+            'team_id' => $this->team->id,
+            'parishable_id' => $parish->id,
+            'parishable_type' => 'parish', // Using morph alias directly
+        ]);
+        $churchWithSubParish = Church::factory()->create([
+            'team_id' => $this->team->id,
+            'parishable_id' => $subParish->id,
+            'parishable_type' => 'subParish', // Using morph alias directly
+        ]);
+
+        // Export the data
+        $exportService = new DataExportService;
+        $exportedData = $exportService->export($this->team->id);
+
+        // Verify exported data uses morph alias format
+        $exportedChurches = $exportedData['tables']['churches'];
+        expect($exportedChurches)->toHaveCount(2);
+
+        $parishChurch = collect($exportedChurches)->firstWhere('name', $churchWithParish->name);
+        $subParishChurch = collect($exportedChurches)->firstWhere('name', $churchWithSubParish->name);
+
+        expect($parishChurch['parishable_type'])->toBe('parish');
+        expect($subParishChurch['parishable_type'])->toBe('subParish');
+
+        // Import back into the same team
+        $importService = new DataImportService;
+        $result = $importService->import($exportedData, $this->team->id);
+
+        expect($result->isSuccessful())->toBeTrue();
+
+        // Verify relationships are preserved after import
+        $importedParish = Parish::where('team_id', $this->team->id)->first();
+        $importedSubParish = SubParish::where('team_id', $this->team->id)->first();
+        $importedChurches = Church::where('team_id', $this->team->id)->get();
+
+        expect($importedChurches)->toHaveCount(2);
+
+        $reimportedParishChurch = $importedChurches->firstWhere('name', $churchWithParish->name);
+        $reimportedSubParishChurch = $importedChurches->firstWhere('name', $churchWithSubParish->name);
+
+        expect($reimportedParishChurch->parishable_id)->toBe($importedParish->id);
+        expect($reimportedParishChurch->parishable_type)->toBe('parish');
+
+        expect($reimportedSubParishChurch->parishable_id)->toBe($importedSubParish->id);
+        expect($reimportedSubParishChurch->parishable_type)->toBe('subParish');
+    });
+
     it('deletes existing data before import', function () {
         // Create existing data
         $existingDiocese = Diocese::factory()->create(['team_id' => $this->team->id]);
