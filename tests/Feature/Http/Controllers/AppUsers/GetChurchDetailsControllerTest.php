@@ -374,3 +374,62 @@ test('it resolves church by numeric id', function () {
         ->assertOk()
         ->assertJsonPath('data.details.id', $church->id);
 });
+
+test('it returns hierarchy with parish and diocese when church belongs to parish', function () {
+    $diocese = \App\Models\Diocese::factory()->create(['name' => 'Kampala Archdiocese']);
+    $parish = \App\Models\Parish::factory()->create([
+        'name' => 'Christ the King Parish',
+        'diocese_id' => $diocese->id,
+    ]);
+    $church = Church::factory()->create([
+        'parishable_id' => $parish->id,
+        'parishable_type' => \App\Models\Parish::class,
+    ]);
+
+    $response = getJson(route('church-details', ['church' => $church->id]))
+        ->assertOk();
+
+    $hierarchy = $response->json('data.details.hierarchy');
+    expect($hierarchy)->toBe([
+        'sub_parish' => null,
+        'parish' => 'Christ the King Parish',
+        'diocese' => 'Kampala Archdiocese',
+    ]);
+});
+
+test('it returns hierarchy with sub_parish, parish, and diocese when church belongs to sub_parish', function () {
+    $diocese = \App\Models\Diocese::factory()->create(['name' => 'Jinja Diocese']);
+    $parish = \App\Models\Parish::factory()->create([
+        'name' => 'St. James Parish',
+        'diocese_id' => $diocese->id,
+    ]);
+    $subParish = \App\Models\SubParish::factory()->create([
+        'name' => 'Holy Cross Sub-Parish',
+        'parish_id' => $parish->id,
+    ]);
+    $church = Church::factory()->create([
+        'parishable_id' => $subParish->id,
+        'parishable_type' => \App\Models\SubParish::class,
+    ]);
+
+    $response = getJson(route('church-details', ['church' => $church->id]))
+        ->assertOk();
+
+    $hierarchy = $response->json('data.details.hierarchy');
+    expect($hierarchy)->toBe([
+        'sub_parish' => 'Holy Cross Sub-Parish',
+        'parish' => 'St. James Parish',
+        'diocese' => 'Jinja Diocese',
+    ]);
+});
+
+test('it does not expose raw parishable relationship in details', function () {
+    $church = Church::factory()->create();
+
+    $response = getJson(route('church-details', ['church' => $church->id]))
+        ->assertOk();
+
+    $details = $response->json('data.details');
+    expect($details)->not->toHaveKey('parish');
+    expect($details)->toHaveKey('hierarchy');
+});

@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
-Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
+// V1 search API disabled - use v2 instead
+// Route::get('/search', AppUsers\SearchActivitiesController::class)->name('search');
 Route::get('/search-v2', AppUsers\SearchActivitiesV2Controller::class)->name('search.v2');
 Route::get('/church-details/{church}', AppUsers\GetChurchDetailsController::class)->name('church-details');
 Route::get('/holiday-info', AppUsers\HolidayInfoController::class)->name('holiday-info');

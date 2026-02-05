@@ -9,9 +9,11 @@
     mdiClock,
     mdiCross,
     mdiDirections,
+    mdiDomain,
     mdiEmailFast,
     mdiHandsPray,
     mdiHomeCity,
+    mdiOfficeBuildingMarker,
     mdiPhoneClassic,
     mdiTownHall,
     mdiWeb,
@@ -96,8 +98,40 @@
 
   const fields = computed(() => {
     const data = church.value;
+    const hierarchy = data?.hierarchy;
+
+    // Build hierarchy fields dynamically based on what's available
+    const hierarchyFields = [];
+
+    // Show sub-parish if the church belongs to one
+    if (hierarchy?.sub_parish) {
+      hierarchyFields.push({
+        icon: mdiOfficeBuildingMarker,
+        text: 'Sub-Parish',
+        value: hierarchy.sub_parish,
+      });
+    }
+
+    // Always show parish if available
+    if (hierarchy?.parish) {
+      hierarchyFields.push({
+        icon: mdiHomeCity,
+        text: 'Parish',
+        value: hierarchy.parish,
+      });
+    }
+
+    // Always show diocese if available
+    if (hierarchy?.diocese) {
+      hierarchyFields.push({
+        icon: mdiDomain,
+        text: 'Diocese',
+        value: hierarchy.diocese,
+      });
+    }
+
     return [
-      { icon: mdiHomeCity, text: 'Parish', value: data?.parish?.name },
+      ...hierarchyFields,
       { icon: mdiCity, text: 'City/Town', value: data?.city },
       { icon: mdiTownHall, text: 'District/State', value: data?.district },
       { icon: mdiEmailFast, text: 'Contact Email', value: data?.contact_email },

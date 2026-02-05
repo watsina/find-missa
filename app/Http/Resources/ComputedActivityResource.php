@@ -21,7 +21,7 @@ class ComputedActivityResource extends JsonResource
     {
         return [
             'church_id' => $this->churchId,
-            'church' => $this->when($this->church !== null, fn () => new ChurchResource($this->church)),
+            'church' => $this->when($this->church !== null, fn () => new PublicChurchResource($this->church)),
             'type' => Str::replace('-', ' ', $this->type),
             'start_time' => $this->startTime,
             'end_time' => $this->endTime,

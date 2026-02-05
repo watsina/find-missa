@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Parish;
 use App\Enums\DayPattern;
+use App\Models\SubParish;
 use Illuminate\Http\Request;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
@@ -55,7 +57,7 @@ class ChurchDetailsResource extends JsonResource
                 'contact_phone' => $this->contact_phone,
                 'longitude' => $this->longitude,
                 'latitude' => $this->latitude,
-                'parish' => $this->whenLoaded('parishable'),
+                'hierarchy' => $this->buildHierarchy(),
             ],
 
             // Regular schedule (no schedule period) grouped by day pattern
@@ -298,6 +300,48 @@ class ChurchDetailsResource extends JsonResource
             'end_time' => $activity->end_time,
             'language' => $activity->language,
             'reason' => $activity->reason,
+        ];
+    }
+
+    /**
+     * Build the parish hierarchy with names only.
+     *
+     * @return array<string, string|null>
+     */
+    protected function buildHierarchy(): array
+    {
+        $parishable = $this->parishable;
+
+        if ($parishable === null) {
+            return [
+                'sub_parish' => null,
+                'parish' => null,
+                'diocese' => null,
+            ];
+        }
+
+        // Church belongs directly to a Parish
+        if ($parishable instanceof Parish) {
+            return [
+                'sub_parish' => null,
+                'parish' => $parishable->name,
+                'diocese' => $parishable->diocese?->name,
+            ];
+        }
+
+        // Church belongs to a SubParish
+        if ($parishable instanceof SubParish) {
+            return [
+                'sub_parish' => $parishable->name,
+                'parish' => $parishable->parish?->name,
+                'diocese' => $parishable->parish?->diocese?->name,
+            ];
+        }
+
+        return [
+            'sub_parish' => null,
+            'parish' => null,
+            'diocese' => null,
         ];
     }
 }

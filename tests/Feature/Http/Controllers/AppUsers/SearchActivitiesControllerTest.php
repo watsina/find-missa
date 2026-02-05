@@ -13,6 +13,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+// V1 search API has been disabled - use v2 instead
+// These tests are skipped until the v1 API is removed entirely
+beforeEach(function () {
+    $this->markTestSkipped('V1 search API disabled - use v2 instead');
+});
+
 test('It organises the data by start time...', function () {
     // activities that happen at different times
     $massLater = ActivityTime::factory()->daily('mass')->create(['start_time' => '18:00', 'end_time' => '18:30']);

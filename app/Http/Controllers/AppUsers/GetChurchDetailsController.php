@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AppUsers;
 
 use App\Models\Church;
+use App\Models\SubParish;
 use Illuminate\Http\Request;
 use App\Models\SchedulePeriod;
 use Illuminate\Support\Carbon;
@@ -26,6 +27,13 @@ class GetChurchDetailsController extends Controller
             'adorationChapel.schedules.dayDetails',
             'adorationChapel.exceptions',
         ]);
+
+        // Load hierarchy relationships based on parishable type
+        if ($church->parishable instanceof SubParish) {
+            $church->parishable->loadMissing(['parish.diocese']);
+        } else {
+            $church->parishable?->loadMissing(['diocese']);
+        }
 
         // Get the church's team_id for fetching relevant schedule periods
         $teamId = $church->team_id;

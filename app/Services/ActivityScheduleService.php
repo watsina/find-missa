@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Church;
+use App\Models\Parish;
+use App\Models\SubParish;
 use Illuminate\Support\Carbon;
 use App\Models\AdorationChapel;
 use App\Models\OneTimeActivity;
@@ -10,6 +12,7 @@ use App\Models\ActivitySchedule;
 use App\Models\LiturgicalSchedule;
 use Illuminate\Support\Collection;
 use App\DataTransferObjects\ComputedActivity;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Main service for computing available activities on a specific date.
@@ -114,7 +117,18 @@ class ActivityScheduleService
             ->with(['dayDetails']);
 
         if ($includeChurch) {
-            $query->with('church');
+            $query->with([
+                'church' => function ($query) {
+                    $query->with([
+                        'parishable' => function (MorphTo $morphTo) {
+                            $morphTo->morphWith([
+                                Parish::class => ['diocese'],
+                                SubParish::class => ['parish.diocese'],
+                            ]);
+                        },
+                    ]);
+                },
+            ]);
         }
 
         if ($activityTypes) {
@@ -156,7 +170,18 @@ class ActivityScheduleService
             ->with(['times', 'holiday']);
 
         if ($includeChurch) {
-            $query->with('church');
+            $query->with([
+                'church' => function ($query) {
+                    $query->with([
+                        'parishable' => function (MorphTo $morphTo) {
+                            $morphTo->morphWith([
+                                Parish::class => ['diocese'],
+                                SubParish::class => ['parish.diocese'],
+                            ]);
+                        },
+                    ]);
+                },
+            ]);
         }
 
         $liturgicalSchedules = $query->get();
@@ -215,7 +240,18 @@ class ActivityScheduleService
             ->onDate($date);
 
         if ($includeChurch) {
-            $query->with('church');
+            $query->with([
+                'church' => function ($query) {
+                    $query->with([
+                        'parishable' => function (MorphTo $morphTo) {
+                            $morphTo->morphWith([
+                                Parish::class => ['diocese'],
+                                SubParish::class => ['parish.diocese'],
+                            ]);
+                        },
+                    ]);
+                },
+            ]);
         }
 
         if ($activityTypes) {
@@ -354,7 +390,16 @@ class ActivityScheduleService
             });
         }
 
-        $churches = $churchQuery->get();
+        $churches = $churchQuery
+            ->with([
+                'parishable' => function (MorphTo $morphTo) {
+                    $morphTo->morphWith([
+                        Parish::class => ['diocese'],
+                        SubParish::class => ['parish.diocese'],
+                    ]);
+                },
+            ])
+            ->get();
 
         // Get activities for each church
         $allActivities = $churches->flatMap(
@@ -407,7 +452,20 @@ class ActivityScheduleService
     ): Collection {
         // Build the query for chapels with their churches
         $query = AdorationChapel::query()
-            ->with(['church', 'schedules.dayDetails', 'exceptions']);
+            ->with([
+                'church' => function ($query) {
+                    $query->with([
+                        'parishable' => function (MorphTo $morphTo) {
+                            $morphTo->morphWith([
+                                Parish::class => ['diocese'],
+                                SubParish::class => ['parish.diocese'],
+                            ]);
+                        },
+                    ]);
+                },
+                'schedules.dayDetails',
+                'exceptions',
+            ]);
 
         // Filter by church criteria
         $query->whereHas('church', function ($churchQuery) use ($churchName, $district) {
