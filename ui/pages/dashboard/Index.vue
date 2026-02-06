@@ -1,11 +1,9 @@
 <script setup>
   import AppLayout from '@/layouts/AppLayout.vue';
   import NavLink from '@/components/NavLink.vue';
-  import PrimaryButton from '@/components/PrimaryButton.vue';
-  import ExportDataModal from './ExportDataModal.vue';
   import ActionLogs from './ActionLogs.vue';
   import { ref, onMounted, computed } from 'vue';
-  import { http, notify } from '@/plugins';
+  import { http } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';
 
   const store = useAuthStore();
@@ -27,31 +25,6 @@
       })
       .finally(() => (isFetching.value = false));
   });
-
-  async function clearData() {
-    if (
-      !(await notify.confirm(
-        'Are you sure you want to delete all the data? This action is not reversible.',
-        {
-          title: 'Delete all data',
-        },
-      ))
-    ) {
-      return;
-    }
-
-    isDeleting.value = true;
-    http
-      .delete('/api/v1/clear-data')
-      .then(() => {
-        notify.success('Data cleared successfully');
-        window.location.reload();
-      })
-      .catch(() => {
-        notify.error('Something went wrong while deleting the data.');
-      })
-      .finally(() => (isDeleting.value = false));
-  }
 
   const cards = computed(() =>
     Object.keys(stats.value)?.map((key) => {
@@ -80,12 +53,6 @@
       <v-row class="py-12">
         <v-col class="tw:flex tw:justify-between" cols="12">
           <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to your dashboard</div>
-          <div>
-            <PrimaryButton v-if="user.is_admin" class="tw:mr-2" @click="showExportModal = true">
-              Export data
-            </PrimaryButton>
-            <PrimaryButton v-if="user.is_admin" @click="clearData"> Clear data </PrimaryButton>
-          </div>
         </v-col>
         <template v-if="isFetching">
           <v-col v-for="i in 6" :key="i" cols="12" md="4">
