@@ -26,6 +26,9 @@ export default defineStore('authStore', {
     featureOptionIsEnabled(namespace, feature, option) {
       return !!this.features[namespace]['options'][feature][option];
     },
+    pennantFeatureIsActive(feature) {
+      return !!this.features?.pennant?.[feature];
+    },
     hasPermission(permission) {
       if (this.user?.is_admin) {
         return true;

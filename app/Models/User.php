@@ -5,10 +5,12 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Illuminate\Support\Str;
+use Laravel\Pennant\Feature;
 use Laravel\Fortify\Features;
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use App\Features\DataImportExport;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Concerns\HasProfilePhoto;
@@ -139,7 +141,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $teamId = session()->get('current_team_id');
         $team = $this->currentTeam;
 
-        return cache()->remember($this->getCacheKey("info:{$teamId}:{$team?->updated_at}"), 5 * 60, function () {
+        return cache()->remember($this->getCacheKey("info:{$teamId}:{$team?->updated_at}"), 5 * 60, function () use ($team) {
             return [
                 'user' => $this->withoutRelations(),
                 'current_team' => $this->currentTeam,
@@ -151,6 +153,9 @@ class User extends Authenticatable implements MustVerifyEmail
                         'features' => config('fortify.features', []),
                         'options' => config('fortify-options', []),
                     ],
+                    'pennant' => $team ? [
+                        'data_import_export' => Feature::for($team)->active(DataImportExport::class),
+                    ] : [],
                 ],
             ];
         });

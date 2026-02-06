@@ -6,8 +6,10 @@ use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Diocese;
 use App\Models\SubParish;
+use Laravel\Pennant\Feature;
 use App\Services\ImportResult;
 use Illuminate\Http\UploadedFile;
+use App\Features\DataImportExport;
 use App\Services\DataExportService;
 use App\Services\DataImportService;
 
@@ -21,6 +23,9 @@ beforeEach(function () {
         'is_super_admin' => false,
         'current_team_id' => $this->team->id,
     ]);
+
+    // Enable the DataImportExport feature for the team
+    Feature::for($this->team)->activate(DataImportExport::class);
 });
 
 describe('Full Data Import Controller', function () {
@@ -37,6 +42,18 @@ describe('Full Data Import Controller', function () {
         $this->actingAs($this->regularUser)
             ->postJson('/api/v1/full-import', ['file' => $file])
             ->assertForbidden();
+    });
+
+    it('returns 403 when feature is disabled', function () {
+        // Deactivate the feature for the team
+        Feature::for($this->team)->deactivate(DataImportExport::class);
+
+        $file = UploadedFile::fake()->create('data.json', 100);
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/v1/full-import', ['file' => $file])
+            ->assertForbidden()
+            ->assertJson(['message' => 'This feature is not available.']);
     });
 
     it('requires a file', function () {

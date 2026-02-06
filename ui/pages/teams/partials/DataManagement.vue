@@ -13,14 +13,16 @@
   });
 
   const authStore = useAuthStore();
-  const isAdmin = computed(() => authStore.user?.is_admin);
+  const canAccessDataManagement = computed(() =>
+    authStore.pennantFeatureIsActive('data_import_export'),
+  );
 
   const showExportModal = ref(false);
   const showImportModal = ref(false);
 </script>
 
 <template>
-  <div class="tw:md:grid tw:md:grid-cols-3 tw:md:gap-6">
+  <div v-if="canAccessDataManagement" class="tw:md:grid tw:md:grid-cols-3 tw:md:gap-6">
     <SectionTitle>
       <template #title> Data Management </template>
       <template #description>

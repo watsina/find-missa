@@ -5,6 +5,8 @@ use App\Models\User;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Diocese;
+use Laravel\Pennant\Feature;
+use App\Features\DataImportExport;
 use App\Services\DataExportService;
 
 beforeEach(function () {
@@ -17,6 +19,9 @@ beforeEach(function () {
         'is_super_admin' => false,
         'current_team_id' => $this->team->id,
     ]);
+
+    // Enable the DataImportExport feature for the team
+    Feature::for($this->team)->activate(DataImportExport::class);
 });
 
 describe('Full Data Export Controller', function () {
@@ -29,6 +34,16 @@ describe('Full Data Export Controller', function () {
         $this->actingAs($this->regularUser)
             ->getJson('/api/v1/full-export')
             ->assertForbidden();
+    });
+
+    it('returns 403 when feature is disabled', function () {
+        // Deactivate the feature for the team
+        Feature::for($this->team)->deactivate(DataImportExport::class);
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/v1/full-export')
+            ->assertForbidden()
+            ->assertJson(['message' => 'This feature is not available.']);
     });
 
     it('allows admin users to export data', function () {

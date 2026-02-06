@@ -2,21 +2,26 @@
 
 namespace App\Providers;
 
+use App\Models\Team;
 use App\Models\User;
 use PostHog\PostHog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Laravel\Pennant\Feature;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\RateLimiter;
+use App\Listeners\BustTeamCacheOnFeatureUpdate;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Laravel\Pennant\Middleware\EnsureFeaturesAreActive;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -75,7 +80,30 @@ class AppServiceProvider extends ServiceProvider
                 : $rule;
         });
 
+        $this->configurePennant();
         $this->defineMacros();
+    }
+
+    /**
+     * Configure Laravel Pennant feature flags.
+     */
+    protected function configurePennant(): void
+    {
+        // Use the morph map for scope serialization
+        Feature::useMorphMap();
+
+        // Default scope is the authenticated user's current team
+        Feature::resolveScopeUsing(fn () => auth()->user()?->currentTeam);
+
+        // Return 403 JSON response when feature is inactive
+        EnsureFeaturesAreActive::whenInactive(
+            fn (Request $request) => response()->json([
+                'message' => 'This feature is not available.',
+            ], 403)
+        );
+
+        // Register event subscriber for cache busting
+        Event::subscribe(BustTeamCacheOnFeatureUpdate::class);
     }
 
     protected function defineMacros()
