@@ -19,6 +19,11 @@ Route::middleware(['auth:sanctum'])->get('/auth/user', function (Request $reques
     return $request->user();
 })->name('auth.user');
 
+// ACL - Permission categories (must be defined before apiResource to avoid route conflict)
+Route::middleware(['auth', 'userWithTeam'])
+    ->get('permissions/categories', [Controllers\Acl\PermissionsController::class, 'categories'])
+    ->name('permissions.categories');
+
 // admin routes
 Route::middleware('auth', 'admin')->group(function () {
     Route::delete('clear-data', Controllers\ClearDataController::class)->name('clear-data');
@@ -40,11 +45,9 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::apiResource('teams', Controllers\TeamController::class)->except('destroy');
 
     Route::get('action-logs', Controllers\UserActionLogController::class)->middleware('userWithTeam');
-    // acl
+    // acl - admin only
     Route::get('roles-permissions', Controllers\Acl\GetRolesAndPermissionsController::class);
-    Route::apiResource('roles', Controllers\Acl\RolesController::class)->only('index', 'show', 'update');
     Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('index', 'show', 'store', 'update');
-    Route::apiResource('user.roles', Controllers\Acl\UserRolesController::class)->only('index', 'store')->middleware('userWithTeam');
 });
 
 Route::middleware('auth', 'userWithTeam')->group(function () {
@@ -85,4 +88,8 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::post('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'store'])->name('churches.adoration-chapel.store');
     Route::put('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'update'])->name('churches.adoration-chapel.update');
     Route::delete('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'destroy'])->name('churches.adoration-chapel.destroy');
+
+    // ACL - Team-scoped roles (authorization handled in form requests)
+    Route::apiResource('roles', Controllers\Acl\RolesController::class)->only('index', 'show', 'store', 'update', 'destroy');
+    Route::apiResource('user.roles', Controllers\Acl\UserRolesController::class)->only('index', 'store');
 });

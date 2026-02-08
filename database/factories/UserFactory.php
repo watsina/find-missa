@@ -42,10 +42,14 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user should belong to a team.
+     * Indicate that the user should own a team and have it set as current.
      */
     public function withTeam(): static
     {
-        return $this->has(Team::factory());
+        return $this->afterCreating(function (User $user) {
+            $team = Team::factory()->create(['user_id' => $user->id]);
+            $team->members()->attach($user);
+            $user->update(['current_team_id' => $team->id]);
+        });
     }
 }

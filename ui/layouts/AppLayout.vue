@@ -26,6 +26,7 @@
 
 <script setup>
   import { computed, ref, onMounted } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { http } from '@/plugins';
   import NavDrawer from './NavDrawer';
   import TopBar from './TopBar';
@@ -35,6 +36,8 @@
   import GlobalConfirmationDialog from '@/components/GlobalConfirmationDialog';
   import useAuthStore from '@/stores/useAuthStore';
 
+  const route = useRoute();
+  const router = useRouter();
   const authStore = useAuthStore();
 
   const authUser = computed(() => authStore?.user);
@@ -50,8 +53,8 @@
         showSessionExpiredModal.value = true;
       }
 
-      if (error?.response?.status === 403 && this.$route.name !== 'errors.403') {
-        await this.$router.push({ name: 'errors.403' });
+      if (error?.response?.status === 403 && route.name !== 'errors.403') {
+        await router.push({ name: 'errors.403' });
       }
 
       return Promise.reject(error);

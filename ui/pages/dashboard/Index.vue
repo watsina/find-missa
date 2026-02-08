@@ -2,6 +2,7 @@
   import AppLayout from '@/layouts/AppLayout.vue';
   import NavLink from '@/components/NavLink.vue';
   import ActionLogs from './ActionLogs.vue';
+  import ExportDataModal from './ExportDataModal.vue';
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';

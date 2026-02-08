@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,5 +21,15 @@ class RoleFactory extends Factory
             'name' => $this->faker->unique()->word,
             'description' => $this->faker->sentence(3, true),
         ];
+    }
+
+    /**
+     * Associate the role with a specific team.
+     */
+    public function forTeam(Team $team): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'team_id' => $team->id,
+        ]);
     }
 }
