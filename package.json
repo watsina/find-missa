@@ -19,7 +19,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue/server-renderer": "^3.2.31",
-    "axios": "^1.12.2",
+    "axios": "^1.13.5",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.3.1",
