@@ -65,4 +65,14 @@ class DioceseController extends Controller
 
         return response()->noContent();
     }
+
+    public function syncCodeName(Request $request, Diocese $diocese): DioceseResource
+    {
+        Gate::authorize('update', $diocese);
+
+        $diocese->generateCodeName();
+        $diocese->save();
+
+        return new DioceseResource($diocese);
+    }
 }

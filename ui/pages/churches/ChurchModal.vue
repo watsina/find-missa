@@ -106,6 +106,28 @@
     });
   };
 
+  const syncCodeName = () => {
+    if (!isEditing.value) return;
+
+    form.post(`/api/v1/churches/${props.church?.id}/sync-codename`, {
+      onSuccess: ({ data }) => {
+        notify.success('Code name synced successfully');
+        // We don't close the modal, we just update the form/parent?
+        // Actually, if we just synced, maybe we should close?
+        // Or at least emit updated so the parent list updates if it shows code names.
+        // But usually we just want to fix it.
+        // Let's close modal to be consistent with save, or maybe just emit update.
+        // User might be editing other things.
+        // Let's just emit 'updated' and keep modal open?
+        // Or close it. The prompt didn't specify.
+        // "Sync" implies a quick fix.
+        // Let's close it to be safe and simple.
+        closeModal(data);
+      },
+      onError: () => notify.error('Failed to sync code name. Check for conflicts.'),
+    });
+  };
+
   const closeModal = (data = null) => {
     form.reset();
     if (data?.id && !isEditing.value) emit('created', data);
@@ -276,6 +298,16 @@
 
       <template #footer>
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+
+        <SecondaryButton
+          v-if="isEditing"
+          class="tw:ml-3"
+          :disabled="form.processing"
+          :loading="form.processing"
+          @click="syncCodeName"
+        >
+          Sync Code Name
+        </SecondaryButton>
 
         <PrimaryButton
           class="tw:ml-3 tw:capitalize"

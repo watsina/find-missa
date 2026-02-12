@@ -14,11 +14,49 @@ trait HasCodeName
     protected static function bootHasCodeName()
     {
         static::creating(function ($model) {
-            $value = $model->name.' '.($model->city ?? $model->type);
-            // only want alphabets and spaces
-            $code = Str::replaceMatches('/[^A-Z a-z]/', '', $value);
-            $model->code_name = Str::kebab($code);
+            $model->generateCodeName();
         });
+
+        static::updating(function ($model) {
+            if ($model->isDirty(['name', 'city', 'type'])) {
+                $model->generateCodeName();
+            }
+        });
+    }
+
+    public function generateCodeName(): void
+    {
+        $value = $this->name.' '.($this->city ?? $this->type);
+        // only want alphabets and spaces
+        $code = Str::replaceMatches('/[^A-Z a-z]/', '', $value);
+        $candidate = Str::kebab($code);
+
+        // Check for uniqueness
+        $query = static::where('code_name', $candidate);
+
+        if ($this->exists) {
+            $query->where('id', '!=', $this->id);
+        }
+
+        if ($query->exists()) {
+            $errorField = 'city'; // Default blame
+
+            // If name changed but city didn't, blame name
+            if ($this->isDirty('name') && ! $this->isDirty('city')) {
+                $errorField = 'name';
+            }
+
+            // If the model doesn't have a city field (e.g. Diocese), blame name
+            if (! isset($this->city) && $this->getAttribute('city') === null) {
+                $errorField = 'name';
+            }
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                $errorField => ["The code name '{$candidate}' is already in use by another record."],
+            ]);
+        }
+
+        $this->code_name = $candidate;
     }
 
     public function resolveRouteBinding($value, $field = null)

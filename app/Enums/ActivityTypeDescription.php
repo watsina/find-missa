@@ -12,6 +12,7 @@ enum ActivityTypeDescription: string
     case Confession = 'confession';
     case Adoration = 'adoration';
     case Benediction = 'benediction';
+    case Exposition = 'exposition';
     case TraditionalLatinMass = 'traditional-latin-mass';
     case AnticipationMass = 'anticipation-mass';
     case MassOfTheLordsSupper = 'mass-of-the-lords-supper';
@@ -21,4 +22,25 @@ enum ActivityTypeDescription: string
     case EasterMondayMass = 'easter-monday-mass';
     case ChristmasVigilMass = 'christmas-vigil-mass';
     case ChristmasMass = 'christmas-mass';
+
+    public static function getValidDescriptionsForType(string $type): array
+    {
+        return match ($type) {
+            ActivityType::Mass->value => [
+                self::Mass->value,
+                self::TraditionalLatinMass->value,
+                self::AnticipationMass->value,
+                self::MassOfTheLordsSupper->value,
+                self::GoodFridayService->value,
+                self::EasterVigilMass->value,
+                self::EasterMass->value,
+                self::EasterMondayMass->value,
+                self::ChristmasVigilMass->value,
+                self::ChristmasMass->value,
+            ],
+            ActivityType::Confession->value => [self::Confession->value],
+            ActivityType::Adoration->value => [self::Adoration->value, self::Exposition->value, self::Benediction->value],
+            default => [],
+        };
+    }
 }

@@ -33,6 +33,7 @@
     { title: 'Confession', value: 'confession' },
     { title: 'Adoration', value: 'adoration' },
     { title: 'Benediction', value: 'benediction' },
+    { title: 'Exposition', value: 'exposition' },
     { title: 'Traditional Latin Mass', value: 'traditional-latin-mass' },
     { title: 'Anticipation Mass', value: 'anticipation-mass' },
     { title: 'Mass of the Lords Supper', value: 'mass-of-the-lords-supper' },
@@ -150,8 +151,7 @@
             <v-autocomplete
               v-model="form.activity_type_description"
               class="tw:block tw:w-full tw:mt-1 tw:capitalize"
-              :error="form.errors.activity_type_description"
-              hide-details="auto"
+              :error-messages="form.errors.activity_type_description"
               :items="activityTypeDescriptions"
               label="Activity Type Description*"
               required

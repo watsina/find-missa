@@ -63,4 +63,14 @@ class SubParishController extends Controller
 
         return response()->noContent();
     }
+
+    public function syncCodeName(Request $request, SubParish $subParish): SubParishResource
+    {
+        Gate::authorize('update', $subParish);
+
+        $subParish->generateCodeName();
+        $subParish->save();
+
+        return new SubParishResource($subParish);
+    }
 }

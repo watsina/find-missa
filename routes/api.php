@@ -55,6 +55,13 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::get('dashboard', Controllers\DashboardController::class)->name('dashboard.index');
     Route::put('switch-team', Controllers\SwitchTeamController::class);
     Route::apiResource('team.members', Controllers\TeamMemberController::class)->only('index', 'show', 'update', 'destroy');
+
+    // Sync Code Name Routes
+    Route::post('churches/{church}/sync-codename', [Controllers\ChurchController::class, 'syncCodeName'])->name('churches.sync-codename');
+    Route::post('parishes/{parish}/sync-codename', [Controllers\ParishController::class, 'syncCodeName'])->name('parishes.sync-codename');
+    Route::post('sub-parishes/{subParish}/sync-codename', [Controllers\SubParishController::class, 'syncCodeName'])->name('sub-parishes.sync-codename');
+    Route::post('dioceses/{diocese}/sync-codename', [Controllers\DioceseController::class, 'syncCodeName'])->name('dioceses.sync-codename');
+
     Route::apiResource('churches', Controllers\ChurchController::class)->except('destroy');
     Route::apiResource('dioceses', Controllers\DioceseController::class)->except('destroy');
     Route::apiResource('parishes', Controllers\ParishController::class)->except('destroy');

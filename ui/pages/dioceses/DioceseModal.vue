@@ -77,6 +77,18 @@
     });
   };
 
+  const syncCodeName = () => {
+    if (!isEditing.value) return;
+
+    form.post(`/api/v1/dioceses/${props.diocese?.id}/sync-codename`, {
+      onSuccess: ({ data }) => {
+        notify.success('Code name synced successfully');
+        closeModal(data);
+      },
+      onError: () => notify.error('Failed to sync code name. Check for conflicts.'),
+    });
+  };
+
   const closeModal = (data = null) => {
     form.reset();
     if (data && !isEditing.value) emit('created', data);
@@ -167,6 +179,16 @@
 
       <template #footer>
         <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+
+        <SecondaryButton
+          v-if="isEditing"
+          class="tw:ml-3"
+          :disabled="form.processing"
+          :loading="form.processing"
+          @click="syncCodeName"
+        >
+          Sync Code Name
+        </SecondaryButton>
 
         <PrimaryButton
           class="tw:ml-3 tw:capitalize"

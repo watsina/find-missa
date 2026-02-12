@@ -84,4 +84,14 @@ class ChurchController extends Controller
 
         return response()->noContent();
     }
+
+    public function syncCodeName(Request $request, Church $church): ChurchResource
+    {
+        Gate::authorize('update', $church);
+
+        $church->generateCodeName();
+        $church->save();
+
+        return new ChurchResource($church);
+    }
 }

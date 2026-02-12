@@ -5,6 +5,7 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use App\Enums\ActivityTypeDescription;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -28,12 +29,9 @@ class ValidateActivityTypeDescription implements DataAwareRule, ValidationRule
             $fail('Activity type description requires the activity type');
         }
 
-        $types = [$type];
-        // NOTE: the service is to cater for good-friday-service which we want to show under masses
-        if ($type === 'mass') {
-            $types[] = 'service';
-        }
-        if (! Str::contains($value, $types)) {
+        // get the valid descriptions for the given type
+        $validDescriptions = ActivityTypeDescription::getValidDescriptionsForType($type);
+        if (! Str::contains($value, $validDescriptions)) {
             $fail('Invalid activity type description');
         }
     }

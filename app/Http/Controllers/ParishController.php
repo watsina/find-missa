@@ -65,4 +65,14 @@ class ParishController extends Controller
 
         return response()->noContent();
     }
+
+    public function syncCodeName(Request $request, Parish $parish): ParishResource
+    {
+        Gate::authorize('update', $parish);
+
+        $parish->generateCodeName();
+        $parish->save();
+
+        return new ParishResource($parish);
+    }
 }
