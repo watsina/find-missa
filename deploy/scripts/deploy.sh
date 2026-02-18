@@ -197,9 +197,23 @@ IMAGE_TAG=$(date +%Y%m%d-%H%M%S)
 NETWORK_NAME="${SANITIZED_DOMAIN}-network"
 DEPLOY_PATH="${SERVER_DEPLOY_PATH}/${SANITIZED_DOMAIN}"
 
+# Build SSH options
+SSH_OPTS="-p $SERVER_PORT"
+SCP_OPTS="-P $SERVER_PORT"
+if [ -n "$SSH_KEY_PATH" ]; then
+    # Expand ~ to $HOME
+    SSH_KEY_PATH="${SSH_KEY_PATH/#\~/$HOME}"
+    if [ ! -f "$SSH_KEY_PATH" ]; then
+        print_error "SSH key not found: $SSH_KEY_PATH"
+        exit 1
+    fi
+    SSH_OPTS="$SSH_OPTS -i $SSH_KEY_PATH"
+    SCP_OPTS="$SCP_OPTS -i $SSH_KEY_PATH"
+fi
+
 # SSH command
-SSH_CMD="ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST"
-SCP_CMD="scp -P $SERVER_PORT"
+SSH_CMD="ssh $SSH_OPTS $SERVER_USER@$SERVER_HOST"
+SCP_CMD="scp $SCP_OPTS"
 
 # =============================================================================
 # Status Action

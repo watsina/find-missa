@@ -36,6 +36,65 @@ nano .env.deploy.staging
 - Ports 22, 80, 443 open in firewall
 - DNS configured to point to server IP (for SSL)
 
+## SSH Key Setup
+
+The deployment scripts use SSH key-based authentication. You can either use your existing SSH key or create a dedicated deploy key for each environment.
+
+### Option 1: Use Existing SSH Key (Simplest)
+
+If you already have SSH access to your server, leave `SSH_KEY_PATH` empty in your config:
+
+```bash
+# In .env.deploy.staging
+SSH_KEY_PATH=
+```
+
+The scripts will use your default SSH key (`~/.ssh/id_rsa` or `~/.ssh/id_ed25519`).
+
+### Option 2: Create Dedicated Deploy Keys (Recommended for Teams)
+
+Create a separate key for each environment:
+
+```bash
+# Generate staging deploy key
+ssh-keygen -t ed25519 -C "deploy-staging" -f ~/.ssh/deploy_staging_key
+
+# Generate production deploy key
+ssh-keygen -t ed25519 -C "deploy-production" -f ~/.ssh/deploy_production_key
+```
+
+Add the public key to your server:
+
+```bash
+# Copy staging key to staging server
+ssh-copy-id -i ~/.ssh/deploy_staging_key.pub ubuntu@staging.example.com
+
+# Copy production key to production server
+ssh-copy-id -i ~/.ssh/deploy_production_key.pub ubuntu@production.example.com
+```
+
+Configure the key path in your env files:
+
+```bash
+# In .env.deploy.staging
+SSH_KEY_PATH=~/.ssh/deploy_staging_key
+
+# In .env.deploy.production
+SSH_KEY_PATH=~/.ssh/deploy_production_key
+```
+
+### Verify SSH Access
+
+Test your connection before deploying:
+
+```bash
+# Test with default key
+ssh ubuntu@your-server-ip "echo 'SSH connection successful'"
+
+# Test with specific key
+ssh -i ~/.ssh/deploy_staging_key ubuntu@your-server-ip "echo 'SSH connection successful'"
+```
+
 ## Environment Setup
 
 The deployment system supports multiple environments (staging, production) via separate configuration files.
@@ -63,6 +122,7 @@ Edit `.env.deploy.staging`:
 SERVER_USER=ubuntu
 SERVER_HOST=staging.example.com   # Your staging server IP or hostname
 SERVER_PORT=22
+SSH_KEY_PATH=~/.ssh/deploy_staging_key   # Optional: path to SSH key
 
 # Domain Configuration
 DOMAIN=staging.findmissa.org
@@ -89,6 +149,7 @@ Edit `.env.deploy.production`:
 SERVER_USER=ubuntu
 SERVER_HOST=production.example.com   # Your production server IP or hostname
 SERVER_PORT=22
+SSH_KEY_PATH=~/.ssh/deploy_production_key   # Optional: path to SSH key
 
 # Domain Configuration
 DOMAIN=findmissa.org
