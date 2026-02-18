@@ -12,7 +12,7 @@ cp deploy/config/.env.example .env.deploy.staging
 nano .env.deploy.staging
 
 # 3. Initialize server (one-time)
-./deploy/scripts/server-init.sh --env staging
+./deploy/scripts/server-init-laravel.sh --env staging
 
 # 4. Deploy
 ./deploy/scripts/deploy.sh --env staging
@@ -177,10 +177,10 @@ Run this **once per server** to install Docker, Nginx, Redis, and Certbot:
 
 ```bash
 # For staging server
-./deploy/scripts/server-init.sh --env staging
+./deploy/scripts/server-init-laravel.sh --env staging
 
 # For production server
-./deploy/scripts/server-init.sh --env production
+./deploy/scripts/server-init-laravel.sh --env production
 ```
 
 This script will:
@@ -295,7 +295,7 @@ deploy/
 │   └── upstream.conf.template
 └── scripts/
     ├── deploy.sh             # Main deployment script (run locally)
-    ├── server-init.sh        # Server initialization (run locally)
+    ├── server-init-laravel.sh        # Server initialization (run locally)
     └── server/
         ├── deploy.sh         # Server-side deployment
         ├── enable-ssl.sh     # Enable SSL after certbot

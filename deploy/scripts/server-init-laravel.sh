@@ -7,9 +7,9 @@
 # Run this on your LOCAL machine - it will SSH to the server and configure it.
 #
 # Usage:
-#   ./deploy/scripts/server-init.sh
-#   ./deploy/scripts/server-init.sh --env staging
-#   ./deploy/scripts/server-init.sh --env production
+#   ./deploy/scripts/server-init-laravel.sh
+#   ./deploy/scripts/server-init-laravel.sh --env staging
+#   ./deploy/scripts/server-init-laravel.sh --env production
 # =============================================================================
 
 set -e
@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --help)
-            echo "Usage: ./deploy/scripts/server-init.sh [--env <name>]"
+            echo "Usage: ./deploy/scripts/server-init-laravel.sh [--env <name>]"
             echo ""
             echo "Options:"
             echo "    --env <name>    Use .env.deploy.<name> configuration"
@@ -122,6 +122,7 @@ DEPLOY_PATH="${SERVER_DEPLOY_PATH}/${SANITIZED_DOMAIN}"
 
 # Build SSH options
 SSH_OPTS="-p $SERVER_PORT"
+SCP_OPTS="-P $SERVER_PORT"
 if [ -n "$SSH_KEY_PATH" ]; then
     # Expand ~ to $HOME
     SSH_KEY_PATH="${SSH_KEY_PATH/#\~/$HOME}"
@@ -130,10 +131,12 @@ if [ -n "$SSH_KEY_PATH" ]; then
         exit 1
     fi
     SSH_OPTS="$SSH_OPTS -i $SSH_KEY_PATH"
+    SCP_OPTS="$SCP_OPTS -i $SSH_KEY_PATH"
 fi
 
 # SSH command
 SSH_CMD="ssh $SSH_OPTS $SERVER_USER@$SERVER_HOST"
+SCP_CMD="scp $SCP_OPTS"
 
 # =============================================================================
 # Server Initialization
@@ -155,12 +158,18 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-# Create the initialization script to run on the server
-INIT_SCRIPT=$(cat << 'REMOTE_SCRIPT'
+# =============================================================================
+# Create Remote Init Script
+# =============================================================================
+
+print_info "Creating initialization script..."
+
+TEMP_SCRIPT=$(mktemp)
+cat > "$TEMP_SCRIPT" << 'REMOTE_SCRIPT_END'
 #!/usr/bin/env bash
 set -e
 
-# Variables passed from local script
+# Variables (will be replaced by sed)
 DOMAIN="__DOMAIN__"
 SANITIZED_DOMAIN="__SANITIZED_DOMAIN__"
 DEPLOY_PATH="__DEPLOY_PATH__"
@@ -192,7 +201,7 @@ if command -v docker &> /dev/null; then
     print_success "Docker already installed: $(docker --version)"
 else
     print_info "Installing Docker..."
-    
+
     # Install prerequisites
     apt-get update
     apt-get install -y ca-certificates curl gnupg lsb-release
@@ -250,10 +259,10 @@ if command -v redis-server &> /dev/null; then
 else
     print_info "Installing Redis..."
     apt-get install -y redis-server
-    
+
     # Configure Redis to listen on localhost only
     sed -i 's/^bind .*/bind 127.0.0.1 ::1/' /etc/redis/redis.conf
-    
+
     # Enable and start Redis
     systemctl start redis-server
     systemctl enable redis-server
@@ -278,15 +287,15 @@ fi
 
 if command -v ufw &> /dev/null; then
     print_info "Configuring firewall..."
-    
+
     # Enable UFW if not already enabled
     ufw --force enable
-    
+
     # Allow SSH, HTTP, HTTPS
     ufw allow 22/tcp
     ufw allow 80/tcp
     ufw allow 443/tcp
-    
+
     print_success "Firewall configured (ports 22, 80, 443)"
 else
     print_warning "UFW not found, skipping firewall configuration"
@@ -430,30 +439,73 @@ echo "     ./deploy/scripts/deploy.sh --setup-ssl"
 echo ""
 print_warning "Note: You may need to re-login for docker group changes to take effect"
 echo ""
+REMOTE_SCRIPT_END
 
-REMOTE_SCRIPT
-)
+# =============================================================================
+# Replace Placeholders in Script
+# =============================================================================
 
-# Replace placeholders in the script
-INIT_SCRIPT="${INIT_SCRIPT//__DOMAIN__/$DOMAIN}"
-INIT_SCRIPT="${INIT_SCRIPT//__SANITIZED_DOMAIN__/$SANITIZED_DOMAIN}"
-INIT_SCRIPT="${INIT_SCRIPT//__DEPLOY_PATH__/$DEPLOY_PATH}"
-INIT_SCRIPT="${INIT_SCRIPT//__NETWORK_NAME__/$NETWORK_NAME}"
-INIT_SCRIPT="${INIT_SCRIPT//__BLUE_PORT__/$BLUE_PORT}"
-INIT_SCRIPT="${INIT_SCRIPT//__GREEN_PORT__/$GREEN_PORT}"
-INIT_SCRIPT="${INIT_SCRIPT//__SERVER_USER__/$SERVER_USER}"
+print_info "Configuring script with your settings..."
 
-# Execute on server
+# Use different sed syntax for macOS vs Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s|__DOMAIN__|$DOMAIN|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__SANITIZED_DOMAIN__|$SANITIZED_DOMAIN|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__DEPLOY_PATH__|$DEPLOY_PATH|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__NETWORK_NAME__|$NETWORK_NAME|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__BLUE_PORT__|$BLUE_PORT|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__GREEN_PORT__|$GREEN_PORT|g" "$TEMP_SCRIPT"
+    sed -i '' "s|__SERVER_USER__|$SERVER_USER|g" "$TEMP_SCRIPT"
+else
+    sed -i "s|__DOMAIN__|$DOMAIN|g" "$TEMP_SCRIPT"
+    sed -i "s|__SANITIZED_DOMAIN__|$SANITIZED_DOMAIN|g" "$TEMP_SCRIPT"
+    sed -i "s|__DEPLOY_PATH__|$DEPLOY_PATH|g" "$TEMP_SCRIPT"
+    sed -i "s|__NETWORK_NAME__|$NETWORK_NAME|g" "$TEMP_SCRIPT"
+    sed -i "s|__BLUE_PORT__|$BLUE_PORT|g" "$TEMP_SCRIPT"
+    sed -i "s|__GREEN_PORT__|$GREEN_PORT|g" "$TEMP_SCRIPT"
+    sed -i "s|__SERVER_USER__|$SERVER_USER|g" "$TEMP_SCRIPT"
+fi
+
+# =============================================================================
+# Transfer and Execute Script
+# =============================================================================
+
 echo ""
-print_info "Connecting to server and running initialization..."
+print_info "Transferring initialization script to server..."
+
+$SCP_CMD "$TEMP_SCRIPT" "$SERVER_USER@$SERVER_HOST:/tmp/server-init-laravel.sh" || {
+    print_error "Failed to transfer script to server"
+    rm -f "$TEMP_SCRIPT"
+    exit 1
+}
+
+print_info "Executing initialization script on server (with sudo)..."
 echo ""
 
-$SSH_CMD "sudo bash -c '$INIT_SCRIPT'"
+$SSH_CMD "sudo bash /tmp/server-init-laravel.sh" || {
+    print_error "Server initialization failed"
+    $SSH_CMD "rm -f /tmp/server-init-laravel.sh" 2>/dev/null
+    rm -f "$TEMP_SCRIPT"
+    exit 1
+}
+
+# =============================================================================
+# Cleanup
+# =============================================================================
+
+print_info "Cleaning up..."
+$SSH_CMD "rm -f /tmp/server-init-laravel.sh"
+rm -f "$TEMP_SCRIPT"
 
 print_header "Server Initialization Complete"
 
 print_success "Server is ready for deployment!"
 echo ""
 echo "Next steps:"
-echo "  1. Deploy: ./deploy/scripts/deploy.sh"
-echo "  2. Setup SSL: ./deploy/scripts/deploy.sh --setup-ssl"
+if [ -n "$ENV_NAME" ]; then
+    echo "  1. Deploy: ./deploy/scripts/deploy.sh --env $ENV_NAME"
+    echo "  2. Setup SSL: ./deploy/scripts/deploy.sh --env $ENV_NAME --setup-ssl"
+else
+    echo "  1. Deploy: ./deploy/scripts/deploy.sh"
+    echo "  2. Setup SSL: ./deploy/scripts/deploy.sh --setup-ssl"
+fi
