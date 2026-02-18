@@ -286,6 +286,15 @@ if [ "$ACTION" = "setup-ssl" ]; then
         fi
     fi
 
+    # Ensure scripts are transferred to server
+    print_info "Ensuring scripts are available on server..."
+    $SSH_CMD "sudo mkdir -p ${DEPLOY_PATH}/scripts && sudo chown -R $SERVER_USER:$SERVER_USER ${DEPLOY_PATH}/scripts"
+    $SCP_CMD -r "$SCRIPT_DIR/server/"* "$SERVER_USER@$SERVER_HOST:${DEPLOY_PATH}/scripts/" || {
+        print_error "Failed to transfer scripts"
+        exit 1
+    }
+    $SSH_CMD "chmod +x ${DEPLOY_PATH}/scripts/*.sh"
+
     echo ""
     print_info "Running Certbot..."
     $SSH_CMD "sudo certbot certonly --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN" || {
