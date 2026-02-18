@@ -26,3 +26,9 @@ yarn-error.log
 /storage/exports
 *.zip
 /database/exports
+
+# Deployment configuration files (contain secrets)
+.env.deploy
+.env.deploy.*
+deploy/*.tar.gz
+/tmp/*.tar.gz

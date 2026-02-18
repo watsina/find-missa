@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "findMissa" ]; then
     echo "You should set SUPERVISOR_PHP_USER to either 'findMissa' or 'root'."
     exit 1
@@ -19,7 +21,46 @@ chmod -R ugo+rw /.composer
 if [ $# -eq 0 ]; then
     echo "Running Laravel setup commands..."
 
-    # Ensure storage subdirectories exist (important for fresh volume mounts)
+    # ===========================================================================
+    # SQLite Database Setup
+    # ===========================================================================
+    SQLITE_DB="/var/www/html/database/database.sqlite"
+
+    # Ensure database directory exists (this is the mounted volume)
+    echo "Setting up database directory..."
+    mkdir -p /var/www/html/database
+    chown -R findMissa:findMissa /var/www/html/database
+    chmod 775 /var/www/html/database
+
+    # Create database file if it doesn't exist
+    if [ ! -f "$SQLITE_DB" ]; then
+        echo "Creating SQLite database file..."
+        touch "$SQLITE_DB"
+        chown findMissa:findMissa "$SQLITE_DB"
+        chmod 664 "$SQLITE_DB"
+    fi
+
+    # Configure SQLite for production with WAL mode
+    echo "Configuring SQLite for production (WAL mode)..."
+    sqlite3 "$SQLITE_DB" "PRAGMA journal_mode=WAL;"
+    sqlite3 "$SQLITE_DB" "PRAGMA synchronous=NORMAL;"
+    sqlite3 "$SQLITE_DB" "PRAGMA busy_timeout=5000;"
+    sqlite3 "$SQLITE_DB" "PRAGMA cache_size=-20000;"
+    sqlite3 "$SQLITE_DB" "PRAGMA foreign_keys=ON;"
+
+    # Ensure WAL files have correct ownership if they exist
+    if [ -f "${SQLITE_DB}-wal" ]; then
+        chown findMissa:findMissa "${SQLITE_DB}-wal"
+        chmod 664 "${SQLITE_DB}-wal"
+    fi
+    if [ -f "${SQLITE_DB}-shm" ]; then
+        chown findMissa:findMissa "${SQLITE_DB}-shm"
+        chmod 664 "${SQLITE_DB}-shm"
+    fi
+
+    # ===========================================================================
+    # Storage Directory Setup
+    # ===========================================================================
     echo "Creating storage directories..."
     mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
     mkdir -p /var/www/html/storage/logs
@@ -32,15 +73,23 @@ if [ $# -eq 0 ]; then
         php artisan storage:link --ansi
     fi
 
+    # ===========================================================================
+    # Laravel Optimization
+    # ===========================================================================
     php artisan package:discover --ansi
 
     # Optimize application (caches config, events, routes, and views)
     php artisan optimize --ansi
 
-    # Database setup
+    # ===========================================================================
+    # Database Migration
+    # ===========================================================================
+    echo "Running database migrations..."
     php artisan migrate --force --ansi
 
-    # Queue management
+    # ===========================================================================
+    # Queue Management
+    # ===========================================================================
     php artisan queue:restart --ansi
 fi
 
@@ -49,6 +98,10 @@ fi
 echo "Setting storage permissions..."
 chown -R findMissa:findMissa /var/www/html/storage
 chmod -R 775 /var/www/html/storage
+
+# Ensure database directory permissions are correct
+chown -R findMissa:findMissa /var/www/html/database
+chmod 775 /var/www/html/database
 
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
