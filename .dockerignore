@@ -1,0 +1,53 @@
+# Dependencies (installed fresh in Docker build)
+/node_modules
+/vendor
+
+# Build artifacts (generated during Docker build)
+/public/build
+/public/hot
+/public/storage
+
+# Cache files (regenerated in container at startup)
+/bootstrap/cache/*.php
+
+# Environment files (passed via Docker env vars)
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+/.idea
+/.vscode
+/.fleet
+.DS_Store
+
+# Testing
+/.phpunit.cache
+/.phpunit.result.cache
+*.testing
+
+# Development files
+/storage/logs/*
+/storage/pail
+/storage/exports
+/database/exports
+/database/*.sqlite
+/database/*.sqlite-*
+
+# Deployment config (contains secrets)
+.env.deploy
+.env.deploy.*
+deploy/*.tar.gz
+/tmp/*.tar.gz
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation (not needed in production image)
+README.md
+AGENTS.md
+CLAUDE.md
+deploy/README.md
+deploy/DECISIONS.md

@@ -26,16 +26,12 @@ if [ $# -eq 0 ]; then
     # ===========================================================================
     SQLITE_DB="/var/www/html/database/database.sqlite"
 
-    # Ensure database directory exists (this is the mounted volume)
-    echo "Setting up database directory..."
-    mkdir -p /var/www/html/database
-    chown -R findMissa:findMissa /var/www/html/database
-    chmod 775 /var/www/html/database
+    # The SQLite file is mounted from the host. The database/ directory exists
+    # in the image and contains migrations, factories, and seeders.
+    echo "Setting up SQLite database..."
 
-    # Create database file if it doesn't exist
-    if [ ! -f "$SQLITE_DB" ]; then
-        echo "Creating SQLite database file..."
-        touch "$SQLITE_DB"
+    # Ensure the mounted SQLite file has correct permissions
+    if [ -f "$SQLITE_DB" ]; then
         chown findMissa:findMissa "$SQLITE_DB"
         chmod 664 "$SQLITE_DB"
     fi
@@ -85,12 +81,28 @@ if [ $# -eq 0 ]; then
     # Database Migration
     # ===========================================================================
     echo "Running database migrations..."
-    php artisan migrate --force --ansi
+    if [ "$FRESH_DB" = "true" ]; then
+        echo "WARNING: Running migrate:fresh - all data will be deleted!"
+        php artisan migrate:fresh --force --ansi
+    else
+        php artisan migrate --force --ansi
+    fi
+
+    # ===========================================================================
+    # Database Seeding
+    # ===========================================================================
+    if [ "$SEED_DB" = "true" ]; then
+        echo "Running database seeders..."
+        php artisan db:seed --force --ansi
+    fi
 
     # ===========================================================================
     # Queue Management
     # ===========================================================================
-    php artisan queue:restart --ansi
+    # Note: queue:restart may fail if Redis is unavailable, but this shouldn't
+    # prevent the container from starting. The queue worker will pick up jobs
+    # once Redis becomes available.
+    php artisan queue:restart --ansi || echo "Warning: queue:restart failed (Redis may be unavailable)"
 fi
 
 # Ensure storage directory has correct permissions
@@ -99,9 +111,11 @@ echo "Setting storage permissions..."
 chown -R findMissa:findMissa /var/www/html/storage
 chmod -R 775 /var/www/html/storage
 
-# Ensure database directory permissions are correct
-chown -R findMissa:findMissa /var/www/html/database
-chmod 775 /var/www/html/database
+# Ensure SQLite database file permissions are correct
+if [ -f /var/www/html/database/database.sqlite ]; then
+    chown findMissa:findMissa /var/www/html/database/database.sqlite
+    chmod 664 /var/www/html/database/database.sqlite
+fi
 
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then

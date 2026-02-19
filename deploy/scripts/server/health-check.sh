@@ -13,6 +13,7 @@ set -e
 PORT="${1:-8080}"
 TIMEOUT="${2:-60}"
 INTERVAL="${3:-2}"
+INITIAL_DELAY="${4:-5}"
 
 # Colors
 GREEN='\033[0;32m'
@@ -23,6 +24,12 @@ ELAPSED=0
 HEALTH_URL="http://127.0.0.1:${PORT}/up"
 
 echo -e "${YELLOW}→ Waiting for container to be healthy (timeout: ${TIMEOUT}s)...${NC}"
+
+# Initial delay to let supervisor start the PHP server
+if [ "$INITIAL_DELAY" -gt 0 ]; then
+    echo "  Initial delay: ${INITIAL_DELAY}s (waiting for server to start)"
+    sleep $INITIAL_DELAY
+fi
 
 while [ $ELAPSED -lt $TIMEOUT ]; do
     # Try to connect to the health endpoint

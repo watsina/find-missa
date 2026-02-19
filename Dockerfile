@@ -30,7 +30,8 @@ RUN composer install \
     --ignore-platform-reqs
 
 COPY . .
-RUN composer dump-autoload --optimize --no-dev --ignore-platform-reqs
+RUN rm -f bootstrap/cache/*.php && \
+    composer dump-autoload --optimize --no-dev --no-scripts --ignore-platform-reqs
 
 # Final Production Stage - Minimal runtime
 FROM php:8.4-cli-alpine

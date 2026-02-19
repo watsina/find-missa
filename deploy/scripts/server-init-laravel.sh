@@ -260,13 +260,16 @@ else
     print_info "Installing Redis..."
     apt-get install -y redis-server
 
-    # Configure Redis to listen on localhost only
-    sed -i 's/^bind .*/bind 127.0.0.1 ::1/' /etc/redis/redis.conf
+    # Configure Redis to listen on localhost and Docker bridge for container access
+    sed -i 's/^bind .*/bind 127.0.0.1 ::1 172.17.0.1/' /etc/redis/redis.conf
+
+    # Disable protected mode (safe since 172.17.0.1 is only accessible from Docker host)
+    sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis/redis.conf
 
     # Enable and start Redis
     systemctl start redis-server
     systemctl enable redis-server
-    print_success "Redis installed"
+    print_success "Redis installed (Docker-accessible on 172.17.0.1)"
 fi
 
 # =============================================================================
@@ -296,7 +299,10 @@ if command -v ufw &> /dev/null; then
     ufw allow 80/tcp
     ufw allow 443/tcp
 
-    print_success "Firewall configured (ports 22, 80, 443)"
+    # Allow Docker containers to access Redis on host
+    ufw allow from 172.17.0.0/16 to any port 6379 comment 'Docker to Redis'
+
+    print_success "Firewall configured (ports 22, 80, 443, Docker->Redis)"
 else
     print_warning "UFW not found, skipping firewall configuration"
 fi
@@ -307,7 +313,6 @@ fi
 
 print_info "Creating deployment directory structure..."
 
-mkdir -p "${DEPLOY_PATH}/data/database"
 mkdir -p "${DEPLOY_PATH}/data/storage"
 mkdir -p "${DEPLOY_PATH}/data/storage/app/public"
 mkdir -p "${DEPLOY_PATH}/data/storage/framework/sessions"
@@ -317,12 +322,16 @@ mkdir -p "${DEPLOY_PATH}/data/storage/logs"
 mkdir -p "${DEPLOY_PATH}/scripts"
 mkdir -p "${DEPLOY_PATH}/nginx"
 
+# Create empty SQLite database file (will be mounted as a file, not directory)
+touch "${DEPLOY_PATH}/data/database.sqlite"
+
 # Set ownership
 chown -R "$SERVER_USER:$SERVER_USER" "$DEPLOY_PATH"
 
-# Set permissions for data directories (need to be writable by container user UID 1337)
+# Set permissions for data (need to be writable by container user UID 1337)
 chmod -R 775 "${DEPLOY_PATH}/data"
-chown -R 1337:1337 "${DEPLOY_PATH}/data/database"
+chown 1337:1337 "${DEPLOY_PATH}/data/database.sqlite"
+chmod 664 "${DEPLOY_PATH}/data/database.sqlite"
 chown -R 1337:1337 "${DEPLOY_PATH}/data/storage"
 
 print_success "Directory structure created: $DEPLOY_PATH"

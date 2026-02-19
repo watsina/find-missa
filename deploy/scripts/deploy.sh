@@ -70,6 +70,8 @@ Options:
     --rollback        Rollback to previous deployment
     --setup-ssl       Deploy AND setup SSL certificates with Certbot
     --ssl-only        Setup SSL only (no deployment, requires prior deploy)
+    --fresh-db        Reset database (migrate:fresh) - WARNING: destroys all data
+    --seed            Run database seeders after migrations
     --help            Show this help message
 
 Examples:
@@ -105,6 +107,8 @@ ENV_NAME=""
 FORCE_MODE=false
 ACTION="deploy"
 SETUP_SSL_AFTER_DEPLOY=false
+FRESH_DB=false
+SEED_DB=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -130,6 +134,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --ssl-only)
             ACTION="ssl-only"
+            shift
+            ;;
+        --fresh-db)
+            FRESH_DB=true
+            shift
+            ;;
+        --seed)
+            SEED_DB=true
             shift
             ;;
         --help)
@@ -200,7 +212,6 @@ KEEP_OLD_IMAGES="${KEEP_OLD_IMAGES:-3}"
 SANITIZED_DOMAIN=$(sanitize_domain "$DOMAIN")
 IMAGE_NAME="${SANITIZED_DOMAIN}-app"
 IMAGE_TAG=$(date +%Y%m%d-%H%M%S)
-NETWORK_NAME="${SANITIZED_DOMAIN}-network"
 DEPLOY_PATH="${SERVER_DEPLOY_PATH}/${SANITIZED_DOMAIN}"
 
 # Build SSH options
@@ -335,6 +346,12 @@ echo "  Image:       $IMAGE_NAME:$IMAGE_TAG"
 if [ "$SETUP_SSL_AFTER_DEPLOY" = true ]; then
     echo "  SSL Setup:   Yes (after deployment)"
 fi
+if [ "$FRESH_DB" = true ]; then
+    echo "  Fresh DB:    Yes (WARNING: All data will be deleted!)"
+fi
+if [ "$SEED_DB" = true ]; then
+    echo "  Seed DB:     Yes"
+fi
 echo ""
 
 if [ "$SETUP_SSL_AFTER_DEPLOY" = true ]; then
@@ -342,6 +359,17 @@ if [ "$SETUP_SSL_AFTER_DEPLOY" = true ]; then
     echo "  1. DNS for $DOMAIN must point to $SERVER_HOST"
     echo "  2. Port 80 must be open for Certbot verification"
     echo ""
+fi
+
+if [ "$FRESH_DB" = true ] && [ "$FORCE_MODE" = false ]; then
+    echo ""
+    print_warning "DANGER: --fresh-db will DELETE ALL DATA in the database!"
+    read -p "Type 'yes' to confirm: " -r
+    echo ""
+    if [[ ! $REPLY = "yes" ]]; then
+        print_warning "Deployment cancelled"
+        exit 0
+    fi
 fi
 
 if [ "$FORCE_MODE" = false ]; then
@@ -438,7 +466,6 @@ ENV_VARS="$ENV_VARS TARBALL_PATH='/tmp/${SANITIZED_DOMAIN}-${IMAGE_TAG}.tar.gz'"
 ENV_VARS="$ENV_VARS DOMAIN='$DOMAIN'"
 ENV_VARS="$ENV_VARS SANITIZED_DOMAIN='$SANITIZED_DOMAIN'"
 ENV_VARS="$ENV_VARS DEPLOY_PATH='$DEPLOY_PATH'"
-ENV_VARS="$ENV_VARS NETWORK_NAME='$NETWORK_NAME'"
 ENV_VARS="$ENV_VARS BLUE_PORT='$BLUE_PORT'"
 ENV_VARS="$ENV_VARS GREEN_PORT='$GREEN_PORT'"
 ENV_VARS="$ENV_VARS HEALTH_CHECK_TIMEOUT='$HEALTH_CHECK_TIMEOUT'"
@@ -468,6 +495,8 @@ ENV_VARS="$ENV_VARS MAIL_PASSWORD='$MAIL_PASSWORD'"
 ENV_VARS="$ENV_VARS MAIL_ENCRYPTION='$MAIL_ENCRYPTION'"
 ENV_VARS="$ENV_VARS MAIL_FROM_ADDRESS='$MAIL_FROM_ADDRESS'"
 ENV_VARS="$ENV_VARS MAIL_FROM_NAME='$MAIL_FROM_NAME'"
+ENV_VARS="$ENV_VARS FRESH_DB='$FRESH_DB'"
+ENV_VARS="$ENV_VARS SEED_DB='$SEED_DB'"
 
 $SSH_CMD "sudo $ENV_VARS bash ${DEPLOY_PATH}/scripts/deploy.sh" || {
     print_error "Server-side deployment failed"

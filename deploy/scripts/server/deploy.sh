@@ -31,7 +31,6 @@ REQUIRED_VARS=(
     "DOMAIN"
     "SANITIZED_DOMAIN"
     "DEPLOY_PATH"
-    "NETWORK_NAME"
     "BLUE_PORT"
     "GREEN_PORT"
     "APP_KEY"
@@ -140,14 +139,25 @@ print_info "Starting $TARGET_SLOT container..."
 
 # Data paths
 DATA_PATH="${DEPLOY_PATH}/data"
+SQLITE_FILE="${DATA_PATH}/database.sqlite"
+
+# Ensure data directories exist with correct permissions
+mkdir -p "${DATA_PATH}/storage"
+
+# Create SQLite file if it doesn't exist (required for volume mount)
+if [ ! -f "$SQLITE_FILE" ]; then
+    touch "$SQLITE_FILE"
+fi
+chown 1337:1000 "$SQLITE_FILE"
+chmod 664 "$SQLITE_FILE"
+chown -R 1337:1000 "${DATA_PATH}/storage"
 
 docker run -d \
     --name "$TARGET_CONTAINER" \
     --restart unless-stopped \
-    --network "$NETWORK_NAME" \
     -p "127.0.0.1:${TARGET_PORT}:80" \
     --add-host=host.docker.internal:host-gateway \
-    -v "${DATA_PATH}/database:/var/www/html/database:rw" \
+    -v "${SQLITE_FILE}:/var/www/html/database/database.sqlite:rw" \
     -v "${DATA_PATH}/storage:/var/www/html/storage:rw" \
     -e "APP_NAME=${APP_NAME}" \
     -e "APP_ENV=${APP_ENV:-production}" \
@@ -176,6 +186,8 @@ docker run -d \
     -e "MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-}" \
     -e "MAIL_FROM_NAME=${MAIL_FROM_NAME:-}" \
     -e "BROADCAST_CONNECTION=log" \
+    -e "FRESH_DB=${FRESH_DB:-false}" \
+    -e "SEED_DB=${SEED_DB:-false}" \
     "${IMAGE_NAME}:${IMAGE_TAG}" || {
     print_error "Failed to start container"
     exit 1
@@ -194,8 +206,16 @@ HEALTH_CHECK_INTERVAL="${HEALTH_CHECK_INTERVAL:-2}"
 
 if ! bash "$SCRIPT_DIR/health-check.sh" "$TARGET_PORT" "$HEALTH_CHECK_TIMEOUT" "$HEALTH_CHECK_INTERVAL"; then
     print_error "Health check failed"
+    echo ""
+    print_info "Container logs (last 100 lines):"
+    echo "----------------------------------------"
+    docker logs "$TARGET_CONTAINER" --tail 100 2>&1
+    echo "----------------------------------------"
+    echo ""
+    print_info "Container status:"
+    docker inspect "$TARGET_CONTAINER" --format '{{.State.Status}} - {{.State.Error}}' 2>&1 || true
+    echo ""
     print_info "Cleaning up failed container..."
-    docker logs "$TARGET_CONTAINER" --tail 50
     docker rm -f "$TARGET_CONTAINER" 2>/dev/null || true
     exit 1
 fi
@@ -232,13 +252,13 @@ systemctl reload nginx
 print_success "Nginx updated to $TARGET_SLOT slot"
 
 # =============================================================================
-# Step 7: Update Current Slot File
+# Step 6: Update Current Slot File
 # =============================================================================
 
 echo "$TARGET_SLOT" > "$CURRENT_SLOT_FILE"
 
 # =============================================================================
-# Step 8: Stop Old Container
+# Step 7: Stop Old Container
 # =============================================================================
 
 if [ -n "$OLD_CONTAINER" ]; then
@@ -251,7 +271,7 @@ if [ -n "$OLD_CONTAINER" ]; then
 fi
 
 # =============================================================================
-# Step 9: Cleanup Old Images
+# Step 8: Cleanup Old Images
 # =============================================================================
 
 KEEP_OLD_IMAGES="${KEEP_OLD_IMAGES:-3}"
