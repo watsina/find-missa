@@ -307,10 +307,9 @@ deploy/
 ### Server
 
 ```
-/opt/deployments/{domain}/
+${SERVER_DEPLOY_PATH}/${DOMAIN}/
 ├── data/
-│   ├── database/             # SQLite database (persistent)
-│   │   └── database.sqlite
+│   ├── database.sqlite       # SQLite database (persistent)
 │   └── storage/              # Laravel storage (persistent)
 │       ├── app/
 │       ├── framework/
@@ -324,10 +323,10 @@ deploy/
 
 The system maintains two container "slots":
 
-| Slot  | Container Name   | Port |
-| ----- | ---------------- | ---- |
-| Blue  | `{domain}-blue`  | 8080 |
-| Green | `{domain}-green` | 8081 |
+| Slot  | Container Name    | Port |
+| ----- | ----------------- | ---- |
+| Blue  | `${DOMAIN}-blue`  | 8080 |
+| Green | `${DOMAIN}-green` | 8081 |
 
 **Only one container runs at a time.** This is important for SQLite, which doesn't handle concurrent writes well.
 
@@ -359,13 +358,13 @@ The deployment script handles this automatically.
 1. Check container logs:
 
    ```bash
-   ssh user@server "docker logs {domain}-blue"
+   ssh ${SERVER_USER}@${SERVER_HOST} "docker logs ${DOMAIN}-blue"
    ```
 
 2. Verify the `/up` endpoint works:
 
    ```bash
-   ssh user@server "curl -f http://localhost:8080/up"
+   ssh ${SERVER_USER}@${SERVER_HOST} "curl -f http://localhost:8080/up"
    ```
 
 3. Common causes:
@@ -389,7 +388,7 @@ The deployment script handles this automatically.
 
 3. Ensure port 80 is open:
    ```bash
-   ssh user@server "sudo ufw status"
+   ssh ${SERVER_USER}@${SERVER_HOST} "sudo ufw status"
    ```
 
 ### Permission Errors on Volumes
@@ -397,7 +396,7 @@ The deployment script handles this automatically.
 The container runs as user `findMissa` (UID 1337). Ensure volume directories have correct ownership:
 
 ```bash
-ssh user@server "sudo chown -R 1337:1337 /opt/deployments/{domain}/data"
+ssh ${SERVER_USER}@${SERVER_HOST} "sudo chown -R 1337:1337 ${SERVER_DEPLOY_PATH}/${DOMAIN}/data"
 ```
 
 ### Redis Connection Issues
@@ -405,7 +404,7 @@ ssh user@server "sudo chown -R 1337:1337 /opt/deployments/{domain}/data"
 Verify Redis is running on the server:
 
 ```bash
-ssh user@server "redis-cli ping"
+ssh ${SERVER_USER}@${SERVER_HOST} "redis-cli ping"
 # Should return: PONG
 ```
 
@@ -414,6 +413,72 @@ Containers access Redis via `host.docker.internal`. This is configured automatic
 ### Rollback Not Working
 
 Rollback requires the previous container image to still exist. By default, the last 3 images are kept. If the previous image was cleaned up, you'll need to redeploy an older version.
+
+## Accessing the Running Container
+
+To run artisan commands or debug directly inside the container:
+
+### 1. SSH to the Server
+
+```bash
+# Using default SSH key
+ssh ${SERVER_USER}@${SERVER_HOST}
+
+# Using a specific key (if SSH_KEY_PATH is set)
+ssh -i ${SSH_KEY_PATH} ${SERVER_USER}@${SERVER_HOST}
+```
+
+### 2. Find the Active Container
+
+```bash
+# Check which container is running
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Or check the current slot file
+cat ${SERVER_DEPLOY_PATH}/${DOMAIN}/current-slot.txt
+```
+
+### 3. Execute Artisan Commands
+
+```bash
+# Run any artisan command
+docker exec -it ${DOMAIN}-blue php artisan migrate:status
+docker exec -it ${DOMAIN}-blue php artisan cache:clear
+docker exec -it ${DOMAIN}-blue php artisan tinker
+docker exec -it ${DOMAIN}-blue php artisan queue:restart
+```
+
+### 4. Open an Interactive Shell
+
+```bash
+# Get a bash shell inside the container (runs as findMissa user, UID 1337)
+docker exec -it ${DOMAIN}-blue bash
+
+# Or as root (for debugging only)
+docker exec -it --user root ${DOMAIN}-blue bash
+```
+
+### 5. View Logs
+
+```bash
+# Laravel logs (from mounted volume)
+tail -f ${SERVER_DEPLOY_PATH}/${DOMAIN}/data/storage/logs/laravel.log
+
+# Container logs (supervisor output)
+docker logs -f ${DOMAIN}-blue
+```
+
+**Note:** Replace `${DOMAIN}` with your sanitized domain (dots replaced with dashes, e.g., `staging-findmissa-com`). Replace `blue` with `green` if the green container is currently active.
+
+**Environment Variables Reference:**
+
+| Variable                | Description                      | Example                     |
+| ----------------------- | -------------------------------- | --------------------------- |
+| `${SERVER_USER}`        | SSH username                     | `ubuntu`                    |
+| `${SERVER_HOST}`        | Server hostname or IP            | `staging.findmissa.com`     |
+| `${SSH_KEY_PATH}`       | Path to SSH private key          | `~/.ssh/deploy_staging_key` |
+| `${SERVER_DEPLOY_PATH}` | Base deployment directory        | `/opt/deployments`          |
+| `${DOMAIN}`             | Sanitized domain (dots → dashes) | `staging-findmissa-com`     |
 
 ## Security Notes
 
