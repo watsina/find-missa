@@ -39,6 +39,9 @@ Route::middleware('auth', 'admin')->group(function () {
     Route::post('full-import', Controllers\FullDataImportController::class)
         ->middleware(['userWithTeam', EnsureFeaturesAreActive::class.':'.DataImportExport::class])
         ->name('full-import');
+    Route::get('import-status/{importId}', Controllers\ImportStatusController::class)
+        ->middleware(['userWithTeam', EnsureFeaturesAreActive::class.':'.DataImportExport::class])
+        ->name('import-status');
 
     Route::apiResource('team.invitations', Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
     Route::apiResource('users', Controllers\UserController::class)->except('destroy');

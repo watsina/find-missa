@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
-use App\Services\DataImportService;
+use App\Jobs\ProcessFullDataImport;
+use App\Services\ImportStatusService;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\FullDataImportRequest;
 
 class FullDataImportController extends Controller
 {
-    public function __construct(protected DataImportService $importService) {}
+    public function __construct(protected ImportStatusService $statusService) {}
 
     /**
      * Handle the incoming request.
+     *
+     * Validates the file, stores it temporarily, creates a status entry,
+     * dispatches the import job, and returns immediately with 202 Accepted.
      */
     public function __invoke(FullDataImportRequest $request): JsonResponse
     {
@@ -34,22 +40,24 @@ class FullDataImportController extends Controller
             ], 422);
         }
 
-        $teamId = $request->user()->current_team_id;
+        $user = $request->user();
+        $teamId = $user->current_team_id;
+        $importId = Str::uuid()->toString();
 
-        $result = $this->importService->import($data, $teamId);
+        // Store file temporarily for the job to process
+        $filePath = 'imports/'.$importId.'.json';
+        Storage::disk('local')->put($filePath, $contents);
 
-        if (! $result->isSuccessful()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Import failed',
-                'errors' => $result->getErrors(),
-            ], 422);
-        }
+        // Create status entry
+        $this->statusService->create($importId, $teamId, $user->id);
+
+        // Dispatch the job
+        ProcessFullDataImport::dispatch($importId, $teamId, $user->id, $filePath);
 
         return response()->json([
             'success' => true,
-            'message' => 'Import completed successfully',
-            'data' => $result->toArray(),
-        ]);
+            'message' => 'Import job queued successfully',
+            'import_id' => $importId,
+        ], 202);
     }
 }
