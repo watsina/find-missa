@@ -159,6 +159,7 @@
 
   const sendEmailVerification = async () => {
     try {
+      await http.get('/sanctum/csrf-cookie');
       await http.post('/api/v1/email/verification-notification');
       verificationLinkSent.value = true;
       notify.success('Verification email sent!');
