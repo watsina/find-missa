@@ -79,10 +79,8 @@
                 Your email address is unverified.
 
                 <a
-                  as="button"
-                  class="tw:text-gray-600 tw:underline tw:hover:text-gray-900"
-                  :href="route('verification.send')"
-                  method="post"
+                  class="tw:text-gray-600 tw:underline tw:hover:text-gray-900 tw:cursor-pointer"
+                  href="#"
                   @click.prevent="sendEmailVerification"
                 >
                   Click here to re-send the verification email.
@@ -159,8 +157,14 @@
     });
   };
 
-  const sendEmailVerification = () => {
-    verificationLinkSent.value = true;
+  const sendEmailVerification = async () => {
+    try {
+      await http.post('/api/v1/email/verification-notification');
+      verificationLinkSent.value = true;
+      notify.success('Verification email sent!');
+    } catch (error) {
+      notify.error(http.getErrorMessageFromResponse(error));
+    }
   };
 
   const updatePhotoPreview = () => {
