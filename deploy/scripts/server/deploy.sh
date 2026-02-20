@@ -142,15 +142,24 @@ DATA_PATH="${DEPLOY_PATH}/data"
 SQLITE_FILE="${DATA_PATH}/database.sqlite"
 
 # Ensure data directories exist with correct permissions
-mkdir -p "${DATA_PATH}/storage"
+# These directories are mounted into the container, so they must exist on the host
+# with the correct structure before the container starts
+mkdir -p "${DATA_PATH}/storage/app/public"
+mkdir -p "${DATA_PATH}/storage/framework/sessions"
+mkdir -p "${DATA_PATH}/storage/framework/views"
+mkdir -p "${DATA_PATH}/storage/framework/cache"
+mkdir -p "${DATA_PATH}/storage/logs"
 
 # Create SQLite file if it doesn't exist (required for volume mount)
 if [ ! -f "$SQLITE_FILE" ]; then
     touch "$SQLITE_FILE"
 fi
-chown 1337:1000 "$SQLITE_FILE"
+
+# Set ownership to container user (findMissa = UID 1337, GID 1337)
+chown 1337:1337 "$SQLITE_FILE"
 chmod 664 "$SQLITE_FILE"
-chown -R 1337:1000 "${DATA_PATH}/storage"
+chown -R 1337:1337 "${DATA_PATH}/storage"
+chmod -R 775 "${DATA_PATH}/storage"
 
 docker run -d \
     --name "$TARGET_CONTAINER" \
