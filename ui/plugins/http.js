@@ -9,6 +9,8 @@ const instance = axios.create({
   headers: {
     Accept: 'application/json',
   },
+  withCredentials: true,
+  withXSRFToken: true,
 });
 
 instance.getErrorMessageFromResponse = (error) => {
