@@ -466,8 +466,11 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Git Workflow
 
 - **NEVER commit or push changes without explicit user approval.** Always ask for confirmation before running `git commit` or `git push`.
+- **NEVER run `git commit` automatically** after making code changes. Present a summary of changes and wait for user confirmation.
+- **NEVER run `git push` automatically.** Always ask the user before pushing to remote.
 - When changes are ready to be committed, present a summary of the changes and ask the user if they want to commit.
 - Do not batch multiple unrelated changes into a single commit without user consent.
+- If the user says "commit" or "push", that is explicit approval to proceed with that specific action.
 
 === boost rules ===
 
