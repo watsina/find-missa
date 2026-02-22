@@ -74,7 +74,7 @@
               type="email"
             />
 
-            <div v-if="user.email_verified_at === null">
+            <div v-if="emailVerificationEnabled && user.email_verified_at === null">
               <p class="tw:mt-2 tw:text-sm">
                 Your email address is unverified.
 
@@ -130,6 +130,9 @@
   const store = useAuthStore();
 
   const user = computed(() => store?.user);
+  const emailVerificationEnabled = computed(() =>
+    store.featureIsEnabled('fortify', 'email-verification'),
+  );
 
   const form = useForm({
     _method: 'PUT',
