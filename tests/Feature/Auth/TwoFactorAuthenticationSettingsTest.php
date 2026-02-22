@@ -3,6 +3,12 @@
 use App\Models\User;
 use Laravel\Fortify\Features;
 
+// Set Referer header so Sanctum's stateful middleware applies session handling
+// This is needed because these tests use password.confirm middleware which requires sessions
+beforeEach(function () {
+    $this->withHeader('Referer', config('app.url'));
+});
+
 test('two factor authentication cannot be enabled if the feature is disabled', function () {
     $this->actingAs($user = User::factory()->create());
 
