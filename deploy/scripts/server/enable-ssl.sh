@@ -118,6 +118,9 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
+    # Maximum upload size
+    client_max_body_size 50m;
+
     # Proxy to application
     location / {
         proxy_pass http://${SANITIZED_DOMAIN}-backend;
