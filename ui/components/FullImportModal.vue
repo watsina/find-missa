@@ -9,7 +9,7 @@
   import { mdiDatabaseImportOutline, mdiAlertOutline } from '@mdi/js';
 
   const showModal = defineModel('showModal', { type: Boolean });
-  const emit = defineEmits(['imported']);
+  const emit = defineEmits(['started']);
 
   const confirmationChecked = ref(false);
 
@@ -40,18 +40,14 @@
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onSuccess: (response) => {
-        const data = response?.data;
-        const totalImported = data?.total_imported || 0;
-
-        closeModal();
-        notify.success(`Data imported successfully. ${totalImported} records imported.`);
-        emit('imported');
-
-        // Reload to reflect changes
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+      onSuccess: (data) => {
+        if (data?.import_id) {
+          emit('started', data.import_id);
+          closeModal();
+        } else {
+          // Fallback for unexpected response
+          notify.error('Unexpected response from server');
+        }
       },
       onError: (error) => {
         notify.error(error?.message || 'Something went wrong importing the data');

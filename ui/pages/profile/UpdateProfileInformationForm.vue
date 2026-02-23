@@ -74,15 +74,13 @@
               type="email"
             />
 
-            <div v-if="user.email_verified_at === null">
+            <div v-if="emailVerificationEnabled && user.email_verified_at === null">
               <p class="tw:mt-2 tw:text-sm">
                 Your email address is unverified.
 
                 <a
-                  as="button"
-                  class="tw:text-gray-600 tw:underline tw:hover:text-gray-900"
-                  :href="route('verification.send')"
-                  method="post"
+                  class="tw:text-gray-600 tw:underline tw:hover:text-gray-900 tw:cursor-pointer"
+                  href="#"
                   @click.prevent="sendEmailVerification"
                 >
                   Click here to re-send the verification email.
@@ -132,6 +130,9 @@
   const store = useAuthStore();
 
   const user = computed(() => store?.user);
+  const emailVerificationEnabled = computed(() =>
+    store.featureIsEnabled('fortify', 'email-verification'),
+  );
 
   const form = useForm({
     _method: 'PUT',
@@ -159,8 +160,15 @@
     });
   };
 
-  const sendEmailVerification = () => {
-    verificationLinkSent.value = true;
+  const sendEmailVerification = async () => {
+    try {
+      await http.get('/sanctum/csrf-cookie');
+      await http.post('/api/v1/email/verification-notification');
+      verificationLinkSent.value = true;
+      notify.success('Verification email sent!');
+    } catch (error) {
+      notify.error(http.getErrorMessageFromResponse(error));
+    }
   };
 
   const updatePhotoPreview = () => {

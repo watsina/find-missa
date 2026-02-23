@@ -86,8 +86,10 @@ class DataImportService
      * Import data from an exported JSON structure.
      *
      * @param  array<string, mixed>  $data
+     * @param  \Closure|null  $onProgress  Optional callback for progress updates.
+     *                                     Signature: function(string $stage, string $table, int $tablesProcessed, int $tablesTotal, int $recordsImported, int $recordsDeleted)
      */
-    public function import(array $data, int $teamId): ImportResult
+    public function import(array $data, int $teamId, ?\Closure $onProgress = null): ImportResult
     {
         $result = new ImportResult;
 
@@ -98,19 +100,48 @@ class DataImportService
             return $result;
         }
 
+        // Calculate total tables for progress tracking
+        $tablesTotal = count(array_intersect_key($data['tables'], $this->importOrder));
+
         DB::beginTransaction();
 
         try {
             // Step 1: Delete existing data (reverse order to respect FK constraints)
-            $this->deleteExistingData($teamId, $result);
+            $this->deleteExistingData($teamId, $result, $onProgress, $tablesTotal);
 
             // Step 2: Import new data in dependency order
+            $tablesProcessed = 0;
             foreach ($this->importOrder as $tableName => $modelClass) {
                 if (! isset($data['tables'][$tableName])) {
                     continue;
                 }
 
+                // Report progress before processing each table
+                if ($onProgress) {
+                    $onProgress(
+                        'importing',
+                        $tableName,
+                        $tablesProcessed,
+                        $tablesTotal,
+                        $result->getTotalImported(),
+                        $result->getTotalDeleted()
+                    );
+                }
+
                 $this->importTable($tableName, $modelClass, $data['tables'][$tableName], $teamId, $result);
+                $tablesProcessed++;
+
+                // Report progress after processing each table
+                if ($onProgress) {
+                    $onProgress(
+                        'importing',
+                        $tableName,
+                        $tablesProcessed,
+                        $tablesTotal,
+                        $result->getTotalImported(),
+                        $result->getTotalDeleted()
+                    );
+                }
             }
 
             // Step 3: Reset PostgreSQL sequences
@@ -130,14 +161,28 @@ class DataImportService
     /**
      * Delete all existing domain data for a team.
      */
-    protected function deleteExistingData(int $teamId, ImportResult $result): void
+    protected function deleteExistingData(int $teamId, ImportResult $result, ?\Closure $onProgress = null, int $tablesTotal = 0): void
     {
         // Delete in reverse order to respect foreign key constraints
         $deletionOrder = array_reverse($this->importOrder, true);
+        $tablesProcessed = 0;
 
         foreach ($deletionOrder as $tableName => $modelClass) {
+            // Report progress before deleting each table
+            if ($onProgress) {
+                $onProgress(
+                    'deleting',
+                    $tableName,
+                    $tablesProcessed,
+                    $tablesTotal,
+                    $result->getTotalImported(),
+                    $result->getTotalDeleted()
+                );
+            }
+
             $deleted = $this->deleteTableData($modelClass, $teamId);
             $result->addDeleted($tableName, $deleted);
+            $tablesProcessed++;
         }
     }
 

@@ -10,8 +10,12 @@ use Laravel\Pennant\Feature;
 use App\Services\ImportResult;
 use Illuminate\Http\UploadedFile;
 use App\Features\DataImportExport;
+use App\Jobs\ProcessFullDataImport;
 use App\Services\DataExportService;
 use App\Services\DataImportService;
+use App\Services\ImportStatusService;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->team = Team::factory()->create();
@@ -73,7 +77,9 @@ describe('Full Data Import Controller', function () {
             ->assertJsonValidationErrors(['file']);
     });
 
-    it('imports valid json data', function () {
+    it('queues import job for valid json data', function () {
+        Queue::fake();
+
         // Create export data
         $exportData = [
             'version' => '1.0',
@@ -108,14 +114,74 @@ describe('Full Data Import Controller', function () {
         $response = $this->actingAs($this->adminUser)
             ->postJson('/api/v1/full-import', ['file' => $file]);
 
-        $response->assertSuccessful();
+        $response->assertStatus(202);
         $response->assertJson(['success' => true]);
+        $response->assertJsonStructure(['import_id']);
 
-        // Verify diocese was created with new team_id
-        $this->assertDatabaseHas('dioceses', [
-            'name' => 'Test Diocese',
-            'team_id' => $this->team->id,
-        ]);
+        // Verify job was dispatched
+        Queue::assertPushed(ProcessFullDataImport::class, function ($job) {
+            return $job->teamId === $this->team->id
+                && $job->userId === $this->adminUser->id;
+        });
+    });
+
+    it('stores file temporarily for the job', function () {
+        Queue::fake();
+        Storage::fake('local');
+
+        $exportData = [
+            'version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'team_id' => 999,
+            'tables' => [
+                'dioceses' => [
+                    ['id' => 100, 'name' => 'Test Diocese', 'type' => 'diocese'],
+                ],
+            ],
+        ];
+
+        $json = json_encode($exportData);
+        $file = UploadedFile::fake()->createWithContent('data.json', $json);
+
+        $response = $this->actingAs($this->adminUser)
+            ->postJson('/api/v1/full-import', ['file' => $file]);
+
+        $response->assertStatus(202);
+        $importId = $response->json('import_id');
+
+        // Verify file was stored
+        Storage::disk('local')->assertExists("imports/{$importId}.json");
+    });
+
+    it('creates import status entry', function () {
+        Queue::fake();
+
+        $exportData = [
+            'version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'team_id' => 999,
+            'tables' => [
+                'dioceses' => [],
+            ],
+        ];
+
+        $json = json_encode($exportData);
+        $file = UploadedFile::fake()->createWithContent('data.json', $json);
+
+        $response = $this->actingAs($this->adminUser)
+            ->postJson('/api/v1/full-import', ['file' => $file]);
+
+        $response->assertStatus(202);
+        $importId = $response->json('import_id');
+
+        // Verify status was created
+        $statusService = app(ImportStatusService::class);
+        $status = $statusService->getStatus($importId);
+
+        expect($status)->not->toBeNull();
+        expect($status['status'])->toBe('pending');
+        expect($status['team_id'])->toBe($this->team->id);
+        expect($status['user_id'])->toBe($this->adminUser->id);
     });
 
     it('rejects invalid json structure', function () {

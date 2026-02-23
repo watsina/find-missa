@@ -30,7 +30,8 @@ RUN composer install \
     --ignore-platform-reqs
 
 COPY . .
-RUN composer dump-autoload --optimize --no-dev --ignore-platform-reqs
+RUN rm -f bootstrap/cache/*.php && \
+    composer dump-autoload --optimize --no-dev --no-scripts --ignore-platform-reqs
 
 # Final Production Stage - Minimal runtime
 FROM php:8.4-cli-alpine
@@ -53,18 +54,19 @@ RUN apk add --no-cache \
     libcap \
     shadow \
     gosu \
-    postgresql-client \
+    sqlite \
+    sqlite-libs \
     libpng \
     libjpeg-turbo \
     libzip \
     icu-libs \
-    libpq \
-    oniguruma
+    oniguruma \
+    curl
 
 # Install PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
-    postgresql-dev \
+    sqlite-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     libzip-dev \
@@ -72,8 +74,7 @@ RUN apk add --no-cache --virtual .build-deps \
     oniguruma-dev \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        pdo_pgsql \
-        pgsql \
+        pdo_sqlite \
         gd \
         zip \
         bcmath \

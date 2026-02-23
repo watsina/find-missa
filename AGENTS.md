@@ -47,6 +47,7 @@ Find Missa Project is a modern Laravel application with Vue.js frontend for mana
    - `rector.php` - PHP target version (LevelSetList)
 
 **📋 Update Checklist** when versions change:
+
 - [ ] Update version numbers in this instructions file
 - [ ] Update any version-specific code examples or configurations
 - [ ] Review and update coding standards if framework updates introduce new patterns
@@ -54,6 +55,7 @@ Find Missa Project is a modern Laravel application with Vue.js frontend for mana
 - [ ] Update environment requirements (PHP version, Node.js version)
 
 **⚡ Quick Version Check Commands**:
+
 ```bash
 
 # Check current versions
@@ -119,6 +121,7 @@ ui/
 - Import only the icons you need to keep bundle size small
 
 **Icon Usage Example:**
+
 ```vue
 <script setup>
   import { mdiCheckCircle, mdiClose, mdiPencilOutline } from '@mdi/js';
@@ -146,6 +149,7 @@ ui/
 - Use `http.get()`, `http.post()`, `http.put()`, `http.delete()` for API requests
 
 **HTTP Plugin Example:**
+
 ```vue
 <script setup>
   import { http } from '@/plugins';
@@ -190,6 +194,7 @@ ui/
 - Show loading state on buttons with `:loading="form.processing"`
 
 **Form Plugin Example:**
+
 ```vue
 <script setup>
   import useForm from '@/plugins/form';
@@ -230,11 +235,7 @@ ui/
       variant="outlined"
       density="compact"
     />
-    <v-btn
-      :loading="form.processing"
-      :disabled="form.processing"
-      @click="submitForm"
-    >
+    <v-btn :loading="form.processing" :disabled="form.processing" @click="submitForm">
       Submit
     </v-btn>
   </v-form>
@@ -369,6 +370,7 @@ php artisan test           # Run tests
 ## File Editing Guidelines
 
 When editing files, always:
+
 1. **Follow existing patterns** and conventions
 2. **Add proper type hints** and documentation
 3. **Include tests** for new functionality
@@ -461,6 +463,15 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
 
+## Git Workflow
+
+- **NEVER commit or push changes without explicit user approval.** Always ask for confirmation before running `git commit` or `git push`.
+- **NEVER run `git commit` automatically** after making code changes. Present a summary of changes and wait for user confirmation.
+- **NEVER run `git push` automatically.** Always ask the user before pushing to remote.
+- When changes are ready to be committed, present a summary of the changes and ask the user if they want to commit.
+- Do not batch multiple unrelated changes into a single commit without user consent.
+- If the user says "commit" or "push", that is explicit approval to proceed with that specific action.
+
 === boost rules ===
 
 # Laravel Boost
@@ -509,7 +520,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Constructors
 
 - Use PHP 8 constructor property promotion in `__construct()`.
-    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+  - <code-snippet>public function \_\_construct(public GitHub $github) { }</code-snippet>
 - Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ## Type Declarations
@@ -662,4 +673,4 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Fortify is a headless authentication backend that provides authentication routes and controllers for Laravel applications.
 - IMPORTANT: Always use the `search-docs` tool for detailed Laravel Fortify patterns and documentation.
 - IMPORTANT: Activate `developing-with-fortify` skill when working with Fortify authentication features.
-</laravel-boost-guidelines>
+  </laravel-boost-guidelines>

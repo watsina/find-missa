@@ -1,4 +1,4 @@
-name: Web Build & Test (Deploy staging if mainline)
+name: Build & Test
 
 on:
   push:
@@ -48,14 +48,3 @@ jobs:
         id: auto-merge-dependabot-prs-for-semver-patch-updates
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
         run: gh pr merge --auto --merge "$PR_URL"
-
-  deploy_staging:
-    name: Deploy to staging via Coolify
-    runs-on: ubuntu-latest
-    needs: build_and_test
-    if: success() && github.ref == 'refs/heads/main'
-    steps:
-      - name: Trigger Coolify Deployment
-        run: |
-          curl --fail --silent --show-error -X GET "${{ secrets.COOLIFY_STAGING_WEBHOOK_URL }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_STAGING_WEBHOOK_TOKEN }}"
