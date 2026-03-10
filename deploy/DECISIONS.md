@@ -4,7 +4,7 @@ This document explains the architectural decisions made for the blue-green Docke
 
 ## Overview
 
-This deployment system provides zero-downtime deployments for the Find Missa Laravel application using a blue-green deployment strategy with Docker containers.
+This deployment system provides zero-downtime deployments for Laravel applications using a blue-green deployment strategy with Docker containers.
 
 ## Key Decisions
 
@@ -88,10 +88,10 @@ docker build --platform linux/amd64 -t $IMAGE_NAME:$TAG .
 
 **Implementation:**
 
-- Domain `findmissa.org` → sanitized `findmissa-org`
-- Container: `findmissa-org-blue`, `findmissa-org-green`
-- Network: `findmissa-org-network`
-- Image: `findmissa-org-app`
+- Domain `example.com` -> sanitized `example-com`
+- Container: `example-com-blue`, `example-com-green`
+- Network: `example-com-network`
+- Image: `example-com-app`
 
 ### 6. SQLite for Database
 
@@ -237,7 +237,7 @@ Local Machine                          Server
 ## Security Considerations
 
 - SSH key authentication (no passwords)
-- Containers run as non-root user (`findMissa`)
+- Containers run as non-root app user (configured via `CONTAINER_USER` in `.env.deploy`)
 - Firewall allows only ports 22, 80, 443
 - SSL/TLS with modern cipher suites
 - No secrets baked into images

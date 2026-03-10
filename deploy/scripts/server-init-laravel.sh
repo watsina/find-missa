@@ -328,7 +328,7 @@ touch "${DEPLOY_PATH}/data/database.sqlite"
 # Set ownership
 chown -R "$SERVER_USER:$SERVER_USER" "$DEPLOY_PATH"
 
-# Set permissions for data (need to be writable by container user UID 1337)
+# Set permissions for data (writable by container user, UID 1337)
 chmod -R 775 "${DEPLOY_PATH}/data"
 chown 1337:1337 "${DEPLOY_PATH}/data/database.sqlite"
 chmod 664 "${DEPLOY_PATH}/data/database.sqlite"

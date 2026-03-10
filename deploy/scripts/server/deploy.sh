@@ -155,7 +155,7 @@ if [ ! -f "$SQLITE_FILE" ]; then
     touch "$SQLITE_FILE"
 fi
 
-# Set ownership to container user (findMissa = UID 1337, GID 1337)
+# Set ownership to container user (configured via CONTAINER_USER, UID 1337, GID 1337)
 chown 1337:1337 "$SQLITE_FILE"
 chmod 664 "$SQLITE_FILE"
 chown -R 1337:1337 "${DATA_PATH}/storage"
@@ -174,14 +174,14 @@ docker run -d \
     -e "APP_DEBUG=${APP_DEBUG:-false}" \
     -e "APP_TIMEZONE=${APP_TIMEZONE:-UTC}" \
     -e "APP_URL=${APP_URL}" \
-    -e "DB_CONNECTION=sqlite" \
+    -e "DB_CONNECTION=${DB_CONNECTION:-sqlite}" \
     -e "LOG_CHANNEL=${LOG_CHANNEL:-stack}" \
     -e "LOG_LEVEL=${LOG_LEVEL:-error}" \
     -e "SESSION_DRIVER=${SESSION_DRIVER:-database}" \
     -e "SESSION_LIFETIME=${SESSION_LIFETIME:-120}" \
     -e "CACHE_STORE=${CACHE_STORE:-redis}" \
     -e "QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}" \
-    -e "REDIS_CLIENT=phpredis" \
+    -e "REDIS_CLIENT=${REDIS_CLIENT:-phpredis}" \
     -e "REDIS_HOST=${REDIS_HOST:-host.docker.internal}" \
     -e "REDIS_PORT=${REDIS_PORT:-6379}" \
     -e "REDIS_PASSWORD=${REDIS_PASSWORD:-null}" \
@@ -194,7 +194,7 @@ docker run -d \
     -e "MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}" \
     -e "MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-}" \
     -e "MAIL_FROM_NAME=${MAIL_FROM_NAME:-}" \
-    -e "BROADCAST_CONNECTION=log" \
+    -e "BROADCAST_CONNECTION=${BROADCAST_CONNECTION:-log}" \
     -e "FRESH_DB=${FRESH_DB:-false}" \
     -e "SEED_DB=${SEED_DB:-false}" \
     "${IMAGE_NAME}:${IMAGE_TAG}" || {

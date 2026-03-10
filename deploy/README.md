@@ -1,6 +1,6 @@
 # Blue-Green Docker Deployment
 
-Zero-downtime deployment system for the Find Missa Laravel application.
+Zero-downtime deployment system for Laravel applications.
 
 ## Quick Start
 
@@ -125,12 +125,12 @@ SERVER_PORT=22
 SSH_KEY_PATH=~/.ssh/deploy_staging_key   # Optional: path to SSH key
 
 # Domain Configuration
-DOMAIN=staging.findmissa.org
+DOMAIN=staging.example.com
 
 # Application Settings
 APP_ENV=staging
 APP_DEBUG=true
-APP_URL=https://staging.findmissa.org
+APP_URL=https://staging.example.com
 
 # Generate a unique key for this environment
 APP_KEY=base64:your-staging-key-here
@@ -152,12 +152,12 @@ SERVER_PORT=22
 SSH_KEY_PATH=~/.ssh/deploy_production_key   # Optional: path to SSH key
 
 # Domain Configuration
-DOMAIN=findmissa.org
+DOMAIN=example.com
 
 # Application Settings
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://findmissa.org
+APP_URL=https://example.com
 
 # Generate a unique key for this environment
 APP_KEY=base64:your-production-key-here
@@ -371,6 +371,7 @@ The deployment script handles this automatically.
    - Missing environment variables
    - Database migration issues
    - Permission problems on mounted volumes
+   - Wrong health endpoint (default is `/up`, Laravel 11+ convention — change in `scripts/server/health-check.sh` line 24 if your app uses a different endpoint)
 
 ### SSL Setup Fails
 
@@ -393,7 +394,7 @@ The deployment script handles this automatically.
 
 ### Permission Errors on Volumes
 
-The container runs as user `findMissa` (UID 1337). Ensure volume directories have correct ownership:
+The container runs as the non-root user defined by `CONTAINER_USER` in your `.env.deploy` file (default: `app`, UID 1337). Ensure volume directories have correct ownership:
 
 ```bash
 ssh ${SERVER_USER}@${SERVER_HOST} "sudo chown -R 1337:1337 ${SERVER_DEPLOY_PATH}/${DOMAIN}/data"
@@ -451,7 +452,7 @@ docker exec -it ${DOMAIN}-blue php artisan queue:restart
 ### 4. Open an Interactive Shell
 
 ```bash
-# Get a bash shell inside the container (runs as findMissa user, UID 1337)
+# Get a bash shell inside the container (runs as non-root app user, UID 1337)
 docker exec -it ${DOMAIN}-blue bash
 
 # Or as root (for debugging only)
@@ -468,24 +469,24 @@ tail -f ${SERVER_DEPLOY_PATH}/${DOMAIN}/data/storage/logs/laravel.log
 docker logs -f ${DOMAIN}-blue
 ```
 
-**Note:** Replace `${DOMAIN}` with your sanitized domain (dots replaced with dashes, e.g., `staging-findmissa-com`). Replace `blue` with `green` if the green container is currently active.
+**Note:** Replace `${DOMAIN}` with your sanitized domain (dots replaced with dashes, e.g., `staging-example-com`). Replace `blue` with `green` if the green container is currently active.
 
 **Environment Variables Reference:**
 
-| Variable                | Description                      | Example                     |
-| ----------------------- | -------------------------------- | --------------------------- |
-| `${SERVER_USER}`        | SSH username                     | `ubuntu`                    |
-| `${SERVER_HOST}`        | Server hostname or IP            | `staging.findmissa.com`     |
-| `${SSH_KEY_PATH}`       | Path to SSH private key          | `~/.ssh/deploy_staging_key` |
-| `${SERVER_DEPLOY_PATH}` | Base deployment directory        | `/opt/deployments`          |
-| `${DOMAIN}`             | Sanitized domain (dots → dashes) | `staging-findmissa-com`     |
+| Variable                | Description                       | Example                     |
+| ----------------------- | --------------------------------- | --------------------------- |
+| `${SERVER_USER}`        | SSH username                      | `ubuntu`                    |
+| `${SERVER_HOST}`        | Server hostname or IP             | `staging.example.com`       |
+| `${SSH_KEY_PATH}`       | Path to SSH private key           | `~/.ssh/deploy_staging_key` |
+| `${SERVER_DEPLOY_PATH}` | Base deployment directory         | `/opt/deployments`          |
+| `${DOMAIN}`             | Sanitized domain (dots to dashes) | `staging-example-com`       |
 
 ## Security Notes
 
 - **SSH Keys:** Use key-based authentication, not passwords
 - **Secrets:** Never commit `.env.deploy.*` files (they're in `.gitignore`)
 - **Firewall:** Only ports 22, 80, 443 should be open
-- **Container User:** Containers run as non-root user (`findMissa`)
+- **Container User:** Containers run as non-root user (configured via `CONTAINER_USER` in `.env.deploy`)
 - **SSL:** Use `--setup-ssl` to enable HTTPS with Let's Encrypt
 
 ## Architecture Decisions

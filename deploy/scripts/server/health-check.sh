@@ -5,6 +5,10 @@
 # =============================================================================
 # Verifies that a container is healthy and responding on the specified port.
 #
+# The health endpoint defaults to /up (Laravel 11+ convention).
+# If your application uses a different health endpoint, change the
+# HEALTH_URL variable below (line 26).
+#
 # Usage: health-check.sh <port> [timeout] [interval]
 # =============================================================================
 
