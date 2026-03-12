@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use App\Enums\ActivityOccurrence;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ActivityTimeResource extends JsonResource
@@ -22,7 +23,7 @@ class ActivityTimeResource extends JsonResource
             'church_id' => $this->church_id,
             'church' => new ChurchResource($this->whenLoaded('church')),
             'exceptions' => ActivityTimeExceptionResource::collection($this->whenLoaded('exceptions')),
-            'occurrence' => $this->occurrence instanceof \App\Enums\ActivityOccurrence
+            'occurrence' => $this->occurrence instanceof ActivityOccurrence
                 ? $this->occurrence->value
                 : $this->occurrence,
             'date' => $this->date,

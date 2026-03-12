@@ -6,6 +6,7 @@ use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Diocese;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -14,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 class ParishChurchDataImport implements SkipsEmptyRows, ToCollection, WithHeadingRow, WithValidation
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function collection(Collection $rows)
     {

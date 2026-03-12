@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AppUsers;
 
 use Illuminate\Http\Request;
 use App\Services\HolidayService;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HolidayInstanceResource;
 
@@ -17,7 +18,7 @@ class HolidayInfoController extends Controller
      * Get holiday information for a given date.
      * Public endpoint - no authentication required.
      */
-    public function __invoke(Request $request): \Illuminate\Http\JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
             'date' => ['required', 'date'],

@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use App\Enums\ActivityTypeDescription;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\ValidateActivityTypeDescription;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class StoreOneTimeActivityRequest extends FormRequest
 {
@@ -23,7 +24,7 @@ class StoreOneTimeActivityRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

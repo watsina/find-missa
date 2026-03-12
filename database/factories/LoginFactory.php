@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Login;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Login>
+ * @extends Factory<Login>
  */
 class LoginFactory extends Factory
 {

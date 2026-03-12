@@ -6,7 +6,9 @@ use App\Models\Holiday;
 use App\Enums\HolidayType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\HolidayInstance;
 use App\Services\HolidayService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\HolidayResource;
 use App\Http\Resources\HolidayInstanceResource;
@@ -142,7 +144,7 @@ class HolidayController extends Controller
         // Use loadMissing via each since computeInstancesForYear returns a regular Collection
         $instanceIds = $instances->pluck('id')->filter();
         if ($instanceIds->isNotEmpty()) {
-            $loadedInstances = \App\Models\HolidayInstance::whereIn('id', $instanceIds)
+            $loadedInstances = HolidayInstance::whereIn('id', $instanceIds)
                 ->with('holiday')
                 ->get()
                 ->keyBy('id');
@@ -180,7 +182,7 @@ class HolidayController extends Controller
     /**
      * Check if a date is a holiday.
      */
-    public function checkDate(Request $request): \Illuminate\Http\JsonResponse
+    public function checkDate(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Holiday::class);
 

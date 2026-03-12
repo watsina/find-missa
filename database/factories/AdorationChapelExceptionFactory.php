@@ -8,7 +8,7 @@ use App\Models\AdorationChapelException;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AdorationChapelException>
+ * @extends Factory<AdorationChapelException>
  */
 class AdorationChapelExceptionFactory extends Factory
 {

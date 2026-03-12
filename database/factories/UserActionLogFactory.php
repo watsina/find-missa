@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\UserActionLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UserActionLog>
+ * @extends Factory<UserActionLog>
  */
 class UserActionLogFactory extends Factory
 {

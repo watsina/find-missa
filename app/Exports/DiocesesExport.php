@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Diocese;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -15,7 +16,7 @@ class DiocesesExport implements FromCollection, ShouldAutoSize, WithHeadings
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function collection()
     {

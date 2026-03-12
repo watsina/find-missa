@@ -4,6 +4,10 @@ namespace App\Models\Concerns;
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasTeams
 {
@@ -21,7 +25,7 @@ trait HasTeams
     /**
      * Get the current team of the user's context.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function currentTeam()
     {
@@ -54,7 +58,7 @@ trait HasTeams
     /**
      * Get all of the teams the user owns or belongs to.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function allTeams()
     {
@@ -79,7 +83,7 @@ trait HasTeams
     /**
      * Get all of the teams the user belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function teams()
     {
@@ -91,7 +95,7 @@ trait HasTeams
     /**
      * Get all of the teams the user owns.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function ownedTeams()
     {

@@ -15,6 +15,10 @@ use function Pest\Laravel\delete;
 use function Pest\Laravel\assertModelExists;
 use function Pest\Laravel\assertModelMissing;
 
+use App\Http\Requests\StoreSchedulePeriodRequest;
+use App\Http\Controllers\SchedulePeriodController;
+use App\Http\Requests\UpdateSchedulePeriodRequest;
+
 beforeEach(function () {
     $this->seed(AclSeeder::class);
 });
@@ -136,9 +140,9 @@ test('index does not show other team schedule periods', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\SchedulePeriodController::class,
+        SchedulePeriodController::class,
         'store',
-        \App\Http\Requests\StoreSchedulePeriodRequest::class
+        StoreSchedulePeriodRequest::class
     );
 
 test('store creates a schedule period', function (): void {
@@ -259,9 +263,9 @@ test('show returns 403 for other team schedule period', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\SchedulePeriodController::class,
+        SchedulePeriodController::class,
         'update',
-        \App\Http\Requests\UpdateSchedulePeriodRequest::class
+        UpdateSchedulePeriodRequest::class
     );
 
 test('super admin can update universal schedule period', function (): void {

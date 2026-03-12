@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Login;
 
 class SetCurrentTeamOnLogin
@@ -11,7 +12,7 @@ class SetCurrentTeamOnLogin
      */
     public function handle(Login $event)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $event->user;
         // check if tht user has a current team, if not set the team for them
         if (! $user->current_team_id && $team = $user->allTeams()->first()) {
