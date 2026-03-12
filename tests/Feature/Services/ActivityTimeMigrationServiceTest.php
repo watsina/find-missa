@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Models\Team;
 use App\Models\Church;
 use App\Enums\DayPattern;
 use App\Enums\ScheduleScope;
@@ -12,6 +13,7 @@ use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
 use App\Models\ScheduleOverride;
 use App\Enums\ActivityOccurrence;
+use App\Models\ScheduleDayDetail;
 use App\Models\ActivityTimeException;
 use App\Services\ActivityTimeMigrationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,7 +64,7 @@ test('it groups weekly activities into specific day patterns', function () {
     // Ensure all activities share the same team so they group together
     // Team factory doesn't accept church_id, but ActivityTime factory creates one anyway
     // So we'll use a manually created team ID
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
 
     // Create 3 weekly records: Mon, Wed, Fri at same time
     $commonData = [
@@ -161,7 +163,7 @@ test('it handles force migration by clearing old data', function () {
 });
 
 test('it detects weekdays pattern (Mon-Fri)', function () {
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
     $commonData = [
         'church_id' => $this->church->id,
         'team_id' => $team->id,
@@ -218,7 +220,7 @@ test('it detects sunday pattern', function () {
 });
 
 test('it creates day variations for weekdays with different languages', function () {
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
     $commonData = [
         'church_id' => $this->church->id,
         'team_id' => $team->id,
@@ -244,14 +246,14 @@ test('it creates day variations for weekdays with different languages', function
         ->and($schedule->language)->toBe('English'); // Default language is English
 
     // Should have only 2 day detail records (variations from default)
-    expect(\App\Models\ScheduleDayDetail::count())->toBe(2);
+    expect(ScheduleDayDetail::count())->toBe(2);
 
-    expect(\App\Models\ScheduleDayDetail::where('day_of_week', 'Tuesday')->first()->language)->toBe('Swahili');
-    expect(\App\Models\ScheduleDayDetail::where('day_of_week', 'Thursday')->first()->language)->toBe('Luganda');
+    expect(ScheduleDayDetail::where('day_of_week', 'Tuesday')->first()->language)->toBe('Swahili');
+    expect(ScheduleDayDetail::where('day_of_week', 'Thursday')->first()->language)->toBe('Luganda');
 });
 
 test('it splits all 7 days into Weekdays, Saturday, and Sunday schedules', function () {
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
     $commonData = [
         'church_id' => $this->church->id,
         'team_id' => $team->id,
@@ -276,7 +278,7 @@ test('it splits all 7 days into Weekdays, Saturday, and Sunday schedules', funct
 });
 
 test('it splits Mon-Sat into Weekdays and Saturday schedules', function () {
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
     $commonData = [
         'church_id' => $this->church->id,
         'team_id' => $team->id,
@@ -306,7 +308,7 @@ test('it splits Mon-Sat into Weekdays and Saturday schedules', function () {
 });
 
 test('it uses most common language as default when English not present', function () {
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
     $commonData = [
         'church_id' => $this->church->id,
         'team_id' => $team->id,
@@ -328,6 +330,6 @@ test('it uses most common language as default when English not present', functio
         ->and($schedule->has_day_variations)->toBeTrue();
 
     // Only 1 day detail (Thu→Luganda)
-    expect(\App\Models\ScheduleDayDetail::count())->toBe(1);
-    expect(\App\Models\ScheduleDayDetail::first()->language)->toBe('Luganda');
+    expect(ScheduleDayDetail::count())->toBe(1);
+    expect(ScheduleDayDetail::first()->language)->toBe('Luganda');
 });

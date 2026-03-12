@@ -14,8 +14,14 @@ use Database\Seeders\AclSeeder;
 
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
+
+use App\Http\Controllers\HolidayController;
+
 use function Pest\Laravel\assertModelExists;
 use function Pest\Laravel\assertModelMissing;
+
+use App\Http\Requests\Holiday\StoreHolidayRequest;
+use App\Http\Requests\Holiday\UpdateHolidayRequest;
 
 beforeEach(function () {
     $this->seed(AclSeeder::class);
@@ -122,9 +128,9 @@ test('index does not show other team holidays', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\HolidayController::class,
+        HolidayController::class,
         'store',
-        \App\Http\Requests\Holiday\StoreHolidayRequest::class
+        StoreHolidayRequest::class
     );
 
 test('store creates a fixed holiday', function (): void {
@@ -306,9 +312,9 @@ test('show returns a holiday', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\HolidayController::class,
+        HolidayController::class,
         'update',
-        \App\Http\Requests\Holiday\UpdateHolidayRequest::class
+        UpdateHolidayRequest::class
     );
 
 test('super admin can update universal holiday', function (): void {

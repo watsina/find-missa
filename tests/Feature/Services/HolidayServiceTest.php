@@ -189,7 +189,7 @@ it('throws exception for computed holiday without valid rule', function () {
     ]);
 
     $this->service->computeHolidayDate($holiday, 2025);
-})->throws(InvalidArgumentException::class);
+})->throws(\InvalidArgumentException::class);
 
 it('throws exception for invalid day of week', function () {
     $holiday = Holiday::factory()->computed(['nth' => 1, 'day' => 'notaday', 'month' => 1])->create([
@@ -197,7 +197,7 @@ it('throws exception for invalid day of week', function () {
     ]);
 
     $this->service->computeHolidayDate($holiday, 2025);
-})->throws(InvalidArgumentException::class);
+})->throws(\InvalidArgumentException::class);
 
 /*
 |--------------------------------------------------------------------------

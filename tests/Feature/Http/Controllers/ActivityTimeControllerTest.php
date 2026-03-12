@@ -9,9 +9,14 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
+
+use App\Http\Requests\ActivityTimeRequest;
+
 use function Pest\Laravel\assertModelExists;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertModelMissing;
+
+use App\Http\Controllers\ActivityTimeController;
 
 test('index behaves as expected', function (): void {
     $this->actingAsSuperAdminWithTeam();
@@ -26,9 +31,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\ActivityTimeController::class,
+        ActivityTimeController::class,
         'store',
-        \App\Http\Requests\ActivityTimeRequest::class
+        ActivityTimeRequest::class
     );
 
 test('store saves', function (): void {
@@ -108,9 +113,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\ActivityTimeController::class,
+        ActivityTimeController::class,
         'update',
-        \App\Http\Requests\ActivityTimeRequest::class
+        ActivityTimeRequest::class
     );
 
 test('update behaves as expected', function (): void {

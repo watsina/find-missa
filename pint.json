@@ -4,6 +4,11 @@
     "ordered_imports": {
       "sort_algorithm": "length"
     },
-    "single_trait_insert_per_statement": true
+    "single_trait_insert_per_statement": true,
+    "fully_qualified_strict_types": {
+      "import_symbols": true,
+      "leading_backslash_in_global_namespace": true,
+      "phpdoc_tags": []
+    }
   }
 }

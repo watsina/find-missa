@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Holiday;
 
 use App\Enums\HolidayType;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -81,7 +82,7 @@ class StoreHolidayRequest extends FormRequest
     {
         if ($this->has('name') && ! $this->has('slug')) {
             $this->merge([
-                'slug' => \Illuminate\Support\Str::slug($this->name),
+                'slug' => Str::slug($this->name),
             ]);
         }
 

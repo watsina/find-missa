@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Support\Str;
+use App\Models\SchedulePeriod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSchedulePeriodRequest extends FormRequest
@@ -12,7 +13,7 @@ class StoreSchedulePeriodRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Models\SchedulePeriod::class);
+        return $this->user()->can('create', SchedulePeriod::class);
     }
 
     /**

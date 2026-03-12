@@ -3,8 +3,11 @@
 namespace Tests\Feature\Http\Controllers\AppUsers;
 
 use App\Models\Church;
+use App\Models\Parish;
+use App\Models\Diocese;
 use App\Models\Holiday;
 use App\Enums\DayPattern;
+use App\Models\SubParish;
 use App\Models\SchedulePeriod;
 use Illuminate\Support\Carbon;
 use App\Models\OneTimeActivity;
@@ -376,14 +379,14 @@ test('it resolves church by numeric id', function () {
 });
 
 test('it returns hierarchy with parish and diocese when church belongs to parish', function () {
-    $diocese = \App\Models\Diocese::factory()->create(['name' => 'Kampala Archdiocese']);
-    $parish = \App\Models\Parish::factory()->create([
+    $diocese = Diocese::factory()->create(['name' => 'Kampala Archdiocese']);
+    $parish = Parish::factory()->create([
         'name' => 'Christ the King Parish',
         'diocese_id' => $diocese->id,
     ]);
     $church = Church::factory()->create([
         'parishable_id' => $parish->id,
-        'parishable_type' => \App\Models\Parish::class,
+        'parishable_type' => Parish::class,
     ]);
 
     $response = getJson(route('church-details', ['church' => $church->id]))
@@ -398,18 +401,18 @@ test('it returns hierarchy with parish and diocese when church belongs to parish
 });
 
 test('it returns hierarchy with sub_parish, parish, and diocese when church belongs to sub_parish', function () {
-    $diocese = \App\Models\Diocese::factory()->create(['name' => 'Jinja Diocese']);
-    $parish = \App\Models\Parish::factory()->create([
+    $diocese = Diocese::factory()->create(['name' => 'Jinja Diocese']);
+    $parish = Parish::factory()->create([
         'name' => 'St. James Parish',
         'diocese_id' => $diocese->id,
     ]);
-    $subParish = \App\Models\SubParish::factory()->create([
+    $subParish = SubParish::factory()->create([
         'name' => 'Holy Cross Sub-Parish',
         'parish_id' => $parish->id,
     ]);
     $church = Church::factory()->create([
         'parishable_id' => $subParish->id,
-        'parishable_type' => \App\Models\SubParish::class,
+        'parishable_type' => SubParish::class,
     ]);
 
     $response = getJson(route('church-details', ['church' => $church->id]))

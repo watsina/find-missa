@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\AppUsers;
 
+use App\Models\Team;
 use App\Models\Holiday;
 
 use function Pest\Laravel\get;
@@ -51,7 +52,7 @@ test('holiday info validates date parameter format', function (): void {
 
 test('holiday info only returns universal holidays', function (): void {
     // Create a team for the team-specific holiday
-    $team = \App\Models\Team::factory()->create();
+    $team = Team::factory()->create();
 
     // Create a universal holiday
     Holiday::factory()->fixed()->create([

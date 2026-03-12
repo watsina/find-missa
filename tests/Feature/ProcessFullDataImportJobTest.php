@@ -6,6 +6,7 @@ use App\Models\Parish;
 use App\Models\Diocese;
 use Illuminate\Support\Str;
 use App\Jobs\ProcessFullDataImport;
+use App\Services\DataImportService;
 use App\Services\ImportStatusService;
 use Illuminate\Support\Facades\Storage;
 
@@ -67,7 +68,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(\App\Services\DataImportService::class),
+            app(DataImportService::class),
             $statusService
         );
 
@@ -112,7 +113,7 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(\App\Services\DataImportService::class),
+                app(DataImportService::class),
                 $statusService
             );
         } catch (\RuntimeException $e) {
@@ -148,7 +149,7 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(\App\Services\DataImportService::class),
+                app(DataImportService::class),
                 $statusService
             );
         } catch (\RuntimeException $e) {
@@ -182,7 +183,7 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(\App\Services\DataImportService::class),
+                app(DataImportService::class),
                 $statusService
             );
         } catch (\RuntimeException $e) {
@@ -245,7 +246,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(\App\Services\DataImportService::class),
+            app(DataImportService::class),
             $statusService
         );
 
@@ -309,7 +310,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(\App\Services\DataImportService::class),
+            app(DataImportService::class),
             $statusService
         );
 

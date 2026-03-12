@@ -2,6 +2,8 @@
 
 use App\Models\Team;
 use App\Models\Church;
+use App\Models\Parish;
+use App\Models\Diocese;
 use App\Models\Holiday;
 use App\Enums\DayPattern;
 use App\Models\ScheduleRule;
@@ -728,15 +730,15 @@ it('searches activities case-insensitively', function () {
 */
 
 it('applies diocese-level rules to all churches in diocese', function () {
-    $diocese = \App\Models\Diocese::factory()->create(['team_id' => $this->team->id]);
-    $parish = \App\Models\Parish::factory()->create([
+    $diocese = Diocese::factory()->create(['team_id' => $this->team->id]);
+    $parish = Parish::factory()->create([
         'diocese_id' => $diocese->id,
         'team_id' => $this->team->id,
     ]);
 
     // Update church to belong to parish (and thus diocese)
     $this->church->update([
-        'parishable_type' => \App\Models\Parish::class,
+        'parishable_type' => Parish::class,
         'parishable_id' => $parish->id,
     ]);
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Church extends BaseModel
@@ -92,12 +93,12 @@ class Church extends BaseModel
         return $this->hasMany(OneTimeActivity::class);
     }
 
-    public function scheduleRules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function scheduleRules(): MorphMany
     {
         return $this->morphMany(ScheduleRule::class, 'scope');
     }
 
-    public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function scheduleOverrides(): MorphMany
     {
         return $this->morphMany(ScheduleOverride::class, 'scope');
     }

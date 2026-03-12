@@ -8,6 +8,10 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
+
+use App\Http\Requests\SubParishRequest;
+use App\Http\Controllers\SubParishController;
+
 use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
@@ -23,9 +27,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\SubParishController::class,
+        SubParishController::class,
         'store',
-        \App\Http\Requests\SubParishRequest::class
+        SubParishRequest::class
     );
 
 test('store saves', function (): void {
@@ -53,9 +57,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        \App\Http\Controllers\SubParishController::class,
+        SubParishController::class,
         'update',
-        \App\Http\Requests\SubParishRequest::class
+        SubParishRequest::class
     );
 
 test('update behaves as expected', function (): void {
