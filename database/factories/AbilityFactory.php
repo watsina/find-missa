@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Permission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Permission>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Permission>
  */
 class AbilityFactory extends Factory
 {

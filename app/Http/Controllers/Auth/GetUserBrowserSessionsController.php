@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -22,7 +21,7 @@ class GetUserBrowserSessionsController extends Controller
     /**
      * Get the current sessions.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function sessions(Request $request)
     {

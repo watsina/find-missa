@@ -10,14 +10,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Validation\ValidationException;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Handle an incoming registration request.
      *
-     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): Response
     {

@@ -4,11 +4,10 @@ namespace Database\Factories;
 
 use App\Models\Role;
 use App\Models\Team;
-use App\Models\TeamInvitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<TeamInvitation>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TeamInvitation>
  */
 class TeamInvitationFactory extends Factory
 {

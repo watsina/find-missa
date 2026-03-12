@@ -9,7 +9,7 @@ use App\Models\ActivitySchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ActivitySchedule>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ActivitySchedule>
  */
 class ActivityScheduleFactory extends Factory
 {

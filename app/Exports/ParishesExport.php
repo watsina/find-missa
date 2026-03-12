@@ -4,7 +4,6 @@ namespace App\Exports;
 
 use App\Models\Parish;
 use App\Models\Diocese;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -15,7 +14,7 @@ class ParishesExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     public function __construct(protected Diocese $diocese) {}
 
     /**
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function collection()
     {

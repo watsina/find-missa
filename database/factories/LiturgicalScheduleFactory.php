@@ -9,7 +9,7 @@ use App\Models\LiturgicalSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<LiturgicalSchedule>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LiturgicalSchedule>
  */
 class LiturgicalScheduleFactory extends Factory
 {

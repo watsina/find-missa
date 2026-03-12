@@ -6,7 +6,6 @@ use App\Models\Parish;
 use App\Models\Diocese;
 use Illuminate\Support\Str;
 use App\Jobs\ProcessFullDataImport;
-use App\Services\DataImportService;
 use App\Services\ImportStatusService;
 use Illuminate\Support\Facades\Storage;
 
@@ -68,7 +67,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(DataImportService::class),
+            app(\App\Services\DataImportService::class),
             $statusService
         );
 
@@ -113,10 +112,10 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(DataImportService::class),
+                app(\App\Services\DataImportService::class),
                 $statusService
             );
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             // Expected
         }
 
@@ -149,10 +148,10 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(DataImportService::class),
+                app(\App\Services\DataImportService::class),
                 $statusService
             );
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             // Expected
         }
 
@@ -183,10 +182,10 @@ describe('ProcessFullDataImport Job', function () {
 
         try {
             $job->handle(
-                app(DataImportService::class),
+                app(\App\Services\DataImportService::class),
                 $statusService
             );
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             // Expected
         }
 
@@ -246,7 +245,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(DataImportService::class),
+            app(\App\Services\DataImportService::class),
             $statusService
         );
 
@@ -310,7 +309,7 @@ describe('ProcessFullDataImport Job', function () {
             $filePath
         );
         $job->handle(
-            app(DataImportService::class),
+            app(\App\Services\DataImportService::class),
             $statusService
         );
 

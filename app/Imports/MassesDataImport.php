@@ -9,7 +9,6 @@ use App\Models\SubParish;
 use Illuminate\Support\Str;
 use App\Models\ActivityTime;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -26,7 +25,7 @@ class MassesDataImport extends DefaultValueBinder implements SkipsEmptyRows, ToC
     use Importable;
 
     /**
-     * @return Model|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function collection(Collection $rows)
     {

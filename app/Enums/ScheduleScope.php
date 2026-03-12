@@ -2,8 +2,6 @@
 
 namespace App\Enums;
 
-use App\Models\Church;
-use App\Models\Diocese;
 use App\Concerns\EnumToArray;
 
 enum ScheduleScope: string
@@ -30,8 +28,8 @@ enum ScheduleScope: string
     public function modelClass(): string
     {
         return match ($this) {
-            self::Church => Church::class,
-            self::Diocese => Diocese::class,
+            self::Church => \App\Models\Church::class,
+            self::Diocese => \App\Models\Diocese::class,
         };
     }
 }

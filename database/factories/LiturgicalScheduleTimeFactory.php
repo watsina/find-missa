@@ -7,7 +7,7 @@ use App\Models\LiturgicalScheduleTime;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<LiturgicalScheduleTime>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LiturgicalScheduleTime>
  */
 class LiturgicalScheduleTimeFactory extends Factory
 {

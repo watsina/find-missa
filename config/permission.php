@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\Role;
-use App\Models\Permission;
-
 return [
 
     'models' => [
@@ -16,7 +13,7 @@ return [
          * `Spatie\Permission\Contracts\Permission` contract.
          */
 
-        'permission' => Permission::class,
+        'permission' => App\Models\Permission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -27,7 +24,7 @@ return [
          * `Spatie\Permission\Contracts\Role` contract.
          */
 
-        'role' => Role::class,
+        'role' => App\Models\Role::class,
 
     ],
 
@@ -170,7 +167,7 @@ return [
          * When permissions or roles are updated the cache is flushed automatically.
          */
 
-        'expiration_time' => DateInterval::createFromDateString('24 hours'),
+        'expiration_time' => \DateInterval::createFromDateString('24 hours'),
 
         /*
          * The cache key used to store all permissions.

@@ -7,7 +7,7 @@ use App\Models\ScheduleDayDetail;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ScheduleDayDetail>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ScheduleDayDetail>
  */
 class ScheduleDayDetailFactory extends Factory
 {

@@ -5,7 +5,6 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Translation\PotentiallyTranslatedString;
 
 /**
  * Validates that a model exists within the current team's scope.
@@ -30,7 +29,7 @@ class ExistsInTeam implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  Closure(string, ?string=): PotentiallyTranslatedString  $fail
+     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GlobalActivityTimeExceptionFactory;
 
 class GlobalActivityTimeException extends BaseModel
 {
-    /** @use HasFactory<GlobalActivityTimeExceptionFactory> */
+    /** @use HasFactory<\Database\Factories\GlobalActivityTimeExceptionFactory> */
     use HasFactory;
 
     /**

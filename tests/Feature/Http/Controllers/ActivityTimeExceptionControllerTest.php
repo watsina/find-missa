@@ -13,9 +13,6 @@ use App\Models\ActivityTimeException;
 
 use function Pest\Laravel\assertModelMissing;
 
-use App\Http\Requests\ActivityTimeExceptionRequest;
-use App\Http\Controllers\ActivityTimeExceptionController;
-
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
 
 test('index behaves as expected returns the expected number of items', function (): void {
@@ -28,9 +25,9 @@ test('index behaves as expected returns the expected number of items', function 
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        ActivityTimeExceptionController::class,
+        \App\Http\Controllers\ActivityTimeExceptionController::class,
         'store',
-        ActivityTimeExceptionRequest::class
+        \App\Http\Requests\ActivityTimeExceptionRequest::class
     );
 
 test('store saves', function (): void {
@@ -59,9 +56,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        ActivityTimeExceptionController::class,
+        \App\Http\Controllers\ActivityTimeExceptionController::class,
         'update',
-        ActivityTimeExceptionRequest::class
+        \App\Http\Requests\ActivityTimeExceptionRequest::class
     );
 
 test('update behaves as expected', function (): void {

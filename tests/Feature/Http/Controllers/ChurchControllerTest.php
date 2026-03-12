@@ -12,10 +12,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
-
-use App\Http\Requests\ChurchRequest;
-use App\Http\Controllers\ChurchController;
-
 use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
@@ -31,9 +27,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        ChurchController::class,
+        \App\Http\Controllers\ChurchController::class,
         'store',
-        ChurchRequest::class
+        \App\Http\Requests\ChurchRequest::class
     );
 
 test('store saves', function (): void {
@@ -127,9 +123,9 @@ test('it shows the church with its activities', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        ChurchController::class,
+        \App\Http\Controllers\ChurchController::class,
         'update',
-        ChurchRequest::class
+        \App\Http\Requests\ChurchRequest::class
     );
 
 test('update behaves as expected', function (): void {

@@ -9,11 +9,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
-
-use App\Http\Requests\PriestStoreRequest;
-use App\Http\Controllers\PriestController;
-use App\Http\Requests\PriestUpdateRequest;
-
 use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => $this->actingAsSuperAdminWithTeam());
@@ -29,9 +24,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        PriestController::class,
+        \App\Http\Controllers\PriestController::class,
         'store',
-        PriestStoreRequest::class
+        \App\Http\Requests\PriestStoreRequest::class
     );
 
 test('store saves', function (): void {
@@ -62,9 +57,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        PriestController::class,
+        \App\Http\Controllers\PriestController::class,
         'update',
-        PriestUpdateRequest::class
+        \App\Http\Requests\PriestUpdateRequest::class
     );
 
 test('update behaves as expected', function (): void {

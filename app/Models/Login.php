@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Database\Factories\LoginFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\RecordsUserActions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Login extends Model
 {
-    /** @use HasFactory<LoginFactory> */
+    /** @use HasFactory<\Database\Factories\LoginFactory> */
     use HasFactory;
 
     use RecordsUserActions;

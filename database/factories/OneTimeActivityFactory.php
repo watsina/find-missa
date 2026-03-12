@@ -8,7 +8,7 @@ use App\Models\OneTimeActivity;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<OneTimeActivity>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OneTimeActivity>
  */
 class OneTimeActivityFactory extends Factory
 {

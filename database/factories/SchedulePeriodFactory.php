@@ -7,7 +7,7 @@ use App\Models\SchedulePeriod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<SchedulePeriod>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SchedulePeriod>
  */
 class SchedulePeriodFactory extends Factory
 {

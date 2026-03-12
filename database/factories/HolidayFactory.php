@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Holiday;
 use App\Enums\HolidayType;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Holiday>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Holiday>
  */
 class HolidayFactory extends Factory
 {

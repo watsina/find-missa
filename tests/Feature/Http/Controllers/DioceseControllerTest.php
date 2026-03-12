@@ -9,10 +9,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
-
-use App\Http\Requests\DioceseRequest;
-use App\Http\Controllers\DioceseController;
-
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertModelMissing;
 
@@ -25,9 +21,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        DioceseController::class,
+        \App\Http\Controllers\DioceseController::class,
         'store',
-        DioceseRequest::class
+        \App\Http\Requests\DioceseRequest::class
     );
 
 test('store saves', function (): void {
@@ -57,9 +53,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        DioceseController::class,
+        \App\Http\Controllers\DioceseController::class,
         'update',
-        DioceseRequest::class
+        \App\Http\Requests\DioceseRequest::class
     );
 
 test('update behaves as expected', function (): void {

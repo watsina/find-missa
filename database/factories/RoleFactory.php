@@ -2,12 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Role;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Role>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Role>
  */
 class RoleFactory extends Factory
 {

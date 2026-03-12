@@ -9,11 +9,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\put;
 use function Pest\Laravel\post;
 use function Pest\Laravel\delete;
-
-use App\Http\Requests\UserStoreRequest;
-use App\Http\Controllers\UserController;
-use App\Http\Requests\UserUpdateRequest;
-
 use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(fn () => $this->actingAsSuperAdmin());
@@ -29,9 +24,9 @@ test('index behaves as expected', function (): void {
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        UserController::class,
+        \App\Http\Controllers\UserController::class,
         'store',
-        UserStoreRequest::class
+        \App\Http\Requests\UserStoreRequest::class
     );
 
 test('store saves', function (): void {
@@ -65,9 +60,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        UserController::class,
+        \App\Http\Controllers\UserController::class,
         'update',
-        UserUpdateRequest::class
+        \App\Http\Requests\UserUpdateRequest::class
     );
 
 test('update behaves as expected', function (): void {

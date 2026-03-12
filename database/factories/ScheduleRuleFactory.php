@@ -11,7 +11,7 @@ use App\Enums\ScheduleRuleCondition;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ScheduleRule>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ScheduleRule>
  */
 class ScheduleRuleFactory extends Factory
 {

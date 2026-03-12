@@ -10,7 +10,7 @@ use App\Models\ScheduleOverride;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ScheduleOverride>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ScheduleOverride>
  */
 class ScheduleOverrideFactory extends Factory
 {

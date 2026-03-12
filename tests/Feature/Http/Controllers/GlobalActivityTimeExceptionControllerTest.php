@@ -11,9 +11,6 @@ use App\Models\GlobalActivityTimeException;
 
 use function Pest\Laravel\assertModelMissing;
 
-use App\Http\Requests\GlobalActivityTimeExceptionRequest;
-use App\Http\Controllers\GlobalActivityTimeExceptionController;
-
 test('index behaves as expected returns the expected number of items', function (): void {
     $this->actingAsSuperAdminWithTeam();
 
@@ -26,9 +23,9 @@ test('index behaves as expected returns the expected number of items', function 
 
 test('store uses form request validation')
     ->assertActionUsesFormRequest(
-        GlobalActivityTimeExceptionController::class,
+        \App\Http\Controllers\GlobalActivityTimeExceptionController::class,
         'store',
-        GlobalActivityTimeExceptionRequest::class
+        \App\Http\Requests\GlobalActivityTimeExceptionRequest::class
     );
 
 test('store saves', function (): void {
@@ -57,9 +54,9 @@ test('show behaves as expected', function (): void {
 
 test('update uses form request validation')
     ->assertActionUsesFormRequest(
-        GlobalActivityTimeExceptionController::class,
+        \App\Http\Controllers\GlobalActivityTimeExceptionController::class,
         'update',
-        GlobalActivityTimeExceptionRequest::class
+        \App\Http\Requests\GlobalActivityTimeExceptionRequest::class
     );
 
 test('update behaves as expected', function (): void {

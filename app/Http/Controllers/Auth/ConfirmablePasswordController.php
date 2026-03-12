@@ -15,7 +15,7 @@ class ConfirmablePasswordController extends Controller
     /**
      * The guard implementation.
      *
-     * @var StatefulGuard
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
     protected $guard;
 

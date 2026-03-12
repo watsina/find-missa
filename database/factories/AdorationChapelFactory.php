@@ -8,7 +8,7 @@ use App\Models\AdorationChapel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<AdorationChapel>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AdorationChapel>
  */
 class AdorationChapelFactory extends Factory
 {

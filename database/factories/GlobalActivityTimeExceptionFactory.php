@@ -3,11 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Team;
-use App\Models\GlobalActivityTimeException;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<GlobalActivityTimeException>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\GlobalActivityTimeException>
  */
 class GlobalActivityTimeExceptionFactory extends Factory
 {

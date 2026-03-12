@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Illuminate\Validation\ValidationException;
@@ -15,7 +14,7 @@ class OtherBrowserSessionsController extends Controller
     /**
      * Log out from other browser sessions.
      *
-     * @return RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, StatefulGuard $guard)
     {

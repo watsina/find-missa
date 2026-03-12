@@ -3,7 +3,6 @@
 namespace App\Models\Concerns;
 
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 trait HasCodeName
 {
@@ -52,7 +51,7 @@ trait HasCodeName
                 $errorField = 'name';
             }
 
-            throw ValidationException::withMessages([
+            throw \Illuminate\Validation\ValidationException::withMessages([
                 $errorField => ["The code name '{$candidate}' is already in use by another record."],
             ]);
         }

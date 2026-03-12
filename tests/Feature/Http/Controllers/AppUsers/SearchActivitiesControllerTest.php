@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers\AppUsers;
 
-use Carbon\Carbon;
 use App\Models\Church;
 use App\Models\ActivityTime;
 
@@ -324,7 +323,7 @@ test('search returns activities with only effective_until set when search date i
 
 test('search respects effective dates for weekly activities', function () {
     $searchDate = '2024-07-15'; // A Monday in summer
-    $dayName = Carbon::parse($searchDate)->dayName;
+    $dayName = \Carbon\Carbon::parse($searchDate)->dayName;
 
     // Weekly mass effective during the search period
     $effectiveWeeklyMass = ActivityTime::factory()->weekly($dayName, 'mass')->create([

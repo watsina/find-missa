@@ -2,18 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Collection;
-use Database\Factories\TeamFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Pennant\Concerns\HasFeatures;
 use App\Models\Concerns\RecordsUserActions;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Team extends Model
 {
-    /** @use HasFactory<TeamFactory> */
+    /** @use HasFactory<\Database\Factories\TeamFactory> */
     use HasFactory;
 
     use HasFeatures;
@@ -36,7 +32,7 @@ class Team extends Model
     /**
      * Get all of the team's members including its owner.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function allMembers()
     {
@@ -46,7 +42,7 @@ class Team extends Model
     /**
      * Get all of the members that belong to the team.
      *
-     * @return BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function members()
     {
@@ -58,7 +54,7 @@ class Team extends Model
     /**
      * Determine if the given member belongs to the team.
      *
-     * @param  User  $member
+     * @param  \App\Models\User  $member
      * @return bool
      */
     public function hasMember($member)
@@ -81,7 +77,7 @@ class Team extends Model
     /**
      * Determine if the given member has the given permission on the team.
      *
-     * @param  User  $member
+     * @param  \App\Models\User  $member
      * @param  string  $permission
      * @return bool
      */
@@ -93,7 +89,7 @@ class Team extends Model
     /**
      * Get all of the pending member invitations for the team.
      *
-     * @return HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function invitations()
     {
@@ -103,7 +99,7 @@ class Team extends Model
     /**
      * Remove the given member from the team.
      *
-     * @param  User  $member
+     * @param  \App\Models\User  $member
      * @return void
      */
     public function removeMember($member)
