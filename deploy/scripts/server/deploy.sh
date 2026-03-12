@@ -33,7 +33,6 @@ REQUIRED_VARS=(
     "DEPLOY_PATH"
     "BLUE_PORT"
     "GREEN_PORT"
-    "APP_KEY"
 )
 
 for var in "${REQUIRED_VARS[@]}"; do
@@ -69,6 +68,129 @@ get_container_status() {
         echo "stopped"
     else
         echo "none"
+    fi
+}
+
+# Merge incoming env vars into the persistent .env file.
+# - New variables are added
+# - Changed values are updated
+# - Variables present in existing but missing from incoming are kept (never deleted)
+# - Only variable names are logged, never values (security)
+# - APP_KEY rotation: when APP_KEY changes, the old key is automatically appended
+#   to APP_PREVIOUS_KEYS so Laravel can still decrypt data encrypted with it.
+#   See: https://laravel.com/docs/encryption#gracefully-rotating-encryption-keys
+merge_env_file() {
+    local incoming_file="$1"
+    local persistent_file="$2"
+
+    if [ ! -f "$incoming_file" ]; then
+        print_error "Incoming env file not found: $incoming_file"
+        return 1
+    fi
+
+    local added=0
+    local updated=0
+    local kept=0
+    local app_key_rotated=false
+
+    # If no persistent file yet, just use the incoming file as-is
+    if [ ! -f "$persistent_file" ]; then
+        cp "$incoming_file" "$persistent_file"
+        added=$(wc -l < "$incoming_file" | tr -d ' ')
+        print_success "Created env file with $added variables"
+        return 0
+    fi
+
+    # Build associative arrays for existing and incoming vars
+    declare -A existing_vars
+    declare -A incoming_vars
+
+    # Read existing persistent file
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        local key="${line%%=*}"
+        local value="${line#*=}"
+        [[ -n "$key" ]] && existing_vars["$key"]="$value"
+    done < "$persistent_file"
+
+    # Read incoming file
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        local key="${line%%=*}"
+        local value="${line#*=}"
+        [[ -n "$key" ]] && incoming_vars["$key"]="$value"
+    done < "$incoming_file"
+
+    # Handle APP_KEY rotation before the main merge loop.
+    # If APP_KEY changed, append the old key to APP_PREVIOUS_KEYS so Laravel
+    # can still decrypt data encrypted with previous keys.
+    if [ -n "${existing_vars[APP_KEY]+x}" ] && [ -n "${incoming_vars[APP_KEY]+x}" ]; then
+        if [ "${existing_vars[APP_KEY]}" != "${incoming_vars[APP_KEY]}" ]; then
+            local old_key="${existing_vars[APP_KEY]}"
+            local previous_keys="${existing_vars[APP_PREVIOUS_KEYS]:-}"
+
+            # Append old key to APP_PREVIOUS_KEYS (comma-separated), avoiding duplicates
+            if [ -z "$previous_keys" ]; then
+                previous_keys="$old_key"
+            elif [[ ",$previous_keys," != *",$old_key,"* ]]; then
+                previous_keys="${previous_keys},${old_key}"
+            fi
+
+            # Store the updated APP_PREVIOUS_KEYS in incoming so it gets written
+            incoming_vars[APP_PREVIOUS_KEYS]="$previous_keys"
+            app_key_rotated=true
+
+            print_warning "  APP_KEY rotated - old key preserved in APP_PREVIOUS_KEYS"
+        fi
+    fi
+
+    # Start building the merged output
+    local merged_file="${persistent_file}.tmp"
+    > "$merged_file"
+
+    # Process incoming vars (add new, update changed)
+    for key in "${!incoming_vars[@]}"; do
+        if [ -z "${existing_vars[$key]+x}" ]; then
+            # New variable - add it
+            echo "${key}=${incoming_vars[$key]}" >> "$merged_file"
+            # Don't log APP_PREVIOUS_KEYS as "Added" if it was created by key rotation
+            if [ "$key" = "APP_PREVIOUS_KEYS" ] && [ "$app_key_rotated" = true ]; then
+                : # Already logged above
+            else
+                print_info "  Added: $key"
+            fi
+            ((added++))
+        elif [ "${existing_vars[$key]}" != "${incoming_vars[$key]}" ]; then
+            # Changed value - update it
+            echo "${key}=${incoming_vars[$key]}" >> "$merged_file"
+            # Don't log APP_PREVIOUS_KEYS as "Updated" if it was modified by key rotation
+            if [ "$key" = "APP_PREVIOUS_KEYS" ] && [ "$app_key_rotated" = true ]; then
+                : # Already logged above
+            else
+                print_info "  Updated: $key"
+            fi
+            ((updated++))
+        else
+            # Same value - keep as-is
+            echo "${key}=${existing_vars[$key]}" >> "$merged_file"
+        fi
+    done
+
+    # Keep vars that exist in persistent but not in incoming (never delete)
+    for key in "${!existing_vars[@]}"; do
+        if [ -z "${incoming_vars[$key]+x}" ]; then
+            echo "${key}=${existing_vars[$key]}" >> "$merged_file"
+            ((kept++))
+        fi
+    done
+
+    # Replace persistent file with merged result
+    mv "$merged_file" "$persistent_file"
+
+    if [ $added -gt 0 ] || [ $updated -gt 0 ] || [ $kept -gt 0 ]; then
+        print_success "Env file merged: $added added, $updated updated, $kept kept from previous"
+    else
+        print_success "Env file unchanged"
     fi
 }
 
@@ -140,6 +262,8 @@ print_info "Starting $TARGET_SLOT container..."
 # Data paths
 DATA_PATH="${DEPLOY_PATH}/data"
 SQLITE_FILE="${DATA_PATH}/database.sqlite"
+ENV_FILE="${DATA_PATH}/.env"
+INCOMING_ENV_FILE="/tmp/${SANITIZED_DOMAIN}-env-incoming"
 
 # Ensure data directories exist with correct permissions
 # These directories are mounted into the container, so they must exist on the host
@@ -161,6 +285,18 @@ chmod 664 "$SQLITE_FILE"
 chown -R 1337:1337 "${DATA_PATH}/storage"
 chmod -R 775 "${DATA_PATH}/storage"
 
+# Merge incoming env vars into the persistent .env file
+# New vars are added, changed vars are updated, missing vars are kept (never deleted)
+print_info "Merging environment configuration..."
+merge_env_file "$INCOMING_ENV_FILE" "$ENV_FILE"
+
+# Set permissions on env file (same as database file)
+chown 1337:1337 "$ENV_FILE"
+chmod 664 "$ENV_FILE"
+
+# Clean up incoming env file
+rm -f "$INCOMING_ENV_FILE"
+
 docker run -d \
     --name "$TARGET_CONTAINER" \
     --restart unless-stopped \
@@ -168,33 +304,7 @@ docker run -d \
     --add-host=host.docker.internal:host-gateway \
     -v "${SQLITE_FILE}:/var/www/html/database/database.sqlite:rw" \
     -v "${DATA_PATH}/storage:/var/www/html/storage:rw" \
-    -e "APP_NAME=${APP_NAME}" \
-    -e "APP_ENV=${APP_ENV:-production}" \
-    -e "APP_KEY=${APP_KEY}" \
-    -e "APP_DEBUG=${APP_DEBUG:-false}" \
-    -e "APP_TIMEZONE=${APP_TIMEZONE:-UTC}" \
-    -e "APP_URL=${APP_URL}" \
-    -e "DB_CONNECTION=${DB_CONNECTION:-sqlite}" \
-    -e "LOG_CHANNEL=${LOG_CHANNEL:-stack}" \
-    -e "LOG_LEVEL=${LOG_LEVEL:-error}" \
-    -e "SESSION_DRIVER=${SESSION_DRIVER:-database}" \
-    -e "SESSION_LIFETIME=${SESSION_LIFETIME:-120}" \
-    -e "CACHE_STORE=${CACHE_STORE:-redis}" \
-    -e "QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}" \
-    -e "REDIS_CLIENT=${REDIS_CLIENT:-phpredis}" \
-    -e "REDIS_HOST=${REDIS_HOST:-host.docker.internal}" \
-    -e "REDIS_PORT=${REDIS_PORT:-6379}" \
-    -e "REDIS_PASSWORD=${REDIS_PASSWORD:-null}" \
-    -e "FILESYSTEM_DISK=${FILESYSTEM_DISK:-local}" \
-    -e "MAIL_MAILER=${MAIL_MAILER:-log}" \
-    -e "MAIL_HOST=${MAIL_HOST:-}" \
-    -e "MAIL_PORT=${MAIL_PORT:-587}" \
-    -e "MAIL_USERNAME=${MAIL_USERNAME:-}" \
-    -e "MAIL_PASSWORD=${MAIL_PASSWORD:-}" \
-    -e "MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}" \
-    -e "MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-}" \
-    -e "MAIL_FROM_NAME=${MAIL_FROM_NAME:-}" \
-    -e "BROADCAST_CONNECTION=${BROADCAST_CONNECTION:-log}" \
+    --env-file "$ENV_FILE" \
     -e "FRESH_DB=${FRESH_DB:-false}" \
     -e "SEED_DB=${SEED_DB:-false}" \
     "${IMAGE_NAME}:${IMAGE_TAG}" || {

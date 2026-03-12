@@ -454,12 +454,88 @@ print_success "Files transferred successfully"
 rm -f "$TARBALL_PATH"
 
 # -----------------------------------------------------------------------------
-# Step 4: Execute Server-Side Deployment
+# Step 4: Prepare Application Environment File
 # -----------------------------------------------------------------------------
 
-print_header "Step 4: Deploying on Server"
+print_header "Step 4: Preparing Application Environment"
 
-# Build environment variables string for server script
+# Deployment-only variables that should NOT be passed to the container.
+# Everything else from .env.deploy is treated as an application env var.
+DEPLOY_ONLY_VARS=(
+    "SERVER_USER"
+    "SERVER_HOST"
+    "SERVER_PORT"
+    "SERVER_DEPLOY_PATH"
+    "SSH_KEY_PATH"
+    "DOMAIN"
+    "CONTAINER_USER"
+    "HEALTH_CHECK_TIMEOUT"
+    "HEALTH_CHECK_INTERVAL"
+    "KEEP_OLD_IMAGES"
+    "BLUE_PORT"
+    "GREEN_PORT"
+)
+
+is_deploy_only_var() {
+    local var_name="$1"
+    for deploy_var in "${DEPLOY_ONLY_VARS[@]}"; do
+        if [ "$var_name" = "$deploy_var" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Extract application env vars from the .env.deploy file and write to a
+# temporary incoming env file. Only non-comment, non-blank lines with
+# valid KEY=VALUE pairs are included, skipping deployment-only variables.
+INCOMING_ENV_FILE="/tmp/${SANITIZED_DOMAIN}-env-incoming"
+> "$INCOMING_ENV_FILE"
+
+while IFS= read -r line; do
+    # Skip blank lines and comments
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+
+    # Extract variable name (everything before the first '=')
+    var_name="${line%%=*}"
+
+    # Skip if not a valid variable name
+    [[ ! "$var_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] && continue
+
+    # Skip deployment-only variables
+    if is_deploy_only_var "$var_name"; then
+        continue
+    fi
+
+    # Write the variable with its current (resolved) value from the shell
+    # This ensures variable references like ${APP_NAME} are expanded
+    var_value="${!var_name}"
+    echo "${var_name}=${var_value}" >> "$INCOMING_ENV_FILE"
+done < "$ENV_FILE"
+
+print_info "Extracted $(wc -l < "$INCOMING_ENV_FILE" | tr -d ' ') application env vars from $ENV_FILE"
+
+# Transfer incoming env file to server
+print_info "Transferring environment configuration..."
+$SCP_CMD "$INCOMING_ENV_FILE" "$SERVER_USER@$SERVER_HOST:/tmp/${SANITIZED_DOMAIN}-env-incoming" || {
+    print_error "Failed to transfer environment file"
+    rm -f "$INCOMING_ENV_FILE"
+    exit 1
+}
+
+# Clean up local temp file
+rm -f "$INCOMING_ENV_FILE"
+
+print_success "Environment configuration transferred"
+
+# -----------------------------------------------------------------------------
+# Step 5: Execute Server-Side Deployment
+# -----------------------------------------------------------------------------
+
+print_header "Step 5: Deploying on Server"
+
+# Only deployment-specific variables are passed inline to the server script.
+# Application env vars are handled via the incoming env file and --env-file.
 ENV_VARS="IMAGE_NAME='$IMAGE_NAME'"
 ENV_VARS="$ENV_VARS IMAGE_TAG='$IMAGE_TAG'"
 ENV_VARS="$ENV_VARS TARBALL_PATH='/tmp/${SANITIZED_DOMAIN}-${IMAGE_TAG}.tar.gz'"
@@ -471,36 +547,8 @@ ENV_VARS="$ENV_VARS GREEN_PORT='$GREEN_PORT'"
 ENV_VARS="$ENV_VARS HEALTH_CHECK_TIMEOUT='$HEALTH_CHECK_TIMEOUT'"
 ENV_VARS="$ENV_VARS HEALTH_CHECK_INTERVAL='$HEALTH_CHECK_INTERVAL'"
 ENV_VARS="$ENV_VARS KEEP_OLD_IMAGES='$KEEP_OLD_IMAGES'"
-ENV_VARS="$ENV_VARS APP_NAME='$APP_NAME'"
-ENV_VARS="$ENV_VARS APP_ENV='$APP_ENV'"
-ENV_VARS="$ENV_VARS APP_KEY='$APP_KEY'"
-ENV_VARS="$ENV_VARS APP_DEBUG='$APP_DEBUG'"
-ENV_VARS="$ENV_VARS APP_TIMEZONE='$APP_TIMEZONE'"
-ENV_VARS="$ENV_VARS APP_URL='$APP_URL'"
-ENV_VARS="$ENV_VARS LOG_CHANNEL='$LOG_CHANNEL'"
-ENV_VARS="$ENV_VARS LOG_LEVEL='$LOG_LEVEL'"
-ENV_VARS="$ENV_VARS SESSION_DRIVER='$SESSION_DRIVER'"
-ENV_VARS="$ENV_VARS SESSION_LIFETIME='$SESSION_LIFETIME'"
-ENV_VARS="$ENV_VARS CACHE_STORE='$CACHE_STORE'"
-ENV_VARS="$ENV_VARS QUEUE_CONNECTION='$QUEUE_CONNECTION'"
-ENV_VARS="$ENV_VARS REDIS_HOST='$REDIS_HOST'"
-ENV_VARS="$ENV_VARS REDIS_PORT='$REDIS_PORT'"
-ENV_VARS="$ENV_VARS REDIS_PASSWORD='$REDIS_PASSWORD'"
-ENV_VARS="$ENV_VARS FILESYSTEM_DISK='$FILESYSTEM_DISK'"
-ENV_VARS="$ENV_VARS MAIL_MAILER='$MAIL_MAILER'"
-ENV_VARS="$ENV_VARS MAIL_HOST='$MAIL_HOST'"
-ENV_VARS="$ENV_VARS MAIL_PORT='$MAIL_PORT'"
-ENV_VARS="$ENV_VARS MAIL_USERNAME='$MAIL_USERNAME'"
-ENV_VARS="$ENV_VARS MAIL_PASSWORD='$MAIL_PASSWORD'"
-ENV_VARS="$ENV_VARS MAIL_ENCRYPTION='$MAIL_ENCRYPTION'"
-ENV_VARS="$ENV_VARS MAIL_FROM_ADDRESS='$MAIL_FROM_ADDRESS'"
-ENV_VARS="$ENV_VARS MAIL_FROM_NAME='$MAIL_FROM_NAME'"
 ENV_VARS="$ENV_VARS FRESH_DB='$FRESH_DB'"
 ENV_VARS="$ENV_VARS SEED_DB='$SEED_DB'"
-ENV_VARS="$ENV_VARS CONTAINER_USER='$CONTAINER_USER'"
-ENV_VARS="$ENV_VARS DB_CONNECTION='$DB_CONNECTION'"
-ENV_VARS="$ENV_VARS REDIS_CLIENT='$REDIS_CLIENT'"
-ENV_VARS="$ENV_VARS BROADCAST_CONNECTION='$BROADCAST_CONNECTION'"
 
 $SSH_CMD "sudo $ENV_VARS bash ${DEPLOY_PATH}/scripts/deploy.sh" || {
     print_error "Server-side deployment failed"
@@ -508,11 +556,11 @@ $SSH_CMD "sudo $ENV_VARS bash ${DEPLOY_PATH}/scripts/deploy.sh" || {
 }
 
 # -----------------------------------------------------------------------------
-# Step 5: Setup SSL (if requested)
+# Step 6: Setup SSL (if requested)
 # -----------------------------------------------------------------------------
 
 if [ "$SETUP_SSL_AFTER_DEPLOY" = true ]; then
-    print_header "Step 5: Setting Up SSL Certificate"
+    print_header "Step 6: Setting Up SSL Certificate"
 
     print_info "Running Certbot..."
     $SSH_CMD "sudo certbot certonly --nginx -d $DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN" || {
@@ -533,7 +581,7 @@ if [ "$SETUP_SSL_AFTER_DEPLOY" = true ]; then
 fi
 
 # -----------------------------------------------------------------------------
-# Step 6: Verify Deployment
+# Step 7: Verify Deployment
 # -----------------------------------------------------------------------------
 
 print_header "Deployment Complete"
