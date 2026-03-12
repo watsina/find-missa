@@ -1,6 +1,6 @@
 // https://unhead.unjs.io/setup/vue/installation
 import { InferSeoMetaPlugin } from '@unhead/addons';
-import { createHead } from '@unhead/vue';
+import { createHead } from '@unhead/vue/client';
 
 const head = createHead();
 head.use(InferSeoMetaPlugin());
