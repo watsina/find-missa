@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Support\Str;
+use App\Models\SchedulePeriod;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class StoreSchedulePeriodRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class StoreSchedulePeriodRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Models\SchedulePeriod::class);
+        return $this->user()->can('create', SchedulePeriod::class);
     }
 
     /**
@@ -30,7 +32,7 @@ class StoreSchedulePeriodRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

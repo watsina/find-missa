@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Scopes\TeamScope;
+use Database\Factories\TeamMemberFactory;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TeamMember extends Pivot
 {
-    /** @use HasFactory<\Database\Factories\TeamMemberFactory> */
+    /** @use HasFactory<TeamMemberFactory> */
     use HasFactory;
 
     protected $table = 'team_members';

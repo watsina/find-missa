@@ -5,6 +5,10 @@ namespace App\DataTransferObjects;
 use App\Models\Church;
 use Illuminate\Support\Carbon;
 use App\Models\AdorationChapel;
+use App\Models\OneTimeActivity;
+use App\Models\ActivitySchedule;
+use App\Models\LiturgicalSchedule;
+use App\Models\LiturgicalScheduleTime;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -45,7 +49,7 @@ readonly class ComputedActivity implements Arrayable
     /**
      * Create a ComputedActivity from an ActivitySchedule.
      *
-     * @param  \App\Models\ActivitySchedule  $schedule
+     * @param  ActivitySchedule  $schedule
      * @param  array{start_time: string, end_time: string|null, language: string, activity_type_description: string|null, is_skipped: bool}  $resolvedValues
      */
     public static function fromSchedule(
@@ -71,8 +75,8 @@ readonly class ComputedActivity implements Arrayable
     /**
      * Create a ComputedActivity from a LiturgicalScheduleTime.
      *
-     * @param  \App\Models\LiturgicalScheduleTime  $time
-     * @param  \App\Models\LiturgicalSchedule  $schedule
+     * @param  LiturgicalScheduleTime  $time
+     * @param  LiturgicalSchedule  $schedule
      */
     public static function fromLiturgicalTime(
         $time,
@@ -97,7 +101,7 @@ readonly class ComputedActivity implements Arrayable
     /**
      * Create a ComputedActivity from a OneTimeActivity.
      *
-     * @param  \App\Models\OneTimeActivity  $activity
+     * @param  OneTimeActivity  $activity
      */
     public static function fromOneTimeActivity(
         $activity,

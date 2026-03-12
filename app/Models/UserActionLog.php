@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToTeam;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\UserActionLogFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,7 +12,7 @@ class UserActionLog extends Model
 {
     use BelongsToTeam;
 
-    /** @use HasFactory<\Database\Factories\UserActionLogFactory> */
+    /** @use HasFactory<UserActionLogFactory> */
     use HasFactory;
 
     /**

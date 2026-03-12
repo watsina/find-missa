@@ -6,12 +6,13 @@ use App\Models\Scopes\TeamScope;
 use App\Mail\TeamInvitationEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\TeamInvitationFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TeamInvitation extends Model
 {
-    /** @use HasFactory<\Database\Factories\TeamInvitationFactory> */
+    /** @use HasFactory<TeamInvitationFactory> */
     use HasFactory;
 
     protected $guarded = [];

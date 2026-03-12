@@ -5,6 +5,7 @@ namespace App\Models;
 use Laravel\Scout\Searchable;
 use App\Models\Concerns\HasCodeName;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Diocese extends BaseModel
@@ -37,12 +38,12 @@ class Diocese extends BaseModel
         return $this->hasMany(Parish::class);
     }
 
-    public function scheduleRules(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function scheduleRules(): MorphMany
     {
         return $this->morphMany(ScheduleRule::class, 'scope');
     }
 
-    public function scheduleOverrides(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function scheduleOverrides(): MorphMany
     {
         return $this->morphMany(ScheduleOverride::class, 'scope');
     }

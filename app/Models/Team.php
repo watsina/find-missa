@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Collection;
+use Database\Factories\TeamFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Pennant\Concerns\HasFeatures;
 use App\Models\Concerns\RecordsUserActions;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Team extends Model
 {
-    /** @use HasFactory<\Database\Factories\TeamFactory> */
+    /** @use HasFactory<TeamFactory> */
     use HasFactory;
 
     use HasFeatures;
@@ -32,7 +36,7 @@ class Team extends Model
     /**
      * Get all of the team's members including its owner.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function allMembers()
     {
@@ -42,7 +46,7 @@ class Team extends Model
     /**
      * Get all of the members that belong to the team.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function members()
     {
@@ -54,7 +58,7 @@ class Team extends Model
     /**
      * Determine if the given member belongs to the team.
      *
-     * @param  \App\Models\User  $member
+     * @param  User  $member
      * @return bool
      */
     public function hasMember($member)
@@ -77,7 +81,7 @@ class Team extends Model
     /**
      * Determine if the given member has the given permission on the team.
      *
-     * @param  \App\Models\User  $member
+     * @param  User  $member
      * @param  string  $permission
      * @return bool
      */
@@ -89,7 +93,7 @@ class Team extends Model
     /**
      * Get all of the pending member invitations for the team.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function invitations()
     {
@@ -99,7 +103,7 @@ class Team extends Model
     /**
      * Remove the given member from the team.
      *
-     * @param  \App\Models\User  $member
+     * @param  User  $member
      * @return void
      */
     public function removeMember($member)

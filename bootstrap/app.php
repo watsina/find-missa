@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Middleware\UserWithTeam;
 use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Middleware\JsonMiddleware;
+use App\Http\Middleware\TeamsPermission;
+use App\Http\Middleware\IsAdminMiddleware;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Http\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -24,14 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->statefulApi()
             ->throttleApi()
-            ->prepend(\App\Http\Middleware\TeamsPermission::class)
+            ->prepend(TeamsPermission::class)
             ->api(['auth.session', 'json'])
             ->redirectUsersTo(AppServiceProvider::HOME)
             ->alias([
-                'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-                'json' => \App\Http\Middleware\JsonMiddleware::class,
-                'admin' => \App\Http\Middleware\IsAdminMiddleware::class,
-                'userWithTeam' => \App\Http\Middleware\UserWithTeam::class,
+                'verified' => EnsureEmailIsVerified::class,
+                'json' => JsonMiddleware::class,
+                'admin' => IsAdminMiddleware::class,
+                'userWithTeam' => UserWithTeam::class,
             ]);
     })
     ->withSchedule(function (Schedule $schedule) {

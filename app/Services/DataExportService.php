@@ -20,7 +20,9 @@ use App\Models\LiturgicalSchedule;
 use App\Models\ActivityTimeException;
 use App\Models\LiturgicalScheduleTime;
 use App\Models\AdorationChapelSchedule;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\AdorationChapelException;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\GlobalActivityTimeException;
 use App\Models\AdorationChapelScheduleDetail;
 
@@ -131,7 +133,7 @@ class DataExportService
      *
      * @param  class-string  $modelClass
      */
-    protected function filterByParentTeam(string $modelClass, int $teamId): \Illuminate\Database\Eloquent\Builder
+    protected function filterByParentTeam(string $modelClass, int $teamId): Builder
     {
         return match ($modelClass) {
             HolidayInstance::class => HolidayInstance::query()
@@ -153,7 +155,7 @@ class DataExportService
      *
      * @return array<string, mixed>
      */
-    protected function transformForExport(\Illuminate\Database\Eloquent\Model $model): array
+    protected function transformForExport(Model $model): array
     {
         $attributes = $model->attributesToArray();
 

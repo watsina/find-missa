@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Holiday;
+use App\Models\HolidayInstance;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\HolidayInstance>
+ * @extends Factory<HolidayInstance>
  */
 class HolidayInstanceFactory extends Factory
 {
