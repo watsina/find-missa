@@ -159,7 +159,7 @@ merge_env_file() {
             else
                 print_info "  Added: $key"
             fi
-            ((added++))
+            added=$((added + 1))
         elif [ "${existing_vars[$key]}" != "${incoming_vars[$key]}" ]; then
             # Changed value - update it
             echo "${key}=${incoming_vars[$key]}" >> "$merged_file"
@@ -169,7 +169,7 @@ merge_env_file() {
             else
                 print_info "  Updated: $key"
             fi
-            ((updated++))
+            updated=$((updated + 1))
         else
             # Same value - keep as-is
             echo "${key}=${existing_vars[$key]}" >> "$merged_file"
@@ -180,7 +180,7 @@ merge_env_file() {
     for key in "${!existing_vars[@]}"; do
         if [ -z "${incoming_vars[$key]+x}" ]; then
             echo "${key}=${existing_vars[$key]}" >> "$merged_file"
-            ((kept++))
+            kept=$((kept + 1))
         fi
     done
 

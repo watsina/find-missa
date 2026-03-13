@@ -13,6 +13,13 @@ COPY ui ./ui
 COPY resources ./resources
 COPY public ./public
 
+# Vite statically replaces import.meta.env.VITE_* at build time.
+# These must be passed via --build-arg during docker build.
+ARG VITE_APP_NAME
+ARG VITE_POSTHOG_ENABLED
+ARG VITE_POSTHOG_KEY
+ARG VITE_POSTHOG_HOST
+
 RUN npm run build
 
 # PHP Dependencies Stage

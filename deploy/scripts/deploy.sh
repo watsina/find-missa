@@ -394,8 +394,21 @@ print_header "Step 1: Building Docker Image"
 cd "$PROJECT_ROOT"
 
 print_info "Building image for linux/amd64 architecture..."
+
+# Collect all VITE_* env vars as --build-arg flags so Vite can
+# inline them into the frontend bundle at build time.
+VITE_BUILD_ARGS=()
+while IFS='=' read -r key value; do
+    VITE_BUILD_ARGS+=(--build-arg "${key}=${value}")
+done < <(env | grep '^VITE_' | sort)
+
+if [ ${#VITE_BUILD_ARGS[@]} -gt 0 ]; then
+    print_info "Passing ${#VITE_BUILD_ARGS[@]} VITE_* build args to Docker"
+fi
+
 docker build \
     --platform linux/amd64 \
+    "${VITE_BUILD_ARGS[@]}" \
     -t "$IMAGE_NAME:$IMAGE_TAG" \
     -t "$IMAGE_NAME:latest" \
     . || {
