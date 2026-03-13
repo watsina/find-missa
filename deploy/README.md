@@ -523,8 +523,21 @@ docker logs -f ${DOMAIN}-blue
 - **SSH Keys:** Use key-based authentication, not passwords
 - **Secrets:** Never commit `.env.deploy.*` files (they're in `.gitignore`)
 - **Firewall:** Only ports 22, 80, 443 should be open
-- **Container User:** Containers run as non-root user (configured via `CONTAINER_USER` in `.env.deploy`)
+- **Container User:** Containers run as non-root user (configured via `CONTAINER_USER` in your `.env.deploy.*` file)
 - **SSL:** Use `--setup-ssl` to enable HTTPS with Let's Encrypt
+
+### Environment File Safety
+
+When you have multiple environments (e.g., staging and production), it is safer to **always use named environment files** (`.env.deploy.staging`, `.env.deploy.production`) and **not create a bare `.env.deploy` file**. This forces you to always specify the target environment explicitly:
+
+```bash
+./deploy/scripts/deploy.sh --env production
+./deploy/scripts/deploy.sh --env staging
+```
+
+Without `--env`, the script looks for `.env.deploy` as the default configuration file. If that file doesn't exist, the script will exit with an error — which is the desired behavior when you want to enforce explicit environment targeting.
+
+**Why this matters:** Named files make it immediately clear which environment each configuration belongs to. Without them, it's tempting to reuse a bare `.env.deploy` by changing the server connection details when you want to deploy to a different environment. If you forget to also change the application secrets (APP_KEY, database credentials, mail passwords, AWS keys, etc.), you'll push production secrets to another environment. Named files eliminate this risk — each environment's secrets stay in their own clearly-labeled file.
 
 ## Architecture Decisions
 

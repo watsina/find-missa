@@ -7,9 +7,12 @@
 # Builds Docker image, transfers to server, and triggers deployment.
 #
 # Usage:
-#   ./deploy/scripts/deploy.sh              # Deploy using .env.deploy
+#   ./deploy/scripts/deploy.sh                  # Deploy using .env.deploy (default)
 #   ./deploy/scripts/deploy.sh --env staging    # Deploy using .env.deploy.staging
 #   ./deploy/scripts/deploy.sh --env production # Deploy using .env.deploy.production
+#
+# When --env is not specified, the script uses .env.deploy as the configuration
+# file. Use --env to target a specific environment (e.g., staging, production).
 #   ./deploy/scripts/deploy.sh --force      # Skip confirmations
 #   ./deploy/scripts/deploy.sh --status     # Check deployment status
 #   ./deploy/scripts/deploy.sh --rollback   # Rollback to previous version
@@ -64,6 +67,7 @@ Usage: ./deploy/scripts/deploy.sh [OPTIONS]
 
 Options:
     --env <name>      Use .env.deploy.<name> configuration file
+                      (without this flag, .env.deploy is used as the default)
                       Examples: --env staging, --env production
     --force           Skip all confirmation prompts
     --status          Check current deployment status on server
@@ -75,22 +79,24 @@ Options:
     --help            Show this help message
 
 Examples:
-    ./deploy/scripts/deploy.sh                    # Deploy only
-    ./deploy/scripts/deploy.sh --setup-ssl        # Deploy + SSL setup
+    ./deploy/scripts/deploy.sh                    # Deploy using .env.deploy (default)
+    ./deploy/scripts/deploy.sh --env production   # Deploy using .env.deploy.production
     ./deploy/scripts/deploy.sh --env staging      # Deploy to staging
+    ./deploy/scripts/deploy.sh --setup-ssl        # Deploy + SSL setup
     ./deploy/scripts/deploy.sh --env staging --setup-ssl  # Deploy to staging + SSL
     ./deploy/scripts/deploy.sh --ssl-only         # SSL only (after prior deploy)
     ./deploy/scripts/deploy.sh --status           # Check status
     ./deploy/scripts/deploy.sh --rollback         # Rollback
 
 Configuration:
-    Copy deploy/config/.env.example to .env.deploy (or .env.deploy.<env>)
-    and configure your deployment settings.
+    Copy deploy/config/.env.example to .env.deploy.<env> (e.g., .env.deploy.production)
+    and configure your deployment settings. If you don't use --env, the script
+    looks for .env.deploy as the default configuration file.
 
 First-time setup:
-    1. Configure .env.deploy with your server details
+    1. Configure .env.deploy.<env> with your server details
     2. Run: ./deploy/scripts/server-init-laravel.sh
-    3. Run: ./deploy/scripts/deploy.sh --setup-ssl
+    3. Run: ./deploy/scripts/deploy.sh --env <env> --setup-ssl
 
 EOF
 }
