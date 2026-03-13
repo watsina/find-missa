@@ -279,6 +279,43 @@ Rollback switches traffic to the previous container slot. This is instant and ze
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Frontend Environment Variables (VITE\_\*)
+
+Vite statically replaces `import.meta.env.VITE_*` references at **build time**, not at runtime. This means:
+
+- `VITE_*` values are baked into the JavaScript bundle during `docker build`
+- Changing a `VITE_*` value requires a **new build and deploy** — restarting the container is not enough
+- Runtime `--env-file` or `-e` flags have no effect on these variables
+
+### How It Works
+
+The deploy script automatically collects all `VITE_*` variables from your `.env.deploy.*` file and passes them as `--build-arg` flags to `docker build`. Each variable must also have a matching `ARG` declaration in the `Dockerfile`.
+
+### Adding a New VITE\_\* Variable
+
+1. **Add the variable to your `.env.deploy.*` file(s):**
+
+   ```bash
+   VITE_MY_NEW_VAR=some-value
+   ```
+
+2. **Add a matching `ARG` to the `Dockerfile`** (in the `frontend-builder` stage, before `RUN npm run build`):
+
+   ```dockerfile
+   ARG VITE_MY_NEW_VAR
+   ```
+
+The deploy script handles the rest — no other changes needed.
+
+### Security: Secrets Must Not Be Used as Build Args
+
+Do **not** put secrets or sensitive values in `VITE_*` variables. Because they are:
+
+1. **Embedded in the JavaScript bundle** — visible to anyone who views your page source
+2. **Stored in Docker image layers** — recoverable via `docker history` or image inspection
+
+If you need a secret available at runtime (e.g., API keys for server-side use), add it to your `.env.deploy.*` file as a regular (non-`VITE_*`) variable. These are passed to the container via `--env-file` at runtime, never baked into the image.
+
 ## Directory Structure
 
 ### Local (Repository)
