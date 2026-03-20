@@ -54,49 +54,57 @@ class AdorationChapel extends BaseModel
      */
     public function isOpenAt(Carbon $dateTime): bool
     {
-        // Check for exceptions first
-        if ($this->hasExceptionOn($dateTime)) {
-            return false;
+        // Check for applicable exception first (overrides regular schedule)
+        $exception = $this->getApplicableException($dateTime);
+
+        if ($exception) {
+            $hours = $exception->getResolvedHours();
+
+            if ($hours['is_closed']) {
+                return false;
+            }
+
+            if ($hours['is_open_24_hours']) {
+                return true;
+            }
+
+            return $this->isTimeWithinHours($dateTime, $hours['opens_at'], $hours['closes_at']);
         }
 
-        // Find an applicable schedule for this date
+        // Fall back to regular schedule
         $schedule = $this->getApplicableSchedule($dateTime);
 
         if (! $schedule) {
             return false;
         }
 
-        // Check if closed on this day pattern
         if ($schedule->is_closed) {
             return false;
         }
 
-        // Get the resolved hours for this specific day (with any day-specific overrides)
         $hours = $schedule->getResolvedHoursForDay($dateTime->dayName);
 
-        // If this specific day is closed, return false
         if ($hours['is_closed']) {
             return false;
         }
 
-        // If open 24 hours, it's open
         if ($hours['is_open_24_hours']) {
             return true;
         }
 
-        // Check if the time falls within opening hours
         return $this->isTimeWithinHours($dateTime, $hours['opens_at'], $hours['closes_at']);
     }
 
     /**
-     * Check if there's an exception on the given date.
+     * Get the applicable exception for a given date (within date range AND matches day pattern).
      */
-    public function hasExceptionOn(Carbon $date): bool
+    public function getApplicableException(Carbon $date): ?AdorationChapelException
     {
         return $this->exceptions()
             ->where('start_date', '<=', $date->toDateString())
             ->where('end_date', '>=', $date->toDateString())
-            ->exists();
+            ->get()
+            ->first(fn (AdorationChapelException $exception) => $exception->occursOn($date));
     }
 
     /**
@@ -105,15 +113,7 @@ class AdorationChapel extends BaseModel
     public function getApplicableSchedule(Carbon $date): ?AdorationChapelSchedule
     {
         return $this->schedules()
-            ->effectiveOn($date)
             ->matchesDayPattern($date)
-            ->orderByRaw('
-                CASE
-                    WHEN effective_from IS NOT NULL AND effective_until IS NOT NULL THEN 1
-                    WHEN effective_from IS NOT NULL OR effective_until IS NOT NULL THEN 2
-                    ELSE 3
-                END
-            ')
             ->first();
     }
 
@@ -124,10 +124,14 @@ class AdorationChapel extends BaseModel
      */
     public function getHoursForDate(Carbon $date): ?array
     {
-        if ($this->hasExceptionOn($date)) {
-            return ['is_closed' => true, 'opens_at' => null, 'closes_at' => null, 'is_open_24_hours' => false];
+        // Check for applicable exception first (overrides regular schedule)
+        $exception = $this->getApplicableException($date);
+
+        if ($exception) {
+            return $exception->getResolvedHours();
         }
 
+        // Fall back to regular schedule
         $schedule = $this->getApplicableSchedule($date);
 
         if (! $schedule) {
@@ -172,15 +176,13 @@ class AdorationChapel extends BaseModel
      */
     public function getFormattedHours(): array
     {
-        $baseSchedules = $this->schedules()
-            ->whereNull('effective_from')
-            ->whereNull('effective_until')
+        $schedules = $this->schedules()
             ->with('dayDetails')
             ->get();
 
         $hours = [];
 
-        foreach ($baseSchedules as $schedule) {
+        foreach ($schedules as $schedule) {
             $hours[] = $schedule->getFormattedSchedule();
         }
 

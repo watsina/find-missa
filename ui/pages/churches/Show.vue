@@ -77,6 +77,7 @@
   const showChapelModal = ref(false);
   const showChapelScheduleModal = ref(false);
   const showChapelExceptionModal = ref(false);
+  const chapelScheduleToEdit = ref(null);
   const chapelExceptionToEdit = ref(null);
 
   const oneTimeHeaders = [
@@ -114,8 +115,9 @@
 
   const chapelExceptionHeaders = [
     { title: 'Reason', value: 'reason' },
-    { title: 'Start Date', value: 'start_date' },
-    { title: 'End Date', value: 'end_date' },
+    { title: 'Dates', value: 'date_range' },
+    { title: 'Pattern', value: 'day_pattern' },
+    { title: 'Hours', value: 'hours' },
     { title: '', value: 'actions' },
   ];
 
@@ -223,6 +225,36 @@
 
   const onChapelUpdated = (chapel) => {
     adorationChapel.value = chapel;
+  };
+
+  const onChapelScheduleCreated = (schedule) => {
+    if (adorationChapel.value) {
+      adorationChapel.value.schedules = [...(adorationChapel.value.schedules || []), schedule];
+    }
+  };
+
+  const onChapelScheduleUpdated = (schedule) => {
+    if (adorationChapel.value) {
+      const index = adorationChapel.value.schedules.findIndex((s) => s.id === schedule.id);
+      if (index !== -1) adorationChapel.value.schedules[index] = schedule;
+    }
+  };
+
+  const deleteChapelSchedule = async (id) => {
+    if (!(await notify.confirm('Delete this chapel schedule?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/churches/${props.churchId}/adoration-chapel/schedules/${id}`)
+      .then(() => {
+        if (adorationChapel.value) {
+          adorationChapel.value.schedules = adorationChapel.value.schedules.filter(
+            (s) => s.id !== id,
+          );
+        }
+        notify.success('Chapel schedule deleted');
+      })
+      .catch(() => notify.error('Failed to delete chapel schedule'))
+      .finally(() => (deletingItem.value = false));
   };
 
   const deleteAdorationChapel = async () => {
@@ -1001,8 +1033,10 @@
                           Hours when the adoration chapel is open.
                         </p>
                       </div>
-                      <PrimaryButton @click="showChapelScheduleModal = true">
-                        Manage Schedules
+                      <PrimaryButton
+                        @click="((chapelScheduleToEdit = null), (showChapelScheduleModal = true))"
+                      >
+                        Add Schedule
                       </PrimaryButton>
                     </div>
 
@@ -1010,60 +1044,64 @@
                       <div
                         v-for="schedule in adorationChapel.schedules"
                         :key="schedule.id"
-                        class="tw:flex tw:items-center tw:gap-3 tw:p-3 tw:bg-gray-50 tw:rounded-lg"
+                        class="tw:flex tw:items-center tw:justify-between tw:p-3 tw:bg-gray-50 tw:rounded-lg"
                       >
-                        <v-chip color="primary" size="small" variant="tonal">
-                          {{ formatChapelPatternLabel(schedule) }}
-                        </v-chip>
-                        <span class="tw:text-sm tw:text-gray-700">
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:flex-1">
+                          <v-chip color="primary" size="small" variant="tonal">
+                            {{ formatChapelPatternLabel(schedule) }}
+                          </v-chip>
+                          <span class="tw:text-sm tw:text-gray-700">
+                            <v-icon
+                              v-if="schedule.is_closed"
+                              class="tw:mr-1"
+                              color="error"
+                              :icon="mdiCancel"
+                              size="x-small"
+                            />
+                            <v-icon
+                              v-else-if="schedule.is_open_24_hours"
+                              class="tw:mr-1"
+                              color="success"
+                              :icon="mdiWeatherSunny"
+                              size="x-small"
+                            />
+                            <v-icon v-else class="tw:mr-1" :icon="mdiClockOutline" size="x-small" />
+                            {{ formatChapelTimeDisplay(schedule) }}
+                          </span>
+                          <v-chip
+                            v-if="schedule.day_details?.length"
+                            color="info"
+                            size="x-small"
+                            variant="tonal"
+                          >
+                            {{ schedule.day_details.length }} variation{{
+                              schedule.day_details.length > 1 ? 's' : ''
+                            }}
+                          </v-chip>
+                        </div>
+                        <div class="tw:flex tw:items-center tw:gap-2">
                           <v-icon
-                            v-if="schedule.is_closed"
-                            class="tw:mr-1"
+                            color="primary"
+                            :icon="mdiPencilOutline"
+                            size="small"
+                            @click="
+                              ((chapelScheduleToEdit = schedule), (showChapelScheduleModal = true))
+                            "
+                          />
+                          <v-icon
+                            v-if="store.user.is_admin"
                             color="error"
-                            :icon="mdiCancel"
-                            size="x-small"
+                            :disabled="deletingItem"
+                            :icon="mdiDeleteOutline"
+                            size="small"
+                            @click="deleteChapelSchedule(schedule.id)"
                           />
-                          <v-icon
-                            v-else-if="schedule.is_open_24_hours"
-                            class="tw:mr-1"
-                            color="success"
-                            :icon="mdiWeatherSunny"
-                            size="x-small"
-                          />
-                          <v-icon v-else class="tw:mr-1" :icon="mdiClockOutline" size="x-small" />
-                          {{ formatChapelTimeDisplay(schedule) }}
-                        </span>
-                        <span
-                          v-if="schedule.effective_from || schedule.effective_until"
-                          class="tw:text-xs tw:text-gray-500"
-                        >
-                          {{
-                            schedule.effective_from
-                              ? useDayjs(schedule.effective_from).format('MMM D, YYYY')
-                              : ''
-                          }}
-                          {{ schedule.effective_from && schedule.effective_until ? '\u2013' : '' }}
-                          {{
-                            schedule.effective_until
-                              ? useDayjs(schedule.effective_until).format('MMM D, YYYY')
-                              : ''
-                          }}
-                        </span>
-                        <v-chip
-                          v-if="schedule.day_details?.length"
-                          color="info"
-                          size="x-small"
-                          variant="tonal"
-                        >
-                          {{ schedule.day_details.length }} variation{{
-                            schedule.day_details.length > 1 ? 's' : ''
-                          }}
-                        </v-chip>
+                        </div>
                       </div>
                     </div>
 
                     <v-alert v-else class="tw:mx-2" color="info" density="compact" variant="tonal">
-                      No schedules configured. Click "Manage Schedules" to add chapel hours.
+                      No schedules configured. Click "Add Schedule" to add chapel hours.
                     </v-alert>
                   </div>
 
@@ -1089,6 +1127,15 @@
                     >
                       <template #item.reason="{ item }">
                         {{ item.reason || '\u2014' }}
+                      </template>
+                      <template #item.date_range="{ item }">
+                        {{ item.start_date }} – {{ item.end_date }}
+                      </template>
+                      <template #item.day_pattern="{ item }">
+                        {{ formatChapelPatternLabel(item) }}
+                      </template>
+                      <template #item.hours="{ item }">
+                        {{ formatChapelTimeDisplay(item) }}
                       </template>
                       <template #item.actions="{ item }">
                         <v-icon
@@ -1175,8 +1222,9 @@
         <AdorationChapelScheduleModal
           v-model:show-modal="showChapelScheduleModal"
           :church-id="churchId"
-          :schedules="adorationChapel?.schedules || []"
-          @updated="onChapelUpdated"
+          :schedule="chapelScheduleToEdit"
+          @created="onChapelScheduleCreated"
+          @updated="onChapelScheduleUpdated"
         />
 
         <AdorationChapelExceptionModal

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\DayPattern;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +21,14 @@ class AdorationChapelExceptionResource extends JsonResource
             'start_date' => $this->start_date?->toDateString(),
             'end_date' => $this->end_date?->toDateString(),
             'reason' => $this->reason,
+            'day_pattern' => $this->day_pattern instanceof DayPattern
+                ? $this->day_pattern->value
+                : $this->day_pattern,
+            'days_of_week' => $this->days_of_week,
+            'opens_at' => $this->opens_at,
+            'closes_at' => $this->closes_at,
+            'is_open_24_hours' => $this->is_open_24_hours,
+            'is_closed' => $this->is_closed,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

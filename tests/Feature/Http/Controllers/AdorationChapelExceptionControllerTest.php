@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Church;
+use App\Enums\DayPattern;
 use App\Models\AdorationChapel;
 
 use function Pest\Laravel\putJson;
@@ -26,6 +27,9 @@ describe('Store Adoration Chapel Exception', function () {
             'reason' => 'Chapel cleaning',
             'start_date' => '2026-04-01',
             'end_date' => '2026-04-03',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
@@ -33,7 +37,9 @@ describe('Store Adoration Chapel Exception', function () {
         $response->assertCreated()
             ->assertJsonPath('data.reason', 'Chapel cleaning')
             ->assertJsonPath('data.start_date', '2026-04-01')
-            ->assertJsonPath('data.end_date', '2026-04-03');
+            ->assertJsonPath('data.end_date', '2026-04-03')
+            ->assertJsonPath('data.day_pattern', DayPattern::Daily->value)
+            ->assertJsonPath('data.is_closed', true);
 
         assertDatabaseHas('adoration_chapel_exceptions', [
             'adoration_chapel_id' => $chapel->id,
@@ -41,7 +47,84 @@ describe('Store Adoration Chapel Exception', function () {
             'reason' => 'Chapel cleaning',
             'start_date' => '2026-04-01',
             'end_date' => '2026-04-03',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
         ]);
+    });
+
+    test('user can create an exception with specific hours', function () {
+        $this->actingAsSuperAdminWithTeam();
+
+        $church = Church::factory()->create();
+        AdorationChapel::factory()->create([
+            'church_id' => $church->id,
+            'team_id' => $church->team_id,
+        ]);
+
+        $data = [
+            'reason' => 'Easter schedule',
+            'start_date' => '2026-04-01',
+            'end_date' => '2026-04-07',
+            'day_pattern' => DayPattern::Daily->value,
+            'opens_at' => '08:00',
+            'closes_at' => '12:00',
+            'is_open_24_hours' => false,
+            'is_closed' => false,
+        ];
+
+        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.opens_at', '08:00')
+            ->assertJsonPath('data.closes_at', '12:00')
+            ->assertJsonPath('data.is_closed', false);
+    });
+
+    test('user can create an exception with 24 hour override', function () {
+        $this->actingAsSuperAdminWithTeam();
+
+        $church = Church::factory()->create();
+        AdorationChapel::factory()->create([
+            'church_id' => $church->id,
+            'team_id' => $church->team_id,
+        ]);
+
+        $data = [
+            'reason' => 'Special vigil',
+            'start_date' => '2026-05-01',
+            'end_date' => '2026-05-01',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_open_24_hours' => true,
+            'is_closed' => false,
+        ];
+
+        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.is_open_24_hours', true);
+    });
+
+    test('user can create an exception with weekday-only pattern', function () {
+        $this->actingAsSuperAdminWithTeam();
+
+        $church = Church::factory()->create();
+        AdorationChapel::factory()->create([
+            'church_id' => $church->id,
+            'team_id' => $church->team_id,
+        ]);
+
+        $data = [
+            'start_date' => '2026-06-01',
+            'end_date' => '2026-06-30',
+            'day_pattern' => DayPattern::Weekdays->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
+        ];
+
+        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.day_pattern', DayPattern::Weekdays->value);
     });
 
     test('user can create an exception without a reason', function () {
@@ -56,6 +139,9 @@ describe('Store Adoration Chapel Exception', function () {
         $data = [
             'start_date' => '2026-05-01',
             'end_date' => '2026-05-01',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
@@ -73,6 +159,9 @@ describe('Store Adoration Chapel Exception', function () {
             'reason' => 'Cleaning',
             'start_date' => '2026-04-01',
             'end_date' => '2026-04-03',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
@@ -93,6 +182,9 @@ describe('Store Adoration Chapel Exception', function () {
             'reason' => 'Cleaning',
             'start_date' => '2026-04-05',
             'end_date' => '2026-04-01',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
@@ -113,12 +205,61 @@ describe('Store Adoration Chapel Exception', function () {
         $data = [
             'reason' => 'Cleaning',
             'end_date' => '2026-04-03',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors('start_date');
+    });
+
+    test('it validates day_pattern is required', function () {
+        $this->actingAsSuperAdminWithTeam();
+
+        $church = Church::factory()->create();
+        AdorationChapel::factory()->create([
+            'church_id' => $church->id,
+            'team_id' => $church->team_id,
+        ]);
+
+        $data = [
+            'start_date' => '2026-04-01',
+            'end_date' => '2026-04-03',
+            'is_closed' => true,
+            'is_open_24_hours' => false,
+        ];
+
+        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('day_pattern');
+    });
+
+    test('it validates opens_at is required when not 24hr and not closed', function () {
+        $this->actingAsSuperAdminWithTeam();
+
+        $church = Church::factory()->create();
+        AdorationChapel::factory()->create([
+            'church_id' => $church->id,
+            'team_id' => $church->team_id,
+        ]);
+
+        $data = [
+            'start_date' => '2026-04-01',
+            'end_date' => '2026-04-03',
+            'day_pattern' => DayPattern::Daily->value,
+            'closes_at' => '17:00',
+            'is_open_24_hours' => false,
+            'is_closed' => false,
+        ];
+
+        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions", $data);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('opens_at');
     });
 });
 
@@ -144,6 +285,9 @@ describe('Update Adoration Chapel Exception', function () {
             'reason' => 'Updated reason',
             'start_date' => '2026-04-05',
             'end_date' => '2026-04-07',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = putJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions/{$exception->id}", $data);
@@ -151,13 +295,15 @@ describe('Update Adoration Chapel Exception', function () {
         $response->assertSuccessful()
             ->assertJsonPath('data.reason', 'Updated reason')
             ->assertJsonPath('data.start_date', '2026-04-05')
-            ->assertJsonPath('data.end_date', '2026-04-07');
+            ->assertJsonPath('data.end_date', '2026-04-07')
+            ->assertJsonPath('data.day_pattern', DayPattern::Daily->value);
 
         assertDatabaseHas('adoration_chapel_exceptions', [
             'id' => $exception->id,
             'reason' => 'Updated reason',
             'start_date' => '2026-04-05',
             'end_date' => '2026-04-07',
+            'day_pattern' => DayPattern::Daily->value,
         ]);
     });
 
@@ -177,6 +323,9 @@ describe('Update Adoration Chapel Exception', function () {
             'reason' => 'Updated reason',
             'start_date' => '2026-04-05',
             'end_date' => '2026-04-07',
+            'day_pattern' => DayPattern::Daily->value,
+            'is_closed' => true,
+            'is_open_24_hours' => false,
         ];
 
         $response = putJson("/api/v1/churches/{$church->id}/adoration-chapel/exceptions/{$otherException->id}", $data);

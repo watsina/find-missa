@@ -99,6 +99,11 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::put('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'update'])->name('churches.adoration-chapel.update');
     Route::delete('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'destroy'])->name('churches.adoration-chapel.destroy');
 
+    // Adoration Chapel Schedules (nested under chapel - individual CRUD)
+    Route::post('churches/{church}/adoration-chapel/schedules', [Controllers\AdorationChapelScheduleController::class, 'store'])->name('churches.adoration-chapel.schedules.store');
+    Route::put('churches/{church}/adoration-chapel/schedules/{schedule}', [Controllers\AdorationChapelScheduleController::class, 'update'])->name('churches.adoration-chapel.schedules.update');
+    Route::delete('churches/{church}/adoration-chapel/schedules/{schedule}', [Controllers\AdorationChapelScheduleController::class, 'destroy'])->name('churches.adoration-chapel.schedules.destroy');
+
     // Adoration Chapel Exceptions (nested under chapel)
     Route::post('churches/{church}/adoration-chapel/exceptions', [Controllers\AdorationChapelExceptionController::class, 'store'])->name('churches.adoration-chapel.exceptions.store');
     Route::put('churches/{church}/adoration-chapel/exceptions/{exception}', [Controllers\AdorationChapelExceptionController::class, 'update'])->name('churches.adoration-chapel.exceptions.update');

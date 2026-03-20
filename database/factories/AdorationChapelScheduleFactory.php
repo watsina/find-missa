@@ -29,8 +29,6 @@ class AdorationChapelScheduleFactory extends Factory
             'closes_at' => '22:00',
             'is_open_24_hours' => false,
             'is_closed' => false,
-            'effective_from' => null,
-            'effective_until' => null,
         ];
     }
 
@@ -124,17 +122,6 @@ class AdorationChapelScheduleFactory extends Factory
             'opens_at' => $opens,
             'closes_at' => $closes,
             'is_open_24_hours' => false,
-        ]);
-    }
-
-    /**
-     * Set effective dates for the schedule.
-     */
-    public function effectiveBetween(?string $from, ?string $until): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'effective_from' => $from,
-            'effective_until' => $until,
         ]);
     }
 }

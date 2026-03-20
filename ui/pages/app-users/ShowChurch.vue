@@ -176,6 +176,15 @@
     return adorationChapel.value.exceptions.filter((e) => !e.end_date || e.end_date >= today);
   });
 
+  const formatExceptionHours = (exception) => {
+    if (exception.is_closed) return 'Closed';
+    if (exception.is_open_24_hours) return 'Open 24 hours';
+    if (exception.opens_at && exception.closes_at) {
+      return `${exception.opens_at} – ${exception.closes_at}`;
+    }
+    return 'Modified hours';
+  };
+
   const fetchChurchDetails = () => {
     if (!props.churchId) return;
     isFetching.value = true;
@@ -385,11 +394,15 @@
                         :key="exception.id"
                         class="tw:text-sm"
                       >
-                        {{
-                          exception.reason
-                            ? `${exception.reason}: ${exception.start_date} - ${exception.end_date}`
-                            : `Closed: ${exception.start_date} - ${exception.end_date}`
-                        }}
+                        <span class="tw:font-medium">
+                          {{ formatExceptionHours(exception) }}
+                        </span>
+                        <span class="tw:text-gray-600">
+                          {{ exception.start_date }} – {{ exception.end_date }}
+                        </span>
+                        <span v-if="exception.reason" class="tw:text-gray-500">
+                          ({{ exception.reason }})
+                        </span>
                       </div>
                     </v-alert>
                   </section>

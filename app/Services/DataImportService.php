@@ -299,6 +299,11 @@ class DataImportService
             $row['scope_id'] = $this->remapScopeId($row['scope_type'], $row['scope_id']);
         }
 
+        // Strip removed columns from old export data
+        if ($tableName === 'adoration_chapel_schedules') {
+            unset($row['effective_from'], $row['effective_until']);
+        }
+
         return $row;
     }
 
