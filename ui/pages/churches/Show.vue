@@ -11,6 +11,9 @@
     mdiCalendarStar,
     mdiPlus,
     mdiCancel,
+    mdiChurch,
+    mdiClockOutline,
+    mdiWeatherSunny,
   } from '@mdi/js';
   import PrimaryButton from '@/components/PrimaryButton.vue';
   import DataTable from '@/components/DataTable.vue';
@@ -22,6 +25,9 @@
   import ScheduleRuleModal from '@/pages/activities/ScheduleRuleModal.vue';
   import LiturgicalScheduleModal from '@/pages/activities/LiturgicalScheduleModal.vue';
   import DayVariationModal from '@/pages/activities/DayVariationModal.vue';
+  import AdorationChapelModal from '@/pages/churches/AdorationChapelModal.vue';
+  import AdorationChapelScheduleModal from '@/pages/churches/AdorationChapelScheduleModal.vue';
+  import AdorationChapelExceptionModal from '@/pages/churches/AdorationChapelExceptionModal.vue';
   import { notify, useDayjs } from '@/utils';
   import useAuthStore from '@/stores/useAuthStore';
 
@@ -65,6 +71,14 @@
   const liturgicalSchedules = ref([]);
   const schedulePeriodsById = ref({});
 
+  // Adoration Chapel data
+  const adorationChapel = ref(null);
+  const adorationChapelLoading = ref(false);
+  const showChapelModal = ref(false);
+  const showChapelScheduleModal = ref(false);
+  const showChapelExceptionModal = ref(false);
+  const chapelExceptionToEdit = ref(null);
+
   const oneTimeHeaders = [
     { title: 'Type', value: 'type' },
     { title: 'Date', value: 'date' },
@@ -98,6 +112,13 @@
     { title: '', value: 'actions' },
   ];
 
+  const chapelExceptionHeaders = [
+    { title: 'Reason', value: 'reason' },
+    { title: 'Start Date', value: 'start_date' },
+    { title: 'End Date', value: 'end_date' },
+    { title: '', value: 'actions' },
+  ];
+
   onMounted(() => {
     fetchChurchDetails();
     fetchSchedules();
@@ -106,6 +127,7 @@
     fetchRules();
     fetchLiturgicalSchedules();
     fetchSchedulePeriods();
+    fetchAdorationChapel();
   });
 
   const fetchChurchDetails = () => {
@@ -176,6 +198,98 @@
           times_count: item.times?.length || 0,
         }));
       });
+  };
+
+  const fetchAdorationChapel = () => {
+    adorationChapelLoading.value = true;
+    http
+      .get(`/api/v1/churches/${props.churchId}/adoration-chapel`)
+      .then(({ data }) => {
+        adorationChapel.value = data?.data;
+      })
+      .catch((error) => {
+        // 404 is expected when no chapel exists
+        if (error?.response?.status !== 404) {
+          notify.error('Something went wrong fetching the adoration chapel.');
+        }
+        adorationChapel.value = null;
+      })
+      .finally(() => (adorationChapelLoading.value = false));
+  };
+
+  const onChapelCreated = (chapel) => {
+    adorationChapel.value = chapel;
+  };
+
+  const onChapelUpdated = (chapel) => {
+    adorationChapel.value = chapel;
+  };
+
+  const deleteAdorationChapel = async () => {
+    if (
+      !(await notify.confirm(
+        'Delete this adoration chapel? This will remove all schedules and exceptions.',
+      ))
+    )
+      return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/churches/${props.churchId}/adoration-chapel`)
+      .then(() => {
+        adorationChapel.value = null;
+        notify.success('Adoration chapel deleted');
+      })
+      .catch(() => notify.error('Failed to delete adoration chapel'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  const onChapelExceptionCreated = (exception) => {
+    if (adorationChapel.value) {
+      adorationChapel.value.exceptions = [...(adorationChapel.value.exceptions || []), exception];
+    }
+  };
+
+  const onChapelExceptionUpdated = (exception) => {
+    if (adorationChapel.value) {
+      const index = adorationChapel.value.exceptions.findIndex((e) => e.id === exception.id);
+      if (index !== -1) adorationChapel.value.exceptions[index] = exception;
+    }
+  };
+
+  const deleteChapelException = async (id) => {
+    if (!(await notify.confirm('Delete this chapel exception?'))) return;
+    deletingItem.value = true;
+    http
+      .delete(`/api/v1/churches/${props.churchId}/adoration-chapel/exceptions/${id}`)
+      .then(() => {
+        if (adorationChapel.value) {
+          adorationChapel.value.exceptions = adorationChapel.value.exceptions.filter(
+            (e) => e.id !== id,
+          );
+        }
+        notify.success('Chapel exception deleted');
+      })
+      .catch(() => notify.error('Failed to delete chapel exception'))
+      .finally(() => (deletingItem.value = false));
+  };
+
+  const formatChapelPatternLabel = (schedule) => {
+    if (schedule?.day_pattern === 'specific' && schedule?.days_of_week?.length > 0) {
+      return `Every ${schedule.days_of_week.join(', ')}`;
+    }
+    if (schedule?.day_pattern === 'weekdays') return 'Every Monday\u2013Friday';
+    if (schedule?.day_pattern === 'daily') return 'Every day';
+    if (schedule?.day_pattern === 'saturday') return 'Every Saturday';
+    if (schedule?.day_pattern === 'sunday') return 'Every Sunday';
+    return schedule?.day_pattern || 'Schedule';
+  };
+
+  const formatChapelTimeDisplay = (schedule) => {
+    if (schedule.is_closed) return 'Closed';
+    if (schedule.is_open_24_hours) return 'Open 24 hours';
+    const open = schedule.opens_at || '\u2014';
+    const close = schedule.closes_at || '\u2014';
+    return `${open} \u2013 ${close}`;
   };
 
   const weekOfMonthLabels = {
@@ -474,7 +588,7 @@
         <!-- Tabs for Schedule Management -->
         <v-col cols="12">
           <v-card variant="flat">
-            <v-tabs v-model="activeTab" bg-color="transparent" color="primary">
+            <v-tabs v-model="activeTab" bg-color="transparent" color="primary" show-arrows>
               <v-tab value="schedules">
                 <v-icon class="tw:mr-2" :icon="mdiCalendarClock" /> Regular Schedules
               </v-tab>
@@ -489,6 +603,9 @@
               </v-tab>
               <v-tab value="rules">
                 <v-icon class="tw:mr-2" :icon="mdiAlertCircleOutline" /> Rules
+              </v-tab>
+              <v-tab value="adoration-chapel">
+                <v-icon class="tw:mr-2" :icon="mdiChurch" /> Adoration Chapel
               </v-tab>
             </v-tabs>
 
@@ -825,6 +942,175 @@
                   </template>
                 </data-table>
               </v-window-item>
+
+              <!-- Adoration Chapel Tab -->
+              <v-window-item value="adoration-chapel">
+                <v-skeleton-loader v-if="adorationChapelLoading" type="card" />
+
+                <!-- No chapel yet -->
+                <div v-else-if="!adorationChapel" class="tw:text-center tw:py-8">
+                  <v-icon class="tw:mb-4" color="grey" :icon="mdiChurch" size="64" />
+                  <p class="tw:text-base tw:text-gray-700 tw:mb-2">
+                    No adoration chapel has been set up for this church.
+                  </p>
+                  <PrimaryButton @click="showChapelModal = true">
+                    Set Up Adoration Chapel
+                  </PrimaryButton>
+                </div>
+
+                <!-- Chapel exists -->
+                <div v-else>
+                  <!-- Chapel Details -->
+                  <div
+                    class="tw:flex tw:justify-between tw:items-start tw:mb-6 tw:px-2 tw:pb-4 tw:border-b"
+                  >
+                    <div>
+                      <h3 class="tw:text-lg tw:font-medium">
+                        {{ adorationChapel.name || 'Adoration Chapel' }}
+                      </h3>
+                      <p v-if="adorationChapel.notes" class="tw:text-sm tw:text-gray-600 tw:mt-1">
+                        {{ adorationChapel.notes }}
+                      </p>
+                    </div>
+                    <div class="tw:flex tw:gap-2">
+                      <v-btn
+                        color="primary"
+                        :icon="mdiPencilOutline"
+                        size="small"
+                        variant="text"
+                        @click="showChapelModal = true"
+                      />
+                      <v-btn
+                        v-if="store.user.is_admin"
+                        color="error"
+                        :disabled="deletingItem"
+                        :icon="mdiDeleteOutline"
+                        size="small"
+                        variant="text"
+                        @click="deleteAdorationChapel"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Schedules Section -->
+                  <div class="tw:mb-6">
+                    <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
+                      <div>
+                        <p class="tw:text-base tw:font-medium tw:text-gray-700">Schedules</p>
+                        <p class="tw:text-sm tw:text-gray-500">
+                          Hours when the adoration chapel is open.
+                        </p>
+                      </div>
+                      <PrimaryButton @click="showChapelScheduleModal = true">
+                        Manage Schedules
+                      </PrimaryButton>
+                    </div>
+
+                    <div v-if="adorationChapel.schedules?.length" class="tw:space-y-2 tw:px-2">
+                      <div
+                        v-for="schedule in adorationChapel.schedules"
+                        :key="schedule.id"
+                        class="tw:flex tw:items-center tw:gap-3 tw:p-3 tw:bg-gray-50 tw:rounded-lg"
+                      >
+                        <v-chip color="primary" size="small" variant="tonal">
+                          {{ formatChapelPatternLabel(schedule) }}
+                        </v-chip>
+                        <span class="tw:text-sm tw:text-gray-700">
+                          <v-icon
+                            v-if="schedule.is_closed"
+                            class="tw:mr-1"
+                            color="error"
+                            :icon="mdiCancel"
+                            size="x-small"
+                          />
+                          <v-icon
+                            v-else-if="schedule.is_open_24_hours"
+                            class="tw:mr-1"
+                            color="success"
+                            :icon="mdiWeatherSunny"
+                            size="x-small"
+                          />
+                          <v-icon v-else class="tw:mr-1" :icon="mdiClockOutline" size="x-small" />
+                          {{ formatChapelTimeDisplay(schedule) }}
+                        </span>
+                        <span
+                          v-if="schedule.effective_from || schedule.effective_until"
+                          class="tw:text-xs tw:text-gray-500"
+                        >
+                          {{
+                            schedule.effective_from
+                              ? useDayjs(schedule.effective_from).format('MMM D, YYYY')
+                              : ''
+                          }}
+                          {{ schedule.effective_from && schedule.effective_until ? '\u2013' : '' }}
+                          {{
+                            schedule.effective_until
+                              ? useDayjs(schedule.effective_until).format('MMM D, YYYY')
+                              : ''
+                          }}
+                        </span>
+                        <v-chip
+                          v-if="schedule.day_details?.length"
+                          color="info"
+                          size="x-small"
+                          variant="tonal"
+                        >
+                          {{ schedule.day_details.length }} variation{{
+                            schedule.day_details.length > 1 ? 's' : ''
+                          }}
+                        </v-chip>
+                      </div>
+                    </div>
+
+                    <v-alert v-else class="tw:mx-2" color="info" density="compact" variant="tonal">
+                      No schedules configured. Click "Manage Schedules" to add chapel hours.
+                    </v-alert>
+                  </div>
+
+                  <!-- Exceptions Section -->
+                  <div>
+                    <div class="tw:flex tw:justify-between tw:mb-4 tw:px-2">
+                      <div>
+                        <p class="tw:text-base tw:font-medium tw:text-gray-700">Exceptions</p>
+                        <p class="tw:text-sm tw:text-gray-500">
+                          Dates when the adoration chapel is closed or has modified hours.
+                        </p>
+                      </div>
+                      <PrimaryButton
+                        @click="((chapelExceptionToEdit = null), (showChapelExceptionModal = true))"
+                      >
+                        Add Exception
+                      </PrimaryButton>
+                    </div>
+                    <data-table
+                      class="tw:capitalize"
+                      :headers="chapelExceptionHeaders"
+                      :items="adorationChapel.exceptions || []"
+                    >
+                      <template #item.reason="{ item }">
+                        {{ item.reason || '\u2014' }}
+                      </template>
+                      <template #item.actions="{ item }">
+                        <v-icon
+                          class="tw:mr-2"
+                          color="primary"
+                          :icon="mdiPencilOutline"
+                          @click="
+                            ((chapelExceptionToEdit = item), (showChapelExceptionModal = true))
+                          "
+                        />
+                        <v-icon
+                          v-if="store.user.is_admin"
+                          color="error"
+                          :disabled="deletingItem"
+                          :icon="mdiDeleteOutline"
+                          @click="deleteChapelException(item.id)"
+                        />
+                      </template>
+                    </data-table>
+                  </div>
+                </div>
+              </v-window-item>
             </v-window>
           </v-card>
         </v-col>
@@ -876,6 +1162,29 @@
           :schedule="variationSchedule"
           :variation="variationToEdit"
           @saved="saveVariation"
+        />
+
+        <AdorationChapelModal
+          v-model:show-modal="showChapelModal"
+          :chapel="adorationChapel"
+          :church-id="churchId"
+          @created="onChapelCreated"
+          @updated="onChapelUpdated"
+        />
+
+        <AdorationChapelScheduleModal
+          v-model:show-modal="showChapelScheduleModal"
+          :church-id="churchId"
+          :schedules="adorationChapel?.schedules || []"
+          @updated="onChapelUpdated"
+        />
+
+        <AdorationChapelExceptionModal
+          v-model:show-modal="showChapelExceptionModal"
+          :church-id="churchId"
+          :exception="chapelExceptionToEdit"
+          @created="onChapelExceptionCreated"
+          @updated="onChapelExceptionUpdated"
         />
       </v-row>
     </v-container>

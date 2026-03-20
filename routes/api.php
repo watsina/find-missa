@@ -99,6 +99,11 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
     Route::put('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'update'])->name('churches.adoration-chapel.update');
     Route::delete('churches/{church}/adoration-chapel', [Controllers\AdorationChapelController::class, 'destroy'])->name('churches.adoration-chapel.destroy');
 
+    // Adoration Chapel Exceptions (nested under chapel)
+    Route::post('churches/{church}/adoration-chapel/exceptions', [Controllers\AdorationChapelExceptionController::class, 'store'])->name('churches.adoration-chapel.exceptions.store');
+    Route::put('churches/{church}/adoration-chapel/exceptions/{exception}', [Controllers\AdorationChapelExceptionController::class, 'update'])->name('churches.adoration-chapel.exceptions.update');
+    Route::delete('churches/{church}/adoration-chapel/exceptions/{exception}', [Controllers\AdorationChapelExceptionController::class, 'destroy'])->name('churches.adoration-chapel.exceptions.destroy');
+
     // ACL - Team-scoped roles (authorization handled in form requests)
     Route::apiResource('roles', Controllers\Acl\RolesController::class)->only('index', 'show', 'store', 'update', 'destroy');
     Route::apiResource('user.roles', Controllers\Acl\UserRolesController::class)->only('index', 'store');
