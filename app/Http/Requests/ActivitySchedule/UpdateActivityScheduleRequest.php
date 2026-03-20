@@ -31,7 +31,7 @@ class UpdateActivityScheduleRequest extends FormRequest
             'type' => ['sometimes', 'required', Rule::enum(ActivityType::class)],
             'activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'start_time' => ['sometimes', 'required', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'end_time' => ['required_if:type,confession,adoration', 'nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['sometimes', 'required', 'string', 'max:100'],
             'day_pattern' => ['sometimes', 'required', Rule::enum(DayPattern::class)],
             'days_of_week' => [
@@ -82,6 +82,7 @@ class UpdateActivityScheduleRequest extends FormRequest
     {
         return [
             'end_time.after' => 'The end time must be after the start time.',
+            'end_time.required_if' => 'The end time is required for confession and adoration schedules.',
             'week_of_month.required_if' => 'Please select which week of the month.',
             'day_of_week.required_if' => 'Please select a day of the week.',
             'days_of_week.required_if' => 'Please select at least one day of the week.',

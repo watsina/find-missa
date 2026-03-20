@@ -99,6 +99,62 @@ test('search v2 does not expose internal IDs in church data', function () {
     expect($churchData)->toHaveKey('hierarchy');
 });
 
+test('search v2 does not include end_time for mass activities', function () {
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'mass',
+        'start_time' => '10:00',
+        'end_time' => '11:00',
+    ]);
+
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => now()->next('Sunday')->toDateString(),
+    ]))->assertOk();
+
+    expect($response->json('data.0.end_time'))->toBeNull();
+    expect($response->json('data.0.start_time'))->toBe('10:00');
+});
+
+test('search v2 includes end_time for adoration activities', function () {
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'adoration',
+        'activity_type_description' => 'adoration',
+        'start_time' => '07:00',
+        'end_time' => '18:00',
+    ]);
+
+    $response = getJson(route('search.v2', [
+        'type' => 'adoration',
+        'date' => now()->next('Sunday')->toDateString(),
+    ]))->assertOk();
+
+    expect($response->json('data.0.end_time'))->toBe('18:00');
+    expect($response->json('data.0.start_time'))->toBe('07:00');
+});
+
+test('search v2 includes end_time for confession activities', function () {
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'confession',
+        'activity_type_description' => 'confession',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+    ]);
+
+    $response = getJson(route('search.v2', [
+        'type' => 'confession',
+        'date' => now()->next('Sunday')->toDateString(),
+    ]))->assertOk();
+
+    expect($response->json('data.0.end_time'))->toBe('10:00');
+    expect($response->json('data.0.start_time'))->toBe('09:00');
+});
+
 test('search v2 returns activities sorted by start time', function () {
     $church = Church::factory()->create();
 
@@ -122,4 +178,99 @@ test('search v2 returns activities sorted by start time', function () {
 
     $startTimes = collect($response->json('data'))->pluck('start_time')->all();
     expect($startTimes)->toBe(['08:00', '12:00', '18:00']);
+});
+
+test('search v2 shows ongoing confession when searching after start_time', function () {
+    $church = Church::factory()->create();
+
+    // Confession from 14:00 - 16:00
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'confession',
+        'activity_type_description' => 'confession',
+        'start_time' => '14:00',
+        'end_time' => '16:00',
+    ]);
+
+    // Search at 15:00 — confession is still ongoing, should appear
+    $response = getJson(route('search.v2', [
+        'type' => 'confession',
+        'date' => now()->next('Sunday')->toDateString(),
+        'start_time' => '15:00',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('14:00');
+    expect($response->json('data.0.end_time'))->toBe('16:00');
+});
+
+test('search v2 shows ongoing adoration when searching after start_time', function () {
+    $church = Church::factory()->create();
+
+    // Adoration from 06:00 - 21:00
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'adoration',
+        'activity_type_description' => 'adoration',
+        'start_time' => '06:00',
+        'end_time' => '21:00',
+    ]);
+
+    // Search at 10:00 — adoration is still ongoing, should appear
+    $response = getJson(route('search.v2', [
+        'type' => 'adoration',
+        'date' => now()->next('Sunday')->toDateString(),
+        'start_time' => '10:00',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('06:00');
+    expect($response->json('data.0.end_time'))->toBe('21:00');
+});
+
+test('search v2 hides confession that ended before search time', function () {
+    $church = Church::factory()->create();
+
+    // Confession from 09:00 - 10:00
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'confession',
+        'activity_type_description' => 'confession',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+    ]);
+
+    // Search at 10:30 — confession already ended, should NOT appear
+    $response = getJson(route('search.v2', [
+        'type' => 'confession',
+        'date' => now()->next('Sunday')->toDateString(),
+        'start_time' => '10:30',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(0);
+});
+
+test('search v2 still filters mass by start_time only', function () {
+    $church = Church::factory()->create();
+
+    // Mass at 08:00 - 09:00
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'mass',
+        'start_time' => '08:00',
+        'end_time' => '09:00',
+    ]);
+
+    // Mass at 10:00
+    ActivitySchedule::factory()->recycle($church)->sunday()->create([
+        'type' => 'mass',
+        'start_time' => '10:00',
+    ]);
+
+    // Search at 08:30 — mass at 08:00 started before search, should NOT appear
+    // Mass at 10:00 starts after, should appear
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => now()->next('Sunday')->toDateString(),
+        'start_time' => '08:30',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('10:00');
 });

@@ -24,7 +24,7 @@ class ComputedActivityResource extends JsonResource
             'church' => $this->when($this->church !== null, fn () => new PublicChurchResource($this->church)),
             'type' => Str::replace('-', ' ', $this->type),
             'start_time' => $this->startTime,
-            'end_time' => $this->endTime,
+            'end_time' => in_array($this->type, ['adoration', 'confession']) ? $this->endTime : null,
             'language' => $this->language,
             'activity_type_description' => $this->activityTypeDescription,
             'date' => $this->date->toDateString(),

@@ -13,6 +13,7 @@
     mdiEmailFast,
     mdiHandsPray,
     mdiHomeCity,
+    mdiInformationOutline,
     mdiOfficeBuildingMarker,
     mdiPhoneClassic,
     mdiTownHall,
@@ -39,6 +40,7 @@
   const schedulePeriods = ref([]);
   const oneTimeActivities = ref(null);
   const liturgicalSchedules = ref([]);
+  const adorationChapel = ref(null);
   const isFetching = ref(false);
   const activeTab = ref('regular');
 
@@ -167,6 +169,13 @@
     () => hasSchedulePeriods.value || hasOneTimeActivities.value || hasLiturgicalSchedules.value,
   );
 
+  // Computed: Active/future adoration chapel exceptions
+  const activeChapelExceptions = computed(() => {
+    if (!adorationChapel.value?.exceptions?.length) return [];
+    const today = new Date().toISOString().slice(0, 10);
+    return adorationChapel.value.exceptions.filter((e) => !e.end_date || e.end_date >= today);
+  });
+
   const fetchChurchDetails = () => {
     if (!props.churchId) return;
     isFetching.value = true;
@@ -178,6 +187,7 @@
         schedulePeriods.value = data?.data?.schedule_periods || [];
         oneTimeActivities.value = data?.data?.one_time_activities || null;
         liturgicalSchedules.value = data?.data?.liturgical_schedules || [];
+        adorationChapel.value = data?.data?.adoration_chapel || null;
       })
       .catch(() => notify.error('Something went wrong fetching the church details.'))
       .finally(() => (isFetching.value = false));
@@ -326,6 +336,63 @@
                     :show-end-time="true"
                     title="Adoration Schedule"
                   />
+
+                  <!-- Adoration Chapel (if this church has one) -->
+                  <section v-if="adorationChapel" aria-label="Adoration Chapel" class="tw:mt-4">
+                    <h3
+                      class="tw:text-base tw:font-semibold tw:mb-2 tw:flex tw:items-center tw:gap-2"
+                    >
+                      <v-icon color="amber-darken-2" :icon="mdiHandsPray" size="small" />
+                      Adoration Chapel
+                    </h3>
+
+                    <!-- Chapel Hours -->
+                    <div
+                      v-if="adorationChapel.formatted_hours?.length"
+                      class="tw:ml-1 tw:space-y-1"
+                    >
+                      <div
+                        v-for="(hour, idx) in adorationChapel.formatted_hours"
+                        :key="idx"
+                        class="tw:flex tw:items-center tw:gap-2"
+                      >
+                        <v-chip color="amber-darken-2" size="small" variant="tonal">
+                          {{ hour.hours }}
+                        </v-chip>
+                        <span class="tw:text-sm tw:text-gray-600">({{ hour.pattern }})</span>
+                      </div>
+                    </div>
+
+                    <!-- Chapel Notes -->
+                    <p
+                      v-if="adorationChapel.notes"
+                      class="tw:text-sm tw:text-gray-600 tw:mt-2 tw:ml-1"
+                    >
+                      {{ adorationChapel.notes }}
+                    </p>
+
+                    <!-- Chapel Exceptions -->
+                    <v-alert
+                      v-if="activeChapelExceptions.length"
+                      class="tw:mt-2"
+                      color="warning"
+                      density="compact"
+                      :icon="mdiInformationOutline"
+                      variant="tonal"
+                    >
+                      <div
+                        v-for="exception in activeChapelExceptions"
+                        :key="exception.id"
+                        class="tw:text-sm"
+                      >
+                        {{
+                          exception.reason
+                            ? `${exception.reason}: ${exception.start_date} - ${exception.end_date}`
+                            : `Closed: ${exception.start_date} - ${exception.end_date}`
+                        }}
+                      </div>
+                    </v-alert>
+                  </section>
                 </v-card-text>
               </v-tabs-window-item>
 

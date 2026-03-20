@@ -30,7 +30,7 @@ class UpdateOneTimeActivityRequest extends FormRequest
             'activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'date' => ['sometimes', 'required', 'date'],
             'start_time' => ['sometimes', 'required', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'end_time' => ['required_if:type,confession,adoration', 'nullable', 'date_format:H:i', 'after:start_time'],
             'language' => ['sometimes', 'required', 'string', 'max:100'],
             'reason' => ['nullable', 'string', 'max:255'],
         ];
@@ -45,6 +45,7 @@ class UpdateOneTimeActivityRequest extends FormRequest
     {
         return [
             'end_time.after' => 'The end time must be after the start time.',
+            'end_time.required_if' => 'The end time is required for confession and adoration activities.',
         ];
     }
 }

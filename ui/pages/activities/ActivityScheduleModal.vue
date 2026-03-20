@@ -98,6 +98,10 @@
     return form.day_pattern === 'monthly-nth';
   });
 
+  const requiresEndTime = computed(() => {
+    return ['confession', 'adoration'].includes(form.type);
+  });
+
   const hasDayVariations = computed(() => {
     return form.has_day_variations;
   });
@@ -355,7 +359,9 @@
             <TimeInput
               v-model="form.end_time"
               :error="form.errors.end_time"
-              label="End Time (Optional)"
+              :label="requiresEndTime ? 'End Time' : 'End Time (Optional)'"
+              :required="requiresEndTime"
+              :rules="requiresEndTime ? [(v) => !!v || 'End time is required'] : []"
             />
           </div>
 

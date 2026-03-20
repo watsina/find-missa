@@ -425,7 +425,15 @@ class ActivityScheduleService
         // Filter by start time if specified
         if ($startTime) {
             $allActivities = $allActivities->filter(
-                fn (ComputedActivity $activity) => $activity->startTime >= $startTime
+                function (ComputedActivity $activity) use ($startTime) {
+                    // For confession and adoration, show activities still ongoing at search time
+                    if (in_array($activity->type, ['confession', 'adoration'], true)) {
+                        return $activity->endTime === null || $activity->endTime > $startTime;
+                    }
+
+                    // For mass and other types, only show activities starting at or after search time
+                    return $activity->startTime >= $startTime;
+                }
             );
         }
 
