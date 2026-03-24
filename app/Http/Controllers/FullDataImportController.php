@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use App\Jobs\ProcessFullDataImport;
+use Illuminate\Support\Facades\Gate;
 use App\Services\ImportStatusService;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\FullDataImportRequest;
@@ -21,6 +22,8 @@ class FullDataImportController extends Controller
      */
     public function __invoke(FullDataImportRequest $request): JsonResponse
     {
+        Gate::authorize('data.import');
+
         $file = $request->file('file');
         $contents = file_get_contents($file->getRealPath());
 

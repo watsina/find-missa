@@ -146,7 +146,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 'user' => $this->withoutRelations(),
                 'current_team' => $this->currentTeam,
                 'all_teams' => $this->allTeams(),
-                'permissions' => $this->getAllPermissions(),
+                'permissions' => $this->getAllPermissions()->pluck('name'),
                 'features' => [
                     // will merge more as the come
                     'fortify' => [

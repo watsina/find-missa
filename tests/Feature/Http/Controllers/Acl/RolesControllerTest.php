@@ -85,7 +85,7 @@ test('user without permission cannot create a role', function () {
     $owner = User::factory()->withTeam()->create();
     $team = $owner->currentTeam;
 
-    // Create a user who is a team member (not owner) without role.write permission
+    // Create a user who is a team member (not owner) without roles.write permission
     $user = User::factory()->create(['current_team_id' => $team->id]);
     $team->members()->attach($user);
 

@@ -18,7 +18,7 @@ class StoreRoleRequest extends FormRequest
 
         return $user->is_admin
             || $user->ownsTeam($team)
-            || $user->hasPermissionTo('role.write');
+            || $user->hasPermissionTo('roles.write');
     }
 
     /**

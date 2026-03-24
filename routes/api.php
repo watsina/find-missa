@@ -24,33 +24,41 @@ Route::middleware(['auth', 'userWithTeam'])
     ->get('permissions/categories', [Controllers\Acl\PermissionsController::class, 'categories'])
     ->name('permissions.categories');
 
-// admin routes
+// Super-admin-only routes (hard abort(403) for non-admins)
 Route::middleware('auth', 'admin')->group(function () {
     Route::delete('clear-data', Controllers\ClearDataController::class)->name('clear-data');
-    // Route::post('import-data', Controllers\ImportDataController::class)->middleware('userWithTeam')->name('import-data');
-    Route::post('import-churches/{diocese}', Controllers\ImportDioceseChurchesController::class)->middleware('userWithTeam')->name('import-churches');
-    Route::post('import-activities/{diocese}', Controllers\ImportActivitesController::class)->middleware('userWithTeam')->name('import-activities');
-    Route::post('export-data', Controllers\ExportDataController::class)->middleware('userWithTeam')->name('export-data');
+    Route::apiResource('users', Controllers\UserController::class)->except('destroy');
 
-    // Full data export/import (JSON format) - Protected by feature flag
+    // ACL - Creating/modifying permission definitions is super-admin-only
+    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('store', 'update');
+});
+
+// Authenticated routes that require a team context and use permission-based authorization
+Route::middleware('auth', 'userWithTeam')->group(function () {
+    // Data import/export (authorized via Gate checks in controllers)
+    Route::post('import-churches/{diocese}', Controllers\ImportDioceseChurchesController::class)->name('import-churches');
+    Route::post('import-activities/{diocese}', Controllers\ImportActivitesController::class)->name('import-activities');
+    Route::post('export-data', Controllers\ExportDataController::class)->name('export-data');
+
+    // Full data export/import (JSON format) - Protected by feature flag + Gate checks
     Route::get('full-export', Controllers\FullDataExportController::class)
-        ->middleware(['userWithTeam', EnsureFeaturesAreActive::class.':'.DataImportExport::class])
+        ->middleware(EnsureFeaturesAreActive::class.':'.DataImportExport::class)
         ->name('full-export');
     Route::post('full-import', Controllers\FullDataImportController::class)
-        ->middleware(['userWithTeam', EnsureFeaturesAreActive::class.':'.DataImportExport::class])
+        ->middleware(EnsureFeaturesAreActive::class.':'.DataImportExport::class)
         ->name('full-import');
     Route::get('import-status/{importId}', Controllers\ImportStatusController::class)
-        ->middleware(['userWithTeam', EnsureFeaturesAreActive::class.':'.DataImportExport::class])
+        ->middleware(EnsureFeaturesAreActive::class.':'.DataImportExport::class)
         ->name('import-status');
 
     Route::apiResource('team.invitations', Controllers\TeamInvitationController::class)->only('index', 'store', 'destroy');
-    Route::apiResource('users', Controllers\UserController::class)->except('destroy');
     Route::apiResource('teams', Controllers\TeamController::class)->except('destroy');
 
-    Route::get('action-logs', Controllers\UserActionLogController::class)->middleware('userWithTeam');
-    // acl - admin only
+    Route::get('action-logs', Controllers\UserActionLogController::class);
+
+    // ACL - Viewing permissions/roles (authorized via Gate checks in controllers)
     Route::get('roles-permissions', Controllers\Acl\GetRolesAndPermissionsController::class);
-    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('index', 'show', 'store', 'update');
+    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('index', 'show');
 });
 
 Route::middleware('auth', 'userWithTeam')->group(function () {

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Exports\DiocesesExport;
 use App\Exports\ParishesExport;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportDataController extends Controller
@@ -18,6 +19,8 @@ class ExportDataController extends Controller
      */
     public function __invoke(Request $request)
     {
+        Gate::authorize('data.export');
+
         $data = $request->validate([
             'type' => 'required|string|in:dioceses,parishes',
         ]);

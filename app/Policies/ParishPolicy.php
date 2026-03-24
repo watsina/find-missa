@@ -12,7 +12,7 @@ class ParishPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('parish.read');
+        return $user->can('parishes.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class ParishPolicy
      */
     public function view(User $user, Parish $parish): bool
     {
-        return $user->can('parish.read');
+        return $user->can('parishes.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class ParishPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('parish.write');
+        return $user->can('parishes.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class ParishPolicy
      */
     public function update(User $user, Parish $parish): bool
     {
-        return $user->can('parish.write');
+        return $user->can('parishes.write');
     }
 
     /**

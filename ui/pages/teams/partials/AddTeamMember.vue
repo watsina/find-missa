@@ -18,7 +18,7 @@
 
   const authStore = useAuthStore();
 
-  const canAddTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
+  const canAddTeamMembers = computed(() => authStore.hasPermission('team-members.write'));
 
   const form = useForm({
     name: '',

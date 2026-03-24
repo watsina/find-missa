@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\DataExportService;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FullDataExportController extends Controller
@@ -15,6 +16,8 @@ class FullDataExportController extends Controller
      */
     public function __invoke(Request $request): StreamedResponse
     {
+        Gate::authorize('data.export');
+
         $teamId = $request->user()->current_team_id;
         $teamName = $request->user()->currentTeam->name ?? 'export';
 

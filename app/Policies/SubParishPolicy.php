@@ -12,7 +12,7 @@ class SubParishPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('subParish.read');
+        return $user->can('sub-parishes.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class SubParishPolicy
      */
     public function view(User $user, SubParish $subParish): bool
     {
-        return $user->can('subParish.read');
+        return $user->can('sub-parishes.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class SubParishPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('subParish.write');
+        return $user->can('sub-parishes.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class SubParishPolicy
      */
     public function update(User $user, SubParish $subParish): bool
     {
-        return $user->can('subParish.write');
+        return $user->can('sub-parishes.write');
     }
 
     /**

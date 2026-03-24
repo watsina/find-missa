@@ -14,8 +14,8 @@
 
   const authStore = useAuthStore();
 
-  const canRemoveTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
-  const canAddTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
+  const canRemoveTeamMembers = computed(() => authStore.hasPermission('team-members.write'));
+  const canAddTeamMembers = computed(() => authStore.hasPermission('team-members.write'));
 
   const removingInvite = ref(false);
 

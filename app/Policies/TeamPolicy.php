@@ -12,7 +12,7 @@ class TeamPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('team.view');
+        return $user->can('teams.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class TeamPolicy
      */
     public function view(User $user, Team $team): bool
     {
-        return $user->can('teams.view');
+        return $user->can('teams.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class TeamPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('teams.create');
+        return $user->can('teams.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
-        return $user->can('teams.manage');
+        return $user->can('teams.write');
     }
 
     /**

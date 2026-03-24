@@ -13,7 +13,7 @@
   const authUser = computed(() => authStore.user);
   const canCreateTeams = computed(() => authStore.hasPermission('teams.write'));
   const hasManyTeams = computed(() => authStore.all_teams.length > 1);
-  const canViewTeam = computed(() => authStore.hasPermission('team.manage'));
+  const canViewTeam = computed(() => authStore.hasPermission('teams.read'));
 
   const switchToTeam = (team) => {
     http

@@ -12,7 +12,7 @@ class DiocesePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('diocese.read');
+        return $user->can('dioceses.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class DiocesePolicy
      */
     public function view(User $user, Diocese $diocese): bool
     {
-        return $user->can('diocese.read');
+        return $user->can('dioceses.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class DiocesePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('diocese.write');
+        return $user->can('dioceses.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class DiocesePolicy
      */
     public function update(User $user, Diocese $diocese): bool
     {
-        return $user->can('diocese.write');
+        return $user->can('dioceses.write');
     }
 
     /**

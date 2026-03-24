@@ -12,7 +12,7 @@ class LiturgicalSchedulePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class LiturgicalSchedulePolicy
      */
     public function view(User $user, LiturgicalSchedule $liturgicalSchedule): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class LiturgicalSchedulePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class LiturgicalSchedulePolicy
      */
     public function update(User $user, LiturgicalSchedule $liturgicalSchedule): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**

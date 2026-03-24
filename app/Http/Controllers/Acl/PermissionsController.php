@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\PermissionCollection;
 
@@ -17,6 +18,8 @@ class PermissionsController extends Controller
      */
     public function index()
     {
+        Gate::authorize('roles.read');
+
         $permissions = Permission::all();
 
         return new PermissionCollection($permissions);
@@ -71,6 +74,8 @@ class PermissionsController extends Controller
      */
     public function show(Permission $permission)
     {
+        Gate::authorize('roles.read');
+
         return new PermissionResource($permission);
     }
 

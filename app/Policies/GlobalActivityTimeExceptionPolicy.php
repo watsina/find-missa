@@ -12,7 +12,7 @@ class GlobalActivityTimeExceptionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->is_admin;
+        return $user->can('global-exceptions.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class GlobalActivityTimeExceptionPolicy
      */
     public function view(User $user, GlobalActivityTimeException $globalActivityTimeException): bool
     {
-        return $user->is_admin;
+        return $user->can('global-exceptions.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class GlobalActivityTimeExceptionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->is_admin;
+        return $user->can('global-exceptions.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class GlobalActivityTimeExceptionPolicy
      */
     public function update(User $user, GlobalActivityTimeException $globalActivityTimeException): bool
     {
-        return $user->is_admin;
+        return $user->can('global-exceptions.write');
     }
 
     /**

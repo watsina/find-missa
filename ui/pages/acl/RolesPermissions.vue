@@ -23,7 +23,7 @@
     () =>
       authUser.value?.is_admin ||
       authUser.value?.owns_current_team ||
-      authUser.value?.permissions?.includes('role.write'),
+      authUser.value?.permissions?.includes('roles.write'),
   );
 
   const canDeleteRoles = computed(

@@ -12,7 +12,7 @@ use function Pest\Laravel\assertDatabaseHas;
 test('it returns all the configured permissions', function () {
     Permission::factory(10)->create();
 
-    $this->actingAsSuperAdmin();
+    $this->actingAsSuperAdminWithTeam();
 
     get(route('permissions.index'))
         ->assertOk()
@@ -22,7 +22,7 @@ test('it returns all the configured permissions', function () {
 test('it returns a permissions details.', function () {
     $permission = Permission::factory()->create(['name' => 'permission']);
 
-    $this->actingAsSuperAdmin();
+    $this->actingAsSuperAdminWithTeam();
 
     get(route('permissions.show', $permission))
         ->assertOk()

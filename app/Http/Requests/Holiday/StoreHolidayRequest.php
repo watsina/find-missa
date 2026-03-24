@@ -14,7 +14,7 @@ class StoreHolidayRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('holiday.write');
+        return $this->user()->can('holidays.write');
     }
 
     /**

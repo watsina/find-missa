@@ -7,17 +7,18 @@ use App\Actions\Teams\CreateTeam;
 use App\Actions\Teams\UpdateTeamName;
 
 test('index behaves as expected', function (): void {
-    $this->actingAsSuperAdmin();
+    $this->actingAsSuperAdminWithTeam();
 
+    // actingAsSuperAdminWithTeam() already creates 1 team for the user
     Team::factory(3)->create();
 
     $this->get('/api/v1/teams')
         ->assertOk()
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount(4, 'data');
 });
 
 test('store works as expected', function () {
-    $this->actingAsSuperAdmin()
+    $this->actingAsSuperAdminWithTeam()
         ->post('/api/v1/teams', [
             'name' => 'Test Team',
             'country' => 'Uganda',
@@ -31,7 +32,7 @@ test('store uses the create team action...', function () {
     $spy = $this->spy(CreateTeam::class);
     $spy->shouldReceive('handle')->andReturn($team);
 
-    $this->actingAsSuperAdmin()
+    $this->actingAsSuperAdminWithTeam()
         ->post('/api/v1/teams', [
             'name' => 'Test Team',
             'country' => 'Uganda',
@@ -41,7 +42,7 @@ test('store uses the create team action...', function () {
 });
 
 test('show behaves as expected', function (): void {
-    $this->actingAsSuperAdmin();
+    $this->actingAsSuperAdminWithTeam();
 
     $team = Team::factory()->create();
 
@@ -51,7 +52,7 @@ test('show behaves as expected', function (): void {
 });
 
 test('update works as expected', function () {
-    $this->actingAsSuperAdmin();
+    $this->actingAsSuperAdminWithTeam();
     $team = Team::factory()->create();
 
     $this->put('/api/v1/teams/'.$team->id, [
@@ -63,7 +64,7 @@ test('udpate uses the update team action...', function () {
     $spy = $this->spy(UpdateTeamName::class);
 
     $team = Team::factory()->create();
-    $this->actingAsSuperAdmin()
+    $this->actingAsSuperAdminWithTeam()
         ->put('/api/v1/teams/'.$team->id, [
             'name' => 'Update Team',
         ]);

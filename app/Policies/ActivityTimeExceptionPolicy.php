@@ -12,7 +12,7 @@ class ActivityTimeExceptionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class ActivityTimeExceptionPolicy
      */
     public function view(User $user, ActivityTimeException $activityTimeException): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class ActivityTimeExceptionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class ActivityTimeExceptionPolicy
      */
     public function update(User $user, ActivityTimeException $activityTimeException): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
