@@ -81,20 +81,15 @@ if [ $# -eq 0 ]; then
     # Database Migration
     # ===========================================================================
     echo "Running database migrations..."
-    if [ "$FRESH_DB" = "true" ]; then
-        echo "WARNING: Running migrate:fresh - all data will be deleted!"
-        php artisan migrate:fresh --force --ansi
-    else
-        php artisan migrate --force --ansi
-    fi
+    php artisan migrate --force --ansi
 
     # ===========================================================================
-    # Database Seeding
+    # ACL Permissions Seeding
     # ===========================================================================
-    if [ "$SEED_DB" = "true" ]; then
-        echo "Running database seeders..."
-        php artisan db:seed --force --ansi
-    fi
+    # Always seed permissions so new ones from config are available immediately.
+    # Uses firstOrCreate internally, so it's safe to run on every deployment.
+    echo "Seeding ACL permissions..."
+    php artisan db:seed --class=AclSeeder --force --ansi
 
     # ===========================================================================
     # Queue Management
