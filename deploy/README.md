@@ -292,6 +292,19 @@ When the container starts (via `docker/start-container`), it automatically runs 
 
 > **Note:** There are no flags for resetting the database or running the full seeder. This is intentional to protect production data. If you need to run additional seeders, exec into the container manually.
 
+### Supervised Processes
+
+After startup commands complete, supervisord manages the following long-running processes:
+
+| Process        | Command                        | Description                                                           |
+| -------------- | ------------------------------ | --------------------------------------------------------------------- |
+| **php**        | PHP-FPM via Nginx              | Serves the Laravel application                                        |
+| **queue**      | `php artisan queue:work`       | Processes queued jobs                                                 |
+| **cron**       | `crond`                        | Runs the Laravel scheduler every minute                               |
+| **nightwatch** | `php artisan nightwatch:agent` | Sends monitoring data to [Nightwatch](https://nightwatch.laravel.com) |
+
+Nightwatch is disabled by default. To enable it, set `NIGHTWATCH_ENABLED=true` and provide a valid `NIGHTWATCH_TOKEN` in your `.env.deploy.*` file. When disabled, the agent process will start but will not collect or send any data.
+
 ## Frontend Environment Variables (VITE\_\*)
 
 Vite statically replaces `import.meta.env.VITE_*` references at **build time**, not at runtime. This means:
