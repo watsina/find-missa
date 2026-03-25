@@ -417,7 +417,6 @@ class ActivityScheduleService
                 $date,
                 $churchName,
                 $district,
-                $startTime
             );
             $allActivities = $allActivities->concat($chapelActivities);
         }
@@ -445,10 +444,12 @@ class ActivityScheduleService
     }
 
     /**
-     * Get open adoration chapels for a date/time.
+     * Get adoration chapels that have a schedule for the given date.
      *
-     * Returns adoration chapels that are open on the given date,
+     * Returns adoration chapels that are not closed on the given date,
      * filtered by optional church name and district criteria.
+     * Time-based filtering (e.g. excluding chapels that have already closed)
+     * is handled by searchActivities().
      *
      * @return Collection<int, ComputedActivity>
      */
@@ -456,7 +457,6 @@ class ActivityScheduleService
         Carbon $date,
         ?string $churchName = null,
         ?string $district = null,
-        ?string $startTime = null,
     ): Collection {
         // Build the query for chapels with their churches
         $query = AdorationChapel::query()
@@ -491,26 +491,16 @@ class ActivityScheduleService
         $chapels = $query->get();
 
         // Convert each open chapel to a ComputedActivity
+        // Time-based filtering is handled by searchActivities() which checks
+        // if the chapel is still open (endTime > startTime) for adoration types.
         return $chapels
-            ->map(function (AdorationChapel $chapel) use ($date, $startTime) {
+            ->map(function (AdorationChapel $chapel) use ($date) {
                 // Get hours for this date
                 $hours = $chapel->getHoursForDate($date);
 
                 // Skip if no schedule or closed
                 if (! $hours || $hours['is_closed']) {
                     return null;
-                }
-
-                // If start_time filter is provided, check if chapel is open at that time
-                if ($startTime && ! $hours['is_open_24_hours']) {
-                    $opensAt = $hours['opens_at'] ?? '00:00';
-                    $closesAt = $hours['closes_at'] ?? '23:59';
-
-                    // Skip if the requested start time is before the chapel opens
-                    // or after it closes
-                    if ($startTime < $opensAt || $startTime >= $closesAt) {
-                        return null;
-                    }
                 }
 
                 return ComputedActivity::fromAdorationChapel(
