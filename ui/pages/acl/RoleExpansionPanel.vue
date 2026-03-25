@@ -27,13 +27,13 @@
 
   const getSelectedCount = (category) => {
     if (!role.value?.permissions) return 0;
-    const rolePermissionIds = role.value.permissions.map((p) => p.id);
-    return category.permissions.filter((p) => rolePermissionIds.includes(p.id)).length;
+    const rolePermissionNames = role.value.permissions.map((p) => p.name);
+    return category.permissions.filter((p) => rolePermissionNames.includes(p.name)).length;
   };
 
-  const hasPermission = (permissionId) => {
+  const hasPermission = (permissionName) => {
     if (!role.value?.permissions) return false;
-    return role.value.permissions.some((p) => p.id === permissionId);
+    return role.value.permissions.some((p) => p.name === permissionName);
   };
 
   const handleEdit = () => {
@@ -113,10 +113,10 @@
             <div class="tw:flex tw:flex-wrap tw:gap-2">
               <v-chip
                 v-for="permission in category.permissions"
-                :key="permission.id"
-                :color="hasPermission(permission.id) ? 'success' : 'grey'"
+                :key="permission.name"
+                :color="hasPermission(permission.name) ? 'success' : 'grey'"
                 size="small"
-                :variant="hasPermission(permission.id) ? 'flat' : 'outlined'"
+                :variant="hasPermission(permission.name) ? 'flat' : 'outlined'"
               >
                 {{ permission.name }}
               </v-chip>

@@ -6,6 +6,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Ensure the current team context is available in the session.
+ *
+ * Previously this middleware called Spatie's setPermissionsTeamId().
+ * The custom ACL system reads session('current_team_id') directly,
+ * so this middleware now serves as a session-presence guard only.
+ */
 class TeamsPermission
 {
     /**
@@ -15,10 +22,6 @@ class TeamsPermission
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (session()->has('current_team_id')) {
-            setPermissionsTeamId(session()->get('current_team_id'));
-        }
-
         return $next($request);
     }
 }

@@ -28,9 +28,6 @@ Route::middleware(['auth', 'userWithTeam'])
 Route::middleware('auth', 'admin')->group(function () {
     Route::delete('clear-data', Controllers\ClearDataController::class)->name('clear-data');
     Route::apiResource('users', Controllers\UserController::class)->except('destroy');
-
-    // ACL - Creating/modifying permission definitions is super-admin-only
-    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('store', 'update');
 });
 
 // Authenticated routes that require a team context and use permission-based authorization
@@ -58,7 +55,7 @@ Route::middleware('auth', 'userWithTeam')->group(function () {
 
     // ACL - Viewing permissions/roles (authorized via Gate checks in controllers)
     Route::get('roles-permissions', Controllers\Acl\GetRolesAndPermissionsController::class);
-    Route::apiResource('permissions', Controllers\Acl\PermissionsController::class)->only('index', 'show');
+    Route::get('permissions', [Controllers\Acl\PermissionsController::class, 'index'])->name('permissions.index');
 });
 
 Route::middleware('auth', 'userWithTeam')->group(function () {

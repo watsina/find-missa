@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Team;
 use App\Models\User;
 use PostHog\PostHog;
+use App\Models\Permission;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Pennant\Feature;
@@ -62,7 +63,21 @@ class AppServiceProvider extends ServiceProvider
             );
         }
 
-        Gate::before(fn (User $user, string $ability) => $user->is_admin ? true : null);
+        Gate::before(function (User $user, string $ability) {
+            // Super admin bypass — always allow
+            if ($user->is_admin) {
+                return true;
+            }
+
+            // Only resolve known permission slugs (from config/acl.php).
+            // Unknown abilities (e.g. policy method names) return null
+            // so Laravel can resolve them through the normal policy chain.
+            if (Permission::exists($ability)) {
+                return $user->hasPermissionTo($ability) ?: null;
+            }
+
+            return null;
+        });
 
         Gate::define('viewPulse', fn (User $user) => $user->is_admin);
 

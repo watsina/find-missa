@@ -8,11 +8,11 @@ use Illuminate\Support\Str;
 use Laravel\Pennant\Feature;
 use Laravel\Fortify\Features;
 use Laravel\Scout\Searchable;
+use App\Models\Concerns\HasRoles;
 use App\Models\Concerns\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use App\Features\DataImportExport;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Traits\HasRoles;
 use App\Models\Concerns\HasProfilePhoto;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Concerns\RecordsUserActions;
@@ -146,7 +146,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 'user' => $this->withoutRelations(),
                 'current_team' => $this->currentTeam,
                 'all_teams' => $this->allTeams(),
-                'permissions' => $this->getAllPermissions()->pluck('name'),
+                'permissions' => $this->getAllPermissions(),
                 'features' => [
                     // will merge more as the come
                     'fortify' => [

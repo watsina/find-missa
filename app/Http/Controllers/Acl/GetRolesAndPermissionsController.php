@@ -19,7 +19,7 @@ class GetRolesAndPermissionsController extends Controller
 
         return response()->json([
             'data' => [
-                'permissions' => Permission::all()->toArray(),
+                'permissions' => Permission::all()->map->toArray()->all(),
                 'roles' => Role::all()->toArray(),
             ],
         ]);

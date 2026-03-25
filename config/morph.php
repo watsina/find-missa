@@ -9,7 +9,7 @@ return [
     'team-invitation' => Models\TeamInvitation::class,
     'team-member' => Models\TeamMember::class,
     'role' => Models\Role::class,
-    'permission' => Models\Permission::class,
+    'role-permission' => Models\RolePermission::class,
     'diocese' => Models\Diocese::class,
     'parish' => Models\Parish::class,
     'subParish' => Models\SubParish::class,

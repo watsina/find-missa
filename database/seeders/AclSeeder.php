@@ -4,16 +4,16 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Support\Facades\DB;
 
 class AclSeeder extends Seeder
 {
     /**
      * Old slug → new slug rename map.
      *
-     * Used to rename existing permission records in-place so that
-     * role→permission pivot assignments are preserved. Each entry
-     * is only applied once (when the old name still exists in the DB).
+     * Used to rename existing permission strings in role_permissions so that
+     * role assignments are preserved. Each entry is only applied once
+     * (when the old name still exists in the DB).
      *
      * @var array<string, string>
      */
@@ -46,53 +46,55 @@ class AclSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * Renames any legacy permission slugs first (preserving role assignments),
-     * then ensures every permission from config exists. Finally clears the
-     * Spatie permission cache so the new names take effect immediately.
+     * Renames any legacy permission slugs in role_permissions, then removes
+     * any role_permissions entries that no longer match a valid config permission.
+     * Finally flushes the application cache to bust User::info() cached payloads.
      */
     public function run(): void
     {
-        $this->renameExistingPermissions();
-
-        foreach (config('acl.permissions') as $permissions) {
-            collect($permissions)->each(function ($permission) {
-                Permission::firstOrCreate(
-                    ['name' => $permission['name']],
-                    ['description' => $permission['description'] ?? null]
-                );
-            });
-        }
-
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->renameLegacyPermissions();
+        $this->pruneInvalidPermissions();
 
         // Flush the application cache to bust User::info() cached payloads
         // which contain permission names and are cached for 5 minutes.
         cache()->flush();
 
-        $this->command->info('Permissions seeded successfully.');
+        $this->command->info('ACL permissions synchronized successfully.');
     }
 
     /**
-     * Rename legacy permission slugs in the database.
-     *
-     * Updates the `name` column directly so the permission's `id` (and
-     * therefore all role_has_permissions pivot rows) stays unchanged.
+     * Rename legacy permission slugs in the role_permissions table.
      */
-    private function renameExistingPermissions(): void
+    private function renameLegacyPermissions(): void
     {
         $renamed = 0;
 
         foreach (self::RENAME_MAP as $oldName => $newName) {
-            $permission = Permission::where('name', $oldName)->first();
+            $count = DB::table('role_permissions')
+                ->where('permission', $oldName)
+                ->update(['permission' => $newName]);
 
-            if ($permission) {
-                $permission->update(['name' => $newName]);
-                $renamed++;
-            }
+            $renamed += $count;
         }
 
         if ($renamed > 0) {
             $this->command->info("Renamed {$renamed} permission(s) to new slug format.");
+        }
+    }
+
+    /**
+     * Remove role_permissions entries for permissions no longer in config.
+     */
+    private function pruneInvalidPermissions(): void
+    {
+        $validNames = Permission::allNames()->all();
+
+        $pruned = DB::table('role_permissions')
+            ->whereNotIn('permission', $validNames)
+            ->delete();
+
+        if ($pruned > 0) {
+            $this->command->info("Removed {$pruned} invalid permission(s) from role_permissions.");
         }
     }
 }

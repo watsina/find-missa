@@ -17,7 +17,9 @@ class UserRolesController extends Controller
     {
         $this->userBelongsToTeam($user);
 
-        return new RoleCollection($user->roles);
+        $roles = $user->roles()->get();
+
+        return new RoleCollection($roles);
     }
 
     /**

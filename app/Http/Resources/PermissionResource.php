@@ -11,15 +11,18 @@ class PermissionResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
+     * Works with RolePermission models (from role->permissions relationship).
+     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
+        // RolePermission model has 'permission' field (the slug string)
+        $name = $this->permission ?? $this->name;
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'display_name' => ucwords(Str::replace('.', ' ', $this->name)),
-            'description' => $this->description,
+            'name' => $name,
+            'display_name' => ucwords(Str::replace('.', ' ', $name)),
         ];
     }
 }

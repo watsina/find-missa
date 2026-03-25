@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\TeamScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,12 +20,17 @@ class TeamMember extends Pivot
         static::addGlobalScope(new TeamScope);
 
         static::deleting(function ($model) {
-            // remove the assigned roles on that team
-            if ($model->team) {
-                setPermissionsTeamId($model->team->id);
-            }
+            // Remove only the roles belonging to this team, not all user roles
+            if ($model->team && $model->user) {
+                $teamRoleIds = Role::where('team_id', $model->team->id)->pluck('id');
 
-            $model->user?->syncRoles([]);
+                DB::table('user_roles')
+                    ->where('user_id', $model->user->id)
+                    ->whereIn('role_id', $teamRoleIds)
+                    ->delete();
+
+                $model->user->flushPermissionCache();
+            }
         });
     }
 

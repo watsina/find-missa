@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\TeamScope;
 use App\Mail\TeamInvitationEmail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,7 +44,10 @@ class TeamInvitation extends Model
 
         $this->team->members()->attach($user);
 
-        $user->roles()->attach($this->role, ['team_id' => $this->team->id]);
+        DB::table('user_roles')->insert([
+            'user_id' => $user->id,
+            'role_id' => $this->role->id,
+        ]);
 
         $this->delete();
 

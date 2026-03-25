@@ -26,9 +26,9 @@ test('invitation can be accepted and user is created and added to the team and g
     assertDatabaseHas('users', $data);
     // team member was added
     expect($team->members()->count())->toEqual(1);
-    // user was assigned the role
-    setPermissionsTeamId($team->id);
-    assertTrue(User::firstWhere('email', $data['email'])->hasRole($role));
+    // user was assigned the role (custom ACL uses user_roles table, no team scoping needed for hasRole)
+    $user = User::firstWhere('email', $data['email']);
+    assertTrue($user->hasRole($role));
     // invite was deleted
     assertDatabaseMissing('team_invitations', $data);
 });

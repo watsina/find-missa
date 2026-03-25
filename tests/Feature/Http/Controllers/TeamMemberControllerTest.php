@@ -29,12 +29,16 @@ test('can show the member details with only the roles they have on that team.', 
 
     $team->members()->attach($user = User::factory()->create());
     $member = TeamMember::firstWhere('user_id', $user->id);
-    $user->roles()->attach(Role::factory(5)->create(), ['team_id' => $team->id]);
 
-    // assign to another team with other roles
+    // Create team-scoped roles and attach to user
+    $teamRoles = Role::factory(5)->forTeam($team)->create();
+    $user->roles()->attach($teamRoles);
+
+    // Assign to another team with other roles
     $anotherTeam = Team::factory()->create();
     $anotherTeam->members()->attach($user);
-    $user->roles()->attach(Role::factory(3)->create(), ['team_id' => $anotherTeam->id]);
+    $otherRoles = Role::factory(3)->forTeam($anotherTeam)->create();
+    $user->roles()->attach($otherRoles);
 
     get('/api/v1/team/'.$team->id.'/members/'.$member->id)
         ->assertOk()
@@ -47,12 +51,14 @@ test('can update a members roles.', function () {
 
     $team->members()->attach($user = User::factory()->create());
     $member = TeamMember::firstWhere('user_id', $user->id);
-    $user->roles()->attach(Role::factory(5)->create(), ['team_id' => $team->id]);
 
-    $roleIds = Role::factory(2)->create()->pluck('id')->toArray();
+    $oldRoles = Role::factory(5)->forTeam($team)->create();
+    $user->roles()->attach($oldRoles);
+
+    $newRoleIds = Role::factory(2)->forTeam($team)->create()->pluck('id')->toArray();
 
     put('/api/v1/team/'.$team->id.'/members/'.$member->id, [
-        'role_ids' => $roleIds,
+        'role_ids' => $newRoleIds,
     ])
         ->assertOk()
         ->assertJsonCount(2, 'data.user.roles');
@@ -64,17 +70,21 @@ test('can remove a team member with only their assigned roles for that team.', f
 
     $team->members()->attach($user = User::factory()->create());
     $member = TeamMember::firstWhere('user_id', $user->id);
-    $user->roles()->attach(Role::factory(5)->create(), ['team_id' => $team->id]);
 
-    // assign to another team with other roles
+    $teamRoles = Role::factory(5)->forTeam($team)->create();
+    $user->roles()->attach($teamRoles);
+
+    // Assign to another team with other roles
     $anotherTeam = Team::factory()->create();
     $anotherTeam->members()->attach($user);
-    $user->roles()->attach(Role::factory(3)->create(), ['team_id' => $anotherTeam->id]);
+    $otherRoles = Role::factory(3)->forTeam($anotherTeam)->create();
+    $user->roles()->attach($otherRoles);
 
     delete('/api/v1/team/'.$team->id.'/members/'.$member->id)
         ->assertNoContent();
 
-    assertCount(0, $user->fresh()->roles);
-    setPermissionsTeamId($anotherTeam);
-    assertCount(3, $user->roles);
+    // The user should have lost their team-scoped roles when removed
+    // Roles for the other team should remain
+    $remainingRoles = $user->fresh()->roles()->withoutGlobalScopes()->get();
+    assertCount(3, $remainingRoles);
 });
