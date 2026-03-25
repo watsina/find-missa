@@ -21,7 +21,7 @@
   const form = useForm({
     name: props.role?.name || '',
     description: props.role?.description || '',
-    permission_ids: props.role?.permissions?.map((p) => p.id) || [],
+    permissions: props.role?.permissions?.map((p) => p.name) || [],
   });
 
   watch(
@@ -30,7 +30,7 @@
       if (newValue?.id) {
         form.name = newValue?.name || '';
         form.description = newValue?.description || '';
-        form.permission_ids = newValue?.permissions?.map((p) => p.id) || [];
+        form.permissions = newValue?.permissions?.map((p) => p.name) || [];
       }
     },
     { deep: true },
@@ -48,23 +48,23 @@
 
   const isCategoryFullySelected = (category) => {
     if (!category.permissions?.length) return false;
-    return category.permissions.every((p) => form.permission_ids.includes(p.id));
+    return category.permissions.every((p) => form.permissions.includes(p.name));
   };
 
   const isCategoryPartiallySelected = (category) => {
     if (!category.permissions?.length) return false;
-    const selected = category.permissions.filter((p) => form.permission_ids.includes(p.id));
+    const selected = category.permissions.filter((p) => form.permissions.includes(p.name));
     return selected.length > 0 && selected.length < category.permissions.length;
   };
 
   const toggleCategoryPermissions = (category) => {
-    const permissionIds = category.permissions.map((p) => p.id);
+    const permissionNames = category.permissions.map((p) => p.name);
 
     if (isCategoryFullySelected(category)) {
-      form.permission_ids = form.permission_ids.filter((id) => !permissionIds.includes(id));
+      form.permissions = form.permissions.filter((name) => !permissionNames.includes(name));
     } else {
-      const newIds = permissionIds.filter((id) => !form.permission_ids.includes(id));
-      form.permission_ids = [...form.permission_ids, ...newIds];
+      const newNames = permissionNames.filter((name) => !form.permissions.includes(name));
+      form.permissions = [...form.permissions, ...newNames];
     }
   };
 
@@ -146,7 +146,7 @@
                       <span class="tw:font-medium">{{ category.label }}</span>
                       <v-chip class="tw:ml-2" size="x-small" variant="tonal">
                         {{
-                          category.permissions.filter((p) => form.permission_ids.includes(p.id))
+                          category.permissions.filter((p) => form.permissions.includes(p.name))
                             .length
                         }}
                         / {{ category.permissions.length }}
@@ -161,15 +161,15 @@
                     <div class="tw:space-y-1">
                       <div
                         v-for="permission in category.permissions"
-                        :key="permission.id"
+                        :key="permission.name"
                         class="tw:flex tw:items-center tw:py-1"
                       >
                         <v-checkbox
-                          v-model="form.permission_ids"
+                          v-model="form.permissions"
                           color="primary"
                           density="compact"
                           hide-details
-                          :value="permission.id"
+                          :value="permission.name"
                         >
                           <template #label>
                             <div>

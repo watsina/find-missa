@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Role;
+use App\Models\Permission;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +19,7 @@ class StoreRoleRequest extends FormRequest
 
         return $user->is_admin
             || $user->ownsTeam($team)
-            || $user->hasPermissionTo('role.write');
+            || $user->can('roles.write');
     }
 
     /**
@@ -38,8 +39,8 @@ class StoreRoleRequest extends FormRequest
                 Rule::unique(Role::class)->where(fn ($query) => $query->where('team_id', $team->id)),
             ],
             'description' => ['nullable', 'string', 'max:255'],
-            'permission_ids' => ['nullable', 'array'],
-            'permission_ids.*' => ['exists:permissions,id'],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => [Rule::in(Permission::allNames()->all())],
         ];
     }
 

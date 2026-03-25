@@ -36,14 +36,6 @@ if [ $# -eq 0 ]; then
         chmod 664 "$SQLITE_DB"
     fi
 
-    # Configure SQLite for production with WAL mode
-    echo "Configuring SQLite for production (WAL mode)..."
-    sqlite3 "$SQLITE_DB" "PRAGMA journal_mode=WAL;"
-    sqlite3 "$SQLITE_DB" "PRAGMA synchronous=NORMAL;"
-    sqlite3 "$SQLITE_DB" "PRAGMA busy_timeout=5000;"
-    sqlite3 "$SQLITE_DB" "PRAGMA cache_size=-20000;"
-    sqlite3 "$SQLITE_DB" "PRAGMA foreign_keys=ON;"
-
     # Ensure WAL files have correct ownership if they exist
     if [ -f "${SQLITE_DB}-wal" ]; then
         chown findMissa:findMissa "${SQLITE_DB}-wal"
@@ -81,20 +73,15 @@ if [ $# -eq 0 ]; then
     # Database Migration
     # ===========================================================================
     echo "Running database migrations..."
-    if [ "$FRESH_DB" = "true" ]; then
-        echo "WARNING: Running migrate:fresh - all data will be deleted!"
-        php artisan migrate:fresh --force --ansi
-    else
-        php artisan migrate --force --ansi
-    fi
+    php artisan migrate --force --ansi
 
     # ===========================================================================
-    # Database Seeding
+    # ACL Permissions Seeding
     # ===========================================================================
-    if [ "$SEED_DB" = "true" ]; then
-        echo "Running database seeders..."
-        php artisan db:seed --force --ansi
-    fi
+    # Always seed permissions so new ones from config are available immediately.
+    # Uses firstOrCreate internally, so it's safe to run on every deployment.
+    echo "Seeding ACL permissions..."
+    php artisan db:seed --class=AclSeeder --force --ansi
 
     # ===========================================================================
     # Queue Management

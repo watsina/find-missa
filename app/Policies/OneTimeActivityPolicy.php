@@ -12,7 +12,7 @@ class OneTimeActivityPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class OneTimeActivityPolicy
      */
     public function view(User $user, OneTimeActivity $oneTimeActivity): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class OneTimeActivityPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class OneTimeActivityPolicy
      */
     public function update(User $user, OneTimeActivity $oneTimeActivity): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**

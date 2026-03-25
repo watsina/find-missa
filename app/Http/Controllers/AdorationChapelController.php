@@ -37,29 +37,10 @@ class AdorationChapelController extends Controller
             abort(422, 'This church already has an adoration chapel.');
         }
 
-        $data = $request->validated();
-        $schedules = $data['schedules'] ?? [];
-        unset($data['schedules']);
-
-        $chapel = DB::transaction(function () use ($church, $data, $schedules) {
-            $chapel = $church->adorationChapel()->create([
-                ...$data,
-                'team_id' => $church->team_id,
-            ]);
-
-            foreach ($schedules as $scheduleData) {
-                $dayDetails = $scheduleData['day_details'] ?? [];
-                unset($scheduleData['day_details']);
-
-                $schedule = $chapel->schedules()->create($scheduleData);
-
-                foreach ($dayDetails as $detail) {
-                    $schedule->dayDetails()->create($detail);
-                }
-            }
-
-            return $chapel;
-        });
+        $chapel = $church->adorationChapel()->create([
+            ...$request->validated(),
+            'team_id' => $church->team_id,
+        ]);
 
         $chapel->load('schedules.dayDetails', 'exceptions');
 
@@ -76,34 +57,7 @@ class AdorationChapelController extends Controller
             abort(404, 'This church does not have an adoration chapel.');
         }
 
-        $data = $request->validated();
-        $schedules = $data['schedules'] ?? null;
-        unset($data['schedules']);
-
-        DB::transaction(function () use ($chapel, $data, $schedules) {
-            $chapel->update($data);
-
-            // Update schedules if provided
-            if ($schedules !== null) {
-                // Delete existing schedules and their day details
-                foreach ($chapel->schedules as $schedule) {
-                    $schedule->dayDetails()->delete();
-                }
-                $chapel->schedules()->delete();
-
-                // Create new schedules
-                foreach ($schedules as $scheduleData) {
-                    $dayDetails = $scheduleData['day_details'] ?? [];
-                    unset($scheduleData['day_details']);
-
-                    $schedule = $chapel->schedules()->create($scheduleData);
-
-                    foreach ($dayDetails as $detail) {
-                        $schedule->dayDetails()->create($detail);
-                    }
-                }
-            }
-        });
+        $chapel->update($request->validated());
 
         $chapel->load('schedules.dayDetails', 'exceptions');
 

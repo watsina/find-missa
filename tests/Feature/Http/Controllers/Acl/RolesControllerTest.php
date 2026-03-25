@@ -7,18 +7,6 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Permission;
 
-beforeEach(function () {
-    // Seed permissions from config
-    foreach (config('acl.permissions') as $permissions) {
-        collect($permissions)->each(function ($permission) {
-            Permission::firstOrCreate(
-                ['name' => $permission['name']],
-                ['description' => $permission['description'] ?? null]
-            );
-        });
-    }
-});
-
 test('admin can get all roles for current team', function () {
     $user = User::factory()->withTeam()->create(['is_super_admin' => true]);
     $team = $user->currentTeam;
@@ -40,7 +28,9 @@ test('admin can get a single role with its permissions', function () {
     $user = User::factory()->withTeam()->create(['is_super_admin' => true]);
     $team = $user->currentTeam;
 
-    $role = Role::factory()->forTeam($team)->has(Permission::factory(3))->create();
+    $role = Role::factory()->forTeam($team)->create();
+    $permissionNames = Permission::allNames()->take(3)->all();
+    $role->syncPermissions($permissionNames);
 
     $this->actingAsUser($user)
         ->get('/api/v1/roles/'.$role->id)
@@ -69,13 +59,13 @@ test('team owner can create a role', function () {
 
 test('team owner can create a role with permissions', function () {
     $user = User::factory()->withTeam()->create();
-    $permissionIds = Permission::take(3)->pluck('id')->toArray();
+    $permissionNames = Permission::allNames()->take(3)->all();
 
     $this->actingAsUser($user)
         ->postJson('/api/v1/roles', [
             'name' => 'content-editor',
             'description' => 'Can edit content',
-            'permission_ids' => $permissionIds,
+            'permissions' => $permissionNames,
         ])
         ->assertCreated()
         ->assertJsonCount(3, 'data.permissions');
@@ -85,7 +75,7 @@ test('user without permission cannot create a role', function () {
     $owner = User::factory()->withTeam()->create();
     $team = $owner->currentTeam;
 
-    // Create a user who is a team member (not owner) without role.write permission
+    // Create a user who is a team member (not owner) without roles.write permission
     $user = User::factory()->create(['current_team_id' => $team->id]);
     $team->members()->attach($user);
 
@@ -140,13 +130,13 @@ test('team owner can update a role', function () {
     $team = $user->currentTeam;
 
     $role = Role::factory()->forTeam($team)->create(['name' => 'old-name']);
-    $permissionIds = Permission::take(4)->pluck('id')->toArray();
+    $permissionNames = Permission::allNames()->take(4)->all();
 
     $this->actingAsUser($user)
         ->put('/api/v1/roles/'.$role->id, [
             'name' => 'new-name',
             'description' => 'Updated description',
-            'permission_ids' => $permissionIds,
+            'permissions' => $permissionNames,
         ])
         ->assertOk()
         ->assertJsonPath('data.name', 'New Name') // Name is title-cased by resource
@@ -159,11 +149,11 @@ test('admin can assign permissions to a role', function () {
     $team = $user->currentTeam;
 
     $role = Role::factory()->forTeam($team)->create();
-    $permissionIds = Permission::factory(4)->create()->pluck('id');
+    $permissionNames = Permission::allNames()->take(4)->all();
 
     $this->actingAsUser($user)
         ->put('/api/v1/roles/'.$role->id, [
-            'permission_ids' => $permissionIds->toArray(),
+            'permissions' => $permissionNames,
         ])
         ->assertOk()
         ->assertJsonCount(4, 'data.permissions');
@@ -173,12 +163,14 @@ test('admin can remove permissions from a role', function () {
     $user = User::factory()->withTeam()->create(['is_super_admin' => true]);
     $team = $user->currentTeam;
 
-    $role = Role::factory()->forTeam($team)->has(Permission::factory(5))->create();
-    $permissionIds = Permission::factory(2)->create()->pluck('id');
+    $role = Role::factory()->forTeam($team)->create();
+    $role->syncPermissions(Permission::allNames()->take(5)->all());
+
+    $newPermissions = Permission::allNames()->take(2)->all();
 
     $this->actingAsUser($user)
         ->put('/api/v1/roles/'.$role->id, [
-            'permission_ids' => $permissionIds->toArray(),
+            'permissions' => $newPermissions,
         ])
         ->assertOk()
         ->assertJsonCount(2, 'data.permissions');
@@ -241,7 +233,7 @@ test('cannot delete role from another team', function () {
 
     $this->actingAsUser($user)
         ->delete('/api/v1/roles/'.$role->id)
-        ->assertForbidden();
+        ->assertNotFound();
 });
 
 test('permissions categories endpoint returns grouped permissions', function () {

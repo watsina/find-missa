@@ -5,52 +5,59 @@ namespace Tests\Feature\Http\Controllers\Acl;
 use App\Models\Permission;
 
 use function Pest\Laravel\get;
-use function Pest\Laravel\put;
-use function Pest\Laravel\post;
-use function Pest\Laravel\assertDatabaseHas;
 
 test('it returns all the configured permissions', function () {
-    Permission::factory(10)->create();
+    $this->actingAsSuperAdminWithTeam();
 
-    $this->actingAsSuperAdmin();
+    $allPermissions = Permission::all();
 
     get(route('permissions.index'))
         ->assertOk()
-        ->assertJsonCount(10, 'data');
+        ->assertJsonCount($allPermissions->count(), 'data');
 });
 
-test('it returns a permissions details.', function () {
-    $permission = Permission::factory()->create(['name' => 'permission']);
+test('each permission has a name and display_name', function () {
+    $this->actingAsSuperAdminWithTeam();
 
-    $this->actingAsSuperAdmin();
-
-    get(route('permissions.show', $permission))
+    get(route('permissions.index'))
         ->assertOk()
-        ->assertJsonFragment(['id' => $permission->id]);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['name', 'description'],
+            ],
+        ]);
 });
 
-test('it creates a permission.', function () {
-    $data = Permission::factory()->raw();
+test('permission categories endpoint returns grouped permissions', function () {
+    $this->actingAsSuperAdminWithTeam();
 
-    $this->actingAsSuperAdmin();
-
-    post(route('permissions.store'), $data)
-        ->assertCreated();
-
-    assertDatabaseHas('permissions', $data);
+    get(route('permissions.categories'))
+        ->assertOk()
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'key',
+                    'label',
+                    'permissions',
+                ],
+            ],
+        ]);
 });
 
-test('it updates a permission.', function () {
-    $this->actingAsSuperAdmin();
-    $permission = Permission::factory()->create();
+test('categories match those defined in config', function () {
+    $this->actingAsSuperAdminWithTeam();
 
-    $data = [
-        'name' => 'new_name',
-        'description' => 'new description',
-    ];
+    $expectedCategories = array_keys(config('acl.permissions'));
 
-    put(route('permissions.update', $permission), $data)
+    $response = get(route('permissions.categories'))
         ->assertOk();
 
-    assertDatabaseHas('permissions', $data);
+    $returnedKeys = collect($response->json('data'))->pluck('key')->all();
+
+    expect($returnedKeys)->toBe($expectedCategories);
+});
+
+test('unauthenticated user cannot access permissions', function () {
+    get(route('permissions.index'))
+        ->assertRedirect();
 });

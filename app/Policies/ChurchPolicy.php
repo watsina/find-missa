@@ -12,7 +12,7 @@ class ChurchPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('church.read');
+        return $user->can('churches.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class ChurchPolicy
      */
     public function view(User $user, Church $church): bool
     {
-        return $user->can('church.read');
+        return $user->can('churches.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class ChurchPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('church.write');
+        return $user->can('churches.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class ChurchPolicy
      */
     public function update(User $user, Church $church): bool
     {
-        return $user->can('church.write');
+        return $user->can('churches.write');
     }
 
     /**

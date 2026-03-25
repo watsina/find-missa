@@ -14,8 +14,8 @@
 
   const authStore = useAuthStore();
   const authUser = computed(() => authStore?.user);
-  const canRemoveTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
-  const canUpdateTeamMembers = computed(() => authStore.hasPermission('team.members.write'));
+  const canRemoveTeamMembers = computed(() => authStore.hasPermission('team-members.write'));
+  const canUpdateTeamMembers = computed(() => authStore.hasPermission('team-members.write'));
 
   const updateRoleForm = useForm({
     role_id: null,

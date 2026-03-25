@@ -408,11 +408,19 @@
               >
                 <div class="tw:flex">
                   <strong class="tw:me-4!">
-                    {{ `${activity?.start_time}` }}
+                    {{
+                      activity?.end_time
+                        ? `${activity?.start_time} - ${activity?.end_time}`
+                        : `${activity?.start_time}`
+                    }}
                   </strong>
                   <div>
                     <strong class="tw:capitalize">
-                      {{ `${activity?.activity_type_description} (${activity?.language})` }}
+                      {{
+                        activity?.language
+                          ? `${activity?.activity_type_description} (${activity?.language})`
+                          : activity?.activity_type_description
+                      }}
                     </strong>
                     <v-chip
                       v-if="activity?.holiday_name"

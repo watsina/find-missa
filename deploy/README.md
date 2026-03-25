@@ -279,6 +279,32 @@ Rollback switches traffic to the previous container slot. This is instant and ze
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Container Startup
+
+When the container starts (via `docker/start-container`), it automatically runs the following in order:
+
+1. **SQLite setup** - Configures WAL mode and permissions for the mounted database file
+2. **Storage directories** - Creates Laravel storage directories and symlinks
+3. **Laravel optimization** - Caches config, events, routes, and views
+4. **Database migrations** - Runs `php artisan migrate --force` to apply any pending migrations
+5. **ACL permissions seeding** - Runs `php artisan db:seed --class=AclSeeder --force` to ensure all permissions from `config/acl.php` are present in the database (uses `firstOrCreate`, safe to run repeatedly)
+6. **Queue restart** - Signals queue workers to restart with fresh application code
+
+> **Note:** There are no flags for resetting the database or running the full seeder. This is intentional to protect production data. If you need to run additional seeders, exec into the container manually.
+
+### Supervised Processes
+
+After startup commands complete, supervisord manages the following long-running processes:
+
+| Process        | Command                        | Description                                                           |
+| -------------- | ------------------------------ | --------------------------------------------------------------------- |
+| **php**        | PHP-FPM via Nginx              | Serves the Laravel application                                        |
+| **queue**      | `php artisan queue:work`       | Processes queued jobs                                                 |
+| **cron**       | `crond`                        | Runs the Laravel scheduler every minute                               |
+| **nightwatch** | `php artisan nightwatch:agent` | Sends monitoring data to [Nightwatch](https://nightwatch.laravel.com) |
+
+Nightwatch is disabled by default. To enable it, set `NIGHTWATCH_ENABLED=true` and provide a valid `NIGHTWATCH_TOKEN` in your `.env.deploy.*` file. When disabled, the agent process will start but will not collect or send any data.
+
 ## Frontend Environment Variables (VITE\_\*)
 
 Vite statically replaces `import.meta.env.VITE_*` references at **build time**, not at runtime. This means:

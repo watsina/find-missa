@@ -30,7 +30,7 @@ describe('Import Status Controller', function () {
             ->assertUnauthorized();
     });
 
-    it('requires admin access', function () {
+    it('requires data.import permission', function () {
         $importId = Str::uuid()->toString();
 
         $this->actingAs($this->regularUser)

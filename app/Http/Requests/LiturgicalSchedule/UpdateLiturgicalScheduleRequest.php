@@ -37,7 +37,24 @@ class UpdateLiturgicalScheduleRequest extends FormRequest
             'times.*.type' => ['required', Rule::enum(ActivityType::class)],
             'times.*.activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'times.*.start_time' => ['required', 'date_format:H:i'],
-            'times.*.end_time' => ['nullable', 'date_format:H:i', 'after:times.*.start_time'],
+            'times.*.end_time' => [
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    // Extract the index from the attribute (e.g., "times.0.end_time" -> 0)
+                    preg_match('/times\.(\d+)\.end_time/', $attribute, $matches);
+                    $index = $matches[1] ?? null;
+
+                    if ($index !== null) {
+                        $type = $this->input("times.{$index}.type");
+
+                        if (in_array($type, ['confession', 'adoration'], true) && empty($value)) {
+                            $fail('The end time is required for confession and adoration activities.');
+                        }
+                    }
+                },
+                'nullable',
+                'date_format:H:i',
+                'after:times.*.start_time',
+            ],
             'times.*.language' => ['required', 'string', 'max:100'],
         ];
     }

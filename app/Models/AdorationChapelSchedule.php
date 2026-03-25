@@ -38,8 +38,6 @@ class AdorationChapelSchedule extends Model
             'closes_at' => Timecast::class,
             'is_open_24_hours' => 'boolean',
             'is_closed' => 'boolean',
-            'effective_from' => 'date:Y-m-d',
-            'effective_until' => 'date:Y-m-d',
         ];
     }
 
@@ -57,38 +55,6 @@ class AdorationChapelSchedule extends Model
     public function dayDetails(): HasMany
     {
         return $this->hasMany(AdorationChapelScheduleDetail::class);
-    }
-
-    /**
-     * Scope a query to only include schedules effective on a given date.
-     */
-    public function scopeEffectiveOn(Builder $query, Carbon|string|null $date = null): void
-    {
-        $date = $date instanceof Carbon ? $date : Carbon::parse($date ?? 'today');
-        $dateString = $date->toDateString();
-
-        $query->where(function (Builder $q) use ($dateString) {
-            $q->where(function (Builder $inner) {
-                $inner->whereNull('effective_from')
-                    ->whereNull('effective_until');
-            })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNotNull('effective_from')
-                        ->whereNull('effective_until')
-                        ->whereDate('effective_from', '<=', $dateString);
-                })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNull('effective_from')
-                        ->whereNotNull('effective_until')
-                        ->whereDate('effective_until', '>=', $dateString);
-                })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNotNull('effective_from')
-                        ->whereNotNull('effective_until')
-                        ->whereDate('effective_from', '<=', $dateString)
-                        ->whereDate('effective_until', '>=', $dateString);
-                });
-        });
     }
 
     /**
@@ -111,28 +77,6 @@ class AdorationChapelSchedule extends Model
                         ->whereJsonContains('days_of_week', $dayOfWeek);
                 });
         });
-    }
-
-    /**
-     * Check if this schedule is currently effective.
-     */
-    public function isEffective(?Carbon $date = null): bool
-    {
-        $date = $date ?? Carbon::today();
-
-        if (is_null($this->effective_from) && is_null($this->effective_until)) {
-            return true;
-        }
-
-        if (! is_null($this->effective_from) && $this->effective_from->gt($date)) {
-            return false;
-        }
-
-        if (! is_null($this->effective_until) && $this->effective_until->lt($date)) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -200,8 +144,6 @@ class AdorationChapelSchedule extends Model
             return [
                 'pattern' => $patternLabel,
                 'hours' => 'Closed',
-                'effective_from' => $this->effective_from?->format('M j, Y'),
-                'effective_until' => $this->effective_until?->format('M j, Y'),
             ];
         }
 
@@ -209,8 +151,6 @@ class AdorationChapelSchedule extends Model
             return [
                 'pattern' => $patternLabel,
                 'hours' => 'Open 24 hours',
-                'effective_from' => $this->effective_from?->format('M j, Y'),
-                'effective_until' => $this->effective_until?->format('M j, Y'),
             ];
         }
 
@@ -225,8 +165,27 @@ class AdorationChapelSchedule extends Model
         return [
             'pattern' => $patternLabel,
             'hours' => $hours,
-            'effective_from' => $this->effective_from?->format('M j, Y'),
-            'effective_until' => $this->effective_until?->format('M j, Y'),
         ];
+    }
+
+    /**
+     * Get the days this schedule covers based on its day pattern.
+     *
+     * @return array<string>
+     */
+    public function getCoveredDays(): array
+    {
+        $dayPattern = $this->day_pattern instanceof DayPattern
+            ? $this->day_pattern
+            : DayPattern::tryFrom($this->day_pattern);
+
+        return match ($dayPattern) {
+            DayPattern::Daily => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            DayPattern::Weekdays => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+            DayPattern::Saturday => ['Saturday'],
+            DayPattern::Sunday => ['Sunday'],
+            DayPattern::Specific => $this->days_of_week ?? [],
+            default => [],
+        };
     }
 }

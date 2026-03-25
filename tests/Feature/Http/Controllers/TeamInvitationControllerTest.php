@@ -3,15 +3,14 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Role;
-use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Mail\TeamInvitationEmail;
 use Illuminate\Support\Facades\Mail;
 
 test('admin can invite a user and email is sent.', function () {
     Mail::fake();
-    $this->actingAsSuperAdmin();
-    $team = Team::factory()->create();
+    $this->actingAsSuperAdminWithTeam();
+    $team = auth()->user()->currentTeam;
     $data = [
         'name' => 'hello user',
         'email' => 'invite@hello.com',
@@ -27,8 +26,9 @@ test('admin can invite a user and email is sent.', function () {
 });
 
 test('admin can delete a user invitation.', function () {
-    $this->actingAsSuperAdmin();
-    $team = Team::factory()->create();
+    Mail::fake();
+    $this->actingAsSuperAdminWithTeam();
+    $team = auth()->user()->currentTeam;
     $data = [
         'name' => 'hello user',
         'email' => 'invite@hello.com',
@@ -43,9 +43,11 @@ test('admin can delete a user invitation.', function () {
 });
 
 test('admin can get user invitations.', function () {
-    $this->actingAsSuperAdmin();
+    Mail::fake();
+    $this->actingAsSuperAdminWithTeam();
+    $team = auth()->user()->currentTeam;
 
-    $team = Team::factory()->has(TeamInvitation::factory()->count(3), 'invitations')->create();
+    TeamInvitation::factory()->count(3)->create(['team_id' => $team->id]);
 
     $this->get('/api/v1/team/'.$team->id.'/invitations/')
         ->assertOk()

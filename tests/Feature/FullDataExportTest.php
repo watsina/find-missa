@@ -30,7 +30,7 @@ describe('Full Data Export Controller', function () {
             ->assertUnauthorized();
     });
 
-    it('requires admin access', function () {
+    it('requires data.export permission', function () {
         $this->actingAs($this->regularUser)
             ->getJson('/api/v1/full-export')
             ->assertForbidden();

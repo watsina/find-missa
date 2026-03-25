@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Team;
+use App\Enums\DayPattern;
 use App\Models\AdorationChapel;
 use App\Models\AdorationChapelException;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -29,6 +30,12 @@ class AdorationChapelExceptionFactory extends Factory
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $startDate->format('Y-m-d'),
             'reason' => $this->faker->optional()->sentence(),
+            'day_pattern' => DayPattern::Daily->value,
+            'days_of_week' => null,
+            'opens_at' => null,
+            'closes_at' => null,
+            'is_open_24_hours' => false,
+            'is_closed' => true,
         ];
     }
 
@@ -61,6 +68,80 @@ class AdorationChapelExceptionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Mark as closed (default behavior).
+     */
+    public function closed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_closed' => true,
+            'is_open_24_hours' => false,
+            'opens_at' => null,
+            'closes_at' => null,
+        ]);
+    }
+
+    /**
+     * Mark as open 24 hours.
+     */
+    public function open24Hours(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_open_24_hours' => true,
+            'is_closed' => false,
+            'opens_at' => null,
+            'closes_at' => null,
+        ]);
+    }
+
+    /**
+     * Set specific opening hours.
+     */
+    public function withHours(string $opens, string $closes): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'opens_at' => $opens,
+            'closes_at' => $closes,
+            'is_open_24_hours' => false,
+            'is_closed' => false,
+        ]);
+    }
+
+    /**
+     * Set the day pattern to daily.
+     */
+    public function daily(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'day_pattern' => DayPattern::Daily->value,
+            'days_of_week' => null,
+        ]);
+    }
+
+    /**
+     * Set the day pattern to weekdays.
+     */
+    public function weekdays(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'day_pattern' => DayPattern::Weekdays->value,
+            'days_of_week' => null,
+        ]);
+    }
+
+    /**
+     * Set the day pattern to specific days.
+     *
+     * @param  array<string>  $days
+     */
+    public function specificDays(array $days): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'day_pattern' => DayPattern::Specific->value,
+            'days_of_week' => $days,
         ]);
     }
 }

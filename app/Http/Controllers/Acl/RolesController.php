@@ -17,11 +17,7 @@ class RolesController extends Controller
      */
     public function index(): RoleCollection
     {
-        $user = request()->user();
-        $team = $user->currentTeam;
-
         $roles = Role::query()
-            ->where('team_id', $team->id)
             ->with('permissions')
             ->paginate(20);
 
@@ -33,18 +29,14 @@ class RolesController extends Controller
      */
     public function store(StoreRoleRequest $request): RoleResource
     {
-        $user = $request->user();
-        $team = $user->currentTeam;
-
         $role = Role::create([
             'name' => $request->validated('name'),
             'description' => $request->validated('description'),
-            'team_id' => $team->id,
-            'guard_name' => 'web',
+            'team_id' => $request->user()->currentTeam->id,
         ]);
 
-        if ($request->validated('permission_ids')) {
-            $role->syncPermissions($request->validated('permission_ids'));
+        if ($request->validated('permissions')) {
+            $role->syncPermissions($request->validated('permissions'));
         }
 
         $role->loadMissing('permissions');
@@ -69,8 +61,8 @@ class RolesController extends Controller
     {
         $role->update($request->safe()->only(['name', 'description']));
 
-        if ($request->has('permission_ids')) {
-            $role->syncPermissions($request->validated('permission_ids') ?? []);
+        if ($request->has('permissions')) {
+            $role->syncPermissions($request->validated('permissions') ?? []);
         }
 
         $role->loadMissing('permissions');

@@ -20,6 +20,7 @@ return [
         'holiday' => 'Holiday',
         'schedulePeriod' => 'Schedule Period',
         'globalException' => 'Global Exceptions',
+        'team' => 'Team',
         'teamMember' => 'Team Member',
         'role' => 'Roles & Permissions',
         'data' => 'Data Import/Export',
@@ -37,55 +38,59 @@ return [
     */
     'permissions' => [
         'diocese' => [
-            ['name' => 'diocese.write', 'description' => 'Create and update diocese(s)'],
-            ['name' => 'diocese.read', 'description' => 'View diocese(s)'],
+            ['name' => 'dioceses.write', 'description' => 'Create and update diocese(s)'],
+            ['name' => 'dioceses.read', 'description' => 'View diocese(s)'],
         ],
         'parish' => [
-            ['name' => 'parish.write', 'description' => 'Create and update parish(es)'],
-            ['name' => 'parish.read', 'description' => 'View parish(es)'],
+            ['name' => 'parishes.write', 'description' => 'Create and update parish(es)'],
+            ['name' => 'parishes.read', 'description' => 'View parish(es)'],
         ],
         'subParish' => [
-            ['name' => 'subParish.write', 'description' => 'Create and update subParish(es)'],
-            ['name' => 'subParish.read', 'description' => 'View subParish(es)'],
+            ['name' => 'sub-parishes.write', 'description' => 'Create and update sub parish(es)'],
+            ['name' => 'sub-parishes.read', 'description' => 'View sub parish(es)'],
         ],
         'church' => [
-            ['name' => 'church.write', 'description' => 'Create and update church(es)'],
-            ['name' => 'church.read', 'description' => 'View church(es)'],
+            ['name' => 'churches.write', 'description' => 'Create and update church(es)'],
+            ['name' => 'churches.read', 'description' => 'View church(es)'],
         ],
         'activityTime' => [
-            ['name' => 'activity-time.write', 'description' => 'Create and update activity time(s)'],
-            ['name' => 'activity-time.read', 'description' => 'View activity time(s)'],
+            ['name' => 'activity-times.write', 'description' => 'Create and update activity time(s)'],
+            ['name' => 'activity-times.read', 'description' => 'View activity time(s)'],
         ],
         'priest' => [
-            ['name' => 'priest.write', 'description' => 'Create and update priest(s)'],
-            ['name' => 'priest.read', 'description' => 'View priest(s)'],
+            ['name' => 'priests.write', 'description' => 'Create and update priest(s)'],
+            ['name' => 'priests.read', 'description' => 'View priest(s)'],
         ],
         'holiday' => [
-            ['name' => 'holiday.write', 'description' => 'Create and update holiday(s)'],
-            ['name' => 'holiday.read', 'description' => 'View holiday(s)'],
+            ['name' => 'holidays.write', 'description' => 'Create and update holiday(s)'],
+            ['name' => 'holidays.read', 'description' => 'View holiday(s)'],
         ],
         'schedulePeriod' => [
-            ['name' => 'schedule-period.write', 'description' => 'Create and update schedule period(s)'],
-            ['name' => 'schedule-period.read', 'description' => 'View schedule period(s)'],
+            ['name' => 'schedule-periods.write', 'description' => 'Create and update schedule period(s)'],
+            ['name' => 'schedule-periods.read', 'description' => 'View schedule period(s)'],
         ],
         'globalException' => [
-            ['name' => 'global-exception.read', 'description' => 'View global activity exceptions'],
-            ['name' => 'global-exception.write', 'description' => 'Create and update global exceptions'],
+            ['name' => 'global-exceptions.read', 'description' => 'View global activity exceptions'],
+            ['name' => 'global-exceptions.write', 'description' => 'Create and update global exceptions'],
+        ],
+        'team' => [
+            ['name' => 'teams.read', 'description' => 'View team(s)'],
+            ['name' => 'teams.write', 'description' => 'Create and update team(s)'],
         ],
         'teamMember' => [
-            ['name' => 'team-member.read', 'description' => 'View team member(s)'],
-            ['name' => 'team-member.write', 'description' => 'Invite and update team member(s)'],
+            ['name' => 'team-members.read', 'description' => 'View team member(s)'],
+            ['name' => 'team-members.write', 'description' => 'Invite and update team member(s)'],
         ],
         'role' => [
-            ['name' => 'role.read', 'description' => 'View roles and permissions'],
-            ['name' => 'role.write', 'description' => 'Create and update roles'],
+            ['name' => 'roles.read', 'description' => 'View roles and permissions'],
+            ['name' => 'roles.write', 'description' => 'Create and update roles'],
         ],
         'data' => [
             ['name' => 'data.import', 'description' => 'Import data from files'],
             ['name' => 'data.export', 'description' => 'Export data to files'],
         ],
         'actionLog' => [
-            ['name' => 'action-log.read', 'description' => 'View user action logs'],
+            ['name' => 'action-logs.read', 'description' => 'View user action logs'],
         ],
     ],
 

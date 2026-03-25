@@ -30,7 +30,9 @@ class TeamMemberController extends Controller
     {
         Gate::authorize('view', $member);
 
-        $member->loadMissing('user.roles');
+        $member->loadMissing(['user' => function ($query) {
+            $query->with('roles');
+        }]);
 
         return new TeamMemberResource($member);
     }
@@ -55,7 +57,9 @@ class TeamMemberController extends Controller
 
         $member->user->syncRoles($data['role_ids']);
 
-        $member->loadMissing('user.roles');
+        $member->load(['user' => function ($query) {
+            $query->with('roles');
+        }]);
 
         return new TeamMemberResource($member);
     }

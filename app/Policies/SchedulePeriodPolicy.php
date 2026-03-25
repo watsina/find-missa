@@ -12,7 +12,7 @@ class SchedulePeriodPolicy
      */
     public function viewAny(User $user): bool
     {
-        return (bool) $user->can('schedule-period.read');
+        return (bool) $user->can('schedule-periods.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class SchedulePeriodPolicy
      */
     public function view(User $user, SchedulePeriod $schedulePeriod): bool
     {
-        if (! $user->can('schedule-period.read')) {
+        if (! $user->can('schedule-periods.read')) {
             return false;
         }
 
@@ -38,7 +38,7 @@ class SchedulePeriodPolicy
      */
     public function create(User $user): bool
     {
-        return (bool) $user->can('schedule-period.write');
+        return (bool) $user->can('schedule-periods.write');
     }
 
     /**
@@ -51,7 +51,7 @@ class SchedulePeriodPolicy
             return (bool) $user->is_super_admin;
         }
 
-        return (bool) $user->can('schedule-period.write');
+        return (bool) $user->can('schedule-periods.write');
     }
 
     /**
@@ -64,7 +64,7 @@ class SchedulePeriodPolicy
             return (bool) $user->is_super_admin;
         }
 
-        return (bool) $user->can('schedule-period.write');
+        return (bool) $user->can('schedule-periods.write');
     }
 
     /**

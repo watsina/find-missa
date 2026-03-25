@@ -12,7 +12,7 @@ class HolidayPolicy
      */
     public function viewAny(User $user): bool
     {
-        return (bool) $user->can('holiday.read');
+        return (bool) $user->can('holidays.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class HolidayPolicy
      */
     public function view(User $user, Holiday $holiday): bool
     {
-        return (bool) $user->can('holiday.read');
+        return (bool) $user->can('holidays.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class HolidayPolicy
      */
     public function create(User $user): bool
     {
-        return (bool) $user->can('holiday.write');
+        return (bool) $user->can('holidays.write');
     }
 
     /**
@@ -41,7 +41,7 @@ class HolidayPolicy
             return (bool) $user->is_super_admin;
         }
 
-        return (bool) $user->can('holiday.write');
+        return (bool) $user->can('holidays.write');
     }
 
     /**
@@ -55,7 +55,7 @@ class HolidayPolicy
         }
 
         // Team-specific holidays can be deleted by users with holiday.write permission
-        return (bool) $user->can('holiday.write');
+        return (bool) $user->can('holidays.write');
     }
 
     /**

@@ -9,13 +9,16 @@ use App\Enums\DayPattern;
 use App\Models\ScheduleRule;
 use App\Enums\ScheduleAction;
 use Illuminate\Support\Carbon;
+use App\Models\AdorationChapel;
 use App\Models\HolidayInstance;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
 use App\Models\ScheduleOverride;
 use App\Models\LiturgicalSchedule;
 use App\Enums\ScheduleRuleCondition;
+use App\Models\AdorationChapelSchedule;
 use App\Services\ActivityScheduleService;
+use App\DataTransferObjects\ComputedActivity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -673,7 +676,7 @@ it('searches activities across churches', function () {
     expect($laterMasses->first()->startTime)->toBe('09:00');
 });
 
-it('searches activities case-insensitively', function () {
+it('searches activities case-insensitively', function (string $filterType, string $filterValue) {
     $church = Church::factory()->create([
         'team_id' => $this->team->id,
         'name' => 'Christ The King',
@@ -688,40 +691,22 @@ it('searches activities case-insensitively', function () {
         'type' => 'mass',
     ]);
 
-    $date = Carbon::parse('2025-01-06');
+    $params = [$filterType => $filterValue];
 
-    // Search with lowercase church name
     $results = $this->service->searchActivities(
-        $date,
+        Carbon::parse('2025-01-06'),
         ['mass'],
-        churchName: 'christ the king',
+        churchName: $params['churchName'] ?? null,
+        district: $params['district'] ?? null,
     );
-    expect($results)->toHaveCount(1);
 
-    // Search with uppercase church name
-    $results = $this->service->searchActivities(
-        $date,
-        ['mass'],
-        churchName: 'CHRIST THE KING',
-    );
     expect($results)->toHaveCount(1);
-
-    // Search with lowercase district
-    $results = $this->service->searchActivities(
-        $date,
-        ['mass'],
-        district: 'kampala',
-    );
-    expect($results)->toHaveCount(1);
-
-    // Search with mixed case district
-    $results = $this->service->searchActivities(
-        $date,
-        ['mass'],
-        district: 'KAMPALA CITY',
-    );
-    expect($results)->toHaveCount(1);
-});
+})->with([
+    'lowercase church name' => ['churchName', 'christ the king'],
+    'uppercase church name' => ['churchName', 'CHRIST THE KING'],
+    'lowercase district' => ['district', 'kampala'],
+    'uppercase city' => ['district', 'KAMPALA CITY'],
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -803,3 +788,71 @@ it('returns holiday info for a date', function () {
     expect($normalInfo['is_public_holiday'])->toBeFalse();
     expect($normalInfo['holidays'])->toBeEmpty();
 });
+
+/*
+|--------------------------------------------------------------------------
+| Adoration Chapel Search Tests
+|--------------------------------------------------------------------------
+*/
+
+it('includes adoration chapels in search results', function (bool $is24Hours, ?string $startTime) {
+    $chapel = AdorationChapel::factory()->create([
+        'church_id' => $this->church->id,
+        'team_id' => $this->team->id,
+    ]);
+
+    if ($is24Hours) {
+        AdorationChapelSchedule::factory()->daily()->open24Hours()->create([
+            'adoration_chapel_id' => $chapel->id,
+        ]);
+    } else {
+        AdorationChapelSchedule::factory()->daily()->hours('06:00', '21:00')->create([
+            'adoration_chapel_id' => $chapel->id,
+        ]);
+    }
+
+    $results = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['adoration'],
+        startTime: $startTime,
+    );
+
+    expect($results)->toHaveCount(1);
+    expect($results->first()->source)->toBe(ComputedActivity::SOURCE_ADORATION_CHAPEL);
+})->with([
+    'before opening hours' => [false, '04:00'],
+    'during opening hours' => [false, '10:00'],
+    'without start time filter' => [false, null],
+    '24-hour chapel at late hour' => [true, '23:00'],
+    '24-hour chapel without start time' => [true, null],
+]);
+
+it('excludes adoration chapels from search results', function (bool $isClosed, ?string $startTime) {
+    $chapel = AdorationChapel::factory()->create([
+        'church_id' => $this->church->id,
+        'team_id' => $this->team->id,
+    ]);
+
+    if ($isClosed) {
+        AdorationChapelSchedule::factory()->daily()->closed()->create([
+            'adoration_chapel_id' => $chapel->id,
+        ]);
+    } else {
+        AdorationChapelSchedule::factory()->daily()->hours('06:00', '21:00')->create([
+            'adoration_chapel_id' => $chapel->id,
+        ]);
+    }
+
+    $results = $this->service->searchActivities(
+        Carbon::parse('2025-01-06'),
+        ['adoration'],
+        startTime: $startTime,
+    );
+
+    expect($results)->toHaveCount(0);
+})->with([
+    'chapel already closed' => [false, '21:00'],
+    'chapel past closing time' => [false, '22:00'],
+    'closed schedule without start time' => [true, null],
+    'closed schedule with start time' => [true, '10:00'],
+]);

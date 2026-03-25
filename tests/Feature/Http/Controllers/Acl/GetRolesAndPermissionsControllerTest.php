@@ -6,12 +6,12 @@ use App\Models\Role;
 use App\Models\Permission;
 
 test('it returns all roles and permissions.', function () {
-    Role::factory(2)->create();
-    Permission::factory(3)->create();
+    $user = $this->actingAsSuperAdminWithTeam();
 
-    $this->actingAsSuperAdmin()
-        ->get('/api/v1/roles-permissions')
+    Role::factory(2)->create(['team_id' => session('current_team_id')]);
+
+    $this->get('/api/v1/roles-permissions')
         ->assertOk()
-        ->assertJsonCount(3, 'data.permissions')
+        ->assertJsonCount(Permission::all()->count(), 'data.permissions')
         ->assertJsonCount(2, 'data.roles');
 });

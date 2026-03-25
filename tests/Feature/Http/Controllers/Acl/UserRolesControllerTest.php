@@ -18,7 +18,10 @@ test('can get roles of user in the team', function () {
     $this->actingAsSuperAdminWithTeam();
 
     $team = Team::find(session('current_team_id'));
-    $user = User::factory()->hasAttached($team)->hasAttached(Role::factory(3), ['team_id' => $team->id])->create();
+    $user = User::factory()
+        ->hasAttached($team)
+        ->hasAttached(Role::factory(3)->forTeam($team))
+        ->create();
 
     $this->get('/api/v1/user/'.$user->id.'/roles')
         ->assertOk()
@@ -32,7 +35,9 @@ test('can not get roles user has in a different team.', function () {
     $user = User::factory()->hasAttached($team)->create();
     $otherTeam = Team::factory()->create();
     $otherTeam->members()->attach($user);
-    $user->roles()->attach(Role::factory(3)->create(), ['team_id' => $otherTeam->id]);
+
+    $otherRoles = Role::factory(3)->forTeam($otherTeam)->create();
+    $user->roles()->attach($otherRoles);
 
     $this->get('/api/v1/user/'.$user->id.'/roles')
         ->assertOk()
@@ -44,7 +49,7 @@ test('admin can assign roles to a user.', function () {
 
     $team = Team::find(session('current_team_id'));
     $user = User::factory()->hasAttached($team)->create();
-    $roleIds = Role::factory(3)->create()->pluck('id');
+    $roleIds = Role::factory(3)->forTeam($team)->create()->pluck('id');
 
     $this->post('/api/v1/user/'.$user->id.'/roles', [
         'role_ids' => $roleIds->toArray(),
@@ -59,8 +64,11 @@ test('admin can remove users roles.', function () {
     $this->actingAsSuperAdminWithTeam();
 
     $team = Team::find(session('current_team_id'));
-    $user = User::factory()->hasAttached($team)->hasAttached(Role::factory(5), ['team_id' => $team->id])->create();
-    $roleIds = Role::factory(2)->create()->pluck('id');
+    $user = User::factory()
+        ->hasAttached($team)
+        ->hasAttached(Role::factory(5)->forTeam($team))
+        ->create();
+    $roleIds = Role::factory(2)->forTeam($team)->create()->pluck('id');
 
     $this->post('/api/v1/user/'.$user->id.'/roles', [
         'role_ids' => $roleIds->toArray(),

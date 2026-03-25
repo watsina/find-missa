@@ -26,8 +26,6 @@ class AdorationChapelScheduleResource extends JsonResource
             'closes_at' => $this->closes_at,
             'is_open_24_hours' => $this->is_open_24_hours,
             'is_closed' => $this->is_closed,
-            'effective_from' => $this->effective_from?->toDateString(),
-            'effective_until' => $this->effective_until?->toDateString(),
             'day_details' => AdorationChapelScheduleDetailResource::collection($this->whenLoaded('dayDetails')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

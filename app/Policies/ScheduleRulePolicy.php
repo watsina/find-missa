@@ -12,7 +12,7 @@ class ScheduleRulePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -20,7 +20,7 @@ class ScheduleRulePolicy
      */
     public function view(User $user, ScheduleRule $scheduleRule): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -28,7 +28,7 @@ class ScheduleRulePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
@@ -36,7 +36,7 @@ class ScheduleRulePolicy
      */
     public function update(User $user, ScheduleRule $scheduleRule): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**

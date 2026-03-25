@@ -40,7 +40,7 @@ describe('Full Data Import Controller', function () {
             ->assertUnauthorized();
     });
 
-    it('requires admin access', function () {
+    it('requires data.import permission', function () {
         $file = UploadedFile::fake()->create('data.json', 100);
 
         $this->actingAs($this->regularUser)

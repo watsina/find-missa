@@ -66,6 +66,7 @@ test('user can create a specific days activity schedule', function () {
         'type' => 'confession',
         'activity_type_description' => 'confession',
         'start_time' => '17:00',
+        'end_time' => '18:00',
         'language' => 'English',
         'day_pattern' => DayPattern::Specific->value,
         'days_of_week' => ['Tuesday', 'Thursday'],
@@ -123,5 +124,71 @@ test('user can delete an activity schedule', function () {
 
     assertDatabaseMissing('activity_schedules', [
         'id' => $schedule->id,
+    ]);
+})->group('activity-schedules');
+
+test('creating a confession schedule without end_time returns validation error', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'type' => 'confession',
+        'activity_type_description' => 'confession',
+        'start_time' => '14:00',
+        'language' => 'English',
+        'day_pattern' => DayPattern::Daily->value,
+    ];
+
+    $response = postJson('/api/v1/activity-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['end_time']);
+})->group('activity-schedules');
+
+test('creating an adoration schedule without end_time returns validation error', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'type' => 'adoration',
+        'activity_type_description' => 'adoration',
+        'start_time' => '09:00',
+        'language' => 'English',
+        'day_pattern' => DayPattern::Daily->value,
+    ];
+
+    $response = postJson('/api/v1/activity-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['end_time']);
+})->group('activity-schedules');
+
+test('creating a mass schedule without end_time succeeds', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'type' => 'mass',
+        'activity_type_description' => 'mass',
+        'start_time' => '10:00',
+        'language' => 'English',
+        'day_pattern' => DayPattern::Daily->value,
+    ];
+
+    $response = postJson('/api/v1/activity-schedules', $data);
+
+    $response->assertCreated();
+
+    assertDatabaseHas('activity_schedules', [
+        'church_id' => $church->id,
+        'type' => 'mass',
+        'start_time' => '10:00',
+        'end_time' => null,
     ]);
 })->group('activity-schedules');

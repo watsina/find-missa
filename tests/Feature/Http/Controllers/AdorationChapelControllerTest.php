@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Church;
-use App\Enums\DayPattern;
 use App\Models\AdorationChapel;
 
 use function Pest\Laravel\getJson;
@@ -61,20 +60,6 @@ describe('Store Adoration Chapel', function () {
         $data = [
             'name' => 'Perpetual Adoration Chapel',
             'notes' => 'Bring your own rosary',
-            'schedules' => [
-                [
-                    'day_pattern' => DayPattern::Weekdays->value,
-                    'opens_at' => '06:00',
-                    'closes_at' => '22:00',
-                    'is_open_24_hours' => false,
-                    'is_closed' => false,
-                ],
-                [
-                    'day_pattern' => DayPattern::Sunday->value,
-                    'is_open_24_hours' => true,
-                    'is_closed' => false,
-                ],
-            ],
         ];
 
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel", $data);
@@ -86,16 +71,6 @@ describe('Store Adoration Chapel', function () {
             'church_id' => $church->id,
             'team_id' => $church->team_id,
             'name' => 'Perpetual Adoration Chapel',
-        ]);
-
-        assertDatabaseHas('adoration_chapel_schedules', [
-            'day_pattern' => DayPattern::Weekdays->value,
-            'opens_at' => '06:00',
-        ]);
-
-        assertDatabaseHas('adoration_chapel_schedules', [
-            'day_pattern' => DayPattern::Sunday->value,
-            'is_open_24_hours' => true,
         ]);
     });
 
@@ -115,53 +90,6 @@ describe('Store Adoration Chapel', function () {
         $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel", $data);
 
         $response->assertUnprocessable();
-    });
-
-    test('user can create chapel with day details', function () {
-        $this->actingAsSuperAdminWithTeam();
-
-        $church = Church::factory()->create();
-
-        $data = [
-            'name' => 'Chapel with Variations',
-            'schedules' => [
-                [
-                    'day_pattern' => DayPattern::Weekdays->value,
-                    'opens_at' => '06:00',
-                    'closes_at' => '20:00',
-                    'is_open_24_hours' => false,
-                    'is_closed' => false,
-                    'day_details' => [
-                        [
-                            'day_of_week' => 'Monday',
-                            'opens_at' => '07:00',
-                            'closes_at' => '18:00',
-                            'is_open_24_hours' => false,
-                            'is_closed' => false,
-                        ],
-                        [
-                            'day_of_week' => 'Friday',
-                            'is_open_24_hours' => true,
-                            'is_closed' => false,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $response = postJson("/api/v1/churches/{$church->id}/adoration-chapel", $data);
-
-        $response->assertCreated();
-
-        assertDatabaseHas('adoration_chapel_schedule_details', [
-            'day_of_week' => 'Monday',
-            'opens_at' => '07:00',
-        ]);
-
-        assertDatabaseHas('adoration_chapel_schedule_details', [
-            'day_of_week' => 'Friday',
-            'is_open_24_hours' => true,
-        ]);
     });
 });
 
@@ -190,51 +118,6 @@ describe('Update Adoration Chapel', function () {
             'id' => $chapel->id,
             'name' => 'New Chapel Name',
             'notes' => 'Updated notes',
-        ]);
-    });
-
-    test('user can update schedules when updating chapel', function () {
-        $this->actingAsSuperAdminWithTeam();
-
-        $church = Church::factory()->create();
-        $chapel = AdorationChapel::factory()->create([
-            'church_id' => $church->id,
-            'team_id' => $church->team_id,
-        ]);
-
-        // Create existing schedule
-        $oldSchedule = AdorationChapelSchedule::factory()->daily()->create([
-            'adoration_chapel_id' => $chapel->id,
-            'opens_at' => '08:00',
-        ]);
-
-        $data = [
-            'name' => $chapel->name,
-            'schedules' => [
-                [
-                    'day_pattern' => DayPattern::Daily->value,
-                    'opens_at' => '06:00',
-                    'closes_at' => '23:00',
-                    'is_open_24_hours' => false,
-                    'is_closed' => false,
-                ],
-            ],
-        ];
-
-        $response = putJson("/api/v1/churches/{$church->id}/adoration-chapel", $data);
-
-        $response->assertSuccessful();
-
-        // Old schedule should be deleted
-        assertDatabaseMissing('adoration_chapel_schedules', [
-            'id' => $oldSchedule->id,
-        ]);
-
-        // New schedule should exist
-        assertDatabaseHas('adoration_chapel_schedules', [
-            'adoration_chapel_id' => $chapel->id,
-            'opens_at' => '06:00',
-            'closes_at' => '23:00',
         ]);
     });
 

@@ -13,7 +13,7 @@ class AdorationChapelPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -21,7 +21,7 @@ class AdorationChapelPolicy
      */
     public function view(User $user, ?AdorationChapel $adorationChapel, Church $church): bool
     {
-        return $user->can('activity-time.read');
+        return $user->can('activity-times.read');
     }
 
     /**
@@ -29,7 +29,7 @@ class AdorationChapelPolicy
      */
     public function create(User $user, Church $church): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**
@@ -37,7 +37,7 @@ class AdorationChapelPolicy
      */
     public function update(User $user, ?AdorationChapel $adorationChapel, Church $church): bool
     {
-        return $user->can('activity-time.write');
+        return $user->can('activity-times.write');
     }
 
     /**

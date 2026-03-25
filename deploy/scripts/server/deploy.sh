@@ -305,8 +305,6 @@ docker run -d \
     -v "${SQLITE_FILE}:/var/www/html/database/database.sqlite:rw" \
     -v "${DATA_PATH}/storage:/var/www/html/storage:rw" \
     --env-file "$ENV_FILE" \
-    -e "FRESH_DB=${FRESH_DB:-false}" \
-    -e "SEED_DB=${SEED_DB:-false}" \
     "${IMAGE_NAME}:${IMAGE_TAG}" || {
     print_error "Failed to start container"
     exit 1

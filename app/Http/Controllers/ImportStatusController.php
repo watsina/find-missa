@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 use App\Services\ImportStatusService;
 
 class ImportStatusController extends Controller
@@ -15,6 +16,8 @@ class ImportStatusController extends Controller
      */
     public function __invoke(Request $request, string $importId): JsonResponse
     {
+        Gate::authorize('data.import');
+
         $status = $this->statusService->getStatus($importId);
 
         if (! $status) {
