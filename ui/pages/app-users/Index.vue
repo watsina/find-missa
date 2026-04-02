@@ -246,7 +246,7 @@
         <v-col cols="12">
           <v-alert
             class="contribution-alert"
-            color="primary"
+            color="info"
             :icon="mdiHandHeart"
             prominent
             variant="tonal"
@@ -261,7 +261,7 @@
             <v-btn
               :append-icon="mdiArrowRight"
               :block="smAndDown"
-              color="primary"
+              color="info"
               href="https://forms.gle/kGiX1A36dW3is1BJA"
               rel="noopener"
               :size="smAndDown ? 'small' : 'default'"
