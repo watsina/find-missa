@@ -182,6 +182,45 @@ it('computes last sunday in month correctly', function () {
     expect($date->toDateString())->toBe('2025-11-30');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Special Computed Holiday Tests (Sunday in Octave of Christmas)
+|--------------------------------------------------------------------------
+*/
+
+it('computes holy family as sunday within octave of christmas', function (int $year, string $expectedDate) {
+    $holiday = Holiday::factory()->computed(['special' => 'sunday_in_octave_of_christmas'])->create([
+        'name' => 'Holy Family',
+    ]);
+
+    $date = $this->service->computeHolidayDate($holiday, $year);
+
+    expect($date->toDateString())->toBe($expectedDate);
+})->with([
+    // Christmas on Thursday → next Sunday is Dec 28
+    '2025 (Christmas Thu)' => [2025, '2025-12-28'],
+    // Christmas on Sunday → Holy Family on Dec 30 (Friday)
+    '2022 (Christmas Sun)' => [2022, '2022-12-30'],
+    // Christmas on Wednesday → next Sunday is Dec 29
+    '2024 (Christmas Wed)' => [2024, '2024-12-29'],
+    // Christmas on Friday → next Sunday is Dec 27
+    '2026 (Christmas Fri)' => [2026, '2026-12-27'],
+    // Christmas on Monday → next Sunday is Dec 31
+    '2023 (Christmas Mon)' => [2023, '2023-12-31'],
+    // Christmas on Saturday → next Sunday is Dec 26
+    '2027 (Christmas Sat)' => [2027, '2027-12-26'],
+    // Christmas on Tuesday → next Sunday is Dec 30
+    '2029 (Christmas Tue)' => [2029, '2029-12-30'],
+]);
+
+it('throws exception for unknown special computation rule', function () {
+    $holiday = Holiday::factory()->computed(['special' => 'unknown_rule'])->create([
+        'name' => 'Unknown Holiday',
+    ]);
+
+    $this->service->computeHolidayDate($holiday, 2025);
+})->throws(\InvalidArgumentException::class, 'Unknown special computation rule');
+
 it('throws exception for computed holiday without valid rule', function () {
     $holiday = Holiday::factory()->create([
         'type' => HolidayType::Computed,

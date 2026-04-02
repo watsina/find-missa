@@ -280,12 +280,13 @@ class HolidaySeeder extends Seeder
             [
                 'name' => 'Holy Family',
                 'slug' => 'holy-family',
-                'type' => HolidayType::Fixed->value,
-                'fixed_month' => 12,
-                'fixed_day' => 30, // Sunday after Christmas, simplified to Dec 30
+                'type' => HolidayType::Computed->value,
+                'fixed_month' => null,
+                'fixed_day' => null,
+                'computation_rule' => ['special' => 'sunday_in_octave_of_christmas'],
                 'is_holy_day_of_obligation' => false,
                 'is_universal' => true,
-                'is_moveable' => true, // Actually the Sunday after Christmas
+                'is_moveable' => true,
                 'liturgical_color' => 'white',
                 'team_id' => null,
             ],
