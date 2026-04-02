@@ -54,6 +54,11 @@ class ActivityScheduleController extends Controller
                 if ($request->has('day_pattern')) {
                     $query->where('day_pattern', $request->input('day_pattern'));
                 }
+
+                // Filter by day of week (matches all patterns that occur on this day, excludes monthly-nth)
+                if ($request->has('matches_day')) {
+                    $query->matchesDayOfWeek($request->input('matches_day'));
+                }
             })
             ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
 

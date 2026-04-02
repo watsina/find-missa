@@ -8,7 +8,7 @@
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import SelectInput from '@/components/SelectInput.vue';
   import TimeInput from '@/components/TimeInput.vue';
-  import { mdiPlus, mdiDeleteOutline } from '@mdi/js';
+  import { mdiPlus, mdiDeleteOutline, mdiImport } from '@mdi/js';
 
   const props = defineProps({
     liturgicalSchedule: { type: Object, default: null },
@@ -76,6 +76,84 @@
   const removeTimeEntry = (index) => {
     form.times.splice(index, 1);
   };
+
+  const daysOfWeek = [
+    { title: 'Sunday', value: 'Sunday' },
+    { title: 'Monday', value: 'Monday' },
+    { title: 'Tuesday', value: 'Tuesday' },
+    { title: 'Wednesday', value: 'Wednesday' },
+    { title: 'Thursday', value: 'Thursday' },
+    { title: 'Friday', value: 'Friday' },
+    { title: 'Saturday', value: 'Saturday' },
+  ];
+
+  const importDay = ref(null);
+  const importingSchedules = ref(false);
+
+  /**
+   * Resolve the values for a specific day from an activity schedule,
+   * taking day_details variations into account.
+   */
+  function resolveScheduleForDay(schedule, dayName) {
+    const normalizedDay = dayName.toLowerCase();
+    const dayDetail = (schedule.day_details || []).find(
+      (d) => d.day_of_week?.toLowerCase() === normalizedDay,
+    );
+
+    return {
+      type: schedule.type || 'mass',
+      activity_type_description:
+        dayDetail?.activity_type_description || schedule.activity_type_description || schedule.type,
+      start_time: dayDetail?.start_time || schedule.start_time || '',
+      end_time: dayDetail?.end_time || schedule.end_time || '',
+      language: dayDetail?.language || schedule.language || 'English',
+      is_skipped: dayDetail?.is_skipped || false,
+    };
+  }
+
+  function importFromRegularSchedule() {
+    if (!importDay.value || !props.church?.id) return;
+
+    importingSchedules.value = true;
+
+    http
+      .get('/api/v1/activity-schedules', {
+        params: {
+          church_id: props.church.id,
+          matches_day: importDay.value,
+          itemsPerPage: 100,
+        },
+      })
+      .then(({ data }) => {
+        const schedules = data.data || [];
+
+        if (schedules.length === 0) {
+          notify.warning(`No regular schedules found for ${importDay.value}.`);
+          return;
+        }
+
+        const importedTimes = schedules
+          .map((schedule) => resolveScheduleForDay(schedule, importDay.value))
+          .filter((entry) => !entry.is_skipped)
+          .map(({ is_skipped, ...rest }) => rest)
+          .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+        if (importedTimes.length === 0) {
+          notify.warning(`All ${importDay.value} schedules are skipped.`);
+          return;
+        }
+
+        form.times = importedTimes;
+        notify.success(`Imported ${importedTimes.length} schedule(s) from ${importDay.value}.`);
+      })
+      .catch((error) => {
+        console.error('Failed to import schedules:', error);
+        notify.error('Failed to import regular schedules.');
+      })
+      .finally(() => {
+        importingSchedules.value = false;
+      });
+  }
 
   function fetchHolidays() {
     loadingHolidays.value = true;
@@ -232,6 +310,38 @@
               When checked, regular schedules for this day will be replaced by this liturgical
               schedule.
             </div>
+          </div>
+
+          <!-- Import from Regular Schedule -->
+          <v-divider class="tw:my-6" />
+          <div class="tw:text-sm tw:font-medium tw:text-gray-700 tw:mb-2">
+            Import from Regular Schedule
+          </div>
+          <div class="tw:text-xs tw:text-gray-500 tw:mb-3">
+            Pre-fill times by importing the church's regular schedule for a specific day of the
+            week. This will replace any existing times below.
+          </div>
+          <div class="tw:flex tw:items-center tw:gap-3">
+            <v-select
+              v-model="importDay"
+              class="tw:max-w-[200px]"
+              density="compact"
+              hide-details
+              :items="daysOfWeek"
+              label="Day of Week"
+              variant="outlined"
+            />
+            <v-btn
+              color="primary"
+              :disabled="!importDay || importingSchedules"
+              :loading="importingSchedules"
+              :prepend-icon="mdiImport"
+              size="small"
+              variant="tonal"
+              @click="importFromRegularSchedule"
+            >
+              Import
+            </v-btn>
           </div>
 
           <!-- Times Section -->
