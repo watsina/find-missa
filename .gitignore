@@ -32,3 +32,4 @@ yarn-error.log
 .env.deploy.*
 deploy/*.tar.gz
 /tmp/*.tar.gz
+/.opencode/plans

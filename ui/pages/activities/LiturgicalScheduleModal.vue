@@ -77,21 +77,22 @@
     form.times.splice(index, 1);
   };
 
-  async function fetchHolidays() {
+  function fetchHolidays() {
     loadingHolidays.value = true;
-    try {
-      const response = await http.get('/api/v1/holidays', {
-        params: { per_page: 100 },
+    http
+      .get('/api/v1/holidays', { params: { itemsPerPage: 100 } })
+      .then(({ data }) => {
+        holidays.value = data.data.map((h) => ({
+          title: h.name,
+          value: h.id,
+        }));
+      })
+      .catch((error) => {
+        console.error('Failed to fetch holidays:', error);
+      })
+      .finally(() => {
+        loadingHolidays.value = false;
       });
-      holidays.value = response.data.data.map((h) => ({
-        title: `${h.name} (${h.date})`,
-        value: h.id,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch holidays:', error);
-    } finally {
-      loadingHolidays.value = false;
-    }
   }
 
   onMounted(() => {
@@ -189,6 +190,7 @@
           <div class="tw:mt-4">
             <v-text-field
               class="tw:block tw:w-full tw:mt-1 tw:capitalize"
+              density="compact"
               :error="form.errors.church_id"
               label="Church*"
               :model-value="`${church?.name} - ${church?.city}`"
@@ -198,18 +200,20 @@
           </div>
 
           <div class="tw:grid tw:grid-cols-2 tw:gap-4 tw:mt-4">
-            <SelectInput
+            <v-autocomplete
               v-model="form.holiday_id"
               class="tw:block tw:w-full"
-              :error="form.errors.holiday_id"
+              clearable
+              density="compact"
+              :error-messages="form.errors.holiday_id"
+              hide-details="auto"
               :items="holidays"
               label="Holiday*"
               :loading="loadingHolidays"
-              required
             />
             <SelectInput
               v-model="form.year"
-              class="tw:block tw:w-full"
+              density="compact"
               :error="form.errors.year"
               :items="yearOptions"
               label="Year"
@@ -220,6 +224,7 @@
             <v-checkbox
               v-model="form.replaces_regular_schedule"
               color="primary"
+              density="compact"
               hide-details
               label="Replaces Regular Schedule"
             ></v-checkbox>
@@ -234,9 +239,9 @@
           <div class="tw:flex tw:justify-between tw:items-center tw:mb-4">
             <div class="tw:text-sm tw:font-medium tw:text-gray-700">
               Mass/Activity Times*
-              <span class="tw:text-xs tw:text-gray-500 tw:ml-2"
-                >({{ form.times.length }} {{ form.times.length === 1 ? 'time' : 'times' }})</span
-              >
+              <span class="tw:text-xs tw:text-gray-500 tw:ml-2">
+                ({{ form.times.length }} {{ form.times.length === 1 ? 'time' : 'times' }})
+              </span>
             </div>
             <v-btn color="primary" size="small" variant="tonal" @click="addTimeEntry">
               <v-icon :icon="mdiPlus" size="small" />
@@ -251,13 +256,11 @@
           <v-card
             v-for="(time, index) in form.times"
             :key="index"
-            class="tw:mb-4 tw:p-4"
+            class="tw:mb-4"
             variant="outlined"
           >
-            <div class="tw:flex tw:justify-between tw:items-start">
-              <div class="tw:text-sm tw:font-medium tw:text-gray-600 tw:mb-2">
-                Time #{{ index + 1 }}
-              </div>
+            <div class="tw:flex tw:justify-between tw:items-start tw:m-2">
+              <div class="tw:text-sm tw:font-medium tw:text-gray-600">Time #{{ index + 1 }}</div>
               <v-btn
                 v-if="form.times.length > 1"
                 color="error"
@@ -267,46 +270,59 @@
                 @click="removeTimeEntry(index)"
               />
             </div>
-
-            <div class="tw:grid tw:grid-cols-2 tw:gap-4">
-              <SelectInput
-                v-model="time.type"
-                class="tw:block tw:w-full"
-                :error="form.errors[`times.${index}.type`]"
-                :items="activityTypes"
-                label="Type*"
-                required
-              />
-              <v-autocomplete
-                v-model="time.activity_type_description"
-                class="tw:block tw:w-full"
-                :error-messages="form.errors[`times.${index}.activity_type_description`]"
-                hide-details="auto"
-                :items="activityTypeDescriptions"
-                label="Description"
-              />
-            </div>
-
-            <div class="tw:grid tw:grid-cols-3 tw:gap-4 tw:mt-4">
-              <TimeInput
-                v-model="time.start_time"
-                :error="form.errors[`times.${index}.start_time`]"
-                label="Start Time*"
-                required
-              />
-              <TimeInput
-                v-model="time.end_time"
-                :error="form.errors[`times.${index}.end_time`]"
-                label="End Time"
-              />
-              <v-text-field
-                v-model="time.language"
-                :error-messages="form.errors[`times.${index}.language`]"
-                hide-details="auto"
-                label="Language*"
-                variant="outlined"
-              />
-            </div>
+            <v-container>
+              <v-row dense>
+                <v-col md="6">
+                  <SelectInput
+                    v-model="time.type"
+                    class="tw:block tw:w-full"
+                    density="compact"
+                    :error="form.errors[`times.${index}.type`]"
+                    :items="activityTypes"
+                    label="Type*"
+                    required
+                  />
+                </v-col>
+                <v-col md="6">
+                  <v-autocomplete
+                    v-model="time.activity_type_description"
+                    class="tw:block tw:w-full"
+                    density="compact"
+                    :error-messages="form.errors[`times.${index}.activity_type_description`]"
+                    hide-details="auto"
+                    :items="activityTypeDescriptions"
+                    label="Description"
+                  />
+                </v-col>
+                <v-col md="4">
+                  <TimeInput
+                    v-model="time.start_time"
+                    density="compact"
+                    :error="form.errors[`times.${index}.start_time`]"
+                    label="Start Time*"
+                    required
+                  />
+                </v-col>
+                <v-col md="4">
+                  <TimeInput
+                    v-model="time.end_time"
+                    density="compact"
+                    :error="form.errors[`times.${index}.end_time`]"
+                    label="End Time"
+                  />
+                </v-col>
+                <v-col md="4">
+                  <v-text-field
+                    v-model="time.language"
+                    density="compact"
+                    :error-messages="form.errors[`times.${index}.language`]"
+                    hide-details="auto"
+                    label="Language*"
+                    variant="outlined"
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
           </v-card>
 
           <div class="tw:mt-4">
@@ -315,6 +331,7 @@
               auto-grow
               class="tw:mt-1"
               counter
+              density="compact"
               :error-messages="form.errors.notes"
               label="Notes (Optional)"
               maxlength="1000"

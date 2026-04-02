@@ -154,7 +154,7 @@
 
   const fetchSchedulePeriods = () => {
     http
-      .get('/api/v1/schedule-periods', { params: { per_page: 100, is_active: true } })
+      .get('/api/v1/schedule-periods', { params: { itemsPerPage: 100, is_active: true } })
       .then(({ data }) => {
         schedulePeriodsById.value = data.data.reduce((map, period) => {
           map[period.id] = period.name;

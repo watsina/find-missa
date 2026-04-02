@@ -16,7 +16,7 @@ class ParishController extends Controller
     {
         Gate::authorize('viewAny', Parish::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $parishes = Parish::search($request->search)

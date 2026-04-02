@@ -19,7 +19,7 @@ class ActivityScheduleController extends Controller
     {
         Gate::authorize('viewAny', ActivitySchedule::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $activitySchedules = ActivitySchedule::search($request->search)

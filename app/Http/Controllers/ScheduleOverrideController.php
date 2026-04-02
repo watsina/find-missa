@@ -18,7 +18,7 @@ class ScheduleOverrideController extends Controller
     {
         Gate::authorize('viewAny', ScheduleOverride::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $scheduleOverrides = ScheduleOverride::query()

@@ -19,7 +19,7 @@ class SchedulePeriodController extends Controller
     {
         $this->authorize('viewAny', SchedulePeriod::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
         $teamId = $request->user()->currentTeam?->id;
 
