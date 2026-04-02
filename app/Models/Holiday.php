@@ -60,6 +60,7 @@ class Holiday extends Model
             'is_holy_day_of_obligation' => 'boolean',
             'is_universal' => 'boolean',
             'is_moveable' => 'boolean',
+            'suppresses_regular_schedule' => 'boolean',
         ];
     }
 
@@ -146,6 +147,14 @@ class Holiday extends Model
     public function scopeFixed(Builder $query): void
     {
         $query->where('type', HolidayType::Fixed);
+    }
+
+    /**
+     * Scope to get holidays that suppress regular schedules.
+     */
+    public function scopeSuppressesRegularSchedule(Builder $query): void
+    {
+        $query->where('suppresses_regular_schedule', true);
     }
 
     /**

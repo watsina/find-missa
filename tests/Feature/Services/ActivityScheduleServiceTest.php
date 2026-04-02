@@ -795,6 +795,279 @@ it('returns holiday info for a date', function () {
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| Holiday Schedule Suppression Tests
+|--------------------------------------------------------------------------
+*/
+
+it('suppresses regular schedules on a suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Good Friday holiday (suppresses regular schedules)
+    // Easter 2025 is April 20, Good Friday is April 18
+    Holiday::factory()->goodFriday()->create();
+
+    // On Good Friday: regular mass should be suppressed
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+
+    expect($activities)->toHaveCount(0);
+});
+
+it('still shows liturgical schedules on a suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Good Friday holiday (suppresses regular schedules)
+    $goodFriday = Holiday::factory()->goodFriday()->create();
+
+    // Create holiday instance for 2025
+    HolidayInstance::factory()->create([
+        'holiday_id' => $goodFriday->id,
+        'year' => 2025,
+        'date' => '2025-04-18',
+    ]);
+
+    // Liturgical schedule for Good Friday
+    $litSchedule = LiturgicalSchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'holiday_id' => $goodFriday->id,
+        'team_id' => $this->team->id,
+        'replaces_regular_schedule' => true,
+    ]);
+
+    $litSchedule->times()->create([
+        'start_time' => '15:00',
+        'language' => 'English',
+        'type' => 'mass',
+    ]);
+
+    // On Good Friday: only liturgical schedule should show
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+
+    expect($activities)->toHaveCount(1);
+    expect($activities->first()->startTime)->toBe('15:00');
+    expect($activities->first()->source)->toBe('liturgical');
+});
+
+it('still shows one-time activities on a suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Good Friday holiday
+    Holiday::factory()->goodFriday()->create();
+
+    // One-time activity on Good Friday
+    OneTimeActivity::factory()->create([
+        'church_id' => $this->church->id,
+        'date' => '2025-04-18',
+        'start_time' => '18:00',
+        'type' => 'mass',
+        'activity_type_description' => 'Stations of the Cross',
+    ]);
+
+    // On Good Friday: only one-time activity should show (regular suppressed)
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+
+    expect($activities)->toHaveCount(1);
+    expect($activities->first()->startTime)->toBe('18:00');
+    expect($activities->first()->source)->toBe('one_time');
+});
+
+it('does not suppress regular schedules on non-suppressing holidays', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Christmas does NOT suppress regular schedules
+    Holiday::factory()->christmas()->create();
+
+    // On Christmas: regular mass should still appear
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-12-25')
+    );
+
+    expect($activities)->toHaveCount(1);
+    expect($activities->first()->startTime)->toBe('07:00');
+});
+
+it('bypasses schedule rules on a suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Rule that would normally exclude on holidays
+    ScheduleRule::factory()->create([
+        'scope_type' => 'church',
+        'scope_id' => $this->church->id,
+        'condition_type' => ScheduleRuleCondition::PublicHoliday,
+        'action' => ScheduleAction::Exclude,
+    ]);
+
+    // Good Friday (suppressing) — rules should be bypassed entirely,
+    // and regular schedules suppressed by the holiday flag, not rules
+    Holiday::factory()->goodFriday()->create();
+
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+
+    // No activities because regular schedules are suppressed (not because of rules)
+    expect($activities)->toHaveCount(0);
+});
+
+it('bypasses schedule overrides on a suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Override that would normally modify the time
+    ScheduleOverride::factory()->create([
+        'scope_type' => 'church',
+        'scope_id' => $this->church->id,
+        'start_date' => '2025-04-18',
+        'end_date' => '2025-04-18',
+        'action' => ScheduleAction::Modify,
+        'replacement_times' => [
+            ['original' => '07:00', 'replacement' => '08:00'],
+        ],
+    ]);
+
+    // Good Friday (suppressing) — override should be bypassed
+    Holiday::factory()->goodFriday()->create();
+
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+
+    // No activities — regular schedules suppressed, override never applied
+    expect($activities)->toHaveCount(0);
+});
+
+it('shows no activities when church has no liturgical schedule for suppressing holiday', function () {
+    // Regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+
+    // Holy Thursday (suppressing)
+    Holiday::factory()->holyThursday()->create();
+
+    // No liturgical schedule for this church on Holy Thursday
+    // Easter 2025 = April 20, Holy Thursday = April 17
+    $activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-17')
+    );
+
+    expect($activities)->toHaveCount(0);
+});
+
+it('handles multiple churches differently on a suppressing holiday', function () {
+    $church2 = Church::factory()->create(['team_id' => $this->team->id]);
+
+    // Both churches have regular daily mass
+    ActivitySchedule::factory()->create([
+        'church_id' => $this->church->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '07:00',
+        'type' => 'mass',
+    ]);
+    ActivitySchedule::factory()->create([
+        'church_id' => $church2->id,
+        'day_pattern' => DayPattern::Daily,
+        'start_time' => '09:00',
+        'type' => 'mass',
+    ]);
+
+    // Good Friday (suppressing)
+    $goodFriday = Holiday::factory()->goodFriday()->create();
+    HolidayInstance::factory()->create([
+        'holiday_id' => $goodFriday->id,
+        'year' => 2025,
+        'date' => '2025-04-18',
+    ]);
+
+    // Only church2 has liturgical schedule for Good Friday
+    $litSchedule = LiturgicalSchedule::factory()->create([
+        'church_id' => $church2->id,
+        'holiday_id' => $goodFriday->id,
+        'team_id' => $this->team->id,
+        'replaces_regular_schedule' => true,
+    ]);
+
+    $litSchedule->times()->create([
+        'start_time' => '15:00',
+        'type' => 'mass',
+        'language' => 'English',
+    ]);
+
+    // Church 1: no activities (no liturgical schedule)
+    $church1Activities = $this->service->getActivitiesForChurchOnDate(
+        $this->church,
+        Carbon::parse('2025-04-18')
+    );
+    expect($church1Activities)->toHaveCount(0);
+
+    // Church 2: only liturgical schedule
+    $church2Activities = $this->service->getActivitiesForChurchOnDate(
+        $church2,
+        Carbon::parse('2025-04-18')
+    );
+    expect($church2Activities)->toHaveCount(1);
+    expect($church2Activities->first()->startTime)->toBe('15:00');
+    expect($church2Activities->first()->source)->toBe('liturgical');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Adoration Chapel Search Tests
+|--------------------------------------------------------------------------
+*/
+
 it('includes adoration chapels in search results', function (bool $is24Hours, ?string $startTime) {
     $chapel = AdorationChapel::factory()->create([
         'church_id' => $this->church->id,

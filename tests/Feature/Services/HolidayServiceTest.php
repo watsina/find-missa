@@ -461,6 +461,84 @@ it('handles ash wednesday in february', function () {
     expect($this->service->computeHolidayDate($ashWednesday, 2024)->toDateString())->toBe('2024-02-14');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Suppressing Holiday Tests
+|--------------------------------------------------------------------------
+*/
+
+it('returns suppressing holidays on a date', function () {
+    // Good Friday suppresses regular schedules (Easter 2025 = April 20, Good Friday = April 18)
+    Holiday::factory()->goodFriday()->create();
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-04-18');
+
+    expect($suppressingHolidays)->toHaveCount(1);
+    expect($suppressingHolidays->first()->holiday->name)->toBe('Good Friday');
+});
+
+it('does not return non-suppressing holidays from getSuppressingHolidaysOnDate', function () {
+    // Christmas does NOT suppress regular schedules
+    Holiday::factory()->christmas()->create();
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-12-25');
+
+    expect($suppressingHolidays)->toHaveCount(0);
+});
+
+it('returns multiple suppressing holidays on the same date', function () {
+    // Create two holidays that both suppress and fall on the same fixed date
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create(['name' => 'Suppressing A', 'slug' => 'suppressing-a']);
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create(['name' => 'Suppressing B', 'slug' => 'suppressing-b']);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-03-15');
+
+    expect($suppressingHolidays)->toHaveCount(2);
+});
+
+it('scopes suppressing holidays by team', function () {
+    $team = Team::factory()->create();
+    $otherTeam = Team::factory()->create();
+
+    // Universal suppressing holiday
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Universal Suppressing',
+        'slug' => 'universal-suppressing',
+        'team_id' => null,
+    ]);
+
+    // Team-specific suppressing holiday
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Team Suppressing',
+        'slug' => 'team-suppressing',
+        'team_id' => $team->id,
+        'is_universal' => false,
+    ]);
+
+    // Other team's suppressing holiday (should not appear)
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Other Team Suppressing',
+        'slug' => 'other-team-suppressing',
+        'team_id' => $otherTeam->id,
+        'is_universal' => false,
+    ]);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-03-15', $team->id);
+
+    expect($suppressingHolidays)->toHaveCount(2);
+    $names = $suppressingHolidays->pluck('holiday.name')->sort()->values()->all();
+    expect($names)->toBe(['Team Suppressing', 'Universal Suppressing']);
+});
+
+it('returns empty collection when no suppressing holidays on date', function () {
+    // Non-suppressing holiday on the date
+    Holiday::factory()->fixed(6, 1)->create(['name' => 'Regular Holiday', 'slug' => 'regular-holiday']);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-06-01');
+
+    expect($suppressingHolidays)->toBeEmpty();
+});
+
 it('computes all days of week correctly', function (string $day, int $expectedDayNumber) {
     $holiday = Holiday::factory()->computed(['nth' => 1, 'day' => $day, 'month' => 1])->create([
         'name' => "First {$day} of January",

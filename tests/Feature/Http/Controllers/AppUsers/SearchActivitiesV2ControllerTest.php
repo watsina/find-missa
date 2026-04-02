@@ -5,8 +5,13 @@ namespace Tests\Feature\Http\Controllers\AppUsers;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Diocese;
+use App\Models\Holiday;
+use App\Enums\DayPattern;
 use App\Models\SubParish;
+use App\Models\HolidayInstance;
+use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
+use App\Models\LiturgicalSchedule;
 
 use function Pest\Laravel\getJson;
 
@@ -273,4 +278,127 @@ test('search v2 still filters mass by start_time only', function () {
 
     expect($response->json('data'))->toHaveCount(1);
     expect($response->json('data.0.start_time'))->toBe('10:00');
+});
+
+// =============================================================================
+// HOLIDAY SCHEDULE SUPPRESSION TESTS
+// =============================================================================
+
+test('search v2 returns no results on a suppressing holiday when church has no liturgical schedule', function () {
+    $church = Church::factory()->create();
+
+    // Regular daily mass
+    ActivitySchedule::factory()->recycle($church)->create([
+        'day_pattern' => DayPattern::Daily,
+        'type' => 'mass',
+        'start_time' => '07:00',
+    ]);
+
+    // Good Friday (suppresses regular schedules)
+    // Easter 2025 = April 20, Good Friday = April 18
+    Holiday::factory()->goodFriday()->create();
+
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => '2025-04-18',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(0);
+});
+
+test('search v2 returns only liturgical results on a suppressing holiday', function () {
+    $church = Church::factory()->create();
+
+    // Regular daily mass
+    ActivitySchedule::factory()->recycle($church)->create([
+        'day_pattern' => DayPattern::Daily,
+        'type' => 'mass',
+        'start_time' => '07:00',
+    ]);
+
+    // Good Friday holiday
+    $goodFriday = Holiday::factory()->goodFriday()->create();
+
+    // Create holiday instance
+    HolidayInstance::factory()->create([
+        'holiday_id' => $goodFriday->id,
+        'year' => 2025,
+        'date' => '2025-04-18',
+    ]);
+
+    // Liturgical schedule for Good Friday
+    $litSchedule = LiturgicalSchedule::factory()->create([
+        'church_id' => $church->id,
+        'holiday_id' => $goodFriday->id,
+        'team_id' => $church->team_id,
+        'replaces_regular_schedule' => true,
+    ]);
+
+    $litSchedule->times()->create([
+        'start_time' => '15:00',
+        'language' => 'English',
+        'type' => 'mass',
+    ]);
+
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => '2025-04-18',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('15:00');
+});
+
+test('search v2 returns one-time activities on a suppressing holiday', function () {
+    $church = Church::factory()->create();
+
+    // Regular daily mass (should be suppressed)
+    ActivitySchedule::factory()->recycle($church)->create([
+        'day_pattern' => DayPattern::Daily,
+        'type' => 'mass',
+        'start_time' => '07:00',
+    ]);
+
+    // Good Friday holiday
+    Holiday::factory()->goodFriday()->create();
+
+    // One-time activity on Good Friday
+    OneTimeActivity::factory()->create([
+        'church_id' => $church->id,
+        'date' => '2025-04-18',
+        'start_time' => '18:00',
+        'type' => 'mass',
+        'activity_type_description' => 'Passion of the Lord',
+    ]);
+
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => '2025-04-18',
+    ]))->assertOk();
+
+    // Only the one-time activity should appear, not the regular schedule
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('18:00');
+});
+
+test('search v2 returns regular results on a non-suppressing holiday', function () {
+    $church = Church::factory()->create();
+
+    // Regular daily mass
+    ActivitySchedule::factory()->recycle($church)->create([
+        'day_pattern' => DayPattern::Daily,
+        'type' => 'mass',
+        'start_time' => '07:00',
+    ]);
+
+    // Christmas (does NOT suppress regular schedules)
+    Holiday::factory()->christmas()->create();
+
+    $response = getJson(route('search.v2', [
+        'type' => 'mass',
+        'date' => '2025-12-25',
+    ]))->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.0.start_time'))->toBe('07:00');
 });

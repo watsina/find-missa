@@ -602,3 +602,113 @@ test('unauthenticated user cannot access holidays', function (): void {
 
     $response->assertRedirect();
 });
+
+// =============================================================================
+// SUPPRESSES REGULAR SCHEDULE TESTS
+// =============================================================================
+
+test('store creates a holiday with suppresses_regular_schedule flag', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $response = post(route('holidays.store'), [
+        'name' => 'Holy Thursday',
+        'slug' => 'holy-thursday-test',
+        'type' => HolidayType::EasterRelative->value,
+        'easter_offset_days' => -3,
+        'is_holy_day_of_obligation' => false,
+        'is_universal' => true,
+        'is_moveable' => true,
+        'suppresses_regular_schedule' => true,
+        'liturgical_color' => 'white',
+    ]);
+
+    $response->assertCreated();
+    $response->assertJsonPath('data.suppresses_regular_schedule', true);
+
+    $holiday = Holiday::where('slug', 'holy-thursday-test')->first();
+    expect($holiday->suppresses_regular_schedule)->toBeTrue();
+});
+
+test('store defaults suppresses_regular_schedule to false', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $response = post(route('holidays.store'), [
+        'name' => 'Test Holiday',
+        'slug' => 'test-default-suppression',
+        'type' => HolidayType::Fixed->value,
+        'fixed_month' => 3,
+        'fixed_day' => 15,
+    ]);
+
+    $response->assertCreated();
+    $response->assertJsonPath('data.suppresses_regular_schedule', false);
+
+    $holiday = Holiday::where('slug', 'test-default-suppression')->first();
+    expect($holiday->suppresses_regular_schedule)->toBeFalse();
+});
+
+test('update can toggle suppresses_regular_schedule on', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $holiday = Holiday::factory()->create([
+        'suppresses_regular_schedule' => false,
+        'is_universal' => true,
+        'team_id' => null,
+    ]);
+
+    $response = put(route('holidays.update', $holiday), [
+        'suppresses_regular_schedule' => true,
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('data.suppresses_regular_schedule', true);
+
+    $holiday->refresh();
+    expect($holiday->suppresses_regular_schedule)->toBeTrue();
+});
+
+test('update can toggle suppresses_regular_schedule off', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $holiday = Holiday::factory()->suppressesRegularSchedule()->create([
+        'is_universal' => true,
+        'team_id' => null,
+    ]);
+
+    $response = put(route('holidays.update', $holiday), [
+        'suppresses_regular_schedule' => false,
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('data.suppresses_regular_schedule', false);
+
+    $holiday->refresh();
+    expect($holiday->suppresses_regular_schedule)->toBeFalse();
+});
+
+test('show exposes suppresses_regular_schedule in response', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    $holiday = Holiday::factory()->suppressesRegularSchedule()->create();
+
+    $response = get(route('holidays.show', $holiday));
+
+    $response->assertOk();
+    $response->assertJsonPath('data.suppresses_regular_schedule', true);
+});
+
+test('index returns suppresses_regular_schedule field', function (): void {
+    $this->actingAsSuperAdminWithTeam();
+
+    Holiday::factory()->suppressesRegularSchedule()->create(['is_universal' => true, 'team_id' => null]);
+    Holiday::factory()->create(['is_universal' => true, 'team_id' => null, 'suppresses_regular_schedule' => false]);
+
+    $response = get(route('holidays.index'));
+
+    $response->assertOk();
+    $response->assertJsonCount(2, 'data');
+
+    $data = collect($response->json('data'));
+    expect($data->where('suppresses_regular_schedule', true))->toHaveCount(1);
+    expect($data->where('suppresses_regular_schedule', false))->toHaveCount(1);
+});

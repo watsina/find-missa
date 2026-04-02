@@ -70,6 +70,7 @@
     is_holy_day_of_obligation: props.holiday?.is_holy_day_of_obligation || false,
     is_universal: props.holiday?.is_universal ?? true,
     is_moveable: props.holiday?.is_moveable || false,
+    suppresses_regular_schedule: props.holiday?.suppresses_regular_schedule || false,
     liturgical_color: props.holiday?.liturgical_color || 'white',
   });
 
@@ -93,6 +94,7 @@
         form.is_holy_day_of_obligation = newValue?.is_holy_day_of_obligation || false;
         form.is_universal = newValue?.is_universal ?? true;
         form.is_moveable = newValue?.is_moveable || false;
+        form.suppresses_regular_schedule = newValue?.suppresses_regular_schedule || false;
         form.liturgical_color = newValue?.liturgical_color || 'white';
 
         // Update computed rule refs
@@ -337,6 +339,12 @@
                 :disabled="isEditing && holiday?.is_universal && !canEditUniversal"
                 hide-details="auto"
                 label="Universal (All Teams)"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="form.suppresses_regular_schedule"
+                color="primary"
+                hide-details="auto"
+                label="Suppresses Regular Schedule"
               ></v-checkbox>
             </div>
           </div>

@@ -50,6 +50,7 @@ class StoreHolidayRequest extends FormRequest
             'is_holy_day_of_obligation' => ['boolean'],
             'is_universal' => ['boolean'],
             'is_moveable' => ['boolean'],
+            'suppresses_regular_schedule' => ['boolean'],
 
             // Liturgical info
             'liturgical_color' => ['nullable', 'string', Rule::in([
@@ -101,6 +102,10 @@ class StoreHolidayRequest extends FormRequest
             $this->merge([
                 'is_moveable' => $type !== HolidayType::Fixed->value,
             ]);
+        }
+
+        if (! $this->has('suppresses_regular_schedule')) {
+            $this->merge(['suppresses_regular_schedule' => false]);
         }
     }
 }

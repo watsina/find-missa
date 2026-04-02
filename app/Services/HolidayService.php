@@ -282,6 +282,32 @@ class HolidayService
     }
 
     /**
+     * Get holidays on a specific date that suppress regular schedules.
+     *
+     * Returns holiday instances where the parent holiday has
+     * suppresses_regular_schedule = true, indicating that regular
+     * activity schedules should not be shown on this date.
+     *
+     * @return Collection<int, HolidayInstance>
+     */
+    public function getSuppressingHolidaysOnDate(string $date, ?int $teamId = null): Collection
+    {
+        $year = (int) Carbon::parse($date)->year;
+
+        // Ensure instances exist for this year
+        $this->computeInstancesForYear($year, $teamId);
+
+        return HolidayInstance::query()
+            ->whereHas('holiday', function ($query) use ($teamId) {
+                $query->availableForTeam($teamId)
+                    ->suppressesRegularSchedule();
+            })
+            ->onDate($date)
+            ->with('holiday')
+            ->get();
+    }
+
+    /**
      * Check if a specific date is a holiday.
      */
     public function isHoliday(string $date, ?int $teamId = null): bool
