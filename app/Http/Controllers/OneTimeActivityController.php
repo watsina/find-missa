@@ -18,7 +18,7 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('viewAny', OneTimeActivity::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $oneTimeActivities = OneTimeActivity::query()

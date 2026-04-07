@@ -48,6 +48,20 @@ class ActivityScheduleService
     ): Collection {
         $teamId = $church->team_id;
 
+        // Check if a suppressing holiday falls on this date. When it does,
+        // regular schedules, rules, and overrides are all bypassed — only
+        // liturgical schedules and one-time activities are returned.
+        $suppressingHolidays = $this->holidayService->getSuppressingHolidaysOnDate(
+            $date->toDateString(),
+            $teamId
+        );
+
+        if ($suppressingHolidays->isNotEmpty()) {
+            return $this->getActivitiesForSuppressingHoliday(
+                $church, $date, $activityTypes, $includeChurch
+            );
+        }
+
         // Check for liturgical schedules that replace regular schedules
         $liturgicalActivities = $this->getLiturgicalActivities($church, $date, $activityTypes, $includeChurch);
         $liturgicalReplacesRegular = $this->liturgicalReplacesRegular($church, $date, $activityTypes);
@@ -82,6 +96,31 @@ class ActivityScheduleService
 
         // Deduplicate and sort by time
         return $this->deduplicateAndSort($filteredActivities);
+    }
+
+    /**
+     * Get activities for a church on a date where a suppressing holiday applies.
+     *
+     * On suppressing holidays (e.g., Good Friday), regular schedules are not
+     * shown. Only liturgical schedules (if the church has defined them for
+     * this holiday) and one-time activities are returned. Schedule rules and
+     * overrides are also bypassed since there are no regular schedules to act on.
+     *
+     * @param  array<int, string>|null  $activityTypes
+     * @return Collection<int, ComputedActivity>
+     */
+    protected function getActivitiesForSuppressingHoliday(
+        Church $church,
+        Carbon $date,
+        ?array $activityTypes = null,
+        bool $includeChurch = false,
+    ): Collection {
+        $liturgicalActivities = $this->getLiturgicalActivities($church, $date, $activityTypes, $includeChurch);
+        $oneTimeActivities = $this->getOneTimeActivities($church, $date, $activityTypes, $includeChurch);
+
+        return $this->deduplicateAndSort(
+            $liturgicalActivities->concat($oneTimeActivities)
+        );
     }
 
     /**

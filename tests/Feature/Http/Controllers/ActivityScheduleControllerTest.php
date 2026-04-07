@@ -167,6 +167,190 @@ test('creating an adoration schedule without end_time returns validation error',
         ->assertJsonValidationErrors(['end_time']);
 })->group('activity-schedules');
 
+test('matches_day filter returns daily schedules for any day', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    $dailySchedule = ActivitySchedule::factory()->daily()->create([
+        'church_id' => $church->id,
+        'start_time' => '07:00',
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Monday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $dailySchedule->id);
+})->group('activity-schedules');
+
+test('matches_day filter returns weekday schedules for weekdays only', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->weekdays()->create([
+        'church_id' => $church->id,
+        'start_time' => '07:30',
+    ]);
+
+    // Weekday should match
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Wednesday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data');
+
+    // Weekend should not match
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Saturday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter returns sunday schedules for sunday only', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->sunday()->create([
+        'church_id' => $church->id,
+        'start_time' => '09:00',
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Sunday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data');
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Monday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter returns saturday schedules for saturday only', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->saturday()->create([
+        'church_id' => $church->id,
+        'start_time' => '16:00',
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Saturday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data');
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Sunday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter returns specific day schedules when day is included', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->specificDays(['Tuesday', 'Thursday'])->create([
+        'church_id' => $church->id,
+        'type' => 'confession',
+        'activity_type_description' => 'confession',
+        'start_time' => '15:00',
+        'end_time' => '16:00',
+    ]);
+
+    // Included day should match
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Thursday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data');
+
+    // Not-included day should not match
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Wednesday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter excludes monthly-nth schedules', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    // First Friday mass — should NOT appear in matches_day results
+    ActivitySchedule::factory()->monthlyNth('Friday')->create([
+        'church_id' => $church->id,
+        'start_time' => '18:00',
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Friday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter returns multiple matching schedules across patterns', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    // Daily mass at 7:00 — should match Sunday
+    ActivitySchedule::factory()->daily()->create([
+        'church_id' => $church->id,
+        'start_time' => '07:00',
+    ]);
+
+    // Sunday mass at 9:00 — should match Sunday
+    ActivitySchedule::factory()->sunday()->create([
+        'church_id' => $church->id,
+        'start_time' => '09:00',
+    ]);
+
+    // Specific days including Sunday — should match Sunday
+    ActivitySchedule::factory()->specificDays(['Sunday', 'Wednesday'])->create([
+        'church_id' => $church->id,
+        'type' => 'adoration',
+        'activity_type_description' => 'adoration',
+        'start_time' => '14:00',
+        'end_time' => '17:00',
+    ]);
+
+    // Saturday mass — should NOT match Sunday
+    ActivitySchedule::factory()->saturday()->create([
+        'church_id' => $church->id,
+        'start_time' => '17:00',
+    ]);
+
+    // Monthly-nth First Sunday — should NOT match (excluded by design)
+    ActivitySchedule::factory()->monthlyNth('Sunday')->create([
+        'church_id' => $church->id,
+        'start_time' => '11:00',
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=Sunday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(3, 'data');
+})->group('activity-schedules');
+
+test('matches_day filter is case insensitive', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+
+    ActivitySchedule::factory()->sunday()->create([
+        'church_id' => $church->id,
+    ]);
+
+    $response = getJson("/api/v1/activity-schedules?church_id={$church->id}&matches_day=sunday");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data');
+})->group('activity-schedules');
+
 test('creating a mass schedule without end_time succeeds', function () {
     $this->actingAsSuperAdminWithTeam();
 

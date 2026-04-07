@@ -19,7 +19,7 @@ class LiturgicalScheduleController extends Controller
     {
         Gate::authorize('viewAny', LiturgicalSchedule::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $liturgicalSchedules = LiturgicalSchedule::query()

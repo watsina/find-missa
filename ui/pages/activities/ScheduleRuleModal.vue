@@ -66,21 +66,24 @@
 
   const isLiturgicalCondition = computed(() => form.condition_type === 'liturgical_day');
 
-  async function fetchHolidays() {
+  function fetchHolidays() {
     loadingHolidays.value = true;
-    try {
-      const response = await http.get('/api/v1/holidays', {
-        params: { per_page: 100 },
+    http
+      .get('/api/v1/holidays', {
+        params: { itemsPerPage: 100 },
+      })
+      .then(({ data }) => {
+        holidays.value = data.data.map((h) => ({
+          title: h.name,
+          value: h.slug || h.id,
+        }));
+      })
+      .catch((error) => {
+        console.error('Failed to fetch holidays:', error);
+      })
+      .finally(() => {
+        loadingHolidays.value = false;
       });
-      holidays.value = response.data.data.map((h) => ({
-        title: `${h.name} (${h.date})`,
-        value: h.slug || h.id, // Prefer slug if available
-      }));
-    } catch (error) {
-      console.error('Failed to fetch holidays:', error);
-    } finally {
-      loadingHolidays.value = false;
-    }
   }
 
   onMounted(() => {

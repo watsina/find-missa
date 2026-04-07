@@ -8,7 +8,7 @@
   import SecondaryButton from '@/components/SecondaryButton.vue';
   import SelectInput from '@/components/SelectInput.vue';
   import TimeInput from '@/components/TimeInput.vue';
-  import { mdiPlus, mdiDeleteOutline } from '@mdi/js';
+  import { mdiPlus, mdiDeleteOutline, mdiImport } from '@mdi/js';
 
   const props = defineProps({
     liturgicalSchedule: { type: Object, default: null },
@@ -77,21 +77,100 @@
     form.times.splice(index, 1);
   };
 
-  async function fetchHolidays() {
-    loadingHolidays.value = true;
-    try {
-      const response = await http.get('/api/v1/holidays', {
-        params: { per_page: 100 },
+  const daysOfWeek = [
+    { title: 'Sunday', value: 'Sunday' },
+    { title: 'Monday', value: 'Monday' },
+    { title: 'Tuesday', value: 'Tuesday' },
+    { title: 'Wednesday', value: 'Wednesday' },
+    { title: 'Thursday', value: 'Thursday' },
+    { title: 'Friday', value: 'Friday' },
+    { title: 'Saturday', value: 'Saturday' },
+  ];
+
+  const importDay = ref(null);
+  const importingSchedules = ref(false);
+
+  /**
+   * Resolve the values for a specific day from an activity schedule,
+   * taking day_details variations into account.
+   */
+  function resolveScheduleForDay(schedule, dayName) {
+    const normalizedDay = dayName.toLowerCase();
+    const dayDetail = (schedule.day_details || []).find(
+      (d) => d.day_of_week?.toLowerCase() === normalizedDay,
+    );
+
+    return {
+      type: schedule.type || 'mass',
+      activity_type_description:
+        dayDetail?.activity_type_description || schedule.activity_type_description || schedule.type,
+      start_time: dayDetail?.start_time || schedule.start_time || '',
+      end_time: dayDetail?.end_time || schedule.end_time || '',
+      language: dayDetail?.language || schedule.language || 'English',
+      is_skipped: dayDetail?.is_skipped || false,
+    };
+  }
+
+  function importFromRegularSchedule() {
+    if (!importDay.value || !props.church?.id) return;
+
+    importingSchedules.value = true;
+
+    http
+      .get('/api/v1/activity-schedules', {
+        params: {
+          church_id: props.church.id,
+          matches_day: importDay.value,
+          itemsPerPage: 100,
+        },
+      })
+      .then(({ data }) => {
+        const schedules = data.data || [];
+
+        if (schedules.length === 0) {
+          notify.warning(`No regular schedules found for ${importDay.value}.`);
+          return;
+        }
+
+        const importedTimes = schedules
+          .map((schedule) => resolveScheduleForDay(schedule, importDay.value))
+          .filter((entry) => !entry.is_skipped)
+          .map(({ is_skipped, ...rest }) => rest)
+          .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+        if (importedTimes.length === 0) {
+          notify.warning(`All ${importDay.value} schedules are skipped.`);
+          return;
+        }
+
+        form.times = importedTimes;
+        notify.success(`Imported ${importedTimes.length} schedule(s) from ${importDay.value}.`);
+      })
+      .catch((error) => {
+        console.error('Failed to import schedules:', error);
+        notify.error('Failed to import regular schedules.');
+      })
+      .finally(() => {
+        importingSchedules.value = false;
       });
-      holidays.value = response.data.data.map((h) => ({
-        title: `${h.name} (${h.date})`,
-        value: h.id,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch holidays:', error);
-    } finally {
-      loadingHolidays.value = false;
-    }
+  }
+
+  function fetchHolidays() {
+    loadingHolidays.value = true;
+    http
+      .get('/api/v1/holidays', { params: { itemsPerPage: 100 } })
+      .then(({ data }) => {
+        holidays.value = data.data.map((h) => ({
+          title: h.name,
+          value: h.id,
+        }));
+      })
+      .catch((error) => {
+        console.error('Failed to fetch holidays:', error);
+      })
+      .finally(() => {
+        loadingHolidays.value = false;
+      });
   }
 
   onMounted(() => {
@@ -189,6 +268,7 @@
           <div class="tw:mt-4">
             <v-text-field
               class="tw:block tw:w-full tw:mt-1 tw:capitalize"
+              density="compact"
               :error="form.errors.church_id"
               label="Church*"
               :model-value="`${church?.name} - ${church?.city}`"
@@ -198,18 +278,20 @@
           </div>
 
           <div class="tw:grid tw:grid-cols-2 tw:gap-4 tw:mt-4">
-            <SelectInput
+            <v-autocomplete
               v-model="form.holiday_id"
               class="tw:block tw:w-full"
-              :error="form.errors.holiday_id"
+              clearable
+              density="compact"
+              :error-messages="form.errors.holiday_id"
+              hide-details="auto"
               :items="holidays"
               label="Holiday*"
               :loading="loadingHolidays"
-              required
             />
             <SelectInput
               v-model="form.year"
-              class="tw:block tw:w-full"
+              density="compact"
               :error="form.errors.year"
               :items="yearOptions"
               label="Year"
@@ -220,6 +302,7 @@
             <v-checkbox
               v-model="form.replaces_regular_schedule"
               color="primary"
+              density="compact"
               hide-details
               label="Replaces Regular Schedule"
             ></v-checkbox>
@@ -229,14 +312,46 @@
             </div>
           </div>
 
+          <!-- Import from Regular Schedule -->
+          <v-divider class="tw:my-6" />
+          <div class="tw:text-sm tw:font-medium tw:text-gray-700 tw:mb-2">
+            Import from Regular Schedule
+          </div>
+          <div class="tw:text-xs tw:text-gray-500 tw:mb-3">
+            Pre-fill times by importing the church's regular schedule for a specific day of the
+            week. This will replace any existing times below.
+          </div>
+          <div class="tw:flex tw:items-center tw:gap-3">
+            <v-select
+              v-model="importDay"
+              class="tw:max-w-[200px]"
+              density="compact"
+              hide-details
+              :items="daysOfWeek"
+              label="Day of Week"
+              variant="outlined"
+            />
+            <v-btn
+              color="primary"
+              :disabled="!importDay || importingSchedules"
+              :loading="importingSchedules"
+              :prepend-icon="mdiImport"
+              size="small"
+              variant="tonal"
+              @click="importFromRegularSchedule"
+            >
+              Import
+            </v-btn>
+          </div>
+
           <!-- Times Section -->
           <v-divider class="tw:my-6" />
           <div class="tw:flex tw:justify-between tw:items-center tw:mb-4">
             <div class="tw:text-sm tw:font-medium tw:text-gray-700">
               Mass/Activity Times*
-              <span class="tw:text-xs tw:text-gray-500 tw:ml-2"
-                >({{ form.times.length }} {{ form.times.length === 1 ? 'time' : 'times' }})</span
-              >
+              <span class="tw:text-xs tw:text-gray-500 tw:ml-2">
+                ({{ form.times.length }} {{ form.times.length === 1 ? 'time' : 'times' }})
+              </span>
             </div>
             <v-btn color="primary" size="small" variant="tonal" @click="addTimeEntry">
               <v-icon :icon="mdiPlus" size="small" />
@@ -251,13 +366,11 @@
           <v-card
             v-for="(time, index) in form.times"
             :key="index"
-            class="tw:mb-4 tw:p-4"
+            class="tw:mb-4"
             variant="outlined"
           >
-            <div class="tw:flex tw:justify-between tw:items-start">
-              <div class="tw:text-sm tw:font-medium tw:text-gray-600 tw:mb-2">
-                Time #{{ index + 1 }}
-              </div>
+            <div class="tw:flex tw:justify-between tw:items-start tw:m-2">
+              <div class="tw:text-sm tw:font-medium tw:text-gray-600">Time #{{ index + 1 }}</div>
               <v-btn
                 v-if="form.times.length > 1"
                 color="error"
@@ -267,46 +380,59 @@
                 @click="removeTimeEntry(index)"
               />
             </div>
-
-            <div class="tw:grid tw:grid-cols-2 tw:gap-4">
-              <SelectInput
-                v-model="time.type"
-                class="tw:block tw:w-full"
-                :error="form.errors[`times.${index}.type`]"
-                :items="activityTypes"
-                label="Type*"
-                required
-              />
-              <v-autocomplete
-                v-model="time.activity_type_description"
-                class="tw:block tw:w-full"
-                :error-messages="form.errors[`times.${index}.activity_type_description`]"
-                hide-details="auto"
-                :items="activityTypeDescriptions"
-                label="Description"
-              />
-            </div>
-
-            <div class="tw:grid tw:grid-cols-3 tw:gap-4 tw:mt-4">
-              <TimeInput
-                v-model="time.start_time"
-                :error="form.errors[`times.${index}.start_time`]"
-                label="Start Time*"
-                required
-              />
-              <TimeInput
-                v-model="time.end_time"
-                :error="form.errors[`times.${index}.end_time`]"
-                label="End Time"
-              />
-              <v-text-field
-                v-model="time.language"
-                :error-messages="form.errors[`times.${index}.language`]"
-                hide-details="auto"
-                label="Language*"
-                variant="outlined"
-              />
-            </div>
+            <v-container>
+              <v-row dense>
+                <v-col md="6">
+                  <SelectInput
+                    v-model="time.type"
+                    class="tw:block tw:w-full"
+                    density="compact"
+                    :error="form.errors[`times.${index}.type`]"
+                    :items="activityTypes"
+                    label="Type*"
+                    required
+                  />
+                </v-col>
+                <v-col md="6">
+                  <v-autocomplete
+                    v-model="time.activity_type_description"
+                    class="tw:block tw:w-full"
+                    density="compact"
+                    :error-messages="form.errors[`times.${index}.activity_type_description`]"
+                    hide-details="auto"
+                    :items="activityTypeDescriptions"
+                    label="Description"
+                  />
+                </v-col>
+                <v-col md="4">
+                  <TimeInput
+                    v-model="time.start_time"
+                    density="compact"
+                    :error="form.errors[`times.${index}.start_time`]"
+                    label="Start Time*"
+                    required
+                  />
+                </v-col>
+                <v-col md="4">
+                  <TimeInput
+                    v-model="time.end_time"
+                    density="compact"
+                    :error="form.errors[`times.${index}.end_time`]"
+                    label="End Time"
+                  />
+                </v-col>
+                <v-col md="4">
+                  <v-text-field
+                    v-model="time.language"
+                    density="compact"
+                    :error-messages="form.errors[`times.${index}.language`]"
+                    hide-details="auto"
+                    label="Language*"
+                    variant="outlined"
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
           </v-card>
 
           <div class="tw:mt-4">
@@ -315,6 +441,7 @@
               auto-grow
               class="tw:mt-1"
               counter
+              density="compact"
               :error-messages="form.errors.notes"
               label="Notes (Optional)"
               maxlength="1000"

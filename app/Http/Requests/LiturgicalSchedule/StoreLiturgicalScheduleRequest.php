@@ -40,22 +40,24 @@ class StoreLiturgicalScheduleRequest extends FormRequest
             'times.*.activity_type_description' => ['nullable', Rule::enum(ActivityTypeDescription::class), new ValidateActivityTypeDescription],
             'times.*.start_time' => ['required', 'date_format:H:i'],
             'times.*.end_time' => [
+                'required_if:times.*.type,confession,adoration',
+                'nullable',
+                'date_format:H:i',
                 function (string $attribute, mixed $value, \Closure $fail) {
-                    // Extract the index from the attribute (e.g., "times.0.end_time" -> 0)
+                    if (empty($value)) {
+                        return;
+                    }
+
                     preg_match('/times\.(\d+)\.end_time/', $attribute, $matches);
                     $index = $matches[1] ?? null;
 
                     if ($index !== null) {
-                        $type = $this->input("times.{$index}.type");
-
-                        if (in_array($type, ['confession', 'adoration'], true) && empty($value)) {
-                            $fail('The end time is required for confession and adoration activities.');
+                        $startTime = $this->input("times.{$index}.start_time");
+                        if ($startTime && $value <= $startTime) {
+                            $fail('The end time must be after the start time.');
                         }
                     }
                 },
-                'nullable',
-                'date_format:H:i',
-                'after:times.*.start_time',
             ],
             'times.*.language' => ['required', 'string', 'max:100'],
         ];
@@ -71,7 +73,7 @@ class StoreLiturgicalScheduleRequest extends FormRequest
         return [
             'times.required' => 'Please add at least one time for this liturgical schedule.',
             'times.min' => 'Please add at least one time for this liturgical schedule.',
-            'times.*.end_time.after' => 'The end time must be after the start time.',
+            'times.*.end_time.required_if' => 'The end time is required for confession and adoration activities.',
         ];
     }
 }

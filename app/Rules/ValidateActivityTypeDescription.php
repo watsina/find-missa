@@ -25,8 +25,17 @@ class ValidateActivityTypeDescription implements DataAwareRule, ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! $type = Arr::get($this->data, 'type')) {
+        // Derive the sibling "type" field path from the current attribute.
+        // For nested attributes like "times.0.activity_type_description", the sibling is "times.0.type".
+        // For top-level "activity_type_description", the sibling is "type".
+        $typePath = Str::beforeLast($attribute, '.') === $attribute
+            ? 'type'
+            : Str::beforeLast($attribute, '.').'.type';
+
+        if (! $type = Arr::get($this->data, $typePath)) {
             $fail('Activity type description requires the activity type');
+
+            return;
         }
 
         // get the valid descriptions for the given type

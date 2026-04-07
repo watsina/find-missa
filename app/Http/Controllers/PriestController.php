@@ -17,7 +17,7 @@ class PriestController extends Controller
     {
         Gate::authorize('viewAny', Priest::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $priests = Priest::search($request->search)

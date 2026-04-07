@@ -172,15 +172,15 @@
     return useDayjs().isSame(useDayjs(dateUsed.value).format('YYYY-MM-DD'), 'day') ? 'Today' : date;
   });
 
-  // Liturgical color mapping for Vuetify alert colors
+  // Liturgical color mapping to Vuetify semantic colors for readable text contrast
   const liturgicalColorMap = {
-    white: 'grey-lighten-1',
-    red: 'red',
-    green: 'green',
-    violet: 'purple',
-    purple: 'purple',
-    rose: 'pink',
-    gold: 'amber',
+    white: 'warning',
+    red: 'error',
+    green: 'success',
+    violet: 'info',
+    purple: 'info',
+    rose: 'pink-lighten-1',
+    gold: 'warning',
     black: 'grey-darken-3',
   };
 
@@ -246,9 +246,9 @@
         <v-col cols="12">
           <v-alert
             class="contribution-alert"
+            color="info"
             :icon="mdiHandHeart"
             prominent
-            type="warning"
             variant="tonal"
           >
             <template #title>
@@ -260,9 +260,11 @@
             </p>
             <v-btn
               :append-icon="mdiArrowRight"
-              color="warning"
+              :block="smAndDown"
+              color="info"
               href="https://forms.gle/kGiX1A36dW3is1BJA"
               rel="noopener"
+              :size="smAndDown ? 'small' : 'default'"
               target="_blank"
               variant="elevated"
             >
@@ -338,11 +340,17 @@
             :key="holidayInstance.id"
             class="tw:mb-2"
             :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
-            :icon="mdiCalendarStar"
             prominent
             :title="holidayInstance.holiday?.name"
             variant="tonal"
           >
+            <template #prepend>
+              <v-icon
+                :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
+                :icon="mdiCalendarStar"
+                size="large"
+              />
+            </template>
             <template #text>
               <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                 <v-chip
@@ -358,7 +366,7 @@
                   v-if="holidayInstance.holiday?.liturgical_color"
                   :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
                   size="small"
-                  variant="outlined"
+                  variant="flat"
                 >
                   {{ holidayInstance.holiday?.liturgical_color }}
                 </v-chip>

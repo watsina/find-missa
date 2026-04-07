@@ -29,7 +29,7 @@ class HolidayController extends Controller
     {
         Gate::authorize('viewAny', Holiday::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
         $teamId = $request->user()->currentTeam?->id;
 
