@@ -16,7 +16,7 @@ class SubParishController extends Controller
     {
         Gate::authorize('viewAny', SubParish::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $subParishes = SubParish::search($request->search)

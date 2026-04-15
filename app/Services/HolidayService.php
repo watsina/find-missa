@@ -87,16 +87,31 @@ class HolidayService
 
     /**
      * Compute a date based on a computation rule.
-     * Supports rules like: {"nth": 4, "day": "thursday", "month": 11}
-     * Which means "4th Thursday of November".
      *
-     * @param  array{nth?: int, day?: string, month?: int, last?: bool}|null  $rule
+     * Supports two rule formats:
+     *
+     * 1. Nth-day-of-month: {"nth": 4, "day": "thursday", "month": 11}
+     *    Means "4th Thursday of November". Use {"last": true} for "last X of month".
+     *
+     * 2. Special rules: {"special": "sunday_in_octave_of_christmas"}
+     *    Named rules for holidays with unique computation logic.
+     *
+     * @param  array{nth?: int, day?: string, month?: int, last?: bool, special?: string}|null  $rule
      */
     private function computeFromRule(Holiday $holiday, int $year): Carbon
     {
         $rule = $holiday->computation_rule;
 
-        if (! $rule || ! isset($rule['month'])) {
+        if (! $rule) {
+            throw new \InvalidArgumentException("Holiday '{$holiday->name}' has no valid computation rule");
+        }
+
+        // Special named rules for holidays with unique computation logic
+        if (isset($rule['special'])) {
+            return $this->computeSpecialRule($holiday, $rule['special'], $year);
+        }
+
+        if (! isset($rule['month'])) {
             throw new \InvalidArgumentException("Holiday '{$holiday->name}' has no valid computation rule");
         }
 
@@ -110,6 +125,45 @@ class HolidayService
         }
 
         return $this->getNthDayOfWeekInMonth($year, $month, $dayOfWeek, $nth);
+    }
+
+    /**
+     * Compute a date for a special named rule.
+     *
+     * Special rules handle holidays whose date logic doesn't fit the standard
+     * "nth day of week in month" pattern.
+     */
+    private function computeSpecialRule(Holiday $holiday, string $ruleName, int $year): Carbon
+    {
+        return match ($ruleName) {
+            'sunday_in_octave_of_christmas' => $this->computeSundayInOctaveOfChristmas($year),
+            default => throw new \InvalidArgumentException("Unknown special computation rule '{$ruleName}' for holiday '{$holiday->name}'"),
+        };
+    }
+
+    /**
+     * Compute the Feast of the Holy Family — the Sunday within the Octave of Christmas.
+     *
+     * The Octave of Christmas spans Dec 25 through Jan 1. The Holy Family is celebrated
+     * on the first Sunday that falls between Dec 26 and Dec 31. However, when Christmas
+     * itself falls on a Sunday (making the next Sunday Jan 1 — the Solemnity of Mary),
+     * the Holy Family is celebrated on Dec 30 instead.
+     */
+    private function computeSundayInOctaveOfChristmas(int $year): Carbon
+    {
+        $christmas = Carbon::createFromDate($year, 12, 25);
+
+        if ($christmas->isSunday()) {
+            // When Christmas is Sunday, the next Sunday (Jan 1) is the Solemnity of Mary,
+            // so Holy Family is celebrated on Friday, December 30.
+            return Carbon::createFromDate($year, 12, 30);
+        }
+
+        // Find the first Sunday after Christmas within the Octave (Dec 26-31)
+        $nextSunday = $christmas->copy()->next(Carbon::SUNDAY);
+
+        // The next Sunday will always be within Dec 26-31 when Christmas is not Sunday
+        return $nextSunday;
     }
 
     /**
@@ -224,6 +278,32 @@ class HolidayService
             ->inDateRange($startDate, $endDate)
             ->with('holiday')
             ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Get holidays on a specific date that suppress regular schedules.
+     *
+     * Returns holiday instances where the parent holiday has
+     * suppresses_regular_schedule = true, indicating that regular
+     * activity schedules should not be shown on this date.
+     *
+     * @return Collection<int, HolidayInstance>
+     */
+    public function getSuppressingHolidaysOnDate(string $date, ?int $teamId = null): Collection
+    {
+        $year = (int) Carbon::parse($date)->year;
+
+        // Ensure instances exist for this year
+        $this->computeInstancesForYear($year, $teamId);
+
+        return HolidayInstance::query()
+            ->whereHas('holiday', function ($query) use ($teamId) {
+                $query->availableForTeam($teamId)
+                    ->suppressesRegularSchedule();
+            })
+            ->onDate($date)
+            ->with('holiday')
             ->get();
     }
 

@@ -51,6 +51,7 @@ class UpdateHolidayRequest extends FormRequest
             'is_holy_day_of_obligation' => ['boolean'],
             'is_universal' => ['boolean'],
             'is_moveable' => ['boolean'],
+            'suppresses_regular_schedule' => ['boolean'],
 
             // Liturgical info
             'liturgical_color' => ['nullable', 'string', Rule::in([

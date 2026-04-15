@@ -128,6 +128,31 @@ class ActivitySchedule extends BaseModel
     }
 
     /**
+     * Scope a query to only include schedules that match a given day name (e.g., "Sunday").
+     *
+     * Unlike scopeMatchesDayPattern, this does not require a full Carbon date
+     * and excludes MonthlyNth patterns (which need specific date context).
+     */
+    public function scopeMatchesDayOfWeek(Builder $query, string $dayOfWeek): void
+    {
+        $normalizedDay = ucfirst(strtolower($dayOfWeek));
+        $isWeekday = in_array($normalizedDay, ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+        $isSaturday = $normalizedDay === 'Saturday';
+        $isSunday = $normalizedDay === 'Sunday';
+
+        $query->where(function (Builder $q) use ($normalizedDay, $isWeekday, $isSaturday, $isSunday) {
+            $q->where('day_pattern', DayPattern::Daily->value)
+                ->when($isWeekday, fn (Builder $inner) => $inner->orWhere('day_pattern', DayPattern::Weekdays->value))
+                ->when($isSaturday, fn (Builder $inner) => $inner->orWhere('day_pattern', DayPattern::Saturday->value))
+                ->when($isSunday, fn (Builder $inner) => $inner->orWhere('day_pattern', DayPattern::Sunday->value))
+                ->orWhere(function (Builder $inner) use ($normalizedDay) {
+                    $inner->where('day_pattern', DayPattern::Specific->value)
+                        ->whereJsonContains('days_of_week', $normalizedDay);
+                });
+        });
+    }
+
+    /**
      * Scope a query to only include schedules that match the given date's day pattern.
      */
     public function scopeMatchesDayPattern(Builder $query, Carbon $date): void

@@ -365,6 +365,277 @@ test('validation fails for invalid activity type', function () {
         ->assertJsonValidationErrors(['times.0.type']);
 })->group('liturgical-schedules');
 
+test('validation fails when activity_type_description does not match type', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'confession',
+                'activity_type_description' => 'mass', // mass description is invalid for confession type
+                'start_time' => '10:00',
+                'end_time' => '11:00',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.activity_type_description']);
+})->group('liturgical-schedules');
+
+test('valid activity_type_description matching type passes validation', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'mass',
+                'activity_type_description' => 'easter-vigil-mass',
+                'start_time' => '20:00',
+                'language' => 'English',
+            ],
+            [
+                'type' => 'confession',
+                'activity_type_description' => 'confession',
+                'start_time' => '15:00',
+                'end_time' => '16:00',
+                'language' => 'English',
+            ],
+            [
+                'type' => 'adoration',
+                'activity_type_description' => 'exposition',
+                'start_time' => '12:00',
+                'end_time' => '13:00',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertCreated();
+
+    $schedule = LiturgicalSchedule::where('church_id', $church->id)->first();
+    expect($schedule->times)->toHaveCount(3);
+})->group('liturgical-schedules');
+
+test('validation fails when end_time is missing for confession type', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'confession',
+                'activity_type_description' => 'confession',
+                'start_time' => '10:00',
+                'end_time' => '',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.end_time']);
+})->group('liturgical-schedules');
+
+test('validation fails when end_time is missing for adoration type', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'adoration',
+                'activity_type_description' => 'adoration',
+                'start_time' => '10:00',
+                'end_time' => '',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.end_time']);
+})->group('liturgical-schedules');
+
+test('validation fails when end_time is before start_time', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'mass',
+                'start_time' => '10:00',
+                'end_time' => '09:00',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.end_time']);
+})->group('liturgical-schedules');
+
+test('validation fails when start_time is missing', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'mass',
+                'start_time' => '',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.start_time']);
+})->group('liturgical-schedules');
+
+test('validation fails when language is missing', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'mass',
+                'start_time' => '10:00',
+                'language' => '',
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.language']);
+})->group('liturgical-schedules');
+
+test('validation errors target correct indices for multiple time entries', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $data = [
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+        'times' => [
+            [
+                'type' => 'mass',
+                'start_time' => '10:00',
+                'language' => 'English',
+            ],
+            [
+                'type' => 'confession',
+                'activity_type_description' => 'mass', // wrong description for confession
+                'start_time' => '14:00',
+                'end_time' => '', // missing end_time for confession
+                'language' => 'English',
+            ],
+            [
+                'type' => 'mass',
+                'start_time' => '', // missing start_time
+                'language' => '',   // missing language
+            ],
+        ],
+    ];
+
+    $response = postJson('/api/v1/liturgical-schedules', $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'times.1.activity_type_description',
+            'times.1.end_time',
+            'times.2.start_time',
+            'times.2.language',
+        ])
+        ->assertJsonMissingValidationErrors([
+            'times.0.type',
+            'times.0.start_time',
+            'times.0.language',
+        ]);
+})->group('liturgical-schedules');
+
+test('update validation fails when activity_type_description does not match type', function () {
+    $this->actingAsSuperAdminWithTeam();
+
+    $church = Church::factory()->create();
+    $holiday = Holiday::factory()->create();
+
+    $schedule = LiturgicalSchedule::factory()->create([
+        'church_id' => $church->id,
+        'holiday_id' => $holiday->id,
+    ]);
+
+    LiturgicalScheduleTime::factory()->create([
+        'liturgical_schedule_id' => $schedule->id,
+    ]);
+
+    $data = [
+        'times' => [
+            [
+                'type' => 'adoration',
+                'activity_type_description' => 'mass', // invalid for adoration
+                'start_time' => '10:00',
+                'end_time' => '11:00',
+                'language' => 'English',
+            ],
+        ],
+    ];
+
+    $response = putJson("/api/v1/liturgical-schedules/{$schedule->id}", $data);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['times.0.activity_type_description']);
+})->group('liturgical-schedules');
+
 test('response includes holiday information', function () {
     $this->actingAsSuperAdminWithTeam();
 

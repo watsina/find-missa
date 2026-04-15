@@ -18,7 +18,7 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('viewAny', ActivityTime::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $activityTimes = ActivityTime::search($request->search)

@@ -24,8 +24,8 @@ describe('schedule-periods:generate command', function () {
         expect(SchedulePeriod::where('slug', "lent-{$currentYear}")->exists())->toBeTrue();
         expect(SchedulePeriod::where('slug', "holy-week-{$currentYear}")->exists())->toBeTrue();
         expect(SchedulePeriod::where('slug', "easter-season-{$currentYear}")->exists())->toBeTrue();
-        expect(SchedulePeriod::where('slug', "ordinary-time-winter-{$currentYear}")->exists())->toBeTrue();
-        expect(SchedulePeriod::where('slug', "ordinary-time-summer-{$currentYear}")->exists())->toBeTrue();
+        expect(SchedulePeriod::where('slug', "ordinary-time-i-{$currentYear}")->exists())->toBeTrue();
+        expect(SchedulePeriod::where('slug', "ordinary-time-ii-{$currentYear}")->exists())->toBeTrue();
     });
 
     it('generates periods for a specific year when --year option is provided', function () {
@@ -169,29 +169,29 @@ describe('liturgical period date calculations', function () {
         expect($christmas->end_date->isSunday())->toBeTrue();
     });
 
-    it('calculates Ordinary Time Winter correctly', function () {
+    it('calculates Ordinary Time I correctly', function () {
         $this->artisan('schedule-periods:generate', ['--year' => 2030])
             ->assertSuccessful();
 
-        $ordinaryWinter = SchedulePeriod::where('slug', 'ordinary-time-winter-2030')->first();
+        $ordinaryI = SchedulePeriod::where('slug', 'ordinary-time-i-2030')->first();
         $lent = SchedulePeriod::where('slug', 'lent-2030')->first();
 
         // Ends day before Ash Wednesday (Lent start)
-        expect($ordinaryWinter->end_date->addDay()->format('Y-m-d'))->toBe($lent->start_date->format('Y-m-d'));
+        expect($ordinaryI->end_date->addDay()->format('Y-m-d'))->toBe($lent->start_date->format('Y-m-d'));
     });
 
-    it('calculates Ordinary Time Summer correctly', function () {
+    it('calculates Ordinary Time II correctly', function () {
         $this->artisan('schedule-periods:generate', ['--year' => 2030])
             ->assertSuccessful();
 
-        $ordinarySummer = SchedulePeriod::where('slug', 'ordinary-time-summer-2030')->first();
+        $ordinaryII = SchedulePeriod::where('slug', 'ordinary-time-ii-2030')->first();
         $easter = SchedulePeriod::where('slug', 'easter-season-2030')->first();
         $advent = SchedulePeriod::where('slug', 'advent-2030')->first();
 
         // Starts day after Pentecost (Easter season end)
-        expect($ordinarySummer->start_date->subDay()->format('Y-m-d'))->toBe($easter->end_date->format('Y-m-d'));
+        expect($ordinaryII->start_date->subDay()->format('Y-m-d'))->toBe($easter->end_date->format('Y-m-d'));
         // Ends day before Advent
-        expect($ordinarySummer->end_date->addDay()->format('Y-m-d'))->toBe($advent->start_date->format('Y-m-d'));
+        expect($ordinaryII->end_date->addDay()->format('Y-m-d'))->toBe($advent->start_date->format('Y-m-d'));
     });
 });
 

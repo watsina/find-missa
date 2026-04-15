@@ -210,7 +210,56 @@ class HolidayFactory extends Factory
             'easter_offset_days' => -2,
             'is_holy_day_of_obligation' => false,
             'is_moveable' => true,
+            'suppresses_regular_schedule' => true,
             'liturgical_color' => 'red',
+        ]);
+    }
+
+    /**
+     * Create Holy Thursday holiday.
+     */
+    public function holyThursday(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Holy Thursday',
+            'slug' => 'holy-thursday',
+            'type' => HolidayType::EasterRelative,
+            'fixed_month' => null,
+            'fixed_day' => null,
+            'easter_offset_days' => -3,
+            'is_holy_day_of_obligation' => false,
+            'is_moveable' => true,
+            'suppresses_regular_schedule' => true,
+            'liturgical_color' => 'white',
+        ]);
+    }
+
+    /**
+     * Create Holy Saturday holiday.
+     */
+    public function holySaturday(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Holy Saturday',
+            'slug' => 'holy-saturday',
+            'type' => HolidayType::EasterRelative,
+            'fixed_month' => null,
+            'fixed_day' => null,
+            'easter_offset_days' => -1,
+            'is_holy_day_of_obligation' => false,
+            'is_moveable' => true,
+            'suppresses_regular_schedule' => true,
+            'liturgical_color' => 'white',
+        ]);
+    }
+
+    /**
+     * Mark as suppressing regular schedules.
+     */
+    public function suppressesRegularSchedule(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'suppresses_regular_schedule' => true,
         ]);
     }
 }

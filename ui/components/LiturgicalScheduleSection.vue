@@ -7,7 +7,7 @@
     schedules: { type: Array, default: () => [] },
   });
 
-  const { formatActivityDescription, formatTypeDescription } = useActivitySchedule();
+  const { formatActivityDescription } = useActivitySchedule();
 </script>
 
 <template>
@@ -40,9 +40,6 @@
               variant="tonal"
             >
               {{ formatActivityDescription(time, false) }}
-              <span v-if="time.activity_type_description">
-                - {{ formatTypeDescription(time.activity_type_description) }}
-              </span>
             </v-chip>
           </div>
         </v-expansion-panel-text>

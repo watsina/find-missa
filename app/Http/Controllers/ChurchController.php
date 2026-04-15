@@ -18,7 +18,7 @@ class ChurchController extends Controller
     {
         Gate::authorize('viewAny', Church::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?? 20;
+        $items = abs(intval($request->itemsPerPage)) ?: 20;
         $itemsPerPage = $items > 100 ? 100 : $items;
 
         $churches = Church::search($request->search)

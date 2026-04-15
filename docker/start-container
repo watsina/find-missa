@@ -84,6 +84,24 @@ if [ $# -eq 0 ]; then
     php artisan db:seed --class=AclSeeder --force --ansi
 
     # ===========================================================================
+    # Holiday Seeding
+    # ===========================================================================
+    # Seed universal Catholic holidays so the scheduling engine and schedule
+    # period generation can reference them. Uses updateOrCreate keyed on slug,
+    # so it's safe to run on every deployment.
+    echo "Seeding holidays..."
+    php artisan db:seed --class=HolidaySeeder --force --ansi
+
+    # ===========================================================================
+    # Schedule Period Generation
+    # ===========================================================================
+    # Generate liturgical schedule periods for current and next year.
+    # Skips existing periods by default (no --force), so it's safe to run
+    # on every deployment without overwriting user customizations.
+    echo "Generating schedule periods..."
+    php artisan schedule-periods:generate --ansi
+
+    # ===========================================================================
     # Queue Management
     # ===========================================================================
     # Note: queue:restart may fail if Redis is unavailable, but this shouldn't

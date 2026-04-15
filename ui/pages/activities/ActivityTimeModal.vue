@@ -138,7 +138,7 @@
     loadingSchedulePeriods.value = true;
     try {
       const response = await http.get('/api/v1/schedule-periods', {
-        params: { per_page: 100, is_active: true },
+        params: { itemsPerPage: 100, is_active: true },
       });
       schedulePeriods.value = response.data.data;
     } catch (error) {

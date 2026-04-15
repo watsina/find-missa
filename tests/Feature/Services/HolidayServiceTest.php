@@ -182,6 +182,45 @@ it('computes last sunday in month correctly', function () {
     expect($date->toDateString())->toBe('2025-11-30');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Special Computed Holiday Tests (Sunday in Octave of Christmas)
+|--------------------------------------------------------------------------
+*/
+
+it('computes holy family as sunday within octave of christmas', function (int $year, string $expectedDate) {
+    $holiday = Holiday::factory()->computed(['special' => 'sunday_in_octave_of_christmas'])->create([
+        'name' => 'Holy Family',
+    ]);
+
+    $date = $this->service->computeHolidayDate($holiday, $year);
+
+    expect($date->toDateString())->toBe($expectedDate);
+})->with([
+    // Christmas on Thursday → next Sunday is Dec 28
+    '2025 (Christmas Thu)' => [2025, '2025-12-28'],
+    // Christmas on Sunday → Holy Family on Dec 30 (Friday)
+    '2022 (Christmas Sun)' => [2022, '2022-12-30'],
+    // Christmas on Wednesday → next Sunday is Dec 29
+    '2024 (Christmas Wed)' => [2024, '2024-12-29'],
+    // Christmas on Friday → next Sunday is Dec 27
+    '2026 (Christmas Fri)' => [2026, '2026-12-27'],
+    // Christmas on Monday → next Sunday is Dec 31
+    '2023 (Christmas Mon)' => [2023, '2023-12-31'],
+    // Christmas on Saturday → next Sunday is Dec 26
+    '2027 (Christmas Sat)' => [2027, '2027-12-26'],
+    // Christmas on Tuesday → next Sunday is Dec 30
+    '2029 (Christmas Tue)' => [2029, '2029-12-30'],
+]);
+
+it('throws exception for unknown special computation rule', function () {
+    $holiday = Holiday::factory()->computed(['special' => 'unknown_rule'])->create([
+        'name' => 'Unknown Holiday',
+    ]);
+
+    $this->service->computeHolidayDate($holiday, 2025);
+})->throws(\InvalidArgumentException::class, 'Unknown special computation rule');
+
 it('throws exception for computed holiday without valid rule', function () {
     $holiday = Holiday::factory()->create([
         'type' => HolidayType::Computed,
@@ -420,6 +459,84 @@ it('handles ash wednesday in february', function () {
 
     expect($this->service->computeHolidayDate($ashWednesday, 2025)->toDateString())->toBe('2025-03-05');
     expect($this->service->computeHolidayDate($ashWednesday, 2024)->toDateString())->toBe('2024-02-14');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Suppressing Holiday Tests
+|--------------------------------------------------------------------------
+*/
+
+it('returns suppressing holidays on a date', function () {
+    // Good Friday suppresses regular schedules (Easter 2025 = April 20, Good Friday = April 18)
+    Holiday::factory()->goodFriday()->create();
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-04-18');
+
+    expect($suppressingHolidays)->toHaveCount(1);
+    expect($suppressingHolidays->first()->holiday->name)->toBe('Good Friday');
+});
+
+it('does not return non-suppressing holidays from getSuppressingHolidaysOnDate', function () {
+    // Christmas does NOT suppress regular schedules
+    Holiday::factory()->christmas()->create();
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-12-25');
+
+    expect($suppressingHolidays)->toHaveCount(0);
+});
+
+it('returns multiple suppressing holidays on the same date', function () {
+    // Create two holidays that both suppress and fall on the same fixed date
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create(['name' => 'Suppressing A', 'slug' => 'suppressing-a']);
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create(['name' => 'Suppressing B', 'slug' => 'suppressing-b']);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-03-15');
+
+    expect($suppressingHolidays)->toHaveCount(2);
+});
+
+it('scopes suppressing holidays by team', function () {
+    $team = Team::factory()->create();
+    $otherTeam = Team::factory()->create();
+
+    // Universal suppressing holiday
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Universal Suppressing',
+        'slug' => 'universal-suppressing',
+        'team_id' => null,
+    ]);
+
+    // Team-specific suppressing holiday
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Team Suppressing',
+        'slug' => 'team-suppressing',
+        'team_id' => $team->id,
+        'is_universal' => false,
+    ]);
+
+    // Other team's suppressing holiday (should not appear)
+    Holiday::factory()->fixed(3, 15)->suppressesRegularSchedule()->create([
+        'name' => 'Other Team Suppressing',
+        'slug' => 'other-team-suppressing',
+        'team_id' => $otherTeam->id,
+        'is_universal' => false,
+    ]);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-03-15', $team->id);
+
+    expect($suppressingHolidays)->toHaveCount(2);
+    $names = $suppressingHolidays->pluck('holiday.name')->sort()->values()->all();
+    expect($names)->toBe(['Team Suppressing', 'Universal Suppressing']);
+});
+
+it('returns empty collection when no suppressing holidays on date', function () {
+    // Non-suppressing holiday on the date
+    Holiday::factory()->fixed(6, 1)->create(['name' => 'Regular Holiday', 'slug' => 'regular-holiday']);
+
+    $suppressingHolidays = $this->service->getSuppressingHolidaysOnDate('2025-06-01');
+
+    expect($suppressingHolidays)->toBeEmpty();
 });
 
 it('computes all days of week correctly', function (string $day, int $expectedDayNumber) {

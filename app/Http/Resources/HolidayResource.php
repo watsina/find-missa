@@ -36,6 +36,7 @@ class HolidayResource extends JsonResource
             'is_holy_day_of_obligation' => $this->is_holy_day_of_obligation,
             'is_universal' => $this->is_universal,
             'is_moveable' => $this->is_moveable,
+            'suppresses_regular_schedule' => $this->suppresses_regular_schedule,
 
             // Liturgical info
             'liturgical_color' => $this->liturgical_color,
