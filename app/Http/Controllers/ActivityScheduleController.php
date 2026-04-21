@@ -19,9 +19,6 @@ class ActivityScheduleController extends Controller
     {
         Gate::authorize('viewAny', ActivitySchedule::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $activitySchedules = ActivitySchedule::search($request->search)
             ->query(function (Builder $query) use ($request) {
                 $query->with('church:id,name', 'dayDetails');
@@ -60,7 +57,7 @@ class ActivityScheduleController extends Controller
                     $query->matchesDayOfWeek($request->input('matches_day'));
                 }
             })
-            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
+            ->paginate(perPage: $this->getItemsPerPage($request), pageName: 'page', page: $request->page ?? 1);
 
         return ActivityScheduleResource::collection($activitySchedules);
     }

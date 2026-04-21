@@ -19,9 +19,6 @@ class LiturgicalScheduleController extends Controller
     {
         Gate::authorize('viewAny', LiturgicalSchedule::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $liturgicalSchedules = LiturgicalSchedule::query()
             ->with('church:id,name', 'holiday:id,name,slug,type', 'times')
             ->when($request->has('church_id'), function (Builder $query) use ($request) {
@@ -34,7 +31,7 @@ class LiturgicalScheduleController extends Controller
                 $query->forYear((int) $request->input('year'));
             })
             ->orderBy('year', 'desc')
-            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
+            ->paginate(perPage: $this->getItemsPerPage($request), pageName: 'page', page: $request->page ?? 1);
 
         return LiturgicalScheduleResource::collection($liturgicalSchedules);
     }

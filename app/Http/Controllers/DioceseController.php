@@ -16,12 +16,9 @@ class DioceseController extends Controller
     {
         Gate::authorize('viewAny', Diocese::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $dioceses = Diocese::search($request->search)
             ->query(fn ($q) => $q->withCount('parishes'))
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return new DioceseCollection($dioceses);
     }

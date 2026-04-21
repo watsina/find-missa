@@ -18,9 +18,6 @@ class ActivityTimeController extends Controller
     {
         Gate::authorize('viewAny', ActivityTime::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $activityTimes = ActivityTime::search($request->search)
             ->query(function (Builder $query) use ($request) {
                 $query->with('church:id,name');
@@ -54,7 +51,7 @@ class ActivityTimeController extends Controller
                     $query->where('occurrence', $request->input('occurrence'));
                 }
             })
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return new ActivityTimeCollection($activityTimes);
     }

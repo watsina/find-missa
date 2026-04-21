@@ -33,3 +33,4 @@ yarn-error.log
 deploy/*.tar.gz
 /tmp/*.tar.gz
 /.opencode/plans
+.opencode/package-lock.json

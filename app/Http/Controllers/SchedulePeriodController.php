@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SchedulePeriod;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\SchedulePeriodResource;
 use App\Http\Requests\StoreSchedulePeriodRequest;
 use App\Http\Requests\UpdateSchedulePeriodRequest;
@@ -17,10 +18,8 @@ class SchedulePeriodController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', SchedulePeriod::class);
+        Gate::authorize('viewAny', SchedulePeriod::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
         $teamId = $request->user()->currentTeam?->id;
 
         $periods = SchedulePeriod::search($request->search)
@@ -53,7 +52,7 @@ class SchedulePeriodController extends Controller
                     $query->overlapping($request->input('overlaps_start'), $request->input('overlaps_end'));
                 }
             })
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return SchedulePeriodResource::collection($periods);
     }
@@ -83,7 +82,7 @@ class SchedulePeriodController extends Controller
      */
     public function show(SchedulePeriod $schedulePeriod): SchedulePeriodResource
     {
-        $this->authorize('view', $schedulePeriod);
+        Gate::authorize('view', $schedulePeriod);
 
         return new SchedulePeriodResource($schedulePeriod);
     }
@@ -105,7 +104,7 @@ class SchedulePeriodController extends Controller
      */
     public function destroy(SchedulePeriod $schedulePeriod): JsonResponse
     {
-        $this->authorize('delete', $schedulePeriod);
+        Gate::authorize('delete', $schedulePeriod);
 
         $schedulePeriod->delete();
 
@@ -117,7 +116,7 @@ class SchedulePeriodController extends Controller
      */
     public function current(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', SchedulePeriod::class);
+        Gate::authorize('viewAny', SchedulePeriod::class);
 
         $teamId = $request->user()->currentTeam?->id;
 
@@ -136,7 +135,7 @@ class SchedulePeriodController extends Controller
      */
     public function upcoming(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', SchedulePeriod::class);
+        Gate::authorize('viewAny', SchedulePeriod::class);
 
         $teamId = $request->user()->currentTeam?->id;
 
@@ -155,7 +154,7 @@ class SchedulePeriodController extends Controller
      */
     public function checkOverlap(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', SchedulePeriod::class);
+        Gate::authorize('viewAny', SchedulePeriod::class);
 
         $request->validate([
             'start_date' => ['required', 'date'],
