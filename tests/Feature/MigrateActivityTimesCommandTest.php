@@ -10,9 +10,6 @@ use App\Enums\ActivityOccurrence;
 use function Pest\Laravel\artisan;
 
 use App\Models\ActivityTimeException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('summarizes actions for dry run without writing data', function () {
     $church = Church::factory()->create();

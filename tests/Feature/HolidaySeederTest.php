@@ -4,9 +4,6 @@ use Carbon\Carbon;
 use App\Models\Holiday;
 use App\Models\HolidayInstance;
 use Database\Seeders\HolidaySeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 /*
 |--------------------------------------------------------------------------
