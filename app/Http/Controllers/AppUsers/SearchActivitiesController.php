@@ -18,21 +18,21 @@ class SearchActivitiesController extends Controller
      */
     public function __invoke(SearchActivitiesRequest $request)
     {
+        $data = $request->validated();
+
         if (config('services.posthog.enabled') && config('services.posthog.key')) {
             PostHog::capture([
                 'distinctId' => $request->user()?->email ?? 'guest-user:'.sha1(session()->getId()),
                 'event' => 'home-page-search',
                 'properties' => [
                     'ip' => $request->getClientIp(),
-                    'request_body' => $request->all(),
+                    'request_body' => $data,
                 ],
                 '$groups' => [
                     'environment' => config('app.env'),
                 ],
             ]);
         }
-
-        $data = $request->validated();
 
         $date = Carbon::createFromDate($data['date']);
         $dayHasGlobalException = GlobalActivityTimeException::whereDate('start_date', '<=', $date)

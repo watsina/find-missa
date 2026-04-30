@@ -35,7 +35,7 @@ class HolidayService
      *
      * @see https://en.wikipedia.org/wiki/Date_of_Easter#Anonymous_Gregorian_algorithm
      */
-    private function calculateEasterDate(int $year): Carbon
+    protected function calculateEasterDate(int $year): Carbon
     {
         $a = $year % 19;
         $b = intdiv($year, 100);
@@ -70,7 +70,7 @@ class HolidayService
     /**
      * Compute a fixed date holiday.
      */
-    private function computeFixedDate(Holiday $holiday, int $year): Carbon
+    protected function computeFixedDate(Holiday $holiday, int $year): Carbon
     {
         return Carbon::createFromDate($year, $holiday->fixed_month, $holiday->fixed_day);
     }
@@ -78,7 +78,7 @@ class HolidayService
     /**
      * Compute an Easter-relative holiday date.
      */
-    private function computeEasterRelativeDate(Holiday $holiday, int $year): Carbon
+    protected function computeEasterRelativeDate(Holiday $holiday, int $year): Carbon
     {
         $easter = $this->getEasterDate($year);
 
@@ -98,7 +98,7 @@ class HolidayService
      *
      * @param  array{nth?: int, day?: string, month?: int, last?: bool, special?: string}|null  $rule
      */
-    private function computeFromRule(Holiday $holiday, int $year): Carbon
+    protected function computeFromRule(Holiday $holiday, int $year): Carbon
     {
         $rule = $holiday->computation_rule;
 
@@ -133,7 +133,7 @@ class HolidayService
      * Special rules handle holidays whose date logic doesn't fit the standard
      * "nth day of week in month" pattern.
      */
-    private function computeSpecialRule(Holiday $holiday, string $ruleName, int $year): Carbon
+    protected function computeSpecialRule(Holiday $holiday, string $ruleName, int $year): Carbon
     {
         return match ($ruleName) {
             'sunday_in_octave_of_christmas' => $this->computeSundayInOctaveOfChristmas($year),
@@ -149,7 +149,7 @@ class HolidayService
      * itself falls on a Sunday (making the next Sunday Jan 1 — the Solemnity of Mary),
      * the Holy Family is celebrated on Dec 30 instead.
      */
-    private function computeSundayInOctaveOfChristmas(int $year): Carbon
+    protected function computeSundayInOctaveOfChristmas(int $year): Carbon
     {
         $christmas = Carbon::createFromDate($year, 12, 25);
 
@@ -170,7 +170,7 @@ class HolidayService
      * Get the nth occurrence of a day of week in a month.
      * e.g., 4th Thursday of November.
      */
-    private function getNthDayOfWeekInMonth(int $year, int $month, string $dayOfWeek, int $nth): Carbon
+    protected function getNthDayOfWeekInMonth(int $year, int $month, string $dayOfWeek, int $nth): Carbon
     {
         $firstOfMonth = Carbon::createFromDate($year, $month, 1);
         $dayNumber = $this->getDayNumber($dayOfWeek);
@@ -187,7 +187,7 @@ class HolidayService
      * Get the last occurrence of a day of week in a month.
      * e.g., Last Monday of May.
      */
-    private function getLastDayOfWeekInMonth(int $year, int $month, string $dayOfWeek): Carbon
+    protected function getLastDayOfWeekInMonth(int $year, int $month, string $dayOfWeek): Carbon
     {
         $lastOfMonth = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         $dayNumber = $this->getDayNumber($dayOfWeek);
@@ -201,7 +201,7 @@ class HolidayService
     /**
      * Convert day name to Carbon day number (0 = Sunday, 6 = Saturday).
      */
-    private function getDayNumber(string $dayOfWeek): int
+    protected function getDayNumber(string $dayOfWeek): int
     {
         return match (strtolower($dayOfWeek)) {
             'sunday' => Carbon::SUNDAY,

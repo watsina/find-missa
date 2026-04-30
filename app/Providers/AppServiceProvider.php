@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap(config('morph'));
 
-        Model::preventLazyLoading();
+        Model::preventLazyLoading(! app()->isProduction());
 
         if (config('services.posthog.enabled') && config('services.posthog.key')) {
             PostHog::init(
