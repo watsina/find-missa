@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use App\Models\TeamMember;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\TeamMemberResource;
 use App\Http\Resources\TeamMemberCollection;
+use App\Http\Requests\UpdateTeamMemberRequest;
 
 class TeamMemberController extends Controller
 {
@@ -40,14 +40,9 @@ class TeamMemberController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Team $team, TeamMember $member)
+    public function update(UpdateTeamMemberRequest $request, Team $team, TeamMember $member)
     {
         Gate::authorize('update', $member);
-
-        $data = $request->validate([
-            'role_ids' => 'required|array',
-            'role_ids.*' => 'required|exists:roles,id',
-        ]);
 
         $member->loadMissing('user');
 
@@ -55,7 +50,7 @@ class TeamMemberController extends Controller
             abort(422, 'Team member has no associated user');
         }
 
-        $member->user->syncRoles($data['role_ids']);
+        $member->user->syncRoles($request->validated('role_ids'));
 
         $member->load(['user' => function ($query) {
             $query->with('roles');

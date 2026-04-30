@@ -4,11 +4,11 @@ namespace App\Http\Controllers\AppUsers;
 
 use PostHog\PostHog;
 use App\Models\ActivityTime;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\GlobalActivityTimeException;
+use App\Http\Requests\SearchActivitiesRequest;
 use App\Http\Resources\ActivityTimeDetailsResource;
 
 class SearchActivitiesController extends Controller
@@ -16,7 +16,7 @@ class SearchActivitiesController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(SearchActivitiesRequest $request)
     {
         if (config('services.posthog.enabled') && config('services.posthog.key')) {
             PostHog::capture([
@@ -32,13 +32,7 @@ class SearchActivitiesController extends Controller
             ]);
         }
 
-        $data = $request->validate([
-            'type' => 'required|string|in:mass,confession,adoration',
-            'date' => 'required|date',
-            'start_time' => 'nullable|date_format:H:i',
-            'church_name' => 'nullable|string',
-            'district' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $date = Carbon::createFromDate($data['date']);
         $dayHasGlobalException = GlobalActivityTimeException::whereDate('start_date', '<=', $date)
