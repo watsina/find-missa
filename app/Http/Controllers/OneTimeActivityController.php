@@ -18,9 +18,6 @@ class OneTimeActivityController extends Controller
     {
         Gate::authorize('viewAny', OneTimeActivity::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $oneTimeActivities = OneTimeActivity::query()
             ->with('church:id,name')
             ->when($request->has('church_id'), function (Builder $query) use ($request) {
@@ -40,7 +37,7 @@ class OneTimeActivityController extends Controller
             })
             ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
+            ->paginate(perPage: $this->getItemsPerPage($request), pageName: 'page', page: $request->page ?? 1);
 
         return OneTimeActivityResource::collection($oneTimeActivities);
     }

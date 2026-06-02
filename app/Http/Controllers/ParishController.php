@@ -16,12 +16,9 @@ class ParishController extends Controller
     {
         Gate::authorize('viewAny', Parish::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $parishes = Parish::search($request->search)
             ->query(fn ($q) => $q->with('diocese')->withCount('churches', 'subParishes'))
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return new ParishCollection($parishes);
     }

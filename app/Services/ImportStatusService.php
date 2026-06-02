@@ -194,7 +194,7 @@ class ImportStatusService
     /**
      * Save status to cache.
      */
-    private function saveStatus(string $importId, array $status): void
+    protected function saveStatus(string $importId, array $status): void
     {
         Cache::put(
             $this->getCacheKey($importId),
@@ -206,7 +206,7 @@ class ImportStatusService
     /**
      * Get the cache key for an import.
      */
-    private function getCacheKey(string $importId): string
+    protected function getCacheKey(string $importId): string
     {
         return self::CACHE_PREFIX.$importId;
     }

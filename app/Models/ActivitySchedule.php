@@ -6,6 +6,8 @@ use App\Casts\Timecast;
 use App\Enums\DayPattern;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use App\Models\Concerns\HasScheduleLogic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,44 +16,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class ActivitySchedule extends BaseModel
 {
     use HasFactory;
+    use HasScheduleLogic;
     use Searchable;
-
-    /**
-     * Week of month constants.
-     */
-    public const WEEK_FIRST = 1;
-
-    public const WEEK_SECOND = 2;
-
-    public const WEEK_THIRD = 3;
-
-    public const WEEK_FOURTH = 4;
-
-    public const WEEK_LAST = 5;
-
-    /**
-     * Get the week of month options for UI.
-     *
-     * @return array<int, string>
-     */
-    public static function weekOfMonthOptions(): array
-    {
-        return [
-            self::WEEK_FIRST => 'First',
-            self::WEEK_SECOND => 'Second',
-            self::WEEK_THIRD => 'Third',
-            self::WEEK_FOURTH => 'Fourth',
-            self::WEEK_LAST => 'Last',
-        ];
-    }
 
     protected static function booted(): void
     {
-        static::creating(function (ActivitySchedule $model) {
-            if (! $model->activity_type_description) {
-                $model->activity_type_description = $model->type;
-            }
-        });
+        static::created(fn () => Cache::clear());
+        static::updated(fn () => Cache::clear());
     }
 
     /**
@@ -85,46 +56,6 @@ class ActivitySchedule extends BaseModel
     public function toSearchableArray(): array
     {
         return $this->only('start_time', 'day_pattern', 'type', 'language');
-    }
-
-    /**
-     * Scope a query to only include schedules of given types.
-     */
-    public function scopeOfType(Builder $query, array $types): void
-    {
-        $query->whereIn('type', $types);
-    }
-
-    /**
-     * Scope a query to only include schedules effective on a given date.
-     */
-    public function scopeEffectiveOn(Builder $query, Carbon|string|null $date = null): void
-    {
-        $date = $date instanceof Carbon ? $date : Carbon::parse($date ?? 'today');
-        $dateString = $date->toDateString();
-
-        $query->where(function (Builder $q) use ($dateString) {
-            $q->where(function (Builder $inner) {
-                $inner->whereNull('effective_from')
-                    ->whereNull('effective_until');
-            })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNotNull('effective_from')
-                        ->whereNull('effective_until')
-                        ->whereDate('effective_from', '<=', $dateString);
-                })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNull('effective_from')
-                        ->whereNotNull('effective_until')
-                        ->whereDate('effective_until', '>=', $dateString);
-                })
-                ->orWhere(function (Builder $inner) use ($dateString) {
-                    $inner->whereNotNull('effective_from')
-                        ->whereNotNull('effective_until')
-                        ->whereDate('effective_from', '<=', $dateString)
-                        ->whereDate('effective_until', '>=', $dateString);
-                });
-        });
     }
 
     /**
@@ -188,48 +119,6 @@ class ActivitySchedule extends BaseModel
     }
 
     /**
-     * Scope a query to only include schedules for a specific schedule period.
-     */
-    public function scopeForSchedulePeriod(Builder $query, int|SchedulePeriod $schedulePeriod): void
-    {
-        $schedulePeriodId = $schedulePeriod instanceof SchedulePeriod
-            ? $schedulePeriod->id
-            : $schedulePeriod;
-
-        $query->where('schedule_period_id', $schedulePeriodId);
-    }
-
-    /**
-     * Scope a query to only include schedules without a schedule period.
-     */
-    public function scopeWithoutSchedulePeriod(Builder $query): void
-    {
-        $query->whereNull('schedule_period_id');
-    }
-
-    /**
-     * Check if this schedule is currently effective.
-     */
-    public function isEffective(?Carbon $date = null): bool
-    {
-        $date = $date ?? Carbon::today();
-
-        if (is_null($this->effective_from) && is_null($this->effective_until)) {
-            return true;
-        }
-
-        if (! is_null($this->effective_from) && $this->effective_from->gt($date)) {
-            return false;
-        }
-
-        if (! is_null($this->effective_until) && $this->effective_until->lt($date)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Check if this schedule occurs on a given date based on its day pattern.
      */
     public function occursOn(Carbon $date): bool
@@ -252,30 +141,6 @@ class ActivitySchedule extends BaseModel
     }
 
     /**
-     * Check if this schedule occurs on a given date for monthly nth pattern.
-     */
-    protected function occursOnMonthlyNth(Carbon $date): bool
-    {
-        if (! $this->week_of_month || ! $this->day_of_week) {
-            return false;
-        }
-
-        if ($date->dayName !== $this->day_of_week) {
-            return false;
-        }
-
-        $weekNumber = (int) ceil($date->day / 7);
-
-        if ($this->week_of_month === self::WEEK_LAST) {
-            $nextWeek = $date->copy()->addWeek();
-
-            return $nextWeek->month !== $date->month;
-        }
-
-        return $weekNumber === $this->week_of_month;
-    }
-
-    /**
      * Get the resolved values for a specific day, considering day details.
      *
      * @return array{start_time: string, end_time: string|null, language: string, activity_type_description: string|null, is_skipped: bool}
@@ -292,18 +157,6 @@ class ActivitySchedule extends BaseModel
             'activity_type_description' => $dayDetail?->activity_type_description ?? $this->activity_type_description,
             'is_skipped' => $dayDetail?->is_skipped ?? false,
         ];
-    }
-
-    /**
-     * Get the human-readable label for the week of month.
-     */
-    public function getWeekOfMonthLabelAttribute(): ?string
-    {
-        if (! $this->week_of_month) {
-            return null;
-        }
-
-        return self::weekOfMonthOptions()[$this->week_of_month] ?? null;
     }
 
     public function church(): BelongsTo

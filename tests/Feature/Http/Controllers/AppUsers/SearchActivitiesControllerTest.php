@@ -10,9 +10,6 @@ use function Pest\Laravel\get;
 
 use App\Models\ActivityTimeException;
 use App\Models\GlobalActivityTimeException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 // V1 search API has been disabled - use v2 instead
 // These tests are skipped until the v1 API is removed entirely

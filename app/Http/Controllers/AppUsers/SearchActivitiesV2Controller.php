@@ -30,8 +30,6 @@ class SearchActivitiesV2Controller extends Controller
      */
     public function __invoke(Request $request): AnonymousResourceCollection
     {
-        $this->trackSearchEvent($request);
-
         $data = $request->validate([
             'type' => 'required|string|in:mass,confession,adoration',
             'date' => 'required|date',
@@ -40,6 +38,8 @@ class SearchActivitiesV2Controller extends Controller
             'district' => 'nullable|string',
             'limit' => 'nullable|integer|min:1|max:100',
         ]);
+
+        $this->trackSearchEvent($request, $data);
 
         $date = Carbon::createFromDate($data['date']);
 
@@ -64,8 +64,10 @@ class SearchActivitiesV2Controller extends Controller
 
     /**
      * Track the search event in PostHog.
+     *
+     * @param  array<string, mixed>  $data
      */
-    protected function trackSearchEvent(Request $request): void
+    protected function trackSearchEvent(Request $request, array $data): void
     {
         if (config('services.posthog.enabled') && config('services.posthog.key')) {
             PostHog::capture([
@@ -73,7 +75,7 @@ class SearchActivitiesV2Controller extends Controller
                 'event' => 'home-page-search-v2',
                 'properties' => [
                     'ip' => $request->getClientIp(),
-                    'request_body' => $request->all(),
+                    'request_body' => $data,
                 ],
                 '$groups' => [
                     'environment' => config('app.env'),

@@ -156,7 +156,7 @@ class ProcessFullDataImport implements ShouldQueue
     /**
      * Clean up the temporary import file.
      */
-    private function cleanupFile(): void
+    protected function cleanupFile(): void
     {
         try {
             if (Storage::disk('local')->exists($this->filePath)) {

@@ -7,9 +7,6 @@ use App\Enums\HolidayType;
 use App\Models\HolidayInstance;
 use App\Services\HolidayService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->service = app(HolidayService::class);

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use App\Models\TeamMember;
-use Illuminate\Http\Request;
 use App\Models\TeamInvitation;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\TeamInvitationResource;
 use App\Http\Resources\TeamInvitationCollection;
+use App\Http\Requests\StoreTeamInvitationRequest;
 
 class TeamInvitationController extends Controller
 {
@@ -27,17 +27,11 @@ class TeamInvitationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Team $team)
+    public function store(StoreTeamInvitationRequest $request, Team $team)
     {
         Gate::authorize('create', TeamMember::class);
 
-        $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users|unique:team_invitations|lowercase',
-            'role_id' => 'required|exists:roles,id',
-        ]);
-
-        $invitation = $team->invitations()->create($data);
+        $invitation = $team->invitations()->create($request->validated());
 
         return new TeamInvitationResource($invitation);
     }

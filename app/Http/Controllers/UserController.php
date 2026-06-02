@@ -14,11 +14,8 @@ class UserController extends Controller
 {
     public function index(Request $request): UserCollection
     {
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $users = User::search($request->search)
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return new UserCollection($users);
     }

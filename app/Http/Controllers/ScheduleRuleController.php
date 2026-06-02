@@ -18,9 +18,6 @@ class ScheduleRuleController extends Controller
     {
         Gate::authorize('viewAny', ScheduleRule::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $scheduleRules = ScheduleRule::query()
             ->when($request->has('scope_type'), function (Builder $query) use ($request) {
                 $query->where('scope_type', $request->input('scope_type'));
@@ -41,7 +38,7 @@ class ScheduleRuleController extends Controller
                 $query->where('is_active', filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN));
             })
             ->orderedByPriority()
-            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
+            ->paginate(perPage: $this->getItemsPerPage($request), pageName: 'page', page: $request->page ?? 1);
 
         return ScheduleRuleResource::collection($scheduleRules);
     }

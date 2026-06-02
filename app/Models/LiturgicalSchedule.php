@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class LiturgicalSchedule extends BaseModel
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::created(fn () => Cache::clear());
+        static::updated(fn () => Cache::clear());
+    }
 
     /**
      * Get the attributes that should be cast.

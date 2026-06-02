@@ -16,12 +16,9 @@ class SubParishController extends Controller
     {
         Gate::authorize('viewAny', SubParish::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $subParishes = SubParish::search($request->search)
             ->query(fn ($q) => $q->with('parish')->withCount('churches'))
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return new SubParishCollection($subParishes);
     }

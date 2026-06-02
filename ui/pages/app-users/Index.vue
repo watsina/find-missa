@@ -362,14 +362,6 @@
                 >
                   Holy Day of Obligation
                 </v-chip>
-                <v-chip
-                  v-if="holidayInstance.holiday?.liturgical_color"
-                  :color="getLiturgicalColor(holidayInstance.holiday?.liturgical_color)"
-                  size="small"
-                  variant="flat"
-                >
-                  {{ holidayInstance.holiday?.liturgical_color }}
-                </v-chip>
               </div>
               <p v-if="holidayInstance.holiday?.description" class="tw:mt-2 tw:mb-0">
                 {{ holidayInstance.holiday?.description }}

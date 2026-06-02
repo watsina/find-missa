@@ -29,8 +29,6 @@ class HolidayController extends Controller
     {
         Gate::authorize('viewAny', Holiday::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
         $teamId = $request->user()->currentTeam?->id;
 
         $holidays = Holiday::search($request->search)
@@ -68,7 +66,7 @@ class HolidayController extends Controller
 
                 $query->orderBy('name');
             })
-            ->paginate($perPage = $itemsPerPage, $pageName = 'page', $page = $request->page ?? 1);
+            ->paginate($perPage = $this->getItemsPerPage($request), $pageName = 'page', $page = $request->page ?? 1);
 
         return HolidayResource::collection($holidays);
     }

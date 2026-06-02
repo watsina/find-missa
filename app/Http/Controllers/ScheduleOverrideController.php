@@ -18,9 +18,6 @@ class ScheduleOverrideController extends Controller
     {
         Gate::authorize('viewAny', ScheduleOverride::class);
 
-        $items = abs(intval($request->itemsPerPage)) ?: 20;
-        $itemsPerPage = $items > 100 ? 100 : $items;
-
         $scheduleOverrides = ScheduleOverride::query()
             ->when($request->has('scope_type'), function (Builder $query) use ($request) {
                 $query->where('scope_type', $request->input('scope_type'));
@@ -41,7 +38,7 @@ class ScheduleOverrideController extends Controller
                 $query->where('is_active', filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN));
             })
             ->orderBy('start_date', 'asc')
-            ->paginate(perPage: $itemsPerPage, pageName: 'page', page: $request->page ?? 1);
+            ->paginate(perPage: $this->getItemsPerPage($request), pageName: 'page', page: $request->page ?? 1);
 
         return ScheduleOverrideResource::collection($scheduleOverrides);
     }
