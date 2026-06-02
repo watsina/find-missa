@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\AppUsers;
 
+use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Services\HolidayService;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,7 @@ class HolidayInfoController extends Controller
         ]);
 
         // No team filtering for public endpoint - only show universal holidays
-        $teamId = null;
+        $teamId = Team::select('id')->where('country', 'Uganda')->first()?->id ?? null;
         $isHoliday = $this->holidayService->isHoliday($request->date, $teamId);
         $isHolyDayOfObligation = $this->holidayService->isHolyDayOfObligation($request->date, $teamId);
         $holidays = $this->holidayService->getHolidaysOnDate($request->date, $teamId);
