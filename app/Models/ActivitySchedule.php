@@ -6,6 +6,7 @@ use App\Casts\Timecast;
 use App\Enums\DayPattern;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Concerns\HasScheduleLogic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,12 @@ class ActivitySchedule extends BaseModel
     use HasFactory;
     use HasScheduleLogic;
     use Searchable;
+
+    protected static function booted(): void
+    {
+        static::created(fn () => Cache::clear());
+        static::updated(fn () => Cache::clear());
+    }
 
     /**
      * Get the attributes that should be cast.

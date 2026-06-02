@@ -58,7 +58,10 @@ class ActivityScheduleService
 
         if ($suppressingHolidays->isNotEmpty()) {
             return $this->getActivitiesForSuppressingHoliday(
-                $church, $date, $activityTypes, $includeChurch
+                $church,
+                $date,
+                $activityTypes,
+                $includeChurch
             );
         }
 
@@ -416,29 +419,31 @@ class ActivityScheduleService
         int $limit = 50,
     ): Collection {
         // First, get all churches that match the filters
-        $churchQuery = Church::query();
 
-        if ($churchName) {
-            $churchQuery->whereLikeInsensitive('name', $churchName);
-        }
+        $churches = cache()->remember("church-query-cache:{$churchName}:{$district}", 12 * 60, function () use ($churchName, $district) {
+            $churchQuery = Church::query();
+            if ($churchName) {
+                $churchQuery->whereLikeInsensitive('name', $churchName);
+            }
 
-        if ($district) {
-            $churchQuery->where(function ($q) use ($district) {
-                $q->whereLikeInsensitive('district', $district)
-                    ->orWhereLikeInsensitive('city', $district);
-            });
-        }
+            if ($district) {
+                $churchQuery->where(function ($q) use ($district) {
+                    $q->whereLikeInsensitive('district', $district)
+                        ->orWhereLikeInsensitive('city', $district);
+                });
+            }
 
-        $churches = $churchQuery
-            ->with([
-                'parishable' => function (MorphTo $morphTo) {
-                    $morphTo->morphWith([
-                        Parish::class => ['diocese'],
-                        SubParish::class => ['parish.diocese'],
-                    ]);
-                },
-            ])
-            ->get();
+            return $churchQuery
+                ->with([
+                    'parishable' => function (MorphTo $morphTo) {
+                        $morphTo->morphWith([
+                            Parish::class => ['diocese'],
+                            SubParish::class => ['parish.diocese'],
+                        ]);
+                    },
+                ])
+                ->get();
+        });
 
         // Get activities for each church
         $allActivities = $churches->flatMap(

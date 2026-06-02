@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Timecast;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,8 @@ class OneTimeActivity extends BaseModel
                 $model->activity_type_description = $model->type;
             }
         });
+        static::created(fn () => Cache::clear());
+        static::updated(fn () => Cache::clear());
     }
 
     /**
