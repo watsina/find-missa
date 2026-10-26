@@ -51,7 +51,7 @@
     "leaflet": "^1.9.4",
     "nprogress": "^0.2.0",
     "pinia": "^2.2.2",
-    "posthog-js": "^1.203.2",
+    "posthog-js": "^1.438.12",
     "uuid": "^14.0.0",
     "vue-router": "^4.4.3",
     "vuetify": "^3.7.7"
