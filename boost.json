@@ -4,18 +4,21 @@
         "opencode",
         "claude_code"
     ],
+    "cloud": true,
     "guidelines": true,
     "mcp": true,
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
+        "infer-conventions",
+        "deploying-to-cloud",
         "fortify-development",
         "laravel-best-practices",
+        "testing-best-practices",
         "configure-nightwatch",
         "pennant-development",
         "pulse-development",
         "scout-development",
-        "pest-testing",
         "tailwindcss-development"
     ]
 }
