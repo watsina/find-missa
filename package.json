@@ -36,7 +36,7 @@
     "sass-embedded": "^1.85.1",
     "tailwindcss": "^4.1.4",
     "unplugin-fonts": "^1.1.1",
-    "vite": "^6.4.2",
+    "vite": "^6.4.5",
     "vite-plugin-vuetify": "^2.0",
     "vue": "^3.5"
   },
