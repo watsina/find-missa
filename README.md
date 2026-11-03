@@ -26,6 +26,16 @@ Find Missa is a high-performance, full-stack web application designed to central
 *   **Testing:** PestPHP with Paratest (Parallel execution)
 *   **Monitoring:** PostHog Analytics & PHP Artisan Pail (Log monitoring)
 
+## 🏗 Infrastructure & Deployment
+
+The project includes a custom-engineered **Blue-Green Deployment** system for zero-downtime updates, managed via a suite of robust shell scripts and Docker orchestration.
+
+*   **Zero-Downtime Updates:** Automated Blue-Green switching logic using Nginx upstream reloads to ensure continuous availability during deployments.
+*   **Containerized Architecture:** Multi-stage Docker builds optimized for size and performance, running a supervised process stack (PHP-FPM, Nginx, Queue Workers, and Scheduler).
+*   **Automated Provisioning:** Custom server-initialization scripts that handle automated installation of Docker, Redis, Nginx, and Certbot/SSL on fresh Ubuntu instances.
+*   **Robust DevOps Workflow:** Integrated health checks, automated database migrations, and instant rollback capabilities to maintain platform stability.
+*   **Persistent Storage:** Optimized SQLite with WAL (Write-Ahead Logging) mode for reliability and Redis for high-concurrency caching.
+
 ## 💡 Motivation
 
 Finding accurate and up-to-date sacramental schedules across different parishes often involves navigating fragmented and outdated websites. **Find Missa** was created to bridge this gap, providing a unified, user-friendly platform for the faithful while offering church administrators a sophisticated tool to manage complex liturgical data. 
