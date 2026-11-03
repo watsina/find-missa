@@ -85,6 +85,8 @@ Admin users can log in to the backoffice to:
 
 Thank you for your interest in Find Missa! At this time, the project is **not open to public contributions** as it is currently under active private development. This repository serves as a showcase of technical implementation and architectural patterns.
 
----
+## ⚖️ License & Copyright
 
-*Developed with ❤️ for the Catholic Community.*
+Copyright © 2026 Eugene Owak. All rights reserved.
+
+This project is **proprietary software**. While the source code is visible for review and portfolio evaluation purposes, it is **not** licensed for use, modification, or redistribution. No part of this repository may be copied or used in other projects without explicit permission.
