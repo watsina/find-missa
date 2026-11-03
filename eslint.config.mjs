@@ -19,7 +19,7 @@ export default defineConfig([
   {
     extends: compat.extends(
       'eslint:recommended',
-      'plugin:vue/vue3-essential',
+      'plugin:vue/essential',
       'plugin:prettier/recommended',
       'plugin:vuetify/base',
     ),

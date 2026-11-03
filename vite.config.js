@@ -33,7 +33,6 @@ export default defineConfig(({ mode }) => {
       laravel({
         input: ['ui/app.js', 'ui/styles/app.css'],
         refresh: true,
-        detectTls: path.basename(env.VITE_APP_URL ?? 'find-mass.test'),
       }),
       vue({
         template: {
