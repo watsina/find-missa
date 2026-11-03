@@ -33,7 +33,7 @@
     "lodash": "^4.18.1",
     "postcss": "^8.5.31",
     "prettier": "^3.3.3",
-    "sass-embedded": "^1.85.1",
+    "sass-embedded": "^1.106.1",
     "tailwindcss": "^4.1.4",
     "unplugin-fonts": "^1.1.1",
     "vite": "^6.4.5",
