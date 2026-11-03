@@ -1,79 +1,90 @@
-# Find Missa
+# Find Missa — Liturgical Schedule Management Platform
 
-A web application designed to help Catholics find **Mass**, **Confession**, and **Adoration** times at churches across different dioceses. The name "Missa" comes from the Latin word for Mass.
+Find Missa is a high-performance, full-stack web application designed to centralize and simplify the discovery of **Mass, Confession, and Adoration** schedules. Built with a modern Laravel 12 backend and a Vue 3 + Vuetify 3 Single Page Application (SPA) frontend, it provides a seamless experience for both the public and church administrators.
 
-## Target Audience
+## 🌟 Key Features
 
-- **Public Users** - Anyone looking for Catholic church service times
-- **Church Administrators** - Diocese/parish staff who manage church schedules
-- **Super Admins** - Platform administrators managing teams and users
+### For the Public
+*   **Intelligent Search:** Full-text search powered by Laravel Scout to find activities by type, date, location, or church name.
+*   **Interactive Maps:** Visual discovery of churches using Leaflet and Google Maps integration.
+*   **Comprehensive Schedules:** Detailed weekly views of liturgical services, including one-time events and recurring schedules.
+*   **Social Sharing:** Easy sharing of service times to community networks.
 
-## Features
+### For Administrators (Backoffice)
+*   **Multi-Tenant Architecture:** Team-based scoping where each team represents a country, allowing for global scalability.
+*   **Hierarchical Management:** Robust management of Dioceses, Parishes, Sub-Parishes, and individual Churches.
+*   **Advanced Scheduling Engine:** Support for daily/weekly recurring patterns, priest assignments, and global/per-activity exceptions.
+*   **Security & Audit:** Secure authentication via Laravel Fortify (2FA supported) and granular RBAC (Role-Based Access Control) using Spatie Permissions. Includes full audit logging of all data changes.
+*   **Data Operations:** Bulk import/export capabilities via Excel and CSV for managing large liturgical datasets.
 
-### For Public Users (No Login Required)
+## 🛠 Tech Stack
 
-- Search for activities by type, date, time, location, or church name
-- View church details with complete weekly schedules
-- Share results via social media
+*   **Backend:** PHP 8.4, Laravel 12 (Service Layers, Action Classes, Eloquent API Resources)
+*   **Frontend:** Vue 3 (Composition API), Vuetify 3, Pinia, Vite
+*   **Database & Cache:** MySQL, Redis (User activity tracking & Caching)
+*   **Search Engine:** Laravel Scout
+*   **Testing:** PestPHP with Paratest (Parallel execution)
+*   **Monitoring:** PostHog Analytics & PHP Artisan Pail (Log monitoring)
 
-### For Authenticated Users (Backoffice)
+## 💡 Motivation
 
-- Hierarchical church management: Dioceses → Parishes → Sub-Parishes → Churches
-- Activity schedule management (one-time, daily, or weekly recurring)
-- Exception handling (per-activity and global exceptions)
-- Priest assignments to parishes/churches
-- Bulk data import via Excel/CSV
-- Data export capabilities
-- Audit logging of all changes
+Finding accurate and up-to-date sacramental schedules across different parishes often involves navigating fragmented and outdated websites. **Find Missa** was created to bridge this gap, providing a unified, user-friendly platform for the faithful while offering church administrators a sophisticated tool to manage complex liturgical data. 
 
-## Tech Stack
+The project demonstrates a professional implementation of multi-tenancy, complex scheduling logic, and modern frontend-backend separation, showcasing the ability to build scalable, real-world enterprise applications.
 
-| Layer              | Technology                                 |
-| ------------------ | ------------------------------------------ |
-| **Backend**        | Laravel 12 (PHP 8.4)                       |
-| **Frontend**       | Vue 3 + Vuetify 3 (SPA)                    |
-| **Database**       | MySQL                                      |
-| **Authentication** | Laravel Fortify + Sanctum (2FA supported)  |
-| **Authorization**  | Spatie Permission (RBAC with team support) |
-| **Search**         | Laravel Scout                              |
-| **Analytics**      | PostHog                                    |
-| **Maps**           | Leaflet + Google Maps                      |
+## 🚀 Quick Start
 
-## Architecture
+### Prerequisites
+*   PHP 8.4+ & Composer
+*   Node.js & NPM
+*   MySQL & Redis
 
-### Multi-Tenancy Model
+### Installation
 
-- Each **Team** represents a **country**
-- All data is scoped to a team
-- Users can belong to multiple teams and switch between them
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/find-missa.git
+    cd find-missa
+    ```
 
-### Domain Entities
+2.  **Install dependencies:**
+    ```bash
+    composer install
+    npm install
+    ```
 
-| Entity            | Description                                           |
-| ----------------- | ----------------------------------------------------- |
-| **Diocese**       | Top-level church administrative unit                  |
-| **Parish**        | A church community under a diocese                    |
-| **Sub-Parish**    | A smaller church community under a parish             |
-| **Church**        | Physical building (Cathedral, Basilica, Chapel, etc.) |
-| **Activity Time** | A scheduled Mass, Confession, or Adoration            |
-| **Priest**        | Clergy member assigned to a parish                    |
+3.  **Environment Setup:**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-## Development
+4.  **Database Migration & Seeding:**
+    ```bash
+    php artisan migrate --seed
+    ```
 
-```bash
-# Start all services (server, queue, logs, vite)
-composer run dev
+5.  **Run Development Environment:**
+    ```bash
+    composer run dev
+    ```
 
-# Run tests
-composer run test
+## 📖 Usage
 
-# Code linting
-composer run lint:fix   # PHP
-npm run lint:fix        # JS/Vue
-```
+### Public Interface
+Simply navigate to the homepage to search for nearby churches or specific service times. No registration is required for public discovery.
 
-## Deployment
+### Administrative Access
+Admin users can log in to the backoffice to:
+1.  **Switch Teams:** Manage data for different countries via the team switcher.
+2.  **Manage Hierarchy:** Create and link Dioceses down to individual Churches.
+3.  **Update Schedules:** Use the scheduling dashboard to set Mass or Confession times.
+4.  **Monitor Activity:** View audit logs and user activity via the admin dashboard.
 
-- **CI/CD**: GitHub Actions
-- **Staging**: Auto-deploys from `main` branch
-- **Production**: Manual deployment trigger
+## 🤝 Contributing
+
+Thank you for your interest in Find Missa! At this time, the project is **not open to public contributions** as it is currently under active private development. This repository serves as a showcase of technical implementation and architectural patterns.
+
+---
+
+*Developed with ❤️ for the Catholic Community.*
