@@ -1,5 +1,7 @@
 # Find Missa — Liturgical Schedule Management Platform
 
+Built and maintained by [Eugene Owak](https://github.com/geneowak)
+
 Find Missa is a high-performance, full-stack web application designed to centralize and simplify the discovery of **Mass, Confession, and Adoration** schedules. Built with a modern Laravel 12 backend and a Vue 3 + Vuetify 3 Single Page Application (SPA) frontend, it provides a seamless experience for both the public and church administrators.
 
 ## 🌟 Key Features
@@ -21,7 +23,7 @@ Find Missa is a high-performance, full-stack web application designed to central
 
 *   **Backend:** PHP 8.4, Laravel 12 (Service Layers, Action Classes, Eloquent API Resources)
 *   **Frontend:** Vue 3 (Composition API), Vuetify 3, Pinia, Vite
-*   **Database & Cache:** MySQL, Redis (User activity tracking & Caching)
+*   **Database & Cache:** SQLite (Production) / Agnostic (MySQL/PostgreSQL supported), Redis (User activity tracking & Caching)
 *   **Search Engine:** Laravel Scout
 *   **Testing:** PestPHP with Paratest (Parallel execution)
 *   **Monitoring:** PostHog Analytics & PHP Artisan Pail (Log monitoring)
@@ -34,7 +36,7 @@ The project includes a custom-engineered **Blue-Green Deployment** system for ze
 *   **Containerized Architecture:** Multi-stage Docker builds optimized for size and performance, running a supervised process stack (PHP-FPM, Nginx, Queue Workers, and Scheduler).
 *   **Automated Provisioning:** Custom server-initialization scripts that handle automated installation of Docker, Redis, Nginx, and Certbot/SSL on fresh Ubuntu instances.
 *   **Robust DevOps Workflow:** Integrated health checks, automated database migrations, and instant rollback capabilities to maintain platform stability.
-*   **Persistent Storage:** Optimized SQLite with WAL (Write-Ahead Logging) mode for reliability and Redis for high-concurrency caching.
+*   **Persistent Storage:** Optimized SQLite with WAL (Write-Ahead Logging) mode for reliability and zero-downtime slot switching; architected with Eloquent to support seamless migration to MySQL or PostgreSQL.
 
 ## 💡 Motivation
 
@@ -47,7 +49,7 @@ The project demonstrates a professional implementation of multi-tenancy, complex
 ### Prerequisites
 *   PHP 8.4+ & Composer
 *   Node.js & NPM
-*   MySQL & Redis
+*   MySQL, PostgreSQL or SQLite
 
 ### Installation
 
@@ -97,6 +99,6 @@ Thank you for your interest in Find Missa! At this time, the project is **not op
 
 ## ⚖️ License & Copyright
 
-Copyright © 2026 Eugene Owak. All rights reserved.
+Copyright © 2024–2026 Eugene Owak (Watsina). All rights reserved.
 
 This project is **proprietary software**. While the source code is visible for review and portfolio evaluation purposes, it is **not** licensed for use, modification, or redistribution. No part of this repository may be copied or used in other projects without explicit permission.
