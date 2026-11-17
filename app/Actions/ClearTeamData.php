@@ -9,6 +9,7 @@ use App\Models\Diocese;
 use App\Models\SubParish;
 use App\Models\ActivityTime;
 use App\Models\ScheduleRule;
+use App\Models\AdorationChapel;
 use App\Models\OneTimeActivity;
 use App\Models\ActivitySchedule;
 use App\Models\ScheduleOverride;
@@ -16,6 +17,8 @@ use App\Models\LiturgicalSchedule;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityTimeException;
 use Illuminate\Support\Facades\Schema;
+use App\Models\AdorationChapelSchedule;
+use App\Models\AdorationChapelException;
 
 class ClearTeamData
 {
@@ -33,6 +36,12 @@ class ClearTeamData
             // Pivot tables first
             DB::table('liturgical_schedule_times')->truncate();
             DB::table('schedule_day_details')->truncate();
+            DB::table('adoration_chapel_schedule_details')->truncate();
+
+            // Adoration chapel tables (children of churches)
+            AdorationChapelException::truncate();
+            AdorationChapelSchedule::truncate();
+            AdorationChapel::truncate();
 
             // V2 Schedule tables (children of churches)
             ActivitySchedule::truncate();

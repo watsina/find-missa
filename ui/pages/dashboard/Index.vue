@@ -1,8 +1,10 @@
 <script setup>
   import AppLayout from '@/layouts/AppLayout.vue';
   import NavLink from '@/components/NavLink.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
   import ActionLogs from './ActionLogs.vue';
   import ExportDataModal from './ExportDataModal.vue';
+  import ImportDataModal from './ImportDataModal.vue';
   import { ref, onMounted, computed } from 'vue';
   import { http } from '@/plugins';
   import useAuthStore from '@/stores/useAuthStore';
@@ -14,6 +16,7 @@
   const isFetching = ref(false);
   const isDeleting = ref(false);
   const showExportModal = ref(false);
+  const showUploadModal = ref(false);
 
   const stats = ref([]);
 
@@ -48,12 +51,19 @@
       </h2>
     </template>
 
-    <export-data-modal v-if="user.is_admin" v-model:show-modal="showExportModal" />
+    <export-data-modal v-if="user?.is_admin" v-model:show-modal="showExportModal" />
+    <import-data-modal v-if="user?.is_admin" v-model:show-modal="showUploadModal" />
 
     <v-container>
       <v-row class="py-12">
-        <v-col class="tw:flex tw:justify-between" cols="12">
+        <v-col class="tw:flex tw:justify-between tw:items-center" cols="12">
           <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to your dashboard</div>
+          <div v-if="user?.is_admin" class="tw:flex tw:gap-2">
+            <PrimaryButton class="tw:mr-2" @click="showUploadModal = true">
+              Upload Data
+            </PrimaryButton>
+            <PrimaryButton @click="showExportModal = true"> Export Data </PrimaryButton>
+          </div>
         </v-col>
         <template v-if="isFetching">
           <v-col v-for="i in 6" :key="i" cols="12" md="4">

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rules\File;
 
-class ImportActivitesController extends Controller
+class ImportActivitiesController extends Controller
 {
     /**
      * Handle the incoming request.

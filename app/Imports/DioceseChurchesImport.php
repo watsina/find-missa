@@ -19,6 +19,8 @@ class DioceseChurchesImport implements SkipsEmptyRows, ToCollection, WithHeading
 
     public function collection(Collection $rows)
     {
+        $teamId = $this->diocese->team_id ?? session('current_team_id') ?? auth()->user()?->current_team_id;
+
         foreach ($rows as $row) {
             $parishType = 'parish';
             $subParish = null;
@@ -28,22 +30,26 @@ class DioceseChurchesImport implements SkipsEmptyRows, ToCollection, WithHeading
                 [
                     'district' => trim($row['district']),
                     'city' => trim($row['town']),
-                    'contact_email' => trim($row['contact_email']),
-                    'office_address' => trim($row['office_address']),
-                    'website_url' => trim($row['website_url']),
+                    'contact_email' => ! empty($row['contact_email']) ? trim($row['contact_email']) : null,
+                    'office_address' => ! empty($row['office_address']) ? trim($row['office_address']) : null,
+                    'website_url' => ! empty($row['website_url']) ? trim($row['website_url']) : null,
+                    'team_id' => $teamId,
                 ],
             );
 
-            if (isset($row['sub_parish_name'])) {
+            $hasSubParish = ! empty(trim((string) ($row['sub_parish_name'] ?? '')));
+
+            if ($hasSubParish) {
                 $parishType = 'subParish';
                 $subParish = SubParish::firstOrCreate(
                     ['name' => trim($row['sub_parish_name']), 'parish_id' => $parish->id],
                     [
                         'district' => trim($row['district']),
                         'city' => trim($row['town']),
-                        'contact_email' => trim($row['contact_email']),
-                        'office_address' => trim($row['office_address']),
-                        'website_url' => trim($row['website_url']),
+                        'contact_email' => ! empty($row['contact_email']) ? trim($row['contact_email']) : null,
+                        'office_address' => ! empty($row['office_address']) ? trim($row['office_address']) : null,
+                        'website_url' => ! empty($row['website_url']) ? trim($row['website_url']) : null,
+                        'team_id' => $teamId,
                     ],
                 );
             }
@@ -58,19 +64,37 @@ class DioceseChurchesImport implements SkipsEmptyRows, ToCollection, WithHeading
                     'type' => Str::kebab($parishType),
                     'city' => trim($row['town']),
                     'district' => trim($row['district']),
-                    'contact_email' => trim($row['contact_email']),
-                    'contact_phone' => trim($row['church_contact_phone']),
-                    'street_address' => trim($row['office_address']),
-                    'website_url' => trim($row['website_url']),
-                    'latitude' => $row['latitude'],
-                    'longitude' => $row['longitude'],
-                    'street_address' => trim($row['office_address']),
-                    'postal_address' => trim($row['postal_address']),
-                    'google_maps_link' => trim($row['google_maps_link']),
-                    'district' => trim($row['district']),
+                    'contact_email' => ! empty($row['contact_email']) ? trim($row['contact_email']) : null,
+                    'contact_phone' => ! empty($row['church_contact_phone']) ? trim($row['church_contact_phone']) : null,
+                    'street_address' => ! empty($row['office_address']) ? trim($row['office_address']) : null,
+                    'website_url' => ! empty($row['website_url']) ? trim($row['website_url']) : null,
+                    'latitude' => $row['latitude'] ?? null,
+                    'longitude' => $row['longitude'] ?? null,
+                    'postal_address' => ! empty($row['postal_address']) ? trim($row['postal_address']) : null,
+                    'google_maps_link' => ! empty($row['google_maps_link']) ? trim($row['google_maps_link']) : null,
+                    'team_id' => $teamId,
                 ],
             );
         }
+    }
+
+    public function prepareForValidation(array $data, int $index): array
+    {
+        foreach ($data as $key => $val) {
+            if (is_string($val)) {
+                $data[$key] = trim($val);
+            }
+        }
+
+        if (isset($data['postal_address']) && $data['postal_address'] !== '') {
+            $data['postal_address'] = (string) $data['postal_address'];
+        }
+
+        if (isset($data['church_contact_phone']) && $data['church_contact_phone'] !== '') {
+            $data['church_contact_phone'] = (string) $data['church_contact_phone'];
+        }
+
+        return $data;
     }
 
     public function rules(): array
@@ -117,7 +141,7 @@ class DioceseChurchesImport implements SkipsEmptyRows, ToCollection, WithHeading
             'church_contact_phone' => $optional,
             '*.church_contact_phone' => $optional,
 
-            'office_address' => $optional,
+            'city' => $optional,
             '*.city' => $optional,
 
             'postal_address' => $optional,

@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Team;
 use App\Models\Church;
 use App\Models\Parish;
 use App\Models\Diocese;
@@ -13,52 +14,66 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class ParishChurchDataImport implements SkipsEmptyRows, ToCollection, WithHeadingRow, WithValidation
 {
-    /**
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
+    public function __construct(protected ?Team $team = null) {}
+
     public function collection(Collection $rows)
     {
+        $teamId = $this->team?->id ?? session('current_team_id') ?? auth()->user()?->current_team_id;
 
         foreach ($rows as $row) {
-
             $diocese = Diocese::firstOrCreate(
                 [
-                    'name' => $row['diocese_name'],
+                    'name' => trim($row['diocese_name']),
                 ],
                 [
-                    'type' => $row['diocese_type'],
+                    'type' => trim($row['diocese_type']),
+                    'team_id' => $teamId,
                 ],
             );
 
             $parish = Parish::firstOrCreate(
                 [
-                    'name' => $row['parish_name'],
+                    'name' => trim($row['parish_name']),
                     'diocese_id' => $diocese->id,
                 ],
                 [
-                    'city' => $row['parish_town'],
+                    'city' => trim($row['parish_town']),
+                    'team_id' => $teamId,
                 ],
             );
 
             Church::firstOrCreate(
                 [
-                    'name' => $row['church_name'],
+                    'name' => trim($row['church_name']),
                     'parishable_id' => $parish->id,
                     'parishable_type' => 'parish',
                 ],
                 [
-                    'type' => $row['church_type'],
+                    'type' => trim($row['church_type']),
                     'latitude' => $row['latitude'],
                     'longitude' => $row['longitude'],
-                    'city' => $row['city'],
+                    'city' => trim($row['city']),
+                    'team_id' => $teamId,
                 ],
             );
         }
     }
 
+    public function prepareForValidation(array $data, int $index): array
+    {
+        foreach ($data as $key => $val) {
+            if (is_string($val)) {
+                $data[$key] = trim($val);
+            }
+        }
+
+        return $data;
+    }
+
     public function rules(): array
     {
         $required = 'required|string|max:255';
+        $coordinate = 'required|numeric|between:-180.9999999,180.9999999';
 
         return [
             'diocese_name' => $required,
@@ -79,14 +94,14 @@ class ParishChurchDataImport implements SkipsEmptyRows, ToCollection, WithHeadin
             'church_type' => $required,
             '*.church_type' => $required,
 
-            'latitude' => $required,
-            '*.latitude' => $required,
+            'latitude' => $coordinate,
+            '*.latitude' => $coordinate,
 
-            'longitude' => $required,
-            '*.longitude' => $required,
+            'longitude' => $coordinate,
+            '*.longitude' => $coordinate,
 
             'city' => $required,
-            'city' => $required,
+            '*.city' => $required,
         ];
     }
 }
