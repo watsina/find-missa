@@ -59,6 +59,18 @@
               label="Import Type*"
               required
             />
+            <div
+              class="tw:mt-2 tw:text-xs tw:flex tw:items-center tw:justify-between tw:text-gray-500"
+            >
+              <span>Need the expected format?</span>
+              <a
+                class="tw:text-indigo-600 hover:tw:text-indigo-800 tw:font-medium tw:underline"
+                download
+                :href="`/api/v1/import-templates/${form.type}`"
+              >
+                Download {{ form.type === 'masses' ? 'Masses' : 'Parishes' }} Template (.csv)
+              </a>
+            </div>
           </div>
           <div class="tw:mt-4">
             <FileInput

@@ -33,6 +33,7 @@ Route::middleware('auth', 'admin')->group(function () {
 // Authenticated routes that require a team context and use permission-based authorization
 Route::middleware('auth', 'userWithTeam')->group(function () {
     // Data import/export (authorized via Gate checks in controllers)
+    Route::get('import-templates/{type}', Controllers\DownloadImportTemplateController::class)->name('import-templates.download');
     Route::post('import-data', Controllers\ImportDataController::class)->name('import-data');
     Route::post('import-churches/{diocese}', Controllers\ImportDioceseChurchesController::class)->name('import-churches');
     Route::post('import-activities/{diocese}', Controllers\ImportActivitiesController::class)->name('import-activities');

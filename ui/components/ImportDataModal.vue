@@ -1,4 +1,5 @@
 <script setup>
+  import { computed } from 'vue';
   import { useForm } from '@/plugins';
   import { notify } from '@/utils';
   import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -13,6 +14,10 @@
 
   const form = useForm({
     file: null,
+  });
+
+  const templateType = computed(() => {
+    return props.importUrl.includes('import-churches') ? 'churches' : 'activities';
   });
 
   const submit = () => {
@@ -58,6 +63,19 @@
               placeholder="Choose a file..."
               required
             />
+            <div
+              class="tw:mt-2 tw:text-xs tw:flex tw:items-center tw:justify-between tw:text-gray-500"
+            >
+              <span>Need the expected format?</span>
+              <a
+                class="tw:text-indigo-600 hover:tw:text-indigo-800 tw:font-medium tw:underline"
+                download
+                :href="`/api/v1/import-templates/${templateType}`"
+              >
+                Download {{ templateType === 'churches' ? 'Churches' : 'Activities' }} Template
+                (.csv)
+              </a>
+            </div>
             <progress v-if="form.progress" max="100" :value="form.progress.percentage">
               {{ form.progress.percentage }}%
             </progress>
