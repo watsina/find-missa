@@ -31,7 +31,7 @@
 
   const availableDays = computed(() => {
     const pattern = props.schedule?.day_pattern;
-    let days = [];
+    let days;
 
     if (pattern === 'daily') {
       days = [...allDays];
